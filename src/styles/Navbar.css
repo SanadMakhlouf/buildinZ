@@ -1,0 +1,75 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2rem;
+  height: 70px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  direction: rtl;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  direction: ltr;
+}
+
+.brand-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0c4da2;
+}
+
+.brand-marketplace {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #f39c12;
+  margin-left: 5px;
+}
+
+.navbar-menu {
+  display: flex;
+  gap: 2rem;
+}
+
+.navbar-item {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  transition: color 0.3s;
+  font-size: 1rem;
+}
+
+.navbar-item:hover {
+  color: #0c4da2;
+}
+
+.navbar-auth {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.login-btn {
+  text-decoration: none;
+  color: #0c4da2;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.register-btn {
+  text-decoration: none;
+  background-color: #0c4da2;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: background-color 0.3s;
+  font-size: 1rem;
+}
+
+.register-btn:hover {
+  background-color: #083a7d;
+}
