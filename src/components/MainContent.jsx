@@ -7,6 +7,27 @@ const MainContent = ({ selectedService }) => {
   const [calculationResult, setCalculationResult] = useState(null);
   const [selectedTier, setSelectedTier] = useState("silver");
 
+  // Function to calculate total price based on inputs and selected products
+  const calculateTotalPrice = ({
+    inputValue,
+    priceUnit,
+    selectedOptions = [],
+    allProducts = [],
+  }) => {
+    // Step 1: Base price calculation
+    let totalPrice = inputValue * priceUnit;
+
+    // Step 2: Add selected options (products) to the total
+    selectedOptions.forEach((productId) => {
+      const product = allProducts.find((p) => p.id === productId);
+      if (product) {
+        totalPrice += product.price;
+      }
+    });
+
+    return totalPrice;
+  };
+
   // Initialize calculator inputs when service changes
   useEffect(() => {
     if (selectedService) {
@@ -23,6 +44,9 @@ const MainContent = ({ selectedService }) => {
             initialInputs[input.name] = input.options[0];
           } else if (input.type === "boolean") {
             initialInputs[input.name] = false;
+          } else {
+            // Ensure all other input types have a default value
+            initialInputs[input.name] = "";
           }
         });
         setCalculatorInputs(initialInputs);
@@ -56,84 +80,49 @@ const MainContent = ({ selectedService }) => {
         return;
       }
 
-      const formula = generator.pricing_formula;
       const priceUnit = selectedService.price_unit;
 
-      // Validate that all required inputs are present
-      const missingInputs = generator.inputs.filter(
-        (input) => calculatorInputs[input.name] === undefined
-      );
-
-      if (missingInputs.length > 0) {
-        console.error(
-          "Missing required inputs:",
-          missingInputs.map((i) => i.name)
-        );
-        return;
-      }
-
-      // Create a context object with all variables needed for evaluation
-      const context = {
-        ...calculatorInputs,
-        price_unit: priceUnit,
-      };
-
-      // Convert Arabic paint type to English for calculation if needed
-      if (selectedService.id === 1 && calculatorInputs.paint_type) {
-        context.paint_type =
-          calculatorInputs.paint_type === "زيتي" ? "oil" : "water";
-      }
-
-      // Evaluate the formula using the context
-      let evaluationString = formula;
-
-      // Replace formula variables with actual values
-      Object.entries(context).forEach(([key, value]) => {
-        if (value !== undefined) {
-          const replacementValue =
-            typeof value === "string" ? `'${value}'` : value;
-          evaluationString = evaluationString.replace(
-            new RegExp(key, "g"),
-            replacementValue
-          );
+      // Get all product IDs from inputs that end with "_id"
+      const selectedProductIds = [];
+      Object.entries(calculatorInputs).forEach(([key, value]) => {
+        if (key.includes("_id") && typeof value === "number") {
+          selectedProductIds.push(value);
         }
       });
 
-      console.log("Evaluation string:", evaluationString);
-
-      // Create a safe evaluation context
-      const evalContext = {
-        Math: Math,
-      };
-
-      // Evaluate the formula
-      totalPrice = new Function("Math", `return ${evaluationString}`)(Math);
-      console.log("Total price calculated:", totalPrice);
-
-      // Calculate labor and materials costs separately
-      if (selectedService.id === 1) {
-        // Paint service
-        laborCost = calculatorInputs.area * priceUnit;
-        materialsCost = totalPrice - laborCost;
-      } else if (selectedService.id === 2) {
-        // Wallpaper service
-        laborCost =
-          calculatorInputs.wall_length *
-          calculatorInputs.wall_height *
-          priceUnit;
-        materialsCost = totalPrice - laborCost;
-      } else if (selectedService.id === 3) {
-        // Ceiling service
-        const complexity_multiplier =
-          {
-            بسيط: 1.0,
-            متوسط: 1.5,
-            معقد: 2.0,
-          }[calculatorInputs.design_complexity] || 1.0;
-        laborCost =
-          calculatorInputs.room_area * complexity_multiplier * priceUnit;
-        materialsCost = totalPrice - laborCost;
+      // Get primary input value based on service type
+      let primaryInputValue = 0;
+      if (calculatorInputs.area) {
+        primaryInputValue = calculatorInputs.area;
+      } else if (calculatorInputs.room_area) {
+        primaryInputValue = calculatorInputs.room_area;
+      } else if (calculatorInputs.wall_length && calculatorInputs.wall_height) {
+        primaryInputValue =
+          calculatorInputs.wall_length * calculatorInputs.wall_height;
+      } else if (calculatorInputs.doors_count) {
+        primaryInputValue = calculatorInputs.doors_count;
+      } else {
+        // Default to 1 if no primary input is found
+        primaryInputValue = 1;
       }
+
+      // Calculate total price using our new function
+      totalPrice = calculateTotalPrice({
+        inputValue: primaryInputValue,
+        priceUnit: priceUnit,
+        selectedOptions: selectedProductIds,
+        allProducts: buildingzData.products,
+      });
+
+      // Add additional costs based on service type
+      if (selectedService.id === 14 && calculatorInputs.includes_accessories) {
+        // For door installation, add accessories cost if selected
+        totalPrice += calculatorInputs.doors_count * 120;
+      }
+
+      // Calculate labor and materials costs
+      laborCost = primaryInputValue * priceUnit;
+      materialsCost = totalPrice - laborCost;
 
       // Get associated products
       const serviceProducts = buildingzData.products.filter((p) =>
@@ -195,18 +184,20 @@ const MainContent = ({ selectedService }) => {
   const serviceTiers = buildingzData.serviceTiers;
 
   const renderSelectOptions = (input) => {
-    // If the input name ends with 'product_id', it's a product selection
-    if (input.name.endsWith("product_id")) {
-      return input.options.map((productId) => {
-        const product = buildingzData.products.find((p) => p.id === productId);
+    // Si l'option est un ID de produit (qu'il se termine par 'product_id' ou '_id')
+    if (input.name.includes("_id")) {
+      return input.options.map((optionId) => {
+        const product = buildingzData.products.find((p) => p.id === optionId);
         return (
-          <option key={productId} value={productId}>
-            {product ? product.name : `Product ${productId}`}
+          <option key={optionId} value={optionId}>
+            {product
+              ? `${product.name} - ${product.price} ${product.currency}`
+              : `Option ${optionId}`}
           </option>
         );
       });
     }
-    // For non-product selections (like patterns, conditions, etc.)
+    // Pour les autres types d'options (comme patterns, conditions, etc.)
     return input.options.map((option) => (
       <option key={option} value={option}>
         {option}
@@ -228,7 +219,7 @@ const MainContent = ({ selectedService }) => {
                   <div className="number-input">
                     <input
                       type="number"
-                      value={calculatorInputs[input.name]}
+                      value={calculatorInputs[input.name] || 0}
                       onChange={(e) =>
                         handleInputChange(
                           input.name,
@@ -242,11 +233,11 @@ const MainContent = ({ selectedService }) => {
                 )}
                 {input.type === "select" && (
                   <select
-                    value={calculatorInputs[input.name]}
+                    value={calculatorInputs[input.name] || input.options[0]}
                     onChange={(e) =>
                       handleInputChange(
                         input.name,
-                        input.name.endsWith("product_id")
+                        input.name.includes("_id")
                           ? parseInt(e.target.value)
                           : e.target.value
                       )
@@ -259,7 +250,7 @@ const MainContent = ({ selectedService }) => {
                   <label className="checkbox-label">
                     <input
                       type="checkbox"
-                      checked={calculatorInputs[input.name]}
+                      checked={!!calculatorInputs[input.name]}
                       onChange={(e) =>
                         handleInputChange(input.name, e.target.checked)
                       }
@@ -303,27 +294,40 @@ const MainContent = ({ selectedService }) => {
           {calculationResult ? (
             <div className="result-card">
               <div className="result-details">
-                <div className="detail-item">
-                  <span className="detail-label">Total Area:</span>
-                  <span className="detail-value">
-                    {calculatorInputs.area ||
-                      calculatorInputs.room_area ||
-                      (calculatorInputs.wall_length &&
-                      calculatorInputs.wall_height
-                        ? calculatorInputs.wall_length *
-                          calculatorInputs.wall_height
-                        : 0)}{" "}
-                    m²
-                  </span>
-                </div>
-                <div className="detail-item">
-                  <span className="detail-label">Paint Type:</span>
-                  <span className="detail-value">
-                    {calculatorInputs.paint_type === "زيتي"
-                      ? "Premium Paint"
-                      : "Standard Paint"}
-                  </span>
-                </div>
+                {/* Afficher dynamiquement les détails en fonction du service */}
+                {Object.entries(calculatorInputs).map(([key, value]) => {
+                  // Trouver l'input correspondant dans le générateur actuel
+                  const input = currentGenerator.inputs.find(
+                    (input) => input.name === key
+                  );
+                  if (!input) return null;
+
+                  // Formater la valeur en fonction du type d'input
+                  let displayValue = value;
+                  if (
+                    input.type === "select" &&
+                    input.name.endsWith("product_id")
+                  ) {
+                    const product = buildingzData.products.find(
+                      (p) => p.id === value
+                    );
+                    displayValue = product
+                      ? `${product.name} - ${product.price} ${product.currency}`
+                      : value;
+                  } else if (input.type === "boolean") {
+                    displayValue = value ? "نعم" : "لا";
+                  } else if (input.unit) {
+                    displayValue = `${value} ${input.unit}`;
+                  }
+
+                  return (
+                    <div key={key} className="detail-item">
+                      <span className="detail-label">{input.label}:</span>
+                      <span className="detail-value">{displayValue}</span>
+                    </div>
+                  );
+                })}
+
                 <div className="detail-item">
                   <span className="detail-label">Service Tier:</span>
                   <span className="detail-value">
@@ -332,21 +336,20 @@ const MainContent = ({ selectedService }) => {
                     )?.name || "Standard"}
                   </span>
                 </div>
-                <div className="detail-item">
-                  <span className="detail-label">Number of Coats:</span>
-                  <span className="detail-value">2</span>
-                </div>
+
                 <hr />
                 <div className="detail-item">
                   <span className="detail-label">Material Cost:</span>
                   <span className="detail-value">
-                    AED {calculationResult.materialsCost.toFixed(0)}
+                    {calculationResult.currency}{" "}
+                    {calculationResult.materialsCost.toFixed(2)}
                   </span>
                 </div>
                 <div className="detail-item">
                   <span className="detail-label">Labor Cost:</span>
                   <span className="detail-value">
-                    AED {calculationResult.laborCost.toFixed(0)}
+                    {calculationResult.currency}{" "}
+                    {calculationResult.laborCost.toFixed(2)}
                   </span>
                 </div>
                 <hr />
@@ -356,7 +359,8 @@ const MainContent = ({ selectedService }) => {
                 >
                   <span className="detail-label">Total Cost:</span>
                   <span className="detail-value">
-                    AED {calculationResult.totalPrice.toFixed(0)}
+                    {calculationResult.currency}{" "}
+                    {calculationResult.totalPrice.toFixed(2)}
                   </span>
                 </div>
                 <button className="booking-btn">Continue to Booking</button>

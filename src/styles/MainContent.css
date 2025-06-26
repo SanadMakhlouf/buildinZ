@@ -1,9 +1,8 @@
 .main-content {
   flex-grow: 1;
-  padding: 2rem;
   background-color: #ffffff;
-  height: calc(100vh - 70px);
-  overflow-y: auto;
+  height: 100vh;
+  overflow: hidden;
   direction: rtl;
 }
 
@@ -154,26 +153,30 @@
 /* Layout for calculator and result sections */
 .calculator-result-container {
   display: flex;
+  flex-direction: row;
   gap: 2rem;
-  margin-bottom: 2rem;
+  margin: 2rem;
+  height: calc(100vh - 120px);
 }
 
 .calculator-section {
+  flex: 1;
   background-color: #f8f9fa;
   border-radius: 8px;
   padding: 2rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  flex: 1;
-  max-width: 48%;
+  overflow-y: auto;
+  max-height: 100%;
 }
 
 .result-section {
+  flex: 1;
   background-color: #fff;
   border-radius: 8px;
   padding: 2rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  flex: 1;
-  max-width: 48%;
+  overflow-y: auto;
+  max-height: 100%;
 }
 
 .calculator-section h2,
@@ -186,6 +189,7 @@
 .calculator-form {
   display: grid;
   gap: 1.5rem;
+  padding-bottom: 1rem;
 }
 
 /* Project Details and Cost Estimate headers */
@@ -368,6 +372,8 @@
   background-color: #f8f9fa;
   border-radius: 8px;
   padding: 1.5rem;
+  height: auto;
+  overflow-y: auto;
 }
 
 .result-header {
@@ -406,10 +412,10 @@
 }
 
 .detail-item {
+  margin-bottom: 1rem;
   display: flex;
   justify-content: space-between;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #eee;
+  align-items: center;
 }
 
 .detail-item:last-child {
