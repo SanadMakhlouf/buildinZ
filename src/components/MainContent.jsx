@@ -119,7 +119,24 @@ const MainContent = ({ selectedService }) => {
         price_unit: priceUnit
       };
       
-      console.log("Input Variables:", variables);
+      // Add product prices to variables for dynamic access in formulas
+      const allProducts = dataService.getProducts();
+      
+      // For each input that references a product ID, add its price as a variable
+      currentGenerator.inputs.forEach(input => {
+        if (input.type === 'select' && input.option_type === 'product' && inputs[input.name]) {
+          const productId = inputs[input.name];
+          const product = allProducts.find(p => p.id === productId);
+          if (product) {
+            // Add product price with variable name pattern: {input_name}_price
+            variables[`${input.name}_price`] = product.price;
+            // Add product coverage with variable name pattern: {input_name}_coverage
+            variables[`${input.name}_coverage`] = product.coverage || 1;
+          }
+        }
+      });
+      
+      console.log("Input Variables with Product Prices:", variables);
       
       // Log each variable evaluation separately for debugging
       console.log("Individual Variable Values:");

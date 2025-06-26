@@ -210,6 +210,105 @@ const GeneratorsManager = ({
     setOpenFormulaDialog(true);
   };
 
+  // Helper function to insert variable into formula
+  const insertVariableIntoFormula = (variable) => {
+    if (currentFormulaType === 'derived') {
+      const textarea = document.getElementById('derived-formula-input');
+      if (textarea) {
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const formula = derivedInputForm.formula;
+        const newFormula = formula.substring(0, start) + variable + formula.substring(end);
+        setDerivedInputForm({...derivedInputForm, formula: newFormula});
+        // Set cursor position after the inserted variable
+        setTimeout(() => {
+          textarea.focus();
+          textarea.setSelectionRange(start + variable.length, start + variable.length);
+        }, 50);
+      } else {
+        setDerivedInputForm({...derivedInputForm, formula: derivedInputForm.formula + ' ' + variable});
+      }
+    } else {
+      const textarea = document.getElementById('formula-input');
+      if (textarea) {
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const formula = formulaForm.formula;
+        const newFormula = formula.substring(0, start) + variable + formula.substring(end);
+        setFormulaForm({...formulaForm, formula: newFormula});
+        // Set cursor position after the inserted variable
+        setTimeout(() => {
+          textarea.focus();
+          textarea.setSelectionRange(start + variable.length, start + variable.length);
+        }, 50);
+      } else {
+        setFormulaForm({...formulaForm, formula: formulaForm.formula + ' ' + variable});
+      }
+    }
+  };
+
+  // Helper function to insert math function into formula
+  const insertMathFunction = (func) => {
+    const funcText = {
+      'ceil': 'Math.ceil()',
+      'floor': 'Math.floor()',
+      'round': 'Math.round()',
+      'max': 'Math.max()',
+      'min': 'Math.min()',
+      'conditional': '? : ',
+      'multiply': ' * ',
+      'divide': ' / ',
+      'add': ' + ',
+      'subtract': ' - '
+    }[func];
+
+    if (currentFormulaType === 'derived') {
+      const textarea = document.getElementById('derived-formula-input');
+      if (textarea) {
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const formula = derivedInputForm.formula;
+        const newFormula = formula.substring(0, start) + funcText + formula.substring(end);
+        setDerivedInputForm({...derivedInputForm, formula: newFormula});
+        // Set cursor position inside the function parentheses
+        setTimeout(() => {
+          textarea.focus();
+          if (func === 'conditional') {
+            textarea.setSelectionRange(start, start);
+          } else if (['multiply', 'divide', 'add', 'subtract'].includes(func)) {
+            textarea.setSelectionRange(start + funcText.length, start + funcText.length);
+          } else {
+            textarea.setSelectionRange(start + funcText.length - 1, start + funcText.length - 1);
+          }
+        }, 50);
+      } else {
+        setDerivedInputForm({...derivedInputForm, formula: derivedInputForm.formula + ' ' + funcText});
+      }
+    } else {
+      const textarea = document.getElementById('formula-input');
+      if (textarea) {
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const formula = formulaForm.formula;
+        const newFormula = formula.substring(0, start) + funcText + formula.substring(end);
+        setFormulaForm({...formulaForm, formula: newFormula});
+        // Set cursor position inside the function parentheses
+        setTimeout(() => {
+          textarea.focus();
+          if (func === 'conditional') {
+            textarea.setSelectionRange(start, start);
+          } else if (['multiply', 'divide', 'add', 'subtract'].includes(func)) {
+            textarea.setSelectionRange(start + funcText.length, start + funcText.length);
+          } else {
+            textarea.setSelectionRange(start + funcText.length - 1, start + funcText.length - 1);
+          }
+        }, 50);
+      } else {
+        setFormulaForm({...formulaForm, formula: formulaForm.formula + ' ' + funcText});
+      }
+    }
+  };
+
   const handleCloseFormulaDialog = () => {
     setOpenFormulaDialog(false);
   };
@@ -783,16 +882,43 @@ const GeneratorsManager = ({
                 </Select>
               </FormControl>
               
-              <TextField
-                margin="dense"
-                label="Formula"
-                fullWidth
-                multiline
-                rows={3}
-                value={derivedInputForm.formula}
-                onChange={(e) => setDerivedInputForm({...derivedInputForm, formula: e.target.value})}
-                helperText="JavaScript formula to calculate this derived input"
-              />
+              <div className="formula-builder">
+                <h4>Formula Builder</h4>
+                <div className="formula-tools">
+                  <div className="formula-section">
+                    <h5>Math Functions</h5>
+                    <div className="function-buttons">
+                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('ceil')}>Ceiling</Button>
+                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('floor')}>Floor</Button>
+                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('round')}>Round</Button>
+                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('max')}>Max</Button>
+                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('min')}>Min</Button>
+                    </div>
+                  </div>
+                  <div className="formula-section">
+                    <h5>Operators</h5>
+                    <div className="operator-buttons">
+                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('multiply')}>×</Button>
+                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('divide')}>÷</Button>
+                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('add')}>+</Button>
+                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('subtract')}>−</Button>
+                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('conditional')}>? :</Button>
+                    </div>
+                  </div>
+                </div>
+                
+                <TextField
+                  id="derived-formula-input"
+                  margin="dense"
+                  label="Formula"
+                  fullWidth
+                  multiline
+                  rows={3}
+                  value={derivedInputForm.formula}
+                  onChange={(e) => setDerivedInputForm({...derivedInputForm, formula: e.target.value})}
+                  helperText="JavaScript formula to calculate this derived input"
+                />
+              </div>
               
               <TextField
                 margin="dense"
@@ -805,17 +931,44 @@ const GeneratorsManager = ({
             </>
           ) : (
             <>
-              <TextField
-                autoFocus
-                margin="dense"
-                label="Formula"
-                fullWidth
-                multiline
-                rows={5}
-                value={formulaForm.formula}
-                onChange={(e) => setFormulaForm({...formulaForm, formula: e.target.value})}
-                helperText="JavaScript formula to calculate the price"
-              />
+              <div className="formula-builder">
+                <h4>Formula Builder</h4>
+                <div className="formula-tools">
+                  <div className="formula-section">
+                    <h5>Math Functions</h5>
+                    <div className="function-buttons">
+                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('ceil')}>Ceiling</Button>
+                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('floor')}>Floor</Button>
+                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('round')}>Round</Button>
+                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('max')}>Max</Button>
+                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('min')}>Min</Button>
+                    </div>
+                  </div>
+                  <div className="formula-section">
+                    <h5>Operators</h5>
+                    <div className="operator-buttons">
+                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('multiply')}>×</Button>
+                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('divide')}>÷</Button>
+                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('add')}>+</Button>
+                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('subtract')}>−</Button>
+                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('conditional')}>? :</Button>
+                    </div>
+                  </div>
+                </div>
+                
+                <TextField
+                  id="formula-input"
+                  autoFocus
+                  margin="dense"
+                  label="Formula"
+                  fullWidth
+                  multiline
+                  rows={5}
+                  value={formulaForm.formula}
+                  onChange={(e) => setFormulaForm({...formulaForm, formula: e.target.value})}
+                  helperText="JavaScript formula to calculate the price"
+                />
+              </div>
               
               <TextField
                 margin="dense"
@@ -837,6 +990,7 @@ const GeneratorsManager = ({
                   label={input.name}
                   variant="outlined"
                   size="small"
+                  onClick={() => insertVariableIntoFormula(input.name)}
                   sx={{ m: 0.5 }}
                 />
               ))}
@@ -845,9 +999,47 @@ const GeneratorsManager = ({
                 variant="outlined"
                 size="small"
                 color="primary"
+                onClick={() => insertVariableIntoFormula('price_unit')}
                 sx={{ m: 0.5 }}
               />
+              {generatorForm.inputs.filter(input => input.type === 'select' && input.option_type === 'product').map(input => (
+                <React.Fragment key={`${input.id}-price`}>
+                  <Chip
+                    label={`${input.name}_price`}
+                    variant="outlined"
+                    size="small"
+                    color="secondary"
+                    onClick={() => insertVariableIntoFormula(`${input.name}_price`)}
+                    sx={{ m: 0.5 }}
+                  />
+                  <Chip
+                    label={`${input.name}_coverage`}
+                    variant="outlined"
+                    size="small"
+                    color="secondary"
+                    onClick={() => insertVariableIntoFormula(`${input.name}_coverage`)}
+                    sx={{ m: 0.5 }}
+                  />
+                </React.Fragment>
+              ))}
             </div>
+            
+            <h4>Formula Examples:</h4>
+            <div className="formula-examples">
+              <div className="example">
+                <h5>Basic Area Calculation:</h5>
+                <pre>area * price_unit</pre>
+              </div>
+              <div className="example">
+                <h5>Product Price Calculation:</h5>
+                <pre>Math.ceil(area / paint_product_id_coverage) * paint_product_id_price</pre>
+              </div>
+              <div className="example">
+                <h5>Conditional Calculation:</h5>
+                <pre>wall_condition_id === 15 ? area * 15 : area * 30</pre>
+              </div>
+            </div>
+            
             <p>You can use JavaScript math functions like Math.ceil(), Math.floor(), etc.</p>
           </div>
         </DialogContent>
