@@ -1,18 +1,25 @@
 import React, { useState } from "react";
 import "../styles/Sidebar.css";
-import buildingzData from "../data/json/buildingzData.json";
+import dataService from "../services/dataService";
 
-const Sidebar = ({ onServiceSelect }) => {
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [selectedSubcategory, setSelectedSubcategory] = useState(null);
+const Sidebar = ({ categories, onServiceSelect }) => {
+  const [expandedCategory, setExpandedCategory] = useState(null);
+  const [expandedSubcategory, setExpandedSubcategory] = useState(null);
 
-  const handleCategoryClick = (category) => {
-    setSelectedCategory(category);
-    setSelectedSubcategory(null);
+  const toggleCategory = (categoryId) => {
+    if (expandedCategory === categoryId) {
+      setExpandedCategory(null);
+      setExpandedSubcategory(null);
+    } else {
+      setExpandedCategory(categoryId);
+      setExpandedSubcategory(null);
+    }
   };
 
-  const handleSubcategoryClick = (subcategory) => {
-    setSelectedSubcategory(subcategory);
+  const toggleSubcategory = (subcategoryId) => {
+    setExpandedSubcategory(
+      expandedSubcategory === subcategoryId ? null : subcategoryId
+    );
   };
 
   const handleServiceClick = (service) => {
@@ -21,54 +28,53 @@ const Sidebar = ({ onServiceSelect }) => {
 
   return (
     <div className="sidebar">
-      <div className="categories-section">
-        <h2>الخدمات</h2>
-        <div className="categories-list">
-          {buildingzData.categories.map((category) => (
-            <div key={category.id} className="category-item">
-              <div
-                className={`category-header ${
-                  selectedCategory?.id === category.id ? "active" : ""
-                }`}
-                onClick={() => handleCategoryClick(category)}
-              >
-                <span className="category-icon">{category.icon}</span>
-                <span className="category-name">{category.name}</span>
-              </div>
-              {selectedCategory?.id === category.id && (
-                <div className="subcategories-list">
-                  {category.subcategories.map((subcategory) => (
-                    <div key={subcategory.id} className="subcategory-item">
-                      <div
-                        className={`subcategory-header ${
-                          selectedSubcategory?.id === subcategory.id
-                            ? "active"
-                            : ""
-                        }`}
-                        onClick={() => handleSubcategoryClick(subcategory)}
-                      >
-                        {subcategory.name}
-                      </div>
-                      {selectedSubcategory?.id === subcategory.id && (
-                        <div className="services-list">
-                          {subcategory.services.map((service) => (
-                            <div
-                              key={service.id}
-                              className="service-item"
-                              onClick={() => handleServiceClick(service)}
-                            >
-                              {service.name}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
+      <h2>الخدمات</h2>
+      <div className="categories-list">
+        {categories.map((category) => (
+          <div key={category.id} className="category">
+            <div
+              className={`category-header ${
+                expandedCategory === category.id ? "expanded" : ""
+              }`}
+              onClick={() => toggleCategory(category.id)}
+            >
+              <span className="category-icon">{category.icon}</span>
+              <span className="category-name">{category.name}</span>
             </div>
-          ))}
-        </div>
+            {expandedCategory === category.id && (
+              <div className="subcategories-list">
+                {category.subcategories.map((subcategory) => (
+                  <div key={subcategory.id} className="subcategory">
+                    <div
+                      className={`subcategory-header ${
+                        expandedSubcategory === subcategory.id ? "expanded" : ""
+                      }`}
+                      onClick={() => toggleSubcategory(subcategory.id)}
+                    >
+                      <span className="subcategory-name">{subcategory.name}</span>
+                    </div>
+                    {expandedSubcategory === subcategory.id && (
+                      <div className="services-list">
+                        {subcategory.services.map((service) => (
+                          <div
+                            key={service.id}
+                            className="service-item"
+                            onClick={() => handleServiceClick(service)}
+                          >
+                            {service.name}
+                          </div>
+                        ))}
+                        {subcategory.services.length === 0 && (
+                          <div className="no-services">لا توجد خدمات متاحة</div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );

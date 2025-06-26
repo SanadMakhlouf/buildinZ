@@ -1,59 +1,70 @@
 import React, { useState, useEffect } from "react";
 import "../styles/MainContent.css";
-import buildingzData from "../data/json/buildingzData.json";
+import dataService from "../services/dataService";
+import { evaluateFormula } from "../utils/formulaUtils";
 
 const MainContent = ({ selectedService }) => {
   const [calculatorInputs, setCalculatorInputs] = useState({});
   const [calculationResult, setCalculationResult] = useState(null);
-  const [selectedTier, setSelectedTier] = useState("silver");
-
-  // Function to calculate total price based on inputs and selected products
-  const calculateTotalPrice = ({
-    inputValue,
-    priceUnit,
-    selectedOptions = [],
-    allProducts = [],
-  }) => {
-    // Step 1: Base price calculation
-    let totalPrice = inputValue * priceUnit;
-
-    // Step 2: Add selected options (products) to the total
-    selectedOptions.forEach((productId) => {
-      const product = allProducts.find((p) => p.id === productId);
-      if (product) {
-        totalPrice += product.price;
-      }
-    });
-
-    return totalPrice;
-  };
+  const [autoCalculate, setAutoCalculate] = useState(true);
+  const [currentGenerator, setCurrentGenerator] = useState(null);
+  const [derivedInputs, setDerivedInputs] = useState({});
 
   // Initialize calculator inputs when service changes
   useEffect(() => {
     if (selectedService) {
-      const generator = buildingzData.type_de_generator.find(
-        (g) => g.id === selectedService.foreign_key_generator
-      );
+      const generator = dataService.getGeneratorById(selectedService.foreign_key_generator);
+      
       if (generator) {
-        // Initialize inputs with default values based on type
+        setCurrentGenerator(generator);
+        
+        // Initialize inputs with default values from the generator
         const initialInputs = {};
         generator.inputs.forEach((input) => {
-          if (input.type === "number") {
-            initialInputs[input.name] = 0;
-          } else if (input.type === "select" && input.options.length > 0) {
-            initialInputs[input.name] = input.options[0];
-          } else if (input.type === "boolean") {
-            initialInputs[input.name] = false;
+          // Use the default value from the JSON if available
+          if (input.hasOwnProperty('default')) {
+            initialInputs[input.name] = input.default;
           } else {
-            // Ensure all other input types have a default value
-            initialInputs[input.name] = "";
+            // Fallback to type-based defaults if no default is specified
+            if (input.type === "number") {
+              initialInputs[input.name] = 0;
+            } else if (input.type === "select" && input.options.length > 0) {
+              initialInputs[input.name] = input.options[0];
+            } else if (input.type === "boolean") {
+              initialInputs[input.name] = false;
+            } else {
+              initialInputs[input.name] = "";
+            }
           }
         });
+        
         setCalculatorInputs(initialInputs);
-        setCalculationResult(null); // Reset result when service changes
+        
+        // If auto-calculate is enabled, calculate with initial values
+        if (autoCalculate) {
+          setTimeout(() => calculatePrice(initialInputs), 0);
+        } else {
+          setCalculationResult(null); // Reset result when service changes
+        }
       }
+    } else {
+      setCurrentGenerator(null);
     }
-  }, [selectedService]);
+  }, [selectedService, autoCalculate]);
+
+  // Auto-recalculate when inputs change
+  useEffect(() => {
+    if (autoCalculate && selectedService && Object.keys(calculatorInputs).length > 0) {
+      calculatePrice(calculatorInputs);
+    }
+  }, [calculatorInputs, autoCalculate]);
+
+  // Calculate derived inputs whenever regular inputs change
+  useEffect(() => {
+    if (currentGenerator && Object.keys(calculatorInputs).length > 0) {
+      calculateDerivedInputs();
+    }
+  }, [calculatorInputs, currentGenerator]);
 
   const handleInputChange = (name, value) => {
     setCalculatorInputs((prev) => ({
@@ -62,96 +73,133 @@ const MainContent = ({ selectedService }) => {
     }));
   };
 
-  const calculatePrice = () => {
-    if (!selectedService) return;
+  const calculateDerivedInputs = () => {
+    if (!currentGenerator || !currentGenerator.formulas.derived_inputs) return;
+
+    const variables = {
+      ...calculatorInputs,
+      price_unit: selectedService.price_unit
+    };
+
+    const newDerivedInputs = {};
+    currentGenerator.formulas.derived_inputs.forEach(derivedInput => {
+      try {
+        newDerivedInputs[derivedInput.name] = evaluateFormula(derivedInput.formula, variables);
+      } catch (error) {
+        console.error(`Error calculating derived input ${derivedInput.name}:`, error);
+        newDerivedInputs[derivedInput.name] = 0;
+      }
+    });
+
+    setDerivedInputs(newDerivedInputs);
+  };
+
+  const calculatePrice = (inputs = calculatorInputs) => {
+    if (!selectedService || !currentGenerator) return;
 
     try {
-      let totalPrice = 0;
-      let laborCost = 0;
-      let materialsCost = 0;
-
-      // Find the generator for this service
-      const generator = buildingzData.type_de_generator.find(
-        (g) => g.id === selectedService.foreign_key_generator
-      );
-
-      if (!generator) {
-        console.error("Generator not found for service:", selectedService);
-        return;
-      }
-
+      console.log("========== CALCULATION DEBUG ==========");
+      console.log("Selected Service:", selectedService);
+      console.log("Current Generator:", currentGenerator);
+      
+      // Get the pricing formulas and price unit
+      const priceFormula = currentGenerator.formulas.pricing.formula;
+      const laborFormula = currentGenerator.formulas.labor.formula;
+      const materialsFormula = currentGenerator.formulas.materials.formula;
       const priceUnit = selectedService.price_unit;
+      
+      console.log("Price Formula:", priceFormula);
+      console.log("Labor Formula:", laborFormula);
+      console.log("Materials Formula:", materialsFormula);
+      console.log("Price Unit:", priceUnit);
 
-      // Get all product IDs from inputs that end with "_id"
-      const selectedProductIds = [];
-      Object.entries(calculatorInputs).forEach(([key, value]) => {
-        if (key.includes("_id") && typeof value === "number") {
-          selectedProductIds.push(value);
-        }
+      // Create variables object with all inputs and price_unit
+      const variables = {
+        ...inputs,
+        price_unit: priceUnit
+      };
+      
+      console.log("Input Variables:", variables);
+      
+      // Log each variable evaluation separately for debugging
+      console.log("Individual Variable Values:");
+      Object.entries(variables).forEach(([key, value]) => {
+        console.log(`  ${key}: ${value} (${typeof value})`);
       });
-
-      // Get primary input value based on service type
-      let primaryInputValue = 0;
-      if (calculatorInputs.area) {
-        primaryInputValue = calculatorInputs.area;
-      } else if (calculatorInputs.room_area) {
-        primaryInputValue = calculatorInputs.room_area;
-      } else if (calculatorInputs.wall_length && calculatorInputs.wall_height) {
-        primaryInputValue =
-          calculatorInputs.wall_length * calculatorInputs.wall_height;
-      } else if (calculatorInputs.doors_count) {
-        primaryInputValue = calculatorInputs.doors_count;
-      } else {
-        // Default to 1 if no primary input is found
-        primaryInputValue = 1;
-      }
-
-      // Calculate total price using our new function
-      totalPrice = calculateTotalPrice({
-        inputValue: primaryInputValue,
-        priceUnit: priceUnit,
-        selectedOptions: selectedProductIds,
-        allProducts: buildingzData.products,
-      });
-
-      // Add additional costs based on service type
-      if (selectedService.id === 14 && calculatorInputs.includes_accessories) {
-        // For door installation, add accessories cost if selected
-        totalPrice += calculatorInputs.doors_count * 120;
-      }
-
-      // Calculate labor and materials costs
-      laborCost = primaryInputValue * priceUnit;
-      materialsCost = totalPrice - laborCost;
-
+      
+      // Calculate prices using the formulas
+      console.log("Evaluating Price Formula...");
+      const totalPrice = evaluateFormula(priceFormula, variables);
+      console.log("Total Price Result:", totalPrice);
+      
+      console.log("Evaluating Labor Formula...");
+      const laborCost = laborFormula ? evaluateFormula(laborFormula, variables) : totalPrice * 0.6;
+      console.log("Labor Cost Result:", laborCost);
+      
+      console.log("Evaluating Materials Formula...");
+      const materialsCost = materialsFormula ? evaluateFormula(materialsFormula, variables) : totalPrice * 0.4;
+      console.log("Materials Cost Result:", materialsCost);
+      
       // Get associated products
-      const serviceProducts = buildingzData.products.filter((p) =>
+      const serviceProducts = dataService.getProducts().filter((p) =>
         selectedService.product_ids.includes(p.id)
       );
-
-      // Find the selected tier
-      const tierData = buildingzData.serviceTiers.find(
-        (tier) => tier.id === selectedTier
-      );
-
-      // Apply tier pricing
-      const tierMultiplier = tierData ? tierData.multiplier : 1.0;
-      totalPrice = totalPrice * tierMultiplier;
-      laborCost = laborCost * tierMultiplier;
-      materialsCost = materialsCost * tierMultiplier;
+      
+      console.log("Associated Products:", serviceProducts);
+      console.log("Final Results:");
+      console.log("  Total Price:", totalPrice);
+      console.log("  Labor Cost:", laborCost);
+      console.log("  Materials Cost:", materialsCost);
+      console.log("  Total Sum Check:", laborCost + materialsCost);
+      console.log("  Difference from Total:", totalPrice - (laborCost + materialsCost));
+      console.log("======================================");
 
       setCalculationResult({
-        totalPrice,
-        laborCost,
-        materialsCost,
+        totalPrice: totalPrice,
+        laborCost: laborCost,
+        materialsCost: materialsCost,
         currency: selectedService.currency,
-        inputs: { ...calculatorInputs },
-        products: serviceProducts,
-        tier: selectedTier,
+        inputs: { ...inputs },
+        products: serviceProducts
       });
     } catch (error) {
       console.error("Error calculating price:", error);
+      console.log("Error details:", error.message);
+      console.log("Error stack:", error.stack);
     }
+  };
+
+  const renderSelectOptions = (input) => {
+    // For product IDs
+    if (input.name.includes("product_id")) {
+      return input.options.map((optionId) => {
+        const product = dataService.getProductById(optionId);
+        return (
+          <option key={optionId} value={optionId}>
+            {product
+              ? `${product.name} - ${product.price} ${product.currency}`
+              : `Option ${optionId}`}
+          </option>
+        );
+      });
+    }
+    // For condition IDs
+    else if (input.name.includes("condition_id")) {
+      return input.options.map((optionId) => {
+        const condition = dataService.getConditionById(optionId);
+        return (
+          <option key={optionId} value={optionId}>
+            {condition ? condition.name : `Condition ${optionId}`}
+          </option>
+        );
+      });
+    }
+    // For other types of options (like patterns, etc.)
+    return input.options.map((option) => (
+      <option key={option} value={option}>
+        {option}
+      </option>
+    ));
   };
 
   if (!selectedService) {
@@ -165,10 +213,6 @@ const MainContent = ({ selectedService }) => {
     );
   }
 
-  const currentGenerator = buildingzData.type_de_generator.find(
-    (g) => g.id === selectedService.foreign_key_generator
-  );
-
   if (!currentGenerator) {
     return (
       <div className="main-content">
@@ -180,31 +224,6 @@ const MainContent = ({ selectedService }) => {
     );
   }
 
-  // Get service tiers from JSON data
-  const serviceTiers = buildingzData.serviceTiers;
-
-  const renderSelectOptions = (input) => {
-    // Si l'option est un ID de produit (qu'il se termine par 'product_id' ou '_id')
-    if (input.name.includes("_id")) {
-      return input.options.map((optionId) => {
-        const product = buildingzData.products.find((p) => p.id === optionId);
-        return (
-          <option key={optionId} value={optionId}>
-            {product
-              ? `${product.name} - ${product.price} ${product.currency}`
-              : `Option ${optionId}`}
-          </option>
-        );
-      });
-    }
-    // Pour les autres types d'options (comme patterns, conditions, etc.)
-    return input.options.map((option) => (
-      <option key={option} value={option}>
-        {option}
-      </option>
-    ));
-  };
-
   return (
     <div className="main-content">
       <div className="calculator-result-container">
@@ -213,7 +232,7 @@ const MainContent = ({ selectedService }) => {
           <h2 className="section-header">Project Details</h2>
           <div className="calculator-form">
             {currentGenerator.inputs.map((input) => (
-              <div key={input.name} className="input-group">
+              <div key={input.id} className="input-group">
                 <label>{input.label}</label>
                 {input.type === "number" && (
                   <div className="number-input">
@@ -261,30 +280,40 @@ const MainContent = ({ selectedService }) => {
               </div>
             ))}
 
-            {/* Service Tier Selection */}
-            <div className="input-group">
-              <label>Service Tier</label>
-              <div className="service-tier-options">
-                {serviceTiers.map((tier) => (
-                  <div
-                    key={tier.id}
-                    className={`tier-option ${
-                      selectedTier === tier.id ? "selected" : ""
-                    }`}
-                    onClick={() => setSelectedTier(tier.id)}
-                  >
-                    <div className="tier-name">{tier.name}</div>
-                    <div className="tier-price">
-                      {tier.currency} {tier.pricePerMeter}/m²
+            {/* Derived Inputs Display */}
+            {currentGenerator.formulas.derived_inputs && 
+             currentGenerator.formulas.derived_inputs.length > 0 && (
+              <div className="derived-inputs">
+                <h3>Calculated Values</h3>
+                {currentGenerator.formulas.derived_inputs.map((input) => (
+                  <div key={input.name} className="input-group">
+                    <label>{input.label}</label>
+                    <div className="derived-value">
+                      {derivedInputs[input.name] !== undefined 
+                        ? `${derivedInputs[input.name]} ${input.unit || ''}`
+                        : 'Calculating...'}
                     </div>
                   </div>
                 ))}
               </div>
+            )}
+
+            <div className="input-group">
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={autoCalculate}
+                  onChange={(e) => setAutoCalculate(e.target.checked)}
+                />
+                Auto-calculate
+              </label>
             </div>
 
-            <button className="calculate-btn" onClick={calculatePrice}>
-              Calculate
-            </button>
+            {!autoCalculate && (
+              <button className="calculate-btn" onClick={() => calculatePrice()}>
+                Calculate
+              </button>
+            )}
           </div>
         </div>
 
@@ -294,23 +323,21 @@ const MainContent = ({ selectedService }) => {
           {calculationResult ? (
             <div className="result-card">
               <div className="result-details">
-                {/* Afficher dynamiquement les détails en fonction du service */}
+                {/* Display input values */}
                 {Object.entries(calculatorInputs).map(([key, value]) => {
-                  // Trouver l'input correspondant dans le générateur actuel
+                  // Find the input definition
                   const input = currentGenerator.inputs.find(
                     (input) => input.name === key
                   );
                   if (!input) return null;
 
-                  // Formater la valeur en fonction du type d'input
+                  // Format the value based on input type
                   let displayValue = value;
                   if (
                     input.type === "select" &&
                     input.name.endsWith("product_id")
                   ) {
-                    const product = buildingzData.products.find(
-                      (p) => p.id === value
-                    );
+                    const product = dataService.getProductById(value);
                     displayValue = product
                       ? `${product.name} - ${product.price} ${product.currency}`
                       : value;
@@ -328,14 +355,24 @@ const MainContent = ({ selectedService }) => {
                   );
                 })}
 
-                <div className="detail-item">
-                  <span className="detail-label">Service Tier:</span>
-                  <span className="detail-value">
-                    {serviceTiers.find(
-                      (tier) => tier.id === calculationResult.tier
-                    )?.name || "Standard"}
-                  </span>
-                </div>
+                {/* Display derived input values */}
+                {currentGenerator.formulas.derived_inputs && 
+                 currentGenerator.formulas.derived_inputs.length > 0 && 
+                 Object.entries(derivedInputs).map(([key, value]) => {
+                  const derivedInput = currentGenerator.formulas.derived_inputs.find(
+                    (input) => input.name === key
+                  );
+                  if (!derivedInput) return null;
+
+                  return (
+                    <div key={key} className="detail-item">
+                      <span className="detail-label">{derivedInput.label}:</span>
+                      <span className="detail-value">
+                        {value} {derivedInput.unit || ''}
+                      </span>
+                    </div>
+                  );
+                })}
 
                 <hr />
                 <div className="detail-item">

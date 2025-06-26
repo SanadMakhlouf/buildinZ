@@ -1,4 +1,8 @@
 {
+  "metadata": {
+    "version": "1.0",
+    "lastUpdated": "2023-05-20T12:00:00Z"
+  },
   "categories": [
     {
       "id": 1,
@@ -123,55 +127,144 @@
       ]
     }
   ],
-  "type_de_generator": [
+  "generators": [
     {
       "id": 1,
       "name": "حاسبة الدهان",
+      "description": "حاسبة لتقدير تكلفة أعمال الدهان",
+      "category_id": 1,
       "inputs": [
         {
+          "id": "area",
           "name": "area",
           "label": "المساحة",
           "type": "number",
-          "unit": "m²"
+          "unit": "m²",
+          "required": true,
+          "default": 0,
+          "order": 1
         },
         {
+          "id": "paint_product_id",
           "name": "paint_product_id",
           "label": "نوع الدهان",
           "type": "select",
-          "options": [1, 2]
+          "options": [1, 2],
+          "required": true,
+          "default": 1,
+          "option_type": "product",
+          "order": 2
         },
         {
+          "id": "wall_condition_id",
           "name": "wall_condition_id",
           "label": "حالة الجدران",
           "type": "select",
-          "options": [15, 16]
+          "options": [15, 16],
+          "required": true,
+          "default": 15,
+          "option_type": "condition",
+          "order": 3
         }
       ],
-      "pricing_formula": "(area * price_unit) + (Math.ceil(area / (paint_product_id === 1 ? 20 : 25)) * (paint_product_id === 1 ? 75 : 60)) + (wall_condition_id === 15 ? area * 15 : wall_condition_id === 16 ? area * 30 : 0)"
+      "formulas": {
+        "pricing": {
+          "formula": "(area * price_unit) + (Math.ceil(area / (paint_product_id === 1 ? 20 : 25)) * (paint_product_id === 1 ? 75 : 60)) + (wall_condition_id === 15 ? area * 15 : wall_condition_id === 16 ? area * 30 : 0)",
+          "description": "Total price calculation"
+        },
+        "labor": {
+          "formula": "area * price_unit * 0.6",
+          "description": "Labor cost calculation"
+        },
+        "materials": {
+          "formula": "area * price_unit * 0.4 + (Math.ceil(area / (paint_product_id === 1 ? 20 : 25)) * (paint_product_id === 1 ? 75 : 60))",
+          "description": "Materials cost calculation"
+        },
+        "derived_inputs": [
+          {
+            "name": "paint_cans",
+            "label": "عدد علب الدهان",
+            "formula": "Math.ceil(area / (paint_product_id === 1 ? 20 : 25))",
+            "unit": "علبة",
+            "description": "Calculated number of paint cans needed"
+          },
+          {
+            "name": "estimated_time",
+            "label": "الوقت المقدر",
+            "formula": "Math.ceil(area / 10)",
+            "unit": "ساعة",
+            "description": "Estimated time to complete the job"
+          }
+        ]
+      }
     },
     {
       "id": 6,
       "name": "حاسبة السيراميك",
+      "description": "حاسبة لتقدير تكلفة تركيب السيراميك",
+      "category_id": 2,
       "inputs": [
         {
+          "id": "floor_area",
           "name": "floor_area",
           "label": "مساحة الأرضية",
           "type": "number",
-          "unit": "m²"
+          "unit": "m²",
+          "required": true,
+          "default": 0,
+          "order": 1
         },
         {
+          "id": "ceramic_product_id",
           "name": "ceramic_product_id",
           "label": "نوع السيراميك",
           "type": "select",
-          "options": [7, 8]
+          "options": [7, 8],
+          "required": true,
+          "default": 7,
+          "option_type": "product",
+          "order": 2
         },
         {
+          "id": "floor_preparation",
           "name": "floor_preparation",
           "label": "تحضير الأرضية",
-          "type": "boolean"
+          "type": "boolean",
+          "required": false,
+          "default": false,
+          "order": 3
         }
       ],
-      "pricing_formula": "(floor_area * price_unit * (ceramic_product_id === 7 ? 1.2 : 1.0)) + (floor_preparation ? floor_area * 20 : 0) + (Math.ceil(floor_area / 5) * 35) + (floor_area * 15)"
+      "formulas": {
+        "pricing": {
+          "formula": "(floor_area * price_unit * (ceramic_product_id === 7 ? 1.2 : 1.0)) + (floor_preparation ? floor_area * 20 : 0) + (Math.ceil(floor_area / 5) * 35) + (floor_area * 15)",
+          "description": "Total price calculation"
+        },
+        "labor": {
+          "formula": "floor_area * price_unit * 0.7",
+          "description": "Labor cost calculation"
+        },
+        "materials": {
+          "formula": "(floor_area * price_unit * 0.3) + (Math.ceil(floor_area / 5) * 35) + (floor_preparation ? floor_area * 20 : 0)",
+          "description": "Materials cost calculation"
+        },
+        "derived_inputs": [
+          {
+            "name": "ceramic_boxes",
+            "label": "عدد صناديق السيراميك",
+            "formula": "Math.ceil(floor_area / 1.5)",
+            "unit": "صندوق",
+            "description": "Calculated number of ceramic boxes needed"
+          },
+          {
+            "name": "adhesive_bags",
+            "label": "أكياس المواد اللاصقة",
+            "formula": "Math.ceil(floor_area / 5)",
+            "unit": "كيس",
+            "description": "Number of adhesive bags needed"
+          }
+        ]
+      }
     }
   ],
   "products": [
@@ -180,28 +273,44 @@
       "name": "دهان جوتن مميز",
       "description": "دهان داخلي عالي الجودة",
       "price": 120,
-      "currency": "SAR"
+      "currency": "SAR",
+      "category_id": 1,
+      "image_url": "",
+      "unit": "علبة",
+      "coverage": 20
     },
     {
       "id": 2,
       "name": "دهان سايبس",
       "description": "دهان اقتصادي للجدران الداخلية",
       "price": 60,
-      "currency": "SAR"
+      "currency": "SAR",
+      "category_id": 1,
+      "image_url": "",
+      "unit": "علبة",
+      "coverage": 25
     },
     {
       "id": 7,
       "name": "سيراميك أرضيات",
       "description": "سيراميك أرضيات متين",
       "price": 40,
-      "currency": "SAR"
+      "currency": "SAR",
+      "category_id": 2,
+      "image_url": "",
+      "unit": "م²",
+      "coverage": 1
     },
     {
       "id": 8,
       "name": "مواد لاصقة",
       "description": "مواد لاصقة للسيراميك",
       "price": 25,
-      "currency": "SAR"
+      "currency": "SAR",
+      "category_id": 2,
+      "image_url": "",
+      "unit": "كيس",
+      "coverage": 5
     }
   ],
   "serviceTiers": [
@@ -210,21 +319,120 @@
       "name": "Bronze",
       "pricePerMeter": 80,
       "currency": "AED",
-      "multiplier": 0.8
+      "multiplier": 0.8,
+      "description": "Basic service level with standard materials"
     },
     {
       "id": "silver",
       "name": "Silver",
       "pricePerMeter": 100,
       "currency": "AED",
-      "multiplier": 1.0
+      "multiplier": 1.0,
+      "description": "Standard service level with quality materials"
     },
     {
       "id": "gold",
       "name": "Gold",
       "pricePerMeter": 150,
       "currency": "AED",
-      "multiplier": 1.3
+      "multiplier": 1.3,
+      "description": "Premium service level with high-end materials"
+    }
+  ],
+  "conditions": [
+    {
+      "id": 15,
+      "name": "جيدة",
+      "description": "الجدران بحالة جيدة، تحتاج إلى تحضير بسيط",
+      "category_id": 1
+    },
+    {
+      "id": 16,
+      "name": "سيئة",
+      "description": "الجدران بحالة سيئة، تحتاج إلى معالجة وتحضير",
+      "category_id": 1
+    }
+  ],
+  "input_types": [
+    {
+      "id": "number",
+      "name": "Number",
+      "has_unit": true,
+      "has_options": false,
+      "has_default": true
+    },
+    {
+      "id": "select",
+      "name": "Select",
+      "has_unit": false,
+      "has_options": true,
+      "has_default": true
+    },
+    {
+      "id": "boolean",
+      "name": "Boolean",
+      "has_unit": false,
+      "has_options": false,
+      "has_default": true
+    },
+    {
+      "id": "text",
+      "name": "Text",
+      "has_unit": false,
+      "has_options": false,
+      "has_default": true
+    },
+    {
+      "id": "derived",
+      "name": "Derived",
+      "has_unit": true,
+      "has_options": false,
+      "has_default": false,
+      "has_formula": true
+    }
+  ],
+  "option_types": [
+    {
+      "id": "product",
+      "name": "Product",
+      "source": "products"
+    },
+    {
+      "id": "condition",
+      "name": "Condition",
+      "source": "conditions"
+    },
+    {
+      "id": "custom",
+      "name": "Custom",
+      "source": "custom_values"
+    }
+  ],
+  "units": [
+    {
+      "id": "m2",
+      "name": "m²",
+      "category": "area"
+    },
+    {
+      "id": "m",
+      "name": "m",
+      "category": "length"
+    },
+    {
+      "id": "piece",
+      "name": "قطعة",
+      "category": "count"
+    },
+    {
+      "id": "hour",
+      "name": "ساعة",
+      "category": "time"
+    },
+    {
+      "id": "day",
+      "name": "يوم",
+      "category": "time"
     }
   ]
 }

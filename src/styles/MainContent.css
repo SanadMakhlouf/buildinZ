@@ -240,37 +240,25 @@
   background-color: #f0f5ff;
 }
 
-/* Service tier options */
+/* Service tier options - REMOVED */
 .service-tier-options {
-  display: flex;
-  gap: 1rem;
-  margin: 1rem 0;
+  display: none;
 }
 
 .tier-option {
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 1rem;
-  flex: 1;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.3s;
+  display: none;
 }
 
 .tier-option.selected {
-  border-color: #0c4da2;
-  background-color: #f0f5ff;
+  display: none;
 }
 
 .tier-name {
-  font-weight: 600;
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
+  display: none;
 }
 
 .tier-price {
-  color: #0c4da2;
-  font-size: 1rem;
+  display: none;
 }
 
 /* Calculator Section */
@@ -601,4 +589,29 @@ select {
   margin: 1rem 0;
   border: 0;
   border-top: 1px solid #eee;
+}
+
+/* Add styles for derived inputs */
+.derived-inputs {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.derived-inputs h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 16px;
+  color: #333;
+}
+
+.derived-value {
+  font-weight: 500;
+  font-size: 16px;
+  color: #2196f3;
+  padding: 8px 12px;
+  background-color: #e3f2fd;
+  border-radius: 4px;
+  display: inline-block;
 }
