@@ -151,6 +151,124 @@
   padding: 2rem;
 }
 
+/* Layout for calculator and result sections */
+.calculator-result-container {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.calculator-section {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  flex: 1;
+  max-width: 48%;
+}
+
+.result-section {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  flex: 1;
+  max-width: 48%;
+}
+
+.calculator-section h2,
+.result-section h2 {
+  color: #333;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.calculator-form {
+  display: grid;
+  gap: 1.5rem;
+}
+
+/* Project Details and Cost Estimate headers */
+.section-header {
+  font-weight: 600;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
+}
+
+/* Continue to booking button */
+.booking-btn {
+  background-color: #0c4da2;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 1rem;
+  width: 100%;
+  text-align: center;
+}
+
+.booking-btn:hover {
+  background-color: #083a7d;
+}
+
+/* Get detailed quote button */
+.quote-detail-btn {
+  background-color: #ffffff;
+  color: #0c4da2;
+  border: 1px solid #0c4da2;
+  padding: 0.8rem 1.5rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 0.5rem;
+  width: 100%;
+  text-align: center;
+}
+
+.quote-detail-btn:hover {
+  background-color: #f0f5ff;
+}
+
+/* Service tier options */
+.service-tier-options {
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.tier-option {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 1rem;
+  flex: 1;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.tier-option.selected {
+  border-color: #0c4da2;
+  background-color: #f0f5ff;
+}
+
+.tier-name {
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.tier-price {
+  color: #0c4da2;
+  font-size: 1rem;
+}
+
 /* Calculator Section */
 .calculator-section {
   background-color: #f8f9fa;
@@ -457,4 +575,24 @@ select {
   text-align: center;
   padding: 40px;
   color: #dc3545;
+}
+
+/* Empty result state */
+.empty-result {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  color: #666;
+  text-align: center;
+  padding: 2rem;
+}
+
+/* Horizontal rules in cost estimate */
+.result-details hr {
+  margin: 1rem 0;
+  border: 0;
+  border-top: 1px solid #eee;
 }

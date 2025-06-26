@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "../styles/Sidebar.css";
-import { categories } from "../data/dummyData";
+import buildingzData from "../data/json/buildingzData.json";
 
 const Sidebar = ({ onServiceSelect }) => {
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -24,7 +24,7 @@ const Sidebar = ({ onServiceSelect }) => {
       <div className="categories-section">
         <h2>الخدمات</h2>
         <div className="categories-list">
-          {categories.map((category) => (
+          {buildingzData.categories.map((category) => (
             <div key={category.id} className="category-item">
               <div
                 className={`category-header ${

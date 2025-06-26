@@ -1,28 +1,29 @@
 import React, { useState, useEffect } from "react";
 import "../styles/MainContent.css";
-import { type_de_generator, products } from "../data/dummyData";
+import buildingzData from "../data/json/buildingzData.json";
 
 const MainContent = ({ selectedService }) => {
   const [calculatorInputs, setCalculatorInputs] = useState({});
   const [calculationResult, setCalculationResult] = useState(null);
+  const [selectedTier, setSelectedTier] = useState("silver");
 
   // Initialize calculator inputs when service changes
   useEffect(() => {
     if (selectedService) {
-      const generator = type_de_generator.find(
+      const generator = buildingzData.type_de_generator.find(
         (g) => g.id === selectedService.foreign_key_generator
       );
       if (generator) {
+        // Initialize inputs with default values based on type
         const initialInputs = {};
         generator.inputs.forEach((input) => {
-          initialInputs[input.name] =
-            input.type === "number"
-              ? 0
-              : input.type === "select"
-              ? input.options[0]
-              : input.type === "boolean"
-              ? false
-              : "";
+          if (input.type === "number") {
+            initialInputs[input.name] = 0;
+          } else if (input.type === "select" && input.options.length > 0) {
+            initialInputs[input.name] = input.options[0];
+          } else if (input.type === "boolean") {
+            initialInputs[input.name] = false;
+          }
         });
         setCalculatorInputs(initialInputs);
         setCalculationResult(null); // Reset result when service changes
@@ -46,7 +47,7 @@ const MainContent = ({ selectedService }) => {
       let materialsCost = 0;
 
       // Find the generator for this service
-      const generator = type_de_generator.find(
+      const generator = buildingzData.type_de_generator.find(
         (g) => g.id === selectedService.foreign_key_generator
       );
 
@@ -58,11 +59,23 @@ const MainContent = ({ selectedService }) => {
       const formula = generator.pricing_formula;
       const priceUnit = selectedService.price_unit;
 
+      // Validate that all required inputs are present
+      const missingInputs = generator.inputs.filter(
+        (input) => calculatorInputs[input.name] === undefined
+      );
+
+      if (missingInputs.length > 0) {
+        console.error(
+          "Missing required inputs:",
+          missingInputs.map((i) => i.name)
+        );
+        return;
+      }
+
       // Create a context object with all variables needed for evaluation
       const context = {
         ...calculatorInputs,
         price_unit: priceUnit,
-        Math: Math,
       };
 
       // Convert Arabic paint type to English for calculation if needed
@@ -72,31 +85,29 @@ const MainContent = ({ selectedService }) => {
       }
 
       // Evaluate the formula using the context
-      // Replace formula variables with actual values
       let evaluationString = formula;
 
-      // Make sure we're only processing defined values
-      Object.keys(context).forEach((key) => {
-        if (key !== "Math" && context[key] !== undefined) {
-          const value =
-            typeof context[key] === "string"
-              ? `'${context[key]}'` // Wrap strings in quotes
-              : context[key];
-
-          // Only replace if both key and value are defined
-          if (key && value !== undefined) {
-            evaluationString = evaluationString.replace(
-              new RegExp(key, "g"),
-              value
-            );
-          }
+      // Replace formula variables with actual values
+      Object.entries(context).forEach(([key, value]) => {
+        if (value !== undefined) {
+          const replacementValue =
+            typeof value === "string" ? `'${value}'` : value;
+          evaluationString = evaluationString.replace(
+            new RegExp(key, "g"),
+            replacementValue
+          );
         }
       });
 
       console.log("Evaluation string:", evaluationString);
 
+      // Create a safe evaluation context
+      const evalContext = {
+        Math: Math,
+      };
+
       // Evaluate the formula
-      totalPrice = eval(evaluationString);
+      totalPrice = new Function("Math", `return ${evaluationString}`)(Math);
       console.log("Total price calculated:", totalPrice);
 
       // Calculate labor and materials costs separately
@@ -125,9 +136,20 @@ const MainContent = ({ selectedService }) => {
       }
 
       // Get associated products
-      const serviceProducts = products.filter((p) =>
+      const serviceProducts = buildingzData.products.filter((p) =>
         selectedService.product_ids.includes(p.id)
       );
+
+      // Find the selected tier
+      const tierData = buildingzData.serviceTiers.find(
+        (tier) => tier.id === selectedTier
+      );
+
+      // Apply tier pricing
+      const tierMultiplier = tierData ? tierData.multiplier : 1.0;
+      totalPrice = totalPrice * tierMultiplier;
+      laborCost = laborCost * tierMultiplier;
+      materialsCost = materialsCost * tierMultiplier;
 
       setCalculationResult({
         totalPrice,
@@ -136,6 +158,7 @@ const MainContent = ({ selectedService }) => {
         currency: selectedService.currency,
         inputs: { ...calculatorInputs },
         products: serviceProducts,
+        tier: selectedTier,
       });
     } catch (error) {
       console.error("Error calculating price:", error);
@@ -153,7 +176,7 @@ const MainContent = ({ selectedService }) => {
     );
   }
 
-  const currentGenerator = type_de_generator.find(
+  const currentGenerator = buildingzData.type_de_generator.find(
     (g) => g.id === selectedService.foreign_key_generator
   );
 
@@ -168,130 +191,188 @@ const MainContent = ({ selectedService }) => {
     );
   }
 
+  // Get service tiers from JSON data
+  const serviceTiers = buildingzData.serviceTiers;
+
+  const renderSelectOptions = (input) => {
+    // If the input name ends with 'product_id', it's a product selection
+    if (input.name.endsWith("product_id")) {
+      return input.options.map((productId) => {
+        const product = buildingzData.products.find((p) => p.id === productId);
+        return (
+          <option key={productId} value={productId}>
+            {product ? product.name : `Product ${productId}`}
+          </option>
+        );
+      });
+    }
+    // For non-product selections (like patterns, conditions, etc.)
+    return input.options.map((option) => (
+      <option key={option} value={option}>
+        {option}
+      </option>
+    ));
+  };
+
   return (
     <div className="main-content">
-      <div className="calculator-section">
-        <h2>حاسبة التكلفة - {selectedService.name}</h2>
-        <div className="calculator-form">
-          {currentGenerator.inputs.map((input) => (
-            <div key={input.name} className="input-group">
-              <label>{input.label}</label>
-              {input.type === "number" && (
-                <div className="number-input">
-                  <input
-                    type="number"
+      <div className="calculator-result-container">
+        {/* Project Details Section */}
+        <div className="calculator-section">
+          <h2 className="section-header">Project Details</h2>
+          <div className="calculator-form">
+            {currentGenerator.inputs.map((input) => (
+              <div key={input.name} className="input-group">
+                <label>{input.label}</label>
+                {input.type === "number" && (
+                  <div className="number-input">
+                    <input
+                      type="number"
+                      value={calculatorInputs[input.name]}
+                      onChange={(e) =>
+                        handleInputChange(
+                          input.name,
+                          parseFloat(e.target.value) || 0
+                        )
+                      }
+                      min="0"
+                    />
+                    {input.unit && <span className="unit">{input.unit}</span>}
+                  </div>
+                )}
+                {input.type === "select" && (
+                  <select
                     value={calculatorInputs[input.name]}
                     onChange={(e) =>
                       handleInputChange(
                         input.name,
-                        parseFloat(e.target.value) || 0
+                        input.name.endsWith("product_id")
+                          ? parseInt(e.target.value)
+                          : e.target.value
                       )
                     }
-                    min="0"
-                  />
-                  {input.unit && <span className="unit">{input.unit}</span>}
-                </div>
-              )}
-              {input.type === "select" && (
-                <select
-                  value={calculatorInputs[input.name]}
-                  onChange={(e) =>
-                    handleInputChange(input.name, e.target.value)
-                  }
-                >
-                  {input.options.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              )}
-              {input.type === "boolean" && (
-                <label className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={calculatorInputs[input.name]}
-                    onChange={(e) =>
-                      handleInputChange(input.name, e.target.checked)
-                    }
-                  />
-                  نعم
-                </label>
-              )}
-            </div>
-          ))}
-          <button className="calculate-btn" onClick={calculatePrice}>
-            احسب التكلفة
-          </button>
-        </div>
-      </div>
+                  >
+                    {renderSelectOptions(input)}
+                  </select>
+                )}
+                {input.type === "boolean" && (
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={calculatorInputs[input.name]}
+                      onChange={(e) =>
+                        handleInputChange(input.name, e.target.checked)
+                      }
+                    />
+                    نعم
+                  </label>
+                )}
+              </div>
+            ))}
 
-      {calculationResult && (
-        <div className="result-section">
-          <h2>نتيجة الحساب</h2>
-          <div className="result-card">
-            <div className="result-header">
-              <h3>التكلفة الإجمالية</h3>
-              <div className="total-price">
-                <span className="price">
-                  {calculationResult.totalPrice.toFixed(2)}
-                </span>
-                <span className="currency">{calculationResult.currency}</span>
-              </div>
-            </div>
-            <div className="result-details">
-              <div className="cost-breakdown">
-                <div className="cost-item">
-                  <span className="cost-label">تكلفة العمالة:</span>
-                  <span className="cost-value">
-                    {calculationResult.laborCost.toFixed(2)}{" "}
-                    {calculationResult.currency}
-                  </span>
-                </div>
-                <div className="cost-item">
-                  <span className="cost-label">تكلفة المواد:</span>
-                  <span className="cost-value">
-                    {calculationResult.materialsCost.toFixed(2)}{" "}
-                    {calculationResult.currency}
-                  </span>
-                </div>
-              </div>
-              <h4>المدخلات:</h4>
-              {Object.entries(calculationResult.inputs).map(([key, value]) => {
-                const inputDef = currentGenerator.inputs.find(
-                  (i) => i.name === key
-                );
-                if (!inputDef) return null;
-                return (
-                  <div key={key} className="detail-item">
-                    <span className="detail-label">{inputDef.label}:</span>
-                    <span className="detail-value">
-                      {typeof value === "boolean"
-                        ? value
-                          ? "نعم"
-                          : "لا"
-                        : value}
-                      {inputDef.unit && ` ${inputDef.unit}`}
-                    </span>
+            {/* Service Tier Selection */}
+            <div className="input-group">
+              <label>Service Tier</label>
+              <div className="service-tier-options">
+                {serviceTiers.map((tier) => (
+                  <div
+                    key={tier.id}
+                    className={`tier-option ${
+                      selectedTier === tier.id ? "selected" : ""
+                    }`}
+                    onClick={() => setSelectedTier(tier.id)}
+                  >
+                    <div className="tier-name">{tier.name}</div>
+                    <div className="tier-price">
+                      {tier.currency} {tier.pricePerMeter}/m²
+                    </div>
                   </div>
-                );
-              })}
-              <h4>المواد المستخدمة:</h4>
-              {calculationResult.products.map((product) => (
-                <div key={product.id} className="product-item">
-                  <span className="product-name">{product.name}</span>
-                  <span className="product-price">
-                    {product.price} {product.currency}
-                  </span>
-                  <span className="product-description">
-                    {product.description}
-                  </span>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
+
+            <button className="calculate-btn" onClick={calculatePrice}>
+              Calculate
+            </button>
           </div>
         </div>
-      )}
+
+        {/* Cost Estimate Section */}
+        <div className="result-section">
+          <h2 className="section-header">Cost Estimate</h2>
+          {calculationResult ? (
+            <div className="result-card">
+              <div className="result-details">
+                <div className="detail-item">
+                  <span className="detail-label">Total Area:</span>
+                  <span className="detail-value">
+                    {calculatorInputs.area ||
+                      calculatorInputs.room_area ||
+                      (calculatorInputs.wall_length &&
+                      calculatorInputs.wall_height
+                        ? calculatorInputs.wall_length *
+                          calculatorInputs.wall_height
+                        : 0)}{" "}
+                    m²
+                  </span>
+                </div>
+                <div className="detail-item">
+                  <span className="detail-label">Paint Type:</span>
+                  <span className="detail-value">
+                    {calculatorInputs.paint_type === "زيتي"
+                      ? "Premium Paint"
+                      : "Standard Paint"}
+                  </span>
+                </div>
+                <div className="detail-item">
+                  <span className="detail-label">Service Tier:</span>
+                  <span className="detail-value">
+                    {serviceTiers.find(
+                      (tier) => tier.id === calculationResult.tier
+                    )?.name || "Standard"}
+                  </span>
+                </div>
+                <div className="detail-item">
+                  <span className="detail-label">Number of Coats:</span>
+                  <span className="detail-value">2</span>
+                </div>
+                <hr />
+                <div className="detail-item">
+                  <span className="detail-label">Material Cost:</span>
+                  <span className="detail-value">
+                    AED {calculationResult.materialsCost.toFixed(0)}
+                  </span>
+                </div>
+                <div className="detail-item">
+                  <span className="detail-label">Labor Cost:</span>
+                  <span className="detail-value">
+                    AED {calculationResult.laborCost.toFixed(0)}
+                  </span>
+                </div>
+                <hr />
+                <div
+                  className="detail-item"
+                  style={{ fontWeight: "bold", fontSize: "1.2rem" }}
+                >
+                  <span className="detail-label">Total Cost:</span>
+                  <span className="detail-value">
+                    AED {calculationResult.totalPrice.toFixed(0)}
+                  </span>
+                </div>
+                <button className="booking-btn">Continue to Booking</button>
+                <button className="quote-detail-btn">Get Detailed Quote</button>
+              </div>
+            </div>
+          ) : (
+            <div className="empty-result">
+              <p>
+                Fill in the project details and click calculate to see the cost
+                estimate.
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
