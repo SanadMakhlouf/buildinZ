@@ -2,18 +2,21 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 2rem;
-  height: 70px;
-  background-color: #ffffff;
-  border-bottom: 1px solid #e0e0e0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding: 0.5rem 2rem;
+  background-color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   direction: rtl;
 }
 
 .navbar-brand {
   display: flex;
   align-items: center;
-  direction: ltr;
+}
+
+.brand-link {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
 }
 
 .brand-name {
@@ -31,19 +34,35 @@
 
 .navbar-menu {
   display: flex;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 .navbar-item {
-  text-decoration: none;
   color: #333;
+  text-decoration: none;
   font-weight: 500;
+  padding: 0.5rem 0;
+  position: relative;
   transition: color 0.3s;
-  font-size: 1rem;
 }
 
 .navbar-item:hover {
   color: #0c4da2;
+}
+
+.navbar-item.active {
+  color: #0c4da2;
+}
+
+.navbar-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: #0c4da2;
+  border-radius: 1.5px;
 }
 
 .navbar-auth {
@@ -52,24 +71,57 @@
   align-items: center;
 }
 
-.login-btn {
+.login-btn, .register-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-weight: 600;
   text-decoration: none;
+  transition: all 0.3s;
+}
+
+.login-btn {
   color: #0c4da2;
-  font-weight: 500;
-  font-size: 1rem;
+}
+
+.login-btn:hover {
+  background-color: rgba(12, 77, 162, 0.1);
 }
 
 .register-btn {
-  text-decoration: none;
   background-color: #0c4da2;
   color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  font-weight: 500;
-  transition: background-color 0.3s;
-  font-size: 1rem;
 }
 
 .register-btn:hover {
   background-color: #083a7d;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    padding: 1rem;
+  }
+  
+  .navbar-brand {
+    margin-bottom: 1rem;
+  }
+  
+  .navbar-menu {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    width: 100%;
+  }
+  
+  .navbar-item {
+    width: 100%;
+    text-align: center;
+    padding: 0.5rem;
+  }
+  
+  .navbar-auth {
+    width: 100%;
+    justify-content: center;
+  }
 }

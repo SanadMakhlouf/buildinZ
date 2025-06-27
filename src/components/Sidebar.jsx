@@ -1,18 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/Sidebar.css";
 import dataService from "../services/dataService";
 
-const Sidebar = ({ categories, onServiceSelect }) => {
+const Sidebar = ({ categories, onServiceSelect, selectedCategory, onCategorySelect }) => {
   const [expandedCategory, setExpandedCategory] = useState(null);
   const [expandedSubcategory, setExpandedSubcategory] = useState(null);
 
+  // Set expanded category if a selectedCategory prop is provided
+  useEffect(() => {
+    if (selectedCategory) {
+      setExpandedCategory(selectedCategory.id);
+    }
+  }, [selectedCategory]);
+
   const toggleCategory = (categoryId) => {
+    const category = categories.find(cat => cat.id === categoryId);
+    
     if (expandedCategory === categoryId) {
       setExpandedCategory(null);
       setExpandedSubcategory(null);
+      if (onCategorySelect) onCategorySelect(null);
     } else {
       setExpandedCategory(categoryId);
       setExpandedSubcategory(null);
+      if (onCategorySelect) onCategorySelect(category);
     }
   };
 
@@ -28,7 +39,7 @@ const Sidebar = ({ categories, onServiceSelect }) => {
 
   return (
     <div className="sidebar">
-      <h2>الخدمات</h2>
+      <h2>حاسبة التكاليف</h2>
       <div className="categories-list">
         {categories.map((category) => (
           <div key={category.id} className="category">

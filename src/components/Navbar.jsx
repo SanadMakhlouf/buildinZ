@@ -1,37 +1,42 @@
 import React from "react";
+import { Link, useLocation } from "react-router-dom";
 import "../styles/Navbar.css";
 
 const Navbar = () => {
+  const location = useLocation();
+  
+  const isActive = (path) => {
+    return location.pathname === path ? "active" : "";
+  };
+
   return (
     <nav className="navbar">
       <div className="navbar-brand">
-        <span className="brand-name">Buildingz</span>
-        <span className="brand-marketplace">Marketplace</span>
+        <Link to="/" className="brand-link">
+          <span className="brand-name">BuildingZ</span>
+        </Link>
       </div>
       <div className="navbar-menu">
-        <a href="#" className="navbar-item">
+        <Link to="/" className={`navbar-item ${isActive("/")}`}>
           الرئيسية
-        </a>
-        <a href="#" className="navbar-item">
-          الخدمات
-        </a>
-        <a href="#" className="navbar-item">
+        </Link>
+        <Link to="/services" className={`navbar-item ${isActive("/services")}`}>
+          حاسبة التكاليف
+        </Link>
+        <Link to="/providers" className={`navbar-item ${isActive("/providers")}`}>
           مقدمي الخدمات
-        </a>
-        <a href="#" className="navbar-item">
+        </Link>
+        <Link to="/quotes" className={`navbar-item ${isActive("/quotes")}`}>
           عروض الأسعار
-        </a>
-        <a href="#" className="navbar-item">
-          لوحة التحكم
-        </a>
+        </Link>
       </div>
       <div className="navbar-auth">
-        <a href="#" className="login-btn">
+        <Link to="/login" className="login-btn">
           تسجيل الدخول
-        </a>
-        <a href="#" className="register-btn">
+        </Link>
+        <Link to="/signup" className="register-btn">
           إنشاء حساب
-        </a>
+        </Link>
       </div>
     </nav>
   );
