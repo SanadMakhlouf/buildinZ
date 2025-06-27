@@ -141,8 +141,21 @@ export const evaluateFormula = (formula, variables) => {
     throw new Error('Invalid or potentially unsafe formula');
   }
 
-  const paramNames = Object.keys(variables);
-  const paramValues = Object.values(variables);
+  // Preprocess variables - ensure numeric values where possible
+  const processedVariables = { ...variables };
+  Object.keys(processedVariables).forEach(key => {
+    // Convert string numbers to actual numbers
+    if (typeof processedVariables[key] === 'string' && !isNaN(processedVariables[key]) && processedVariables[key] !== '') {
+      processedVariables[key] = parseFloat(processedVariables[key]);
+    }
+    // Handle empty strings
+    if (processedVariables[key] === '') {
+      processedVariables[key] = 0;
+    }
+  });
+
+  const paramNames = Object.keys(processedVariables);
+  const paramValues = Object.values(processedVariables);
   
   // Debug information
   console.log(`Evaluating formula: "${formula}"`);
@@ -177,7 +190,7 @@ export const evaluateFormula = (formula, variables) => {
   } catch (error) {
     console.error("Error evaluating formula:", error.message);
     console.error("Formula:", formula);
-    console.error("Variables:", variables);
+    console.error("Variables:", processedVariables);
     console.error("Stack trace:", error.stack);
     return 0;
   }

@@ -102,6 +102,9 @@ const MainContent = ({ selectedService }) => {
       console.log("Selected Service:", selectedService);
       console.log("Current Generator:", currentGenerator);
       
+      // Debug: Log localStorage data
+      console.log("LocalStorage Data:", JSON.parse(localStorage.getItem('buildingzData')));
+      
       // Get the pricing formulas and price unit
       const priceFormula = currentGenerator.formulas.pricing.formula;
       const laborFormula = currentGenerator.formulas.labor.formula;
@@ -119,12 +122,43 @@ const MainContent = ({ selectedService }) => {
         price_unit: priceUnit
       };
       
+      // Convert string inputs to numbers where possible for calculations
+      Object.keys(variables).forEach(key => {
+        // If the input is a string that represents a number, convert it
+        if (typeof variables[key] === 'string' && !isNaN(variables[key]) && variables[key] !== '') {
+          variables[key] = parseFloat(variables[key]);
+        }
+        // If the input is an empty string, set to 0 for calculations
+        if (variables[key] === '') {
+          variables[key] = 0;
+        }
+      });
+      
+      // Extract variable names from the formula to ensure all needed variables exist
+      const extractVariables = (formula) => {
+        if (!formula) return [];
+        // This regex finds identifiers that might be variable names
+        const matches = formula.match(/[a-zA-Z_][a-zA-Z0-9_]*/g) || [];
+        return [...new Set(matches)]; // Remove duplicates
+      };
+      
+      // Get all variables mentioned in formulas
+      const formulaVars = [
+        ...extractVariables(priceFormula),
+        ...extractVariables(laborFormula),
+        ...extractVariables(materialsFormula)
+      ];
+      
+      console.log("Variables extracted from formulas:", formulaVars);
+      
       // Add product prices to variables for dynamic access in formulas
       const allProducts = dataService.getProducts();
       
       // For each input that references a product ID, add its price as a variable
       currentGenerator.inputs.forEach(input => {
-        if (input.type === 'select' && input.option_type === 'product' && inputs[input.name]) {
+        if (input.type === 'select' && 
+            (input.option_type === 'product' || input.name.includes('product_id')) && 
+            inputs[input.name]) {
           const productId = inputs[input.name];
           const product = allProducts.find(p => p.id === productId);
           if (product) {
@@ -133,6 +167,43 @@ const MainContent = ({ selectedService }) => {
             // Add product coverage with variable name pattern: {input_name}_coverage
             variables[`${input.name}_coverage`] = product.coverage || 1;
           }
+        }
+      });
+      
+      // Check for any variable ending with _price that might be needed in the formula
+      formulaVars.forEach(varName => {
+        if (varName.endsWith('_price')) {
+          // If this price variable is not yet defined
+          if (variables[varName] === undefined) {
+            // Extract base name (remove _price suffix)
+            const baseName = varName.substring(0, varName.length - 6);
+            
+            // Check if we have this base variable in our inputs
+            if (variables[baseName] !== undefined) {
+              // Try to find the product by ID
+              const productId = variables[baseName];
+              const product = allProducts.find(p => p.id === productId);
+              
+              if (product) {
+                // Add the price and coverage variables
+                variables[varName] = product.price;
+                variables[`${baseName}_coverage`] = product.coverage || 1;
+              } else {
+                // Default values if product not found
+                variables[varName] = 0;
+                variables[`${baseName}_coverage`] = 1;
+              }
+            }
+          }
+        }
+      });
+      
+      // Final check: ensure all variables mentioned in formulas exist
+      // This prevents "X is not defined" errors
+      formulaVars.forEach(varName => {
+        if (variables[varName] === undefined) {
+          console.warn(`Formula references undefined variable: ${varName}, setting to 0`);
+          variables[varName] = 0;
         }
       });
       
@@ -187,21 +258,21 @@ const MainContent = ({ selectedService }) => {
   };
 
   const renderSelectOptions = (input) => {
-    // For product IDs
-    if (input.name.includes("product_id")) {
+    // For product IDs - check both name.includes and option_type
+    if (input.name.includes("product_id") || input.option_type === "product") {
       return input.options.map((optionId) => {
         const product = dataService.getProductById(optionId);
         return (
           <option key={optionId} value={optionId}>
             {product
               ? `${product.name} - ${product.price} ${product.currency}`
-              : `Option ${optionId}`}
+              : `Product ${optionId}`}
           </option>
         );
       });
     }
-    // For condition IDs
-    else if (input.name.includes("condition_id")) {
+    // For condition IDs - check both name.includes and option_type
+    else if (input.name.includes("condition_id") || input.option_type === "condition") {
       return input.options.map((optionId) => {
         const condition = dataService.getConditionById(optionId);
         return (
