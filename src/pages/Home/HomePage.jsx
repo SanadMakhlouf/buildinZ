@@ -294,17 +294,11 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* About Section with Parallax */}
+      {/* About Section */}
       <section className="about-section">
         <div className="container">
-          <div className="about-content" data-aos="fade-up">
-            <motion.div 
-              className="about-text"
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-            >
+          <div className="about-content">
+            <div className="about-text">
               <h2 className="section-title">
                 BuildingZ – <span className="highlight">خدمات موثوقة لحياة أسهل</span>
               </h2>
@@ -314,51 +308,25 @@ const HomePage = () => {
               
               <h3 className="about-subtitle">لماذا BuildingZ؟</h3>
               <ul className="about-features">
-                {[
-                  { icon: "fa-headset", text: "فريق خدمة عملاء متواجد دائمًا" },
-                  { icon: "fa-user-check", text: "مزودو خدمات تم التحقق منهم" },
-                  { icon: "fa-heart", text: "رضا العملاء هو أولويتنا" },
-                  { icon: "fa-mobile-alt", text: "واجهة استخدام سهلة وسريعة" }
-                ].map((feature, index) => (
-                  <motion.li
-                    key={index}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    whileHover={{ x: 10, color: '#DAA520' }}
-                    viewport={{ once: true }}
-                  >
-                    <i className={`fas ${feature.icon}`}></i> {feature.text}
-                  </motion.li>
-                ))}
+                <li><i className="fas fa-headset"></i> فريق خدمة عملاء متواجد دائمًا</li>
+                <li><i className="fas fa-user-check"></i> مزودو خدمات تم التحقق منهم</li>
+                <li><i className="fas fa-heart"></i> رضا العملاء هو أولويتنا</li>
+                <li><i className="fas fa-mobile-alt"></i> واجهة استخدام سهلة وسريعة</li>
               </ul>
               
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Link to="/about" className="about-btn">
-                  اعرف أكثر
-                  <i className="fas fa-arrow-left"></i>
-                </Link>
-              </motion.div>
-            </motion.div>
+              <Link to="/about" className="about-btn">
+                اعرف أكثر
+                <i className="fas fa-arrow-left"></i>
+              </Link>
+            </div>
             
-            <motion.div 
-              className="about-image"
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-            >
-              <motion.img 
+            <div className="about-image">
+              <img 
                 src="https://storage.googleapis.com/uxpilot-auth.appspot.com/d87f426b11-8b49fa125e5694bcb57a.png" 
                 alt="BuildingZ App"
-                whileHover={{ scale: 1.05, rotate: 2 }}
-                transition={{ duration: 0.3 }}
               />
               <div className="about-image-shape"></div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
@@ -423,50 +391,22 @@ const HomePage = () => {
             <p className="section-description">اختر نوع الخدمة التي تحتاجها</p>
           </motion.div>
           
-          <motion.div 
-            className="categories-grid"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.8, staggerChildren: 0.1 }}
-            viewport={{ once: true }}
-          >
+          <div className="categories-grid">
             {buildingzData.categories.map((category, index) => (
-              <motion.div
-                key={category.id}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                whileHover={{ 
-                  y: -15,
-                  boxShadow: "0 25px 50px rgba(0,0,0,0.15)",
-                  transition: { duration: 0.3 }
-                }}
-                viewport={{ once: true }}
-              >
-                <Link to={`/services/${category.id}`} className="category-card">
-                  <motion.div 
-                    className="category-icon"
-                    whileHover={{ rotate: 360, scale: 1.2 }}
-                    transition={{ duration: 0.6 }}
-                  >
-                    <span>{category.icon}</span>
-                  </motion.div>
-                  <h3 className="category-title">{category.name}</h3>
-                  <p className="category-description">
-                    {category.subcategories.length} خدمة متاحة
-                  </p>
-                  <motion.div 
-                    className="category-arrow"
-                    initial={{ opacity: 0, x: 20 }}
-                    whileHover={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <i className="fas fa-arrow-left"></i>
-                  </motion.div>
-                </Link>
-              </motion.div>
+              <Link to={`/services/${category.id}`} className="category-card" key={category.id}>
+                <div className="category-icon">
+                  <span>{category.icon}</span>
+                </div>
+                <h3 className="category-title">{category.name}</h3>
+                <p className="category-description">
+                  {category.subcategories.length} خدمة متاحة
+                </p>
+                <div className="category-arrow">
+                  <i className="fas fa-arrow-left"></i>
+                </div>
+              </Link>
             ))}
-          </motion.div>
+          </div>
           
           <motion.div 
             className="categories-action"
