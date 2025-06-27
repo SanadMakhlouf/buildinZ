@@ -314,192 +314,203 @@ const MainContent = ({ selectedService }) => {
 
   return (
     <div className="main-content">
-      <div className="calculator-result-container">
-        {/* Project Details Section */}
-        <div className="calculator-section">
-          <h2 className="section-header">Project Details</h2>
-          <div className="calculator-form">
-            {currentGenerator.inputs.map((input) => (
-              <div key={input.id} className="input-group">
-                <label>{input.label}</label>
-                {input.type === "number" && (
-                  <div className="number-input">
-                    <input
-                      type="number"
-                      value={calculatorInputs[input.name] || 0}
-                      onChange={(e) =>
-                        handleInputChange(
-                          input.name,
-                          parseFloat(e.target.value) || 0
-                        )
-                      }
-                      min="0"
-                    />
-                    {input.unit && <span className="unit">{input.unit}</span>}
-                  </div>
-                )}
-                {input.type === "select" && (
-                  <select
-                    value={calculatorInputs[input.name] || input.options[0]}
-                    onChange={(e) =>
-                      handleInputChange(
-                        input.name,
-                        input.name.includes("_id")
-                          ? parseInt(e.target.value)
-                          : e.target.value
-                      )
-                    }
-                  >
-                    {renderSelectOptions(input)}
-                  </select>
-                )}
-                {input.type === "boolean" && (
-                  <label className="checkbox-label">
-                    <input
-                      type="checkbox"
-                      checked={!!calculatorInputs[input.name]}
-                      onChange={(e) =>
-                        handleInputChange(input.name, e.target.checked)
-                      }
-                    />
-                    نعم
-                  </label>
-                )}
+      <div className="compact-calculator-container">
+        <div className="service-header">
+          <h1>{selectedService.name}</h1>
+          <p>{selectedService.description}</p>
+        </div>
+        
+        <div className="calculator-result-grid">
+          {/* Left panel: Calculator inputs */}
+          <div className="calculator-panel">
+            <div className="panel-header">
+              <h2>تفاصيل المشروع</h2>
+              <div className="auto-calculate-toggle">
+                <label className="toggle-label">
+                  <input
+                    type="checkbox"
+                    checked={autoCalculate}
+                    onChange={(e) => setAutoCalculate(e.target.checked)}
+                  />
+                  <span className="toggle-text">حساب تلقائي</span>
+                </label>
               </div>
-            ))}
+            </div>
+            
+            <div className="input-fields-container">
+              {currentGenerator.inputs.map((input) => (
+                <div key={input.id} className="compact-input-group">
+                  <label>{input.label}</label>
+                  
+                  {input.type === "number" && (
+                    <div className="number-input-wrapper">
+                      <input
+                        type="number"
+                        value={calculatorInputs[input.name] || 0}
+                        onChange={(e) =>
+                          handleInputChange(
+                            input.name,
+                            parseFloat(e.target.value) || 0
+                          )
+                        }
+                        min="0"
+                      />
+                      {input.unit && <span className="unit-badge">{input.unit}</span>}
+                    </div>
+                  )}
+                  
+                  {input.type === "select" && (
+                    <div className="select-wrapper">
+                      <select
+                        value={calculatorInputs[input.name] || input.options[0]}
+                        onChange={(e) =>
+                          handleInputChange(
+                            input.name,
+                            input.name.includes("_id")
+                              ? parseInt(e.target.value)
+                              : e.target.value
+                          )
+                        }
+                      >
+                        {renderSelectOptions(input)}
+                      </select>
+                    </div>
+                  )}
+                  
+                  {input.type === "boolean" && (
+                    <div className="switch-wrapper">
+                      <label className="switch">
+                        <input
+                          type="checkbox"
+                          checked={!!calculatorInputs[input.name]}
+                          onChange={(e) =>
+                            handleInputChange(input.name, e.target.checked)
+                          }
+                        />
+                        <span className="slider"></span>
+                        <span className="switch-text">{!!calculatorInputs[input.name] ? "نعم" : "لا"}</span>
+                      </label>
+                    </div>
+                  )}
+                </div>
+              ))}
 
-            {/* Derived Inputs Display */}
-            {currentGenerator.formulas.derived_inputs && 
-             currentGenerator.formulas.derived_inputs.length > 0 && (
-              <div className="derived-inputs">
-                <h3>Calculated Values</h3>
-                {currentGenerator.formulas.derived_inputs.map((input) => (
-                  <div key={input.name} className="input-group">
-                    <label>{input.label}</label>
-                    <div className="derived-value">
-                      {derivedInputs[input.name] !== undefined 
-                        ? `${derivedInputs[input.name]} ${input.unit || ''}`
-                        : 'Calculating...'}
+              {/* Derived Inputs Display - Compact version */}
+              {currentGenerator.formulas.derived_inputs && 
+               currentGenerator.formulas.derived_inputs.length > 0 && (
+                <div className="derived-values-section">
+                  <h3>القيم المحسوبة</h3>
+                  <div className="derived-values-grid">
+                    {currentGenerator.formulas.derived_inputs.map((input) => (
+                      <div key={input.name} className="derived-value-item">
+                        <span className="derived-label">{input.label}:</span>
+                        <span className="derived-number">
+                          {derivedInputs[input.name] !== undefined 
+                            ? `${derivedInputs[input.name]} ${input.unit || ''}`
+                            : 'جاري الحساب...'}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {!autoCalculate && (
+                <button className="calculate-button" onClick={() => calculatePrice()}>
+                  حساب التكلفة
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Right panel: Results */}
+          <div className="results-panel">
+            <div className="panel-header">
+              <h2>تقدير التكلفة</h2>
+            </div>
+            
+            {calculationResult ? (
+              <div className="results-content">
+                <div className="price-summary">
+                  <div className="total-price-display">
+                    <span className="price-label">التكلفة الإجمالية:</span>
+                    <span className="price-value">
+                      {calculationResult.totalPrice.toLocaleString()} {calculationResult.currency}
+                    </span>
+                  </div>
+                  
+                  <div className="cost-breakdown">
+                    <div className="cost-item">
+                      <span>تكلفة العمالة:</span>
+                      <span>{calculationResult.laborCost.toLocaleString()} {calculationResult.currency}</span>
+                    </div>
+                    <div className="cost-item">
+                      <span>تكلفة المواد:</span>
+                      <span>{calculationResult.materialsCost.toLocaleString()} {calculationResult.currency}</span>
                     </div>
                   </div>
-                ))}
+                </div>
+                
+                <div className="input-summary">
+                  <h3>مواصفات المشروع</h3>
+                  <div className="specs-grid">
+                    {Object.entries(calculatorInputs).map(([key, value]) => {
+                      const input = currentGenerator.inputs.find(
+                        (input) => input.name === key
+                      );
+                      if (!input) return null;
+
+                      // Format the value based on input type
+                      let displayValue = value;
+                      if (
+                        input.type === "select" &&
+                        (input.name.endsWith("product_id") || input.option_type === "product")
+                      ) {
+                        const product = dataService.getProductById(value);
+                        displayValue = product
+                          ? `${product.name}`
+                          : value;
+                      } else if (input.type === "boolean") {
+                        displayValue = value ? "نعم" : "لا";
+                      } else if (input.unit) {
+                        displayValue = `${value} ${input.unit}`;
+                      }
+
+                      return (
+                        <div key={key} className="spec-item">
+                          <span className="spec-label">{input.label}:</span>
+                          <span className="spec-value">{displayValue}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+                
+                {calculationResult.products && calculationResult.products.length > 0 && (
+                  <div className="products-summary">
+                    <h3>المنتجات المستخدمة</h3>
+                    <div className="products-list">
+                      {calculationResult.products.map(product => (
+                        <div key={product.id} className="product-item">
+                          <span className="product-name">{product.name}</span>
+                          <span className="product-price">{product.price} {product.currency}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                <div className="action-buttons">
+                  <button className="primary-button">متابعة للحجز</button>
+                  <button className="secondary-button">الحصول على عرض سعر مفصل</button>
+                </div>
               </div>
-            )}
-
-            <div className="input-group">
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={autoCalculate}
-                  onChange={(e) => setAutoCalculate(e.target.checked)}
-                />
-                Auto-calculate
-              </label>
-            </div>
-
-            {!autoCalculate && (
-              <button className="calculate-btn" onClick={() => calculatePrice()}>
-                Calculate
-              </button>
+            ) : (
+              <div className="empty-result">
+                <p>أدخل تفاصيل المشروع لرؤية تقدير التكلفة</p>
+              </div>
             )}
           </div>
-        </div>
-
-        {/* Cost Estimate Section */}
-        <div className="result-section">
-          <h2 className="section-header">Cost Estimate</h2>
-          {calculationResult ? (
-            <div className="result-card">
-              <div className="result-details">
-                {/* Display input values */}
-                {Object.entries(calculatorInputs).map(([key, value]) => {
-                  // Find the input definition
-                  const input = currentGenerator.inputs.find(
-                    (input) => input.name === key
-                  );
-                  if (!input) return null;
-
-                  // Format the value based on input type
-                  let displayValue = value;
-                  if (
-                    input.type === "select" &&
-                    input.name.endsWith("product_id")
-                  ) {
-                    const product = dataService.getProductById(value);
-                    displayValue = product
-                      ? `${product.name} - ${product.price} ${product.currency}`
-                      : value;
-                  } else if (input.type === "boolean") {
-                    displayValue = value ? "نعم" : "لا";
-                  } else if (input.unit) {
-                    displayValue = `${value} ${input.unit}`;
-                  }
-
-                  return (
-                    <div key={key} className="detail-item">
-                      <span className="detail-label">{input.label}:</span>
-                      <span className="detail-value">{displayValue}</span>
-                    </div>
-                  );
-                })}
-
-                {/* Display derived input values */}
-                {currentGenerator.formulas.derived_inputs && 
-                 currentGenerator.formulas.derived_inputs.length > 0 && 
-                 Object.entries(derivedInputs).map(([key, value]) => {
-                  const derivedInput = currentGenerator.formulas.derived_inputs.find(
-                    (input) => input.name === key
-                  );
-                  if (!derivedInput) return null;
-
-                  return (
-                    <div key={key} className="detail-item">
-                      <span className="detail-label">{derivedInput.label}:</span>
-                      <span className="detail-value">
-                        {value} {derivedInput.unit || ''}
-                      </span>
-                    </div>
-                  );
-                })}
-
-                <hr />
-                <div className="detail-item">
-                  <span className="detail-label">Material Cost:</span>
-                  <span className="detail-value">
-                    {calculationResult.currency}{" "}
-                    {calculationResult.materialsCost.toFixed(2)}
-                  </span>
-                </div>
-                <div className="detail-item">
-                  <span className="detail-label">Labor Cost:</span>
-                  <span className="detail-value">
-                    {calculationResult.currency}{" "}
-                    {calculationResult.laborCost.toFixed(2)}
-                  </span>
-                </div>
-                <hr />
-                <div
-                  className="detail-item"
-                  style={{ fontWeight: "bold", fontSize: "1.2rem" }}
-                >
-                  <span className="detail-label">Total Cost:</span>
-                  <span className="detail-value">
-                    {calculationResult.currency}{" "}
-                    {calculationResult.totalPrice.toFixed(2)}
-                  </span>
-                </div>
-                <button className="booking-btn">Continue to Booking</button>
-                <button className="quote-detail-btn">Get Detailed Quote</button>
-              </div>
-            </div>
-          ) : (
-            <div className="empty-result">
-              <p>
-                Fill in the project details and click calculate to see the cost
-                estimate.
-              </p>
-            </div>
-          )}
         </div>
       </div>
     </div>
