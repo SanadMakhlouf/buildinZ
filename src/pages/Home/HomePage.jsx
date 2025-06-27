@@ -1,80 +1,199 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useSpring, animated } from 'react-spring';
+import { motion } from 'framer-motion';
 import './HomePage.css';
 
 const HomePage = () => {
+  // Hero section animations with react-spring
+  const heroAnimation = useSpring({
+    from: { opacity: 0, transform: 'translateY(30px)' },
+    to: { opacity: 1, transform: 'translateY(0)' },
+    config: { tension: 120, friction: 14 },
+    delay: 300,
+  });
+
+  // Floating animation for hero elements
+  const floatAnimation = useSpring({
+    from: { transform: 'translateY(0px)' },
+    to: { transform: 'translateY(0px)' }, // Disabled floating animation
+    config: { tension: 50, friction: 10 },
+    delay: 1000,
+  });
+
+  // Variants for staggered animations with framer-motion
+  const containerVariants = {
+    hidden: { opacity: 1 }, // Changed from 0 to 1 to ensure visibility
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0
+      }
+    }
+  };
+  
+  const itemVariants = {
+    hidden: { y: 0, opacity: 1 }, // Changed to ensure visibility
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: { type: 'spring', stiffness: 100 }
+    }
+  };
+
   return (
-    <div className="home-page">
-      <div className="hero-section">
-        <div className="hero-content">
-          <h1>BuildingZ</h1>
-          <h2>حاسبة تكاليف البناء والتشطيب</h2>
-          <p>الحل الأمثل لحساب تكاليف مشاريع البناء والتشطيب بدقة وسهولة</p>
-          <div className="hero-buttons">
-            <Link to="/services" className="primary-btn">ابدأ الحساب الآن</Link>
-            <Link to="/about" className="secondary-btn">تعرف علينا</Link>
-          </div>
+    <div className="homepage">
+      {/* Hero Section with Parallax */}
+      <section className="hero-section">
+        <div className="hero-parallax"></div>
+        <div className="hero-particles"></div>
+        <div className="container">
+          <animated.div className="hero-content" style={heroAnimation}>
+            <h1 className="hero-title">
+              حاسبة تكاليف <animated.span className="highlight">البناء</animated.span><br/>
+              <animated.span className="highlight">والتشطيب</animated.span>
+            </h1>
+            <animated.p className="hero-description">
+              الحل الأمثل لحساب تكاليف مشاريع البناء والتشطيب بدقة وسهولة.<br/>
+              احصل على تقديرات فورية وشفافة.
+            </animated.p>
+            <animated.div className="hero-buttons">
+              <Link to="/services" className="primary-btn">
+                <span className="btn-text">ابدأ الحساب الآن</span>
+                <span className="btn-icon"><i className="fas fa-arrow-left"></i></span>
+              </Link>
+              <Link to="/about" className="secondary-btn">
+                <span className="btn-text">تعرف علينا</span>
+              </Link>
+            </animated.div>
+          </animated.div>
         </div>
-      </div>
+        <div className="hero-wave"></div>
+      </section>
 
-      <div className="features-section">
-        <h2>مميزات الخدمة</h2>
-        <div className="features-grid">
-          <div className="feature-card">
-            <div className="feature-icon">🧮</div>
-            <h3>حساب دقيق</h3>
-            <p>حساب تكاليف البناء والتشطيب بدقة عالية وفق أحدث الأسعار</p>
+      {/* Why Choose Us Section */}
+      <section className="why-choose-section">
+        <div className="container">
+          <div>
+            <h2 className="section-title">لماذا تختار <span className="highlight">BuildingZ</span>؟</h2>
+            <p className="section-description">
+              نحن نقدم مجموعة من الميزات المصممة لتبسيط مشاريع البناء الخاصة بك من البداية إلى النهاية.
+            </p>
           </div>
-          <div className="feature-card">
-            <div className="feature-icon">📊</div>
-            <h3>تقارير مفصلة</h3>
-            <p>الحصول على تقارير مفصلة لتكاليف المواد والعمالة</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon">🛠️</div>
-            <h3>خدمات متنوعة</h3>
-            <p>أكثر من 50 خدمة في مجالات البناء والتشطيب المختلفة</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon">📱</div>
-            <h3>سهولة الاستخدام</h3>
-            <p>واجهة سهلة الاستخدام تناسب جميع المستخدمين</p>
+          
+          <div className="features-grid">
+            <div className="feature-card">
+              <div className="feature-icon-wrapper">
+                <div className="feature-icon">
+                  <i className="fas fa-calculator"></i>
+                </div>
+              </div>
+              <h3 className="feature-title">تقديرات دقيقة</h3>
+              <p className="feature-description">
+                احصل على تفاصيل تكلفة دقيقة لمشروعك مع حاسبتنا المتقدمة.
+              </p>
+            </div>
+            
+            <div className="feature-card">
+              <div className="feature-icon-wrapper">
+                <div className="feature-icon">
+                  <i className="fas fa-file-invoice-dollar"></i>
+                </div>
+              </div>
+              <h3 className="feature-title">عروض أسعار شفافة</h3>
+              <p className="feature-description">
+                قارن عروض الأسعار بسهولة واختر الخيار الأنسب لميزانيتك.
+              </p>
+            </div>
+            
+            <div className="feature-card">
+              <div className="feature-icon-wrapper">
+                <div className="feature-icon">
+                  <i className="fas fa-users-gear"></i>
+                </div>
+              </div>
+              <h3 className="feature-title">مقدمو خدمة معتمدون</h3>
+              <p className="feature-description">
+                تواصل مع أفضل المهنيين والمقاولين في منطقتك.
+              </p>
+            </div>
+            
+            <div className="feature-card">
+              <div className="feature-icon-wrapper">
+                <div className="feature-icon">
+                  <i className="fas fa-chart-line"></i>
+                </div>
+              </div>
+              <h3 className="feature-title">تتبع المشاريع</h3>
+              <p className="feature-description">
+                راقب تقدم مشروعك من خلال لوحة تحكم سهلة الاستخدام.
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div className="services-preview-section">
-        <h2>خدماتنا</h2>
-        <div className="services-preview-grid">
-          <div className="service-preview-card">
-            <div className="service-icon">🎨</div>
-            <h3>خدمات الدهان</h3>
-            <p>حساب تكاليف دهان الجدران الداخلية والخارجية</p>
-            <Link to="/services?category=1" className="service-link">استكشاف الخدمة</Link>
+      {/* How It Works Section */}
+      <section className="how-it-works-section">
+        <div className="container">
+          <div>
+            <h2 className="section-title">كيف يعمل؟</h2>
+            <p className="section-description">ثلاث خطوات بسيطة لتحقيق مشروع أحلامك.</p>
           </div>
-          <div className="service-preview-card">
-            <div className="service-icon">🏗️</div>
-            <h3>خدمات الأرضيات</h3>
-            <p>حساب تكاليف تركيب السيراميك والبلاط والباركيه</p>
-            <Link to="/services?category=2" className="service-link">استكشاف الخدمة</Link>
-          </div>
-          <div className="service-preview-card">
-            <div className="service-icon">⚡</div>
-            <h3>خدمات الكهرباء</h3>
-            <p>حساب تكاليف التمديدات والتركيبات الكهربائية</p>
-            <Link to="/services?category=3" className="service-link">استكشاف الخدمة</Link>
+          
+          <div className="steps-container">
+            <div className="steps-image">
+              <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/d87f426b11-8b49fa125e5694bcb57a.png" alt="Team collaborating over blueprint" />
+            </div>
+            
+            <div className="steps-content">
+              <div className="step">
+                <div className="step-number">1</div>
+                <div className="step-details">
+                  <h3 className="step-title">صف مشروعك</h3>
+                  <p className="step-description">
+                    أدخل تفاصيل مشروعك، من المساحة إلى المواد، في حاسبتنا البديهية.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="step">
+                <div className="step-number">2</div>
+                <div className="step-details">
+                  <h3 className="step-title">احصل على تقديرات</h3>
+                  <p className="step-description">
+                    استلم تقديرات فورية للتكلفة وقائمة بمقدمي الخدمات المؤهلين.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="step">
+                <div className="step-number">3</div>
+                <div className="step-details">
+                  <h3 className="step-title">اختر وابدأ</h3>
+                  <p className="step-description">
+                    قارن بين المحترفين، اختر الأفضل لمشروعك، وابدأ العمل بثقة.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <div className="view-all-services">
-          <Link to="/services" className="view-all-link">عرض جميع الخدمات</Link>
-        </div>
-      </div>
+      </section>
 
-      <div className="cta-section">
-        <h2>ابدأ الآن في حساب تكاليف مشروعك</h2>
-        <p>احصل على تقدير دقيق لتكاليف مشروعك في دقائق معدودة</p>
-        <Link to="/services" className="cta-button">ابدأ الحساب الآن</Link>
-      </div>
+      {/* Call to Action Section */}
+      <section className="cta-section">
+        <div className="container">
+          <div>
+            <h2 className="cta-title">جاهز لبدء مشروعك؟</h2>
+            <p className="cta-description">انضم إلى الآلاف من العملاء الراضين الذين يستخدمون BuildingZ لتحقيق مشاريعهم بنجاح.</p>
+            <Link to="/services" className="cta-button">
+              ابدأ مشروعك الآن
+              <i className="fas fa-arrow-left"></i>
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };

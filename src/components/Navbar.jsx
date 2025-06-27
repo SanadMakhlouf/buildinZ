@@ -11,32 +11,25 @@ const Navbar = () => {
 
   return (
     <nav className="navbar">
-      <div className="navbar-brand">
-        <Link to="/" className="brand-link">
-          <span className="brand-name">BuildingZ</span>
-        </Link>
-      </div>
-      <div className="navbar-menu">
-        <Link to="/" className={`navbar-item ${isActive("/")}`}>
-          الرئيسية
-        </Link>
-        <Link to="/services" className={`navbar-item ${isActive("/services")}`}>
-          حاسبة التكاليف
-        </Link>
-        <Link to="/providers" className={`navbar-item ${isActive("/providers")}`}>
-          مقدمي الخدمات
-        </Link>
-        <Link to="/quotes" className={`navbar-item ${isActive("/quotes")}`}>
-          عروض الأسعار
-        </Link>
-      </div>
-      <div className="navbar-auth">
-        <Link to="/login" className="login-btn">
-          تسجيل الدخول
-        </Link>
-        <Link to="/signup" className="register-btn">
-          إنشاء حساب
-        </Link>
+      <div className="container">
+        <div className="navbar-content">
+          <div className="auth-buttons">
+            <Link to="/signup" className="signup-btn">إنشاء حساب</Link>
+            <Link to="/login" className="login-btn">تسجيل الدخول</Link>
+          </div>
+          
+          <div className="nav-links">
+            <Link to="/" className={`nav-link ${isActive("/")}`}>الرئيسية</Link>
+            <Link to="/services" className={`nav-link ${isActive("/services")}`}>الخدمات</Link>
+            <Link to="/providers" className={`nav-link ${isActive("/providers")}`}>مقدمي الخدمات</Link>
+            <Link to="/quotes" className={`nav-link ${isActive("/quotes")}`}>عروض الأسعار</Link>
+            <Link to="/admin" className={`nav-link ${isActive("/admin")}`}>لوحة التحكم</Link>
+          </div>
+          
+          <div className="brand">
+            <Link to="/" className="brand-link">BuildingZ</Link>
+          </div>
+        </div>
       </div>
     </nav>
   );

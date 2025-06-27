@@ -2,12 +2,14 @@
   min-height: calc(100vh - 60px); /* Adjust based on navbar height */
   display: flex;
   flex-direction: column;
+  overflow: auto; /* Allow scrolling */
 }
 
 .services-container {
   display: flex;
   flex: 1;
-  height: calc(100vh - 60px); /* Adjust based on navbar height */
+  height: auto; /* Remove fixed height */
+  overflow: visible; /* Allow content to be visible */
 }
 
 @media (max-width: 768px) {
