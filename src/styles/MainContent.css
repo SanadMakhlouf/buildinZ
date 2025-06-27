@@ -4,6 +4,7 @@
   height: 100vh;
   overflow: hidden;
   direction: rtl;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .welcome-message {
@@ -630,6 +631,7 @@ select {
   margin-bottom: 1.5rem;
   padding-bottom: 0.5rem;
   border-bottom: 1px solid #eaeaea;
+  text-align: right;
 }
 
 .service-header h1 {
@@ -699,6 +701,7 @@ select {
   color: #555;
   font-size: 0.9rem;
   font-weight: 500;
+  text-align: right;
 }
 
 /* Number Input */
@@ -715,6 +718,7 @@ select {
   border-radius: 4px;
   font-size: 0.9rem;
   transition: border-color 0.2s;
+  text-align: right;
 }
 
 .number-input-wrapper input:focus {
@@ -725,7 +729,8 @@ select {
 
 .unit-badge {
   position: absolute;
-  right: 8px;
+  left: 8px;
+  right: auto;
   background-color: #f0f0f0;
   padding: 0.1rem 0.3rem;
   border-radius: 3px;
@@ -747,9 +752,11 @@ select {
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 8px center;
+  background-position: left 8px center;
   background-size: 16px;
-  padding-right: 30px;
+  padding-left: 30px;
+  text-align: right;
+  direction: rtl;
 }
 
 .select-wrapper select:focus {
@@ -762,6 +769,7 @@ select {
 .switch-wrapper {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
 }
 
 .switch {
@@ -785,7 +793,8 @@ select {
   background-color: #ccc;
   border-radius: 20px;
   transition: 0.3s;
-  margin-right: 8px;
+  margin-left: 8px;
+  margin-right: 0;
 }
 
 .slider:before {
@@ -793,7 +802,8 @@ select {
   content: "";
   height: 16px;
   width: 16px;
-  left: 2px;
+  right: 2px;
+  left: auto;
   bottom: 2px;
   background-color: white;
   border-radius: 50%;
@@ -805,7 +815,7 @@ input:checked + .slider {
 }
 
 input:checked + .slider:before {
-  transform: translateX(16px);
+  transform: translateX(-16px);
 }
 
 .switch-text {
@@ -826,7 +836,8 @@ input:checked + .slider:before {
 }
 
 .toggle-label input {
-  margin-right: 6px;
+  margin-left: 6px;
+  margin-right: 0;
 }
 
 .toggle-text {
@@ -846,6 +857,7 @@ input:checked + .slider:before {
   font-weight: 600;
   color: #555;
   margin-bottom: 0.75rem;
+  text-align: right;
 }
 
 .derived-values-grid {
@@ -860,6 +872,7 @@ input:checked + .slider:before {
   border-radius: 4px;
   display: flex;
   flex-direction: column;
+  text-align: right;
 }
 
 .derived-label {
@@ -941,6 +954,7 @@ input:checked + .slider:before {
   display: flex;
   flex-direction: column;
   font-size: 0.85rem;
+  text-align: right;
 }
 
 .cost-item span:first-child {
@@ -964,6 +978,7 @@ input:checked + .slider:before {
   font-weight: 600;
   color: #555;
   margin-bottom: 0.75rem;
+  text-align: right;
 }
 
 .specs-grid {
@@ -975,6 +990,7 @@ input:checked + .slider:before {
 .spec-item {
   display: flex;
   flex-direction: column;
+  text-align: right;
 }
 
 .spec-label {
@@ -994,6 +1010,7 @@ input:checked + .slider:before {
   font-weight: 600;
   color: #555;
   margin-bottom: 0.75rem;
+  text-align: right;
 }
 
 .products-list {
@@ -1030,16 +1047,20 @@ input:checked + .slider:before {
   margin-top: auto;
 }
 
+.primary-button, .secondary-button {
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 0.6rem 1rem;
+  transition: background-color 0.2s;
+}
+
 .primary-button {
   background-color: #0c4da2;
   color: white;
   border: none;
-  padding: 0.6rem 1rem;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s;
 }
 
 .primary-button:hover {
@@ -1050,12 +1071,6 @@ input:checked + .slider:before {
   background-color: white;
   color: #0c4da2;
   border: 1px solid #0c4da2;
-  padding: 0.6rem 1rem;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s;
 }
 
 .secondary-button:hover {
@@ -1094,6 +1109,10 @@ input:checked + .slider:before {
   .compact-input-group {
     grid-template-columns: 1fr;
     gap: 0.25rem;
+  }
+  
+  .compact-input-group label {
+    text-align: right;
   }
   
   .action-buttons {
