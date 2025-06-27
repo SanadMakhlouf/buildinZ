@@ -42,6 +42,36 @@ const HomePage = () => {
     }
   };
 
+  // Testimonials data
+  const testimonials = [
+    {
+      id: 1,
+      text: "جربت خدمة تركيب من BuildingZ وكان الفني محترف ووصل في الوقت المحدد!",
+      name: "خالد",
+      location: "دبي"
+    },
+    {
+      id: 2,
+      text: "أطلب من التطبيق خدمات تنظيف بشكل أسبوعي. جودة ممتازة وسهولة في التعامل.",
+      name: "مريم",
+      location: "أبوظبي"
+    },
+    {
+      id: 3,
+      text: "كل شيء تم إلكترونيًا وبسهولة، فريق الدعم ساعدني فوراً لما واجهت مشكلة بسيطة.",
+      name: "أحمد",
+      location: "الشارقة"
+    }
+  ];
+
+  // Stats data
+  const stats = [
+    { id: 1, icon: "fa-check", value: "15,000+", label: "خدمة منفذة بنجاح" },
+    { id: 2, icon: "fa-tools", value: "300+", label: "فني ومزود خدمة نشط" },
+    { id: 3, icon: "fa-city", value: "100%", label: "تغطية شاملة لكل الإمارات" },
+    { id: 4, icon: "fa-star", value: "4.8/5", label: "معدل رضا العملاء" }
+  ];
+
   return (
     <div className="homepage">
       {/* Hero Section with Parallax */}
@@ -51,20 +81,18 @@ const HomePage = () => {
         <div className="container">
           <animated.div className="hero-content" style={heroAnimation}>
             <h1 className="hero-title">
-              حاسبة تكاليف <animated.span className="highlight">البناء</animated.span><br/>
-              <animated.span className="highlight">والتشطيب</animated.span>
+              أنجز كل خدماتك المنزلية والتجارية بسهولة مع <animated.span className="highlight">BuildingZ</animated.span>
             </h1>
             <animated.p className="hero-description">
-              الحل الأمثل لحساب تكاليف مشاريع البناء والتشطيب بدقة وسهولة.<br/>
-              احصل على تقديرات فورية وشفافة.
+              نحن المنصة الأولى في الإمارات التي تتيح لك حجز خدمات موثوقة مثل التنظيف، الصيانة، التركيبات، وغيرها بضغطة زر.
             </animated.p>
             <animated.div className="hero-buttons">
               <Link to="/services" className="primary-btn">
-                <span className="btn-text">ابدأ الحساب الآن</span>
+                <span className="btn-text">احجز الآن</span>
                 <span className="btn-icon"><i className="fas fa-arrow-left"></i></span>
               </Link>
-              <Link to="/about" className="secondary-btn">
-                <span className="btn-text">تعرف علينا</span>
+              <Link to="/services" className="secondary-btn">
+                <span className="btn-text">تصفح الخدمات</span>
               </Link>
             </animated.div>
           </animated.div>
@@ -72,13 +100,98 @@ const HomePage = () => {
         <div className="hero-wave"></div>
       </section>
 
+      {/* Value Cards Section */}
+      <section className="value-cards-section">
+        <div className="container">
+          <div className="value-cards-grid">
+            <div className="value-card">
+              <div className="value-icon">
+                <i className="fas fa-th-large"></i>
+              </div>
+              <h3 className="value-title">خدمات متنوعة</h3>
+              <p className="value-description">
+                خدمات شاملة للمنازل، المكاتب، الشركات، والمتاجر — كلها في تطبيق واحد.
+              </p>
+            </div>
+            
+            <div className="value-card">
+              <div className="value-icon">
+                <i className="fas fa-bolt"></i>
+              </div>
+              <h3 className="value-title">حجز سريع وسهل</h3>
+              <p className="value-description">
+                اختر خدمتك والموقع والتاريخ، وسنقوم بالباقي.
+              </p>
+            </div>
+            
+            <div className="value-card">
+              <div className="value-icon">
+                <i className="fas fa-tasks"></i>
+              </div>
+              <h3 className="value-title">إدارة كاملة للخدمة</h3>
+              <p className="value-description">
+                تابع الطلبات، قيّم مزود الخدمة، وتواصل بسهولة من خلال التطبيق.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* About Us Section */}
+      <section className="about-section">
+        <div className="container">
+          <div className="about-content">
+            <div className="about-text">
+              <h2 className="section-title">BuildingZ – <span className="highlight">خدمات موثوقة لحياة أسهل</span></h2>
+              <p className="about-description">
+                BuildingZ هي منصتك الذكية لإتمام جميع احتياجاتك اليومية أو التجارية داخل الإمارات. نقدم خدمات فعالة وسريعة عبر تطبيق سهل الاستخدام. هدفنا أن نجعل تجربة حجز الخدمة سلسة، شفافة، وموثوقة — بدون مكالمات مزعجة، ولا انتظار.
+              </p>
+              
+              <h3 className="about-subtitle">لماذا BuildingZ؟</h3>
+              <ul className="about-features">
+                <li><i className="fas fa-headset"></i> فريق خدمة عملاء متواجد دائمًا</li>
+                <li><i className="fas fa-user-check"></i> مزودو خدمات تم التحقق منهم</li>
+                <li><i className="fas fa-heart"></i> رضا العملاء هو أولويتنا</li>
+                <li><i className="fas fa-mobile-alt"></i> واجهة استخدام سهلة وسريعة</li>
+              </ul>
+              
+              <Link to="/about" className="about-btn">
+                اعرف أكثر
+                <i className="fas fa-arrow-left"></i>
+              </Link>
+            </div>
+            <div className="about-image">
+              <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/d87f426b11-8b49fa125e5694bcb57a.png" alt="BuildingZ App" />
+              <div className="about-image-shape"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Quick Stats Section */}
+      <section className="stats-section">
+        <div className="container">
+          <div className="stats-grid">
+            {stats.map(stat => (
+              <div className="stat-card" key={stat.id}>
+                <div className="stat-icon">
+                  <i className={`fas ${stat.icon}`}></i>
+                </div>
+                <div className="stat-value">{stat.value}</div>
+                <div className="stat-label">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Categories Section */}
       <section className="categories-section">
         <div className="container">
           <div>
-            <h2 className="section-title">خدماتنا <span className="highlight">المتنوعة</span></h2>
+            <h2 className="section-title">الأقسام الرئيسية <span className="highlight">للخدمات</span></h2>
             <p className="section-description">
-              نقدم مجموعة واسعة من الخدمات لتلبية احتياجات مشروعك بدقة وكفاءة.
+              اختر نوع الخدمة التي تحتاجها
             </p>
           </div>
           
@@ -98,115 +211,12 @@ const HomePage = () => {
               </Link>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* Why Choose Us Section */}
-      <section className="why-choose-section">
-        <div className="container">
-          <div>
-            <h2 className="section-title">لماذا تختار <span className="highlight">BuildingZ</span>؟</h2>
-            <p className="section-description">
-              نحن نقدم مجموعة من الميزات المصممة لتبسيط مشاريع البناء الخاصة بك من البداية إلى النهاية.
-            </p>
-          </div>
           
-          <div className="features-grid">
-            <div className="feature-card">
-              <div className="feature-icon-wrapper">
-                <div className="feature-icon">
-                  <i className="fas fa-calculator"></i>
-                </div>
-              </div>
-              <h3 className="feature-title">تقديرات دقيقة</h3>
-              <p className="feature-description">
-                احصل على تفاصيل تكلفة دقيقة لمشروعك مع حاسبتنا المتقدمة.
-              </p>
-            </div>
-            
-            <div className="feature-card">
-              <div className="feature-icon-wrapper">
-                <div className="feature-icon">
-                  <i className="fas fa-file-invoice-dollar"></i>
-                </div>
-              </div>
-              <h3 className="feature-title">عروض أسعار شفافة</h3>
-              <p className="feature-description">
-                قارن عروض الأسعار بسهولة واختر الخيار الأنسب لميزانيتك.
-              </p>
-            </div>
-            
-            <div className="feature-card">
-              <div className="feature-icon-wrapper">
-                <div className="feature-icon">
-                  <i className="fas fa-users-gear"></i>
-                </div>
-              </div>
-              <h3 className="feature-title">مقدمو خدمة معتمدون</h3>
-              <p className="feature-description">
-                تواصل مع أفضل المهنيين والمقاولين في منطقتك.
-              </p>
-            </div>
-            
-            <div className="feature-card">
-              <div className="feature-icon-wrapper">
-                <div className="feature-icon">
-                  <i className="fas fa-chart-line"></i>
-                </div>
-              </div>
-              <h3 className="feature-title">تتبع المشاريع</h3>
-              <p className="feature-description">
-                راقب تقدم مشروعك من خلال لوحة تحكم سهلة الاستخدام.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works Section */}
-      <section className="how-it-works-section">
-        <div className="container">
-          <div>
-            <h2 className="section-title">كيف يعمل؟</h2>
-            <p className="section-description">ثلاث خطوات بسيطة لتحقيق مشروع أحلامك.</p>
-          </div>
-          
-          <div className="steps-container">
-            <div className="steps-image">
-              <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/d87f426b11-8b49fa125e5694bcb57a.png" alt="Team collaborating over blueprint" />
-            </div>
-            
-            <div className="steps-content">
-              <div className="step">
-                <div className="step-number">1</div>
-                <div className="step-details">
-                  <h3 className="step-title">صف مشروعك</h3>
-                  <p className="step-description">
-                    أدخل تفاصيل مشروعك، من المساحة إلى المواد، في حاسبتنا البديهية.
-                  </p>
-                </div>
-              </div>
-              
-              <div className="step">
-                <div className="step-number">2</div>
-                <div className="step-details">
-                  <h3 className="step-title">احصل على تقديرات</h3>
-                  <p className="step-description">
-                    استلم تقديرات فورية للتكلفة وقائمة بمقدمي الخدمات المؤهلين.
-                  </p>
-                </div>
-              </div>
-              
-              <div className="step">
-                <div className="step-number">3</div>
-                <div className="step-details">
-                  <h3 className="step-title">اختر وابدأ</h3>
-                  <p className="step-description">
-                    قارن بين المحترفين، اختر الأفضل لمشروعك، وابدأ العمل بثقة.
-                  </p>
-                </div>
-              </div>
-            </div>
+          <div className="categories-action">
+            <Link to="/services" className="view-all-btn">
+              استعرض كل الخدمات
+              <i className="fas fa-arrow-left"></i>
+            </Link>
           </div>
         </div>
       </section>
@@ -216,22 +226,26 @@ const HomePage = () => {
         <div className="container">
           <div className="app-download-content">
             <div className="app-download-text">
-              <h2 className="app-title">حمّل تطبيق BuildingZ</h2>
+              <h2 className="app-title">كل خدماتك في جيبك!</h2>
               <p className="app-description">
-                احصل على تقديرات البناء والتشطيب في أي وقت وأي مكان. تطبيقنا متاح الآن على متجر آبل وجوجل بلاي.
+                حمّل تطبيق BuildingZ وتمتع بتجربة حجز خالية من التعقيد.
               </p>
               <div className="app-features">
                 <div className="app-feature">
-                  <i className="fas fa-bolt"></i>
-                  <span>حاسبة فورية</span>
-                </div>
-                <div className="app-feature">
-                  <i className="fas fa-bell"></i>
-                  <span>إشعارات مباشرة</span>
+                  <i className="fas fa-check-circle"></i>
+                  <span>واجهة سهلة الاستخدام</span>
                 </div>
                 <div className="app-feature">
                   <i className="fas fa-map-marker-alt"></i>
-                  <span>تتبع المقاولين</span>
+                  <span>تتبع الخدمة لحظة بلحظة</span>
+                </div>
+                <div className="app-feature">
+                  <i className="fas fa-bell"></i>
+                  <span>إشعارات فورية</span>
+                </div>
+                <div className="app-feature">
+                  <i className="fas fa-star"></i>
+                  <span>تقييمات موثوقة</span>
                 </div>
               </div>
               <div className="app-buttons">
@@ -264,6 +278,163 @@ const HomePage = () => {
         </div>
       </section>
 
+      {/* Clients Section */}
+      <section className="clients-section">
+        <div className="container">
+          <h2 className="section-title">الشركاء <span className="highlight">والعملاء</span></h2>
+          <p className="section-description">نفتخر بخدمة عملائنا في مختلف القطاعات</p>
+          
+          <div className="clients-grid">
+            <div className="client-type">
+              <div className="client-icon"><i className="fas fa-home"></i></div>
+              <h3>الأفراد والعائلات</h3>
+            </div>
+            <div className="client-type">
+              <div className="client-icon"><i className="fas fa-building"></i></div>
+              <h3>الشركات والمكاتب</h3>
+            </div>
+            <div className="client-type">
+              <div className="client-icon"><i className="fas fa-landmark"></i></div>
+              <h3>الفلل والمباني</h3>
+            </div>
+            <div className="client-type">
+              <div className="client-icon"><i className="fas fa-store"></i></div>
+              <h3>متاجر البيع بالتجزئة</h3>
+            </div>
+            <div className="client-type">
+              <div className="client-icon"><i className="fas fa-city"></i></div>
+              <h3>المشاريع العقارية</h3>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="testimonials-section">
+        <div className="container">
+          <h2 className="section-title">آراء <span className="highlight">العملاء</span></h2>
+          <div className="testimonials-grid">
+            {testimonials.map(testimonial => (
+              <div className="testimonial-card" key={testimonial.id}>
+                <div className="testimonial-quote">
+                  <i className="fas fa-quote-right"></i>
+                </div>
+                <p className="testimonial-text">{testimonial.text}</p>
+                <div className="testimonial-author">
+                  <div className="testimonial-avatar">
+                    <i className="fas fa-user"></i>
+                  </div>
+                  <div className="testimonial-info">
+                    <h4>{testimonial.name}</h4>
+                    <p>{testimonial.location}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Latest Additions Section */}
+      <section className="latest-section">
+        <div className="container">
+          <h2 className="section-title">الإضافات <span className="highlight">الجديدة</span></h2>
+          <p className="section-description">جديد في BuildingZ؟ جرّب هذه الخدمات المضافة حديثاً</p>
+          
+          <div className="latest-grid">
+            <div className="latest-card">
+              <div className="latest-icon">
+                <i className="fas fa-couch"></i>
+              </div>
+              <h3>تنظيف المجالس والسجاد</h3>
+            </div>
+            <div className="latest-card">
+              <div className="latest-icon">
+                <i className="fas fa-spray-can"></i>
+              </div>
+              <h3>خدمات تعقيم ومكافحة الحشرات</h3>
+            </div>
+            <div className="latest-card">
+              <div className="latest-icon">
+                <i className="fas fa-video"></i>
+              </div>
+              <h3>تركيب كاميرات المراقبة</h3>
+            </div>
+            <div className="latest-card">
+              <div className="latest-icon">
+                <i className="fas fa-wind"></i>
+              </div>
+              <h3>صيانة أجهزة التكييف المركزية</h3>
+            </div>
+          </div>
+          
+          <div className="latest-actions">
+            <Link to="/services" className="primary-btn">
+              <span className="btn-text">اطلب الآن</span>
+              <span className="btn-icon"><i className="fas fa-arrow-left"></i></span>
+            </Link>
+            <Link to="/services" className="secondary-btn">
+              <span className="btn-text">استعرض الجديد</span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section className="contact-section">
+        <div className="container">
+          <div className="contact-content">
+            <div className="contact-text">
+              <h2 className="contact-title">تواصل <span className="highlight">معنا</span></h2>
+              <p className="contact-description">
+                هل لديك سؤال؟ فريقنا هنا لخدمتك على مدار الساعة.
+              </p>
+              
+              <div className="contact-info">
+                <div className="contact-item">
+                  <div className="contact-icon">
+                    <i className="fas fa-phone-alt"></i>
+                  </div>
+                  <div className="contact-detail">
+                    <h3>الهاتف / واتساب</h3>
+                    <p>+971 50 123 4567</p>
+                  </div>
+                </div>
+                
+                <div className="contact-item">
+                  <div className="contact-icon">
+                    <i className="fas fa-envelope"></i>
+                  </div>
+                  <div className="contact-detail">
+                    <h3>البريد الإلكتروني</h3>
+                    <p>support@buildinz.com</p>
+                  </div>
+                </div>
+                
+                <div className="contact-item">
+                  <div className="contact-icon">
+                    <i className="fas fa-clock"></i>
+                  </div>
+                  <div className="contact-detail">
+                    <h3>ساعات العمل</h3>
+                    <p>طوال أيام الأسبوع – 24/7</p>
+                  </div>
+                </div>
+              </div>
+              
+              <Link to="/contact" className="contact-btn">
+                تواصل معنا الآن
+                <i className="fas fa-arrow-left"></i>
+              </Link>
+            </div>
+            
+            <div className="contact-image">
+              <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/d87f426b11-8b49fa125e5694bcb57a.png" alt="Customer Support" />
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Call to Action Section */}
       <section className="cta-section">
         <div className="container">
@@ -277,6 +448,57 @@ const HomePage = () => {
           </div>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="footer">
+        <div className="container">
+          <div className="footer-content">
+            <div className="footer-logo">
+              <h2>BuildingZ</h2>
+              <p>نحن نضع بين يديك كل خدماتك اليومية في تطبيق واحد.</p>
+            </div>
+            
+            <div className="footer-links">
+              <div className="footer-link-group">
+                <h3>روابط سريعة</h3>
+                <ul>
+                  <li><Link to="/">الرئيسية</Link></li>
+                  <li><Link to="/services">الخدمات</Link></li>
+                  <li><Link to="/about">من نحن</Link></li>
+                  <li><Link to="/contact">تواصل معنا</Link></li>
+                </ul>
+              </div>
+              
+              <div className="footer-link-group">
+                <h3>التطبيق</h3>
+                <ul>
+                  <li><a href="#">حمل التطبيق</a></li>
+                  <li><Link to="/privacy">سياسة الخصوصية</Link></li>
+                  <li><Link to="/terms">الشروط والأحكام</Link></li>
+                </ul>
+              </div>
+              
+              <div className="footer-link-group">
+                <h3>تواصل معنا</h3>
+                <ul>
+                  <li><a href="tel:+97150123456">+971 50 123 4567</a></li>
+                  <li><a href="mailto:support@buildinz.com">support@buildinz.com</a></li>
+                </ul>
+                <div className="footer-social">
+                  <a href="#"><i className="fab fa-facebook-f"></i></a>
+                  <a href="#"><i className="fab fa-twitter"></i></a>
+                  <a href="#"><i className="fab fa-instagram"></i></a>
+                  <a href="#"><i className="fab fa-linkedin-in"></i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="footer-bottom">
+            <p>© 2025 BuildingZ. جميع الحقوق محفوظة.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
