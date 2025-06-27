@@ -3,7 +3,7 @@ import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
   Paper, Button, TextField, Dialog, DialogActions, DialogContent,
   DialogTitle, IconButton, FormControl, InputLabel, Select, MenuItem,
-  FormHelperText
+  FormHelperText, Checkbox, ListItemText, OutlinedInput
 } from '@mui/material';
 import { Add, Edit, Delete } from '@mui/icons-material';
 import dataService from '../../services/dataService';
@@ -26,6 +26,7 @@ const ServicesManager = ({ categories, generators, onDataChange }) => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedSubcategory, setSelectedSubcategory] = useState('');
   const [availableSubcategories, setAvailableSubcategories] = useState([]);
+  const products = dataService.getProducts();
 
   // Handle category selection change
   const handleCategoryChange = (categoryId) => {
@@ -86,6 +87,17 @@ const ServicesManager = ({ categories, generators, onDataChange }) => {
       dataService.deleteService(categoryId, subcategoryId, serviceId);
       onDataChange();
     }
+  };
+
+  // Handle product selection change
+  const handleProductChange = (event) => {
+    const {
+      target: { value },
+    } = event;
+    setForm({
+      ...form,
+      product_ids: typeof value === 'string' ? value.split(',').map(Number) : value
+    });
   };
 
   // Render all services from all categories and subcategories
@@ -335,6 +347,27 @@ const ServicesManager = ({ categories, generators, onDataChange }) => {
               ))}
             </Select>
             <FormHelperText>Select the calculator generator for this service</FormHelperText>
+          </FormControl>
+          
+          <FormControl fullWidth margin="dense">
+            <InputLabel>Associated Products</InputLabel>
+            <Select
+              multiple
+              value={form.product_ids}
+              onChange={handleProductChange}
+              input={<OutlinedInput label="Associated Products" />}
+              renderValue={(selected) => selected
+                .map(id => products.find(p => p.id === id)?.name || `Product ${id}`)
+                .join(', ')}
+            >
+              {products.map(product => (
+                <MenuItem key={product.id} value={product.id}>
+                  <Checkbox checked={form.product_ids.indexOf(product.id) > -1} />
+                  <ListItemText primary={`${product.name} - ${product.price} ${product.currency}`} />
+                </MenuItem>
+              ))}
+            </Select>
+            <FormHelperText>Select products associated with this service</FormHelperText>
           </FormControl>
         </DialogContent>
         <DialogActions>
