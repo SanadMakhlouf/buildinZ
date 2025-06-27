@@ -6,7 +6,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-import Tilt from 'react-parallax-tilt';
+
 import './HomePage.css';
 import buildingzData from '../../data/json/buildingzData.json';
 
@@ -234,16 +234,10 @@ const HomePage = () => {
         ></motion.div>
       </section>
 
-      {/* Value Cards Section with Tilt Effect */}
+      {/* Value Cards Section with Light Animations */}
       <section className="value-cards-section">
         <div className="container">
-          <motion.div 
-            className="value-cards-grid"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.8, staggerChildren: 0.2 }}
-            viewport={{ once: true }}
-          >
+          <div className="value-cards-grid">
             {[
               {
                 icon: "fa-th-large",
@@ -261,36 +255,15 @@ const HomePage = () => {
                 description: "تابع الطلبات، قيّم مزود الخدمة، وتواصل بسهولة من خلال التطبيق."
               }
             ].map((card, index) => (
-              <Tilt
-                key={index}
-                tiltMaxAngleX={15}
-                tiltMaxAngleY={15}
-                perspective={1000}
-                scale={1.05}
-                transitionSpeed={2000}
-                gyroscope={true}
-              >
-                <motion.div 
-                  className="value-card"
-                  initial={{ opacity: 0, y: 50 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.2 }}
-                  whileHover={{ y: -10, boxShadow: "0 20px 40px rgba(0,0,0,0.1)" }}
-                  viewport={{ once: true }}
-                >
-                  <motion.div 
-                    className="value-icon"
-                    whileHover={{ rotate: 360, scale: 1.1 }}
-                    transition={{ duration: 0.6 }}
-                  >
-                    <i className={`fas ${card.icon}`}></i>
-                  </motion.div>
-                  <h3 className="value-title">{card.title}</h3>
-                  <p className="value-description">{card.description}</p>
-                </motion.div>
-              </Tilt>
+              <div key={index} className="value-card">
+                <div className="value-icon">
+                  <i className={`fas ${card.icon}`}></i>
+                </div>
+                <h3 className="value-title">{card.title}</h3>
+                <p className="value-description">{card.description}</p>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -331,50 +304,27 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Animated Stats Section */}
+      {/* Stats Section */}
       <section className="stats-section">
         <div className="container">
-          <motion.div 
-            className="stats-grid"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.8, staggerChildren: 0.1 }}
-            viewport={{ once: true }}
-          >
+          <div className="stats-grid">
             {stats.map((stat, index) => (
               <motion.div 
                 key={stat.id} 
                 className="stat-card"
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                whileHover={{ 
-                  scale: 1.1, 
-                  backgroundColor: 'rgba(218, 165, 32, 0.1)',
-                  transition: { duration: 0.3 }
-                }}
+                initial={{ opacity: 0, y: 25 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: index * 0.05 }}
                 viewport={{ once: true }}
               >
-                <motion.div 
-                  className="stat-icon"
-                  animate={{ rotate: [0, 10, -10, 0] }}
-                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-                >
+                <div className="stat-icon">
                   <i className={`fas ${stat.icon}`}></i>
-                </motion.div>
-                <motion.div 
-                  className="stat-value"
-                  initial={{ scale: 0 }}
-                  whileInView={{ scale: 1 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 + 0.3 }}
-                  viewport={{ once: true }}
-                >
-                  {stat.value}
-                </motion.div>
+                </div>
+                <div className="stat-value">{stat.value}</div>
                 <div className="stat-label">{stat.label}</div>
               </motion.div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -408,23 +358,12 @@ const HomePage = () => {
             ))}
           </div>
           
-          <motion.div 
-            className="categories-action"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
-            viewport={{ once: true }}
-          >
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Link to="/services" className="view-all-btn">
-                استعرض كل الخدمات
-                <i className="fas fa-arrow-left"></i>
-              </Link>
-            </motion.div>
-          </motion.div>
+          <div className="categories-action">
+            <Link to="/services" className="view-all-btn">
+              استعرض كل الخدمات
+              <i className="fas fa-arrow-left"></i>
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -432,13 +371,7 @@ const HomePage = () => {
       <section className="app-download-section">
         <div className="container">
           <div className="app-download-content">
-            <motion.div 
-              className="app-download-text"
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-            >
+            <div className="app-download-text">
               <h2 className="app-title">كل خدماتك في جيبك!</h2>
               <p className="app-description">
                 حمّل تطبيق BuildingZ وتمتع بتجربة حجز خالية من التعقيد.
@@ -450,62 +383,37 @@ const HomePage = () => {
                   { icon: "fa-bell", text: "إشعارات فورية" },
                   { icon: "fa-star", text: "تقييمات موثوقة" }
                 ].map((feature, index) => (
-                  <motion.div 
-                    key={index}
-                    className="app-feature"
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    whileHover={{ x: 10 }}
-                    viewport={{ once: true }}
-                  >
+                  <div key={index} className="app-feature">
                     <i className={`fas ${feature.icon}`}></i>
                     <span>{feature.text}</span>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
               <div className="app-buttons">
-                <motion.a 
-                  href="#" 
-                  className="app-store-btn"
-                  whileHover={{ scale: 1.05, y: -5 }}
-                  whileTap={{ scale: 0.95 }}
-                >
+                <a href="#" className="app-store-btn">
                   <i className="fab fa-apple"></i>
                   <div className="btn-text">
                     <span className="small-text">تحميل من</span>
                     <span className="big-text">App Store</span>
                   </div>
-                </motion.a>
-                <motion.a 
-                  href="#" 
-                  className="play-store-btn"
-                  whileHover={{ scale: 1.05, y: -5 }}
-                  whileTap={{ scale: 0.95 }}
-                >
+                </a>
+                <a href="#" className="play-store-btn">
                   <i className="fab fa-google-play"></i>
                   <div className="btn-text">
                     <span className="small-text">تحميل من</span>
                     <span className="big-text">Google Play</span>
                   </div>
-                </motion.a>
+                </a>
               </div>
-            </motion.div>
-            <motion.div 
-              className="app-download-image"
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-            >
+            </div>
+            <div className="app-download-image">
               <motion.div 
                 className="phone-mockup"
                 animate={{ 
-                  y: [0, -20, 0],
-                  rotateY: [0, 5, -5, 0]
+                  y: [0, -10, 0]
                 }}
                 transition={{ 
-                  duration: 4, 
+                  duration: 6, 
                   repeat: Infinity,
                   ease: "easeInOut"
                 }}
@@ -516,7 +424,7 @@ const HomePage = () => {
                 <div className="phone-notch"></div>
               </motion.div>
               <div className="phone-shadow"></div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
@@ -524,32 +432,14 @@ const HomePage = () => {
       {/* Clients Section */}
       <section className="clients-section">
         <div className="container">
-          <motion.h2 
-            className="section-title"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
+          <h2 className="section-title">
             الشركاء <span className="highlight">والعملاء</span>
-          </motion.h2>
-          <motion.p 
-            className="section-description"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            viewport={{ once: true }}
-          >
+          </h2>
+          <p className="section-description">
             نفتخر بخدمة عملائنا في مختلف القطاعات
-          </motion.p>
+          </p>
           
-          <motion.div 
-            className="clients-grid"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.8, staggerChildren: 0.1 }}
-            viewport={{ once: true }}
-          >
+          <div className="clients-grid">
             {[
               { icon: "fa-home", title: "الأفراد والعائلات" },
               { icon: "fa-building", title: "الشركات والمكاتب" },
@@ -557,66 +447,26 @@ const HomePage = () => {
               { icon: "fa-store", title: "متاجر البيع بالتجزئة" },
               { icon: "fa-city", title: "المشاريع العقارية" }
             ].map((client, index) => (
-              <motion.div 
-                key={index}
-                className="client-type"
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                whileHover={{ 
-                  scale: 1.1, 
-                  y: -10,
-                  transition: { duration: 0.3 }
-                }}
-                viewport={{ once: true }}
-              >
-                <motion.div 
-                  className="client-icon"
-                  whileHover={{ rotate: 360 }}
-                  transition={{ duration: 0.6 }}
-                >
+              <div key={index} className="client-type">
+                <div className="client-icon">
                   <i className={`fas ${client.icon}`}></i>
-                </motion.div>
+                </div>
                 <h3>{client.title}</h3>
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* Testimonials Section */}
       <section className="testimonials-section">
         <div className="container">
-          <motion.h2 
-            className="section-title"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
+          <h2 className="section-title">
             آراء <span className="highlight">العملاء</span>
-          </motion.h2>
-          <motion.div 
-            className="testimonials-grid"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.8, staggerChildren: 0.2 }}
-            viewport={{ once: true }}
-          >
+          </h2>
+          <div className="testimonials-grid">
             {testimonials.map((testimonial, index) => (
-              <motion.div 
-                key={testimonial.id} 
-                className="testimonial-card"
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.2 }}
-                whileHover={{ 
-                  y: -10,
-                  boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
-                  transition: { duration: 0.3 }
-                }}
-                viewport={{ once: true }}
-              >
+              <div key={testimonial.id} className="testimonial-card">
                 <div className="testimonial-quote">
                   <i className="fas fa-quote-right"></i>
                 </div>
@@ -630,97 +480,47 @@ const HomePage = () => {
                     <p>{testimonial.location}</p>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* Latest Additions Section */}
       <section className="latest-section">
         <div className="container">
-          <motion.h2 
-            className="section-title"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
+          <h2 className="section-title">
             الإضافات <span className="highlight">الجديدة</span>
-          </motion.h2>
-          <motion.p 
-            className="section-description"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            viewport={{ once: true }}
-          >
+          </h2>
+          <p className="section-description">
             جديد في BuildingZ؟ جرّب هذه الخدمات المضافة حديثاً
-          </motion.p>
+          </p>
           
-          <motion.div 
-            className="latest-grid"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.8, staggerChildren: 0.1 }}
-            viewport={{ once: true }}
-          >
+          <div className="latest-grid">
             {[
               { icon: "fa-couch", title: "تنظيف المجالس والسجاد" },
               { icon: "fa-spray-can", title: "خدمات تعقيم ومكافحة الحشرات" },
               { icon: "fa-video", title: "تركيب كاميرات المراقبة" },
               { icon: "fa-wind", title: "صيانة أجهزة التكييف المركزية" }
             ].map((latest, index) => (
-              <motion.div 
-                key={index}
-                className="latest-card"
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                whileHover={{ 
-                  y: -15,
-                  boxShadow: "0 25px 50px rgba(0,0,0,0.15)",
-                  transition: { duration: 0.3 }
-                }}
-                viewport={{ once: true }}
-              >
-                <motion.div 
-                  className="latest-icon"
-                  whileHover={{ rotate: 360, scale: 1.2 }}
-                  transition={{ duration: 0.6 }}
-                >
+              <div key={index} className="latest-card">
+                <div className="latest-icon">
                   <i className={`fas ${latest.icon}`}></i>
-                </motion.div>
+                </div>
                 <h3>{latest.title}</h3>
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
           
-          <motion.div 
-            className="latest-actions"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
-            viewport={{ once: true }}
-          >
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Link to="/services" className="primary-btn">
-                <span className="btn-text">اطلب الآن</span>
-                <span className="btn-icon"><i className="fas fa-arrow-left"></i></span>
-              </Link>
-            </motion.div>
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Link to="/services" className="secondary-btn">
-                <span className="btn-text">استعرض الجديد</span>
-              </Link>
-            </motion.div>
-          </motion.div>
+          <div className="latest-actions">
+            <Link to="/services" className="primary-btn">
+              <span className="btn-text">اطلب الآن</span>
+              <span className="btn-icon"><i className="fas fa-arrow-left"></i></span>
+            </Link>
+            <Link to="/services" className="secondary-btn">
+              <span className="btn-text">استعرض الجديد</span>
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -728,13 +528,7 @@ const HomePage = () => {
       <section className="contact-section">
         <div className="container">
           <div className="contact-content">
-            <motion.div 
-              className="contact-text"
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-            >
+            <div className="contact-text">
               <h2 className="contact-title">تواصل <span className="highlight">معنا</span></h2>
               <p className="contact-description">
                 هل لديك سؤال؟ فريقنا هنا لخدمتك على مدار الساعة.
@@ -746,55 +540,30 @@ const HomePage = () => {
                   { icon: "fa-envelope", title: "البريد الإلكتروني", value: "support@buildinz.com" },
                   { icon: "fa-clock", title: "ساعات العمل", value: "طوال أيام الأسبوع – 24/7" }
                 ].map((contact, index) => (
-                  <motion.div 
-                    key={index}
-                    className="contact-item"
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    whileHover={{ x: 10 }}
-                    viewport={{ once: true }}
-                  >
-                    <motion.div 
-                      className="contact-icon"
-                      whileHover={{ rotate: 360, scale: 1.1 }}
-                      transition={{ duration: 0.6 }}
-                    >
+                  <div key={index} className="contact-item">
+                    <div className="contact-icon">
                       <i className={`fas ${contact.icon}`}></i>
-                    </motion.div>
+                    </div>
                     <div className="contact-detail">
                       <h3>{contact.title}</h3>
                       <p>{contact.value}</p>
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
               
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Link to="/contact" className="contact-btn">
-                  تواصل معنا الآن
-                  <i className="fas fa-arrow-left"></i>
-                </Link>
-              </motion.div>
-            </motion.div>
+              <Link to="/contact" className="contact-btn">
+                تواصل معنا الآن
+                <i className="fas fa-arrow-left"></i>
+              </Link>
+            </div>
             
-            <motion.div 
-              className="contact-image"
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-            >
-              <motion.img 
+            <div className="contact-image">
+              <img 
                 src="https://storage.googleapis.com/uxpilot-auth.appspot.com/d87f426b11-8b49fa125e5694bcb57a.png" 
                 alt="Customer Support"
-                whileHover={{ scale: 1.05, rotate: 2 }}
-                transition={{ duration: 0.3 }}
               />
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
@@ -802,47 +571,25 @@ const HomePage = () => {
       {/* Call to Action Section */}
       <section className="cta-section">
         <div className="container">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
+          <div>
             <h2 className="cta-title">جاهز لبدء مشروعك؟</h2>
             <p className="cta-description">انضم إلى الآلاف من العملاء الراضين الذين يستخدمون BuildingZ لتحقيق مشاريعهم بنجاح.</p>
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Link to="/services" className="cta-button">
-                ابدأ مشروعك الآن
-                <i className="fas fa-arrow-left"></i>
-              </Link>
-            </motion.div>
-          </motion.div>
+            <Link to="/services" className="cta-button">
+              ابدأ مشروعك الآن
+              <i className="fas fa-arrow-left"></i>
+            </Link>
+          </div>
         </div>
       </section>
 
       {/* Footer */}
       <footer className="footer">
         <div className="container">
-          <motion.div 
-            className="footer-content"
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, staggerChildren: 0.1 }}
-            viewport={{ once: true }}
-          >
-            <motion.div 
-              className="footer-logo"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-            >
+          <div className="footer-content">
+            <div className="footer-logo">
               <h2>BuildingZ</h2>
               <p>نحن نضع بين يديك كل خدماتك اليومية في تطبيق واحد.</p>
-            </motion.div>
+            </div>
             
             <div className="footer-links">
               {[
@@ -871,58 +618,36 @@ const HomePage = () => {
                   ]
                 }
               ].map((group, groupIndex) => (
-                <motion.div 
-                  key={groupIndex}
-                  className="footer-link-group"
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: groupIndex * 0.1 }}
-                  viewport={{ once: true }}
-                >
+                <div key={groupIndex} className="footer-link-group">
                   <h3>{group.title}</h3>
                   <ul>
                     {group.links.map((link, linkIndex) => (
-                      <motion.li 
-                        key={linkIndex}
-                        whileHover={{ x: 10, color: '#DAA520' }}
-                        transition={{ duration: 0.3 }}
-                      >
+                      <li key={linkIndex}>
                         {link.to ? (
                           <Link to={link.to}>{link.text}</Link>
                         ) : (
                           <a href={link.href}>{link.text}</a>
                         )}
-                      </motion.li>
+                      </li>
                     ))}
                   </ul>
                   {groupIndex === 2 && (
                     <div className="footer-social">
                       {['facebook-f', 'twitter', 'instagram', 'linkedin-in'].map((social, socialIndex) => (
-                        <motion.a 
-                          key={socialIndex}
-                          href="#"
-                          whileHover={{ scale: 1.2, y: -5 }}
-                          whileTap={{ scale: 0.9 }}
-                        >
+                        <a key={socialIndex} href="#">
                           <i className={`fab fa-${social}`}></i>
-                        </motion.a>
+                        </a>
                       ))}
                     </div>
                   )}
-                </motion.div>
+                </div>
               ))}
             </div>
-          </motion.div>
+          </div>
           
-          <motion.div 
-            className="footer-bottom"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
-            viewport={{ once: true }}
-          >
+          <div className="footer-bottom">
             <p>© 2025 BuildingZ. جميع الحقوق محفوظة.</p>
-          </motion.div>
+          </div>
         </div>
       </footer>
     </div>
