@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useSpring, animated } from 'react-spring';
 import { motion } from 'framer-motion';
 import './HomePage.css';
+import buildingzData from '../../data/json/buildingzData.json';
 
 const HomePage = () => {
   // Hero section animations with react-spring
@@ -69,6 +70,35 @@ const HomePage = () => {
           </animated.div>
         </div>
         <div className="hero-wave"></div>
+      </section>
+
+      {/* Categories Section */}
+      <section className="categories-section">
+        <div className="container">
+          <div>
+            <h2 className="section-title">خدماتنا <span className="highlight">المتنوعة</span></h2>
+            <p className="section-description">
+              نقدم مجموعة واسعة من الخدمات لتلبية احتياجات مشروعك بدقة وكفاءة.
+            </p>
+          </div>
+          
+          <div className="categories-grid">
+            {buildingzData.categories.map((category) => (
+              <Link to={`/services/${category.id}`} className="category-card" key={category.id}>
+                <div className="category-icon">
+                  <span>{category.icon}</span>
+                </div>
+                <h3 className="category-title">{category.name}</h3>
+                <p className="category-description">
+                  {category.subcategories.length} خدمة متاحة
+                </p>
+                <div className="category-arrow">
+                  <i className="fas fa-arrow-left"></i>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* Why Choose Us Section */}
@@ -176,6 +206,59 @@ const HomePage = () => {
                   </p>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* App Download Section */}
+      <section className="app-download-section">
+        <div className="container">
+          <div className="app-download-content">
+            <div className="app-download-text">
+              <h2 className="app-title">حمّل تطبيق BuildingZ</h2>
+              <p className="app-description">
+                احصل على تقديرات البناء والتشطيب في أي وقت وأي مكان. تطبيقنا متاح الآن على متجر آبل وجوجل بلاي.
+              </p>
+              <div className="app-features">
+                <div className="app-feature">
+                  <i className="fas fa-bolt"></i>
+                  <span>حاسبة فورية</span>
+                </div>
+                <div className="app-feature">
+                  <i className="fas fa-bell"></i>
+                  <span>إشعارات مباشرة</span>
+                </div>
+                <div className="app-feature">
+                  <i className="fas fa-map-marker-alt"></i>
+                  <span>تتبع المقاولين</span>
+                </div>
+              </div>
+              <div className="app-buttons">
+                <a href="#" className="app-store-btn">
+                  <i className="fab fa-apple"></i>
+                  <div className="btn-text">
+                    <span className="small-text">تحميل من</span>
+                    <span className="big-text">App Store</span>
+                  </div>
+                </a>
+                <a href="#" className="play-store-btn">
+                  <i className="fab fa-google-play"></i>
+                  <div className="btn-text">
+                    <span className="small-text">تحميل من</span>
+                    <span className="big-text">Google Play</span>
+                  </div>
+                </a>
+              </div>
+            </div>
+            <div className="app-download-image">
+              <div className="phone-mockup">
+                <div className="phone-screen">
+                  <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/d87f426b11-8b49fa125e5694bcb57a.png" alt="BuildingZ App" />
+                </div>
+                <div className="phone-notch"></div>
+              </div>
+              <div className="phone-shadow"></div>
             </div>
           </div>
         </div>
