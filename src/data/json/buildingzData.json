@@ -169,22 +169,22 @@
       ],
       "formulas": {
         "pricing": {
-          "formula": "(area * price_unit) + (Math.ceil(area / (paint_product_id === 1 ? 20 : 25)) * (paint_product_id === 1 ? 75 : 60)) + (wall_condition_id === 15 ? area * 15 : wall_condition_id === 16 ? area * 30 : 0)",
+          "formula": "(area * price_unit) + (Math.ceil(area / paint_product_id_coverage) * paint_product_id_price) + (wall_condition_id === 15 ? area * 15 : wall_condition_id === 16 ? area * 30 : 0)",
           "description": "Total price calculation"
         },
         "labor": {
-          "formula": "area * price_unit * 0.6",
+          "formula": "(area * price_unit) + (wall_condition_id === 15 ? area * 15 : wall_condition_id === 16 ? area * 30 : 0)",
           "description": "Labor cost calculation"
         },
         "materials": {
-          "formula": "area * price_unit * 0.4 + (Math.ceil(area / (paint_product_id === 1 ? 20 : 25)) * (paint_product_id === 1 ? 75 : 60))",
+          "formula": "(Math.ceil(area / paint_product_id_coverage) * paint_product_id_price)",
           "description": "Materials cost calculation"
         },
         "derived_inputs": [
           {
             "name": "paint_cans",
             "label": "عدد علب الدهان",
-            "formula": "Math.ceil(area / (paint_product_id === 1 ? 20 : 25))",
+            "formula": "Math.ceil(area / paint_product_id_coverage)",
             "unit": "علبة",
             "description": "Calculated number of paint cans needed"
           },
@@ -237,16 +237,16 @@
       ],
       "formulas": {
         "pricing": {
-          "formula": "(floor_area * price_unit * (ceramic_product_id === 7 ? 1.2 : 1.0)) + (floor_preparation ? floor_area * 20 : 0) + (Math.ceil(floor_area / 5) * 35) + (floor_area * 15)",
-          "description": "Total price calculation"
+          "formula": "(floor_area * price_unit) + (floor_area * ceramic_product_id_price) + (Math.ceil(floor_area / 5) * 25) + (floor_preparation ? floor_area * 20 : 0)",
+          "description": "Total price calculation including installation, tiles, adhesive, and preparation"
         },
         "labor": {
-          "formula": "floor_area * price_unit * 0.7",
-          "description": "Labor cost calculation"
+          "formula": "(floor_area * price_unit) + (floor_preparation ? floor_area * 20 : 0)",
+          "description": "Labor cost calculation including installation and preparation"
         },
         "materials": {
-          "formula": "(floor_area * price_unit * 0.3) + (Math.ceil(floor_area / 5) * 35) + (floor_preparation ? floor_area * 20 : 0)",
-          "description": "Materials cost calculation"
+          "formula": "(floor_area * ceramic_product_id_price) + (Math.ceil(floor_area / 5) * 25)",
+          "description": "Materials cost calculation including tiles and adhesive"
         },
         "derived_inputs": [
           {

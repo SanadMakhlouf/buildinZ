@@ -1,779 +1,302 @@
 .main-content {
-  flex-grow: 1;
-  background-color: #ffffff;
-  height: auto;
-  min-height: 100%;
-  overflow-y: auto;
-  direction: rtl;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.welcome-message {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  text-align: center;
-  color: #666;
-}
-
-.welcome-message h1 {
-  font-size: 2rem;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 1rem;
-}
-
-.welcome-message p {
-  font-size: 1.2rem;
-  color: #666;
-}
-
-.content-header {
-  margin-bottom: 2rem;
-}
-
-.content-header h1 {
-  font-size: 1.8rem;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 0.5rem;
-}
-
-.content-header p {
-  color: #666;
-  font-size: 1rem;
-}
-
-.services-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-}
-
-.service-card {
-  background-color: #fff;
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.service-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-.service-card h3 {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 1rem;
-}
-
-.service-price {
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: #0c4da2;
-  margin-bottom: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.price-value {
-  font-size: 1.4rem;
-  font-weight: 600;
-}
-
-.currency {
-  color: #666;
-}
-
-.unit {
-  color: #666;
-  font-size: 0.9rem;
-}
-
-.products-list {
-  margin: 1rem 0;
-  padding: 1rem 0;
-  border-top: 1px solid #eee;
-  border-bottom: 1px solid #eee;
-}
-
-.products-list h4 {
-  color: #333;
-  font-size: 1rem;
-  margin-bottom: 0.8rem;
-}
-
-.product-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem 0;
-  color: #666;
-  font-size: 0.9rem;
-}
-
-.product-price {
-  font-weight: 500;
-  color: #0c4da2;
-}
-
-.quote-btn {
-  background-color: #f39c12;
-  color: white;
-  border: none;
-  padding: 0.8rem 1.2rem;
-  border-radius: 4px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  width: 100%;
-  font-size: 1rem;
-}
-
-.quote-btn:hover {
-  background-color: #e67e22;
-}
-
-.empty-state {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 300px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  color: #666;
-  text-align: center;
-  padding: 2rem;
-}
-
-/* Layout for calculator and result sections */
-.calculator-result-container {
-  display: flex;
-  flex-direction: row;
-  gap: 2rem;
-  margin: 2rem;
-  height: auto;
-  min-height: calc(100vh - 120px);
-}
-
-.calculator-section {
   flex: 1;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  padding: 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  overflow-y: auto;
-  max-height: 100%;
-}
-
-.result-section {
-  flex: 1;
-  background-color: #fff;
-  border-radius: 8px;
-  padding: 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  overflow-y: auto;
-  max-height: 100%;
-}
-
-.calculator-section h2,
-.result-section h2 {
-  color: #333;
-  margin-bottom: 1.5rem;
-  font-size: 1.5rem;
-}
-
-.calculator-form {
-  display: grid;
-  gap: 1.5rem;
-  padding-bottom: 1rem;
-}
-
-/* Project Details and Cost Estimate headers */
-.section-header {
-  font-weight: 600;
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
-  color: #333;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 0.5rem;
-}
-
-/* Continue to booking button */
-.booking-btn {
-  background-color: #0c4da2;
-  color: white;
-  border: none;
-  padding: 0.8rem 1.5rem;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  margin-top: 1rem;
-  width: 100%;
-  text-align: center;
-}
-
-.booking-btn:hover {
-  background-color: #083a7d;
-}
-
-/* Get detailed quote button */
-.quote-detail-btn {
-  background-color: #ffffff;
-  color: #0c4da2;
-  border: 1px solid #0c4da2;
-  padding: 0.8rem 1.5rem;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  margin-top: 0.5rem;
-  width: 100%;
-  text-align: center;
-}
-
-.quote-detail-btn:hover {
-  background-color: #f0f5ff;
-}
-
-/* Service tier options - REMOVED */
-.service-tier-options {
-  display: none;
-}
-
-.tier-option {
-  display: none;
-}
-
-.tier-option.selected {
-  display: none;
-}
-
-.tier-name {
-  display: none;
-}
-
-.tier-price {
-  display: none;
-}
-
-/* Calculator Section */
-.calculator-section {
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  padding: 2rem;
-  margin-bottom: 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.calculator-section h2 {
-  color: #333;
-  margin-bottom: 1.5rem;
-  font-size: 1.5rem;
-}
-
-.calculator-form {
-  display: grid;
-  gap: 1.5rem;
-  max-width: 600px;
-}
-
-.input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.input-group label {
-  font-weight: 500;
-  color: #555;
-}
-
-.number-input {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.number-input input,
-.input-group select {
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
-  width: 100%;
-}
-
-.number-input .unit {
-  color: #666;
-  font-size: 0.9rem;
-  min-width: 40px;
-}
-
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-}
-
-.checkbox-label input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-}
-
-.calculate-btn {
-  background-color: #0c4da2;
-  color: white;
-  border: none;
-  padding: 0.8rem 1.5rem;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  margin-top: 1rem;
-}
-
-.calculate-btn:hover {
-  background-color: #083a7d;
-}
-
-/* Result Section */
-.result-section {
-  background-color: #fff;
-  border-radius: 8px;
-  padding: 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.result-section h2 {
-  color: #333;
-  margin-bottom: 1.5rem;
-  font-size: 1.5rem;
-}
-
-.result-card {
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  padding: 1.5rem;
-  height: auto;
-  overflow-y: auto;
-}
-
-.result-header {
-  border-bottom: 1px solid #eee;
-  padding-bottom: 1rem;
-  margin-bottom: 1rem;
-}
-
-.result-header h3 {
-  color: #333;
-  margin-bottom: 0.5rem;
-}
-
-.total-price {
-  font-size: 1.8rem;
-  color: #0c4da2;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.total-price .currency {
-  font-size: 1rem;
-  color: #666;
-}
-
-.result-details {
-  padding-top: 1rem;
-}
-
-.result-details h4 {
-  color: #333;
-  margin-bottom: 1rem;
-  font-size: 1.1rem;
-}
-
-.detail-item {
-  margin-bottom: 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.detail-item:last-child {
-  border-bottom: none;
-}
-
-.detail-label {
-  color: #666;
-}
-
-.detail-value {
-  font-weight: 500;
-  color: #333;
-}
-
-.dimensions-input {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.dimension-field {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.dimension-field label {
-  min-width: 60px;
-  text-align: right;
-}
-
-.dimension-field input {
-  width: 80px;
-  padding: 5px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.dimension-field .unit {
-  color: #666;
-  font-size: 0.9em;
-}
-
-.input-group {
-  margin-bottom: 20px;
-}
-
-.input-group label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 500;
-}
-
-.number-input {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.number-input input {
-  width: 120px;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.unit {
-  color: #666;
-  font-size: 0.9em;
-}
-
-select {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: white;
-}
-
-.calculate-btn {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1.1em;
-  transition: background-color 0.2s;
-}
-
-.calculate-btn:hover {
-  background-color: #0056b3;
-}
-
-.result-section {
-  margin-top: 30px;
-  padding: 20px;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-}
-
-.result-card {
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-}
-
-.result-header {
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.total-price {
-  font-size: 1.5em;
-  color: #28a745;
-  margin-top: 10px;
-}
-
-.cost-breakdown {
-  margin: 20px 0;
-  padding: 15px;
-  background-color: #f8f9fa;
-  border-radius: 4px;
-}
-
-.cost-item {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-
-.detail-item {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-  padding: 8px 0;
-  border-bottom: 1px solid #eee;
-}
-
-.detail-label {
-  color: #666;
-}
-
-.welcome-message {
-  text-align: center;
-  padding: 40px;
-}
-
-.welcome-message h1 {
-  color: #333;
-  margin-bottom: 20px;
-}
-
-.welcome-message p {
-  color: #666;
-  font-size: 1.2em;
-}
-
-.error-message {
-  text-align: center;
-  padding: 40px;
-  color: #dc3545;
-}
-
-/* Empty result state */
-.empty-result {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 300px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  color: #666;
-  text-align: center;
-  padding: 2rem;
-}
-
-/* Horizontal rules in cost estimate */
-.result-details hr {
-  margin: 1rem 0;
-  border: 0;
-  border-top: 1px solid #eee;
-}
-
-/* Add styles for derived inputs */
-.derived-inputs {
-  margin-top: 20px;
-  padding: 15px;
-  background-color: #f5f5f5;
-  border-radius: 4px;
-}
-
-.derived-inputs h3 {
-  margin-top: 0;
-  margin-bottom: 15px;
-  font-size: 16px;
-  color: #333;
-}
-
-.derived-value {
-  font-weight: 500;
-  font-size: 16px;
-  color: #2196f3;
-  padding: 8px 12px;
-  background-color: #e3f2fd;
-  border-radius: 4px;
-  display: inline-block;
-}
-
-/* Compact Calculator Container */
-.compact-calculator-container {
-  padding: 1rem;
-  height: auto;
-}
-
-.service-header {
-  margin-bottom: 1.5rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid #eaeaea;
-  text-align: right;
-}
-
-.service-header h1 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 0.25rem;
-}
-
-.service-header p {
-  color: #666;
-  font-size: 0.9rem;
-}
-
-/* Grid Layout */
-.calculator-result-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  height: auto;
-}
-
-/* Calculator Panel */
-.calculator-panel, .results-panel {
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  height: 100%;
-}
-
-.panel-header {
-  padding: 1rem;
   background-color: #f8f9fa;
-  border-bottom: 1px solid #eaeaea;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  direction: rtl;
 }
 
-.panel-header h2 {
-  font-size: 1.1rem;
-  font-weight: 600;
+.welcome-message,
+.error-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 2rem;
+  text-align: center;
+}
+
+.welcome-message h1,
+.error-message h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
   color: #333;
+}
+
+.welcome-message p,
+.error-message p {
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.error-message {
+  color: #d32f2f;
+}
+
+/* Service Wizard */
+.service-wizard {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+}
+
+/* Service Header */
+.service-header {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #f0f0f0;
+  background-color: #fff;
+  text-align: center;
+}
+
+.service-header h1 {
+  font-size: 1.8rem;
+  margin: 0 0 0.5rem 0;
+  color: #0c4da2;
+}
+
+.service-header p {
+  font-size: 1rem;
+  color: #666;
   margin: 0;
 }
 
-.input-fields-container {
-  padding: 1rem;
-  overflow-y: auto;
-  flex: 1;
-}
-
-/* Compact Input Groups */
-.compact-input-group {
-  margin-bottom: 1rem;
-  display: grid;
-  grid-template-columns: 120px 1fr;
+/* Progress Steps */
+.progress-steps {
+  display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 0.75rem;
+  padding: 1.5rem 2rem;
+  background-color: #fff;
+  border-bottom: 1px solid #f0f0f0;
 }
 
-.compact-input-group label {
-  color: #555;
-  font-size: 0.9rem;
-  font-weight: 500;
-  text-align: right;
-}
-
-/* Number Input */
-.number-input-wrapper {
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   position: relative;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.step-number {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #f0f0f0;
   display: flex;
   align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #666;
+  transition: all 0.3s;
+}
+
+.step.active .step-number {
+  background-color: #0c4da2;
+  color: white;
+  box-shadow: 0 0 0 4px rgba(12, 77, 162, 0.2);
+}
+
+.step.completed .step-number {
+  background-color: #4caf50;
+  color: white;
+}
+
+.step-label {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.step.active .step-label {
+  color: #0c4da2;
+  font-weight: 600;
+}
+
+.step.completed .step-label {
+  color: #4caf50;
+}
+
+.step-connector {
+  flex-grow: 1;
+  height: 2px;
+  background-color: #e0e0e0;
+  margin: 0 1rem;
+  max-width: 100px;
+}
+
+/* Tips toggle */
+.tips-toggle {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.5rem 2rem;
+  background-color: #fff;
+}
+
+.tips-button {
+  background-color: transparent;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  padding: 0.3rem 1rem;
+  font-size: 0.8rem;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.tips-button.active {
+  background-color: #e3f2fd;
+  color: #0c4da2;
+  border-color: #0c4da2;
+}
+
+.tips-button:hover {
+  background-color: #f0f7ff;
+}
+
+/* Step Content Container */
+.step-content-container {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.step-content {
+  height: 100%;
+  padding: 1.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.step-content-header {
+  margin-bottom: 1.5rem;
+}
+
+.step-content-header h2 {
+  font-size: 1.5rem;
+  margin: 0 0 1rem 0;
+  color: #333;
+}
+
+/* Tip Box */
+.tip-box {
+  display: flex;
+  align-items: flex-start;
+  background-color: #f0f7ff;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-right: 4px solid #0c4da2;
+}
+
+.tip-icon {
+  font-size: 1.5rem;
+  margin-left: 1rem;
+}
+
+.tip-text {
+  font-size: 0.9rem;
+  color: #444;
+  line-height: 1.5;
+}
+
+/* Inputs Grid */
+.inputs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.input-card {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s;
+}
+
+.input-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.input-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.input-card-header label {
+  font-weight: 600;
+  color: #333;
+  font-size: 1rem;
+}
+
+.unit-badge {
+  background-color: #f0f7ff;
+  color: #0c4da2;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* Input styles */
+.number-input-wrapper,
+.select-wrapper,
+.switch-wrapper {
+  width: 100%;
 }
 
 .number-input-wrapper input {
   width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  transition: border-color 0.2s;
-  text-align: right;
+  padding: 0.8rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: all 0.3s;
 }
 
 .number-input-wrapper input:focus {
   border-color: #0c4da2;
-  outline: none;
   box-shadow: 0 0 0 2px rgba(12, 77, 162, 0.1);
-}
-
-.unit-badge {
-  position: absolute;
-  left: 8px;
-  right: auto;
-  background-color: #f0f0f0;
-  padding: 0.1rem 0.3rem;
-  border-radius: 3px;
-  font-size: 0.75rem;
-  color: #666;
-}
-
-/* Select Dropdown */
-.select-wrapper {
-  position: relative;
+  outline: none;
 }
 
 .select-wrapper select {
   width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: left 8px center;
-  background-size: 16px;
-  padding-left: 30px;
-  text-align: right;
-  direction: rtl;
+  padding: 0.8rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 1rem;
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.3s;
 }
 
 .select-wrapper select:focus {
   border-color: #0c4da2;
-  outline: none;
   box-shadow: 0 0 0 2px rgba(12, 77, 162, 0.1);
+  outline: none;
 }
 
-/* Toggle Switch */
-.switch-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-}
-
+/* Switch styling */
 .switch {
   position: relative;
-  display: inline-flex;
-  align-items: center;
-  cursor: pointer;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
 }
 
 .switch input {
@@ -783,275 +306,397 @@ select {
 }
 
 .slider {
-  position: relative;
-  display: inline-block;
-  width: 36px;
-  height: 20px;
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
   background-color: #ccc;
-  border-radius: 20px;
-  transition: 0.3s;
-  margin-left: 8px;
-  margin-right: 0;
+  transition: 0.4s;
+  border-radius: 34px;
 }
 
 .slider:before {
   position: absolute;
   content: "";
-  height: 16px;
-  width: 16px;
-  right: 2px;
-  left: auto;
-  bottom: 2px;
+  height: 26px;
+  width: 26px;
+  right: 4px;
+  bottom: 4px;
   background-color: white;
+  transition: 0.4s;
   border-radius: 50%;
-  transition: 0.3s;
 }
 
 input:checked + .slider {
   background-color: #0c4da2;
 }
 
+input:focus + .slider {
+  box-shadow: 0 0 1px #0c4da2;
+}
+
 input:checked + .slider:before {
-  transform: translateX(-16px);
+  transform: translateX(-26px);
 }
 
 .switch-text {
+  margin-right: 70px;
   font-size: 0.9rem;
-  color: #555;
-}
-
-/* Auto-calculate Toggle */
-.auto-calculate-toggle {
-  display: flex;
-  align-items: center;
-}
-
-.toggle-label {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-}
-
-.toggle-label input {
-  margin-left: 6px;
-  margin-right: 0;
-}
-
-.toggle-text {
-  font-size: 0.8rem;
   color: #666;
 }
 
-/* Derived Values Section */
+/* Derived values section */
 .derived-values-section {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 1.5rem;
   margin-top: 1.5rem;
-  padding-top: 1rem;
-  border-top: 1px dashed #eaeaea;
 }
 
 .derived-values-section h3 {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #555;
-  margin-bottom: 0.75rem;
-  text-align: right;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  color: #333;
 }
 
 .derived-values-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
 }
 
 .derived-value-item {
-  background-color: #f8f9fa;
-  padding: 0.5rem 0.75rem;
-  border-radius: 4px;
   display: flex;
   flex-direction: column;
-  text-align: right;
+  background-color: white;
+  padding: 1rem;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .derived-label {
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   color: #666;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
 }
 
 .derived-number {
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: #333;
-}
-
-/* Calculate Button */
-.calculate-button {
-  margin-top: 1.5rem;
-  background-color: #0c4da2;
-  color: white;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  width: 100%;
-}
-
-.calculate-button:hover {
-  background-color: #0a3d82;
-}
-
-/* Results Panel */
-.results-content {
-  padding: 1rem;
-  overflow-y: auto;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-/* Price Summary */
-.price-summary {
-  background-color: #f8f9fa;
-  border-radius: 6px;
-  padding: 1rem;
-}
-
-.total-price-display {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.75rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid #eaeaea;
-}
-
-.price-label {
-  font-size: 0.9rem;
-  color: #555;
-  font-weight: 500;
-}
-
-.price-value {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: #0c4da2;
 }
 
-.cost-breakdown {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
+/* Step navigation */
+.step-navigation {
+  display: flex;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 2rem;
 }
 
-.cost-item {
+.next-button,
+.prev-button {
+  padding: 0.8rem 1.5rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.next-button {
+  background-color: #0c4da2;
+  color: white;
+  border: none;
+  margin-right: auto;
+}
+
+.next-button:hover {
+  background-color: #0a3d82;
+}
+
+.prev-button {
+  background-color: transparent;
+  color: #666;
+  border: 1px solid #ddd;
+  margin-left: auto;
+}
+
+.prev-button:hover {
+  background-color: #f5f5f5;
+}
+
+.button-icon {
+  margin: 0 0.5rem;
+}
+
+/* Results content */
+.calculating-indicator {
   display: flex;
   flex-direction: column;
-  font-size: 0.85rem;
-  text-align: right;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 0;
 }
 
-.cost-item span:first-child {
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(12, 77, 162, 0.2);
+  border-radius: 50%;
+  border-top-color: #0c4da2;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.calculating-indicator p {
   color: #666;
-  margin-bottom: 0.25rem;
+  font-size: 1rem;
 }
 
-.cost-item span:last-child {
-  font-weight: 500;
+.cost-summary-card {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+}
+
+.cost-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.cost-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
   color: #333;
 }
 
-/* Project Specifications */
-.input-summary {
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #eaeaea;
+.total-cost {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #0c4da2;
 }
 
-.input-summary h3 {
-  font-size: 0.9rem;
+.cost-breakdown {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.cost-pie-chart {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background-color: #f0f0f0;
+}
+
+.pie-segment {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  clip-path: polygon(50% 50%, 50% 0%, calc(50% + var(--percentage)) 0%);
+  transform: rotate(0deg);
+}
+
+.pie-segment.labor {
+  background-color: #0c4da2;
+  clip-path: polygon(50% 50%, 50% 0%, 100% 0%, 100% 100%, 50% 100%);
+  transform: rotate(calc(360deg * var(--percentage) / 100));
+}
+
+.pie-segment.materials {
+  background-color: #4caf50;
+  clip-path: polygon(50% 50%, 50% 0%, 100% 0%, 100% 100%, 50% 100%);
+  transform: rotate(calc(360deg * (100 - var(--percentage)) / 100));
+}
+
+.pie-center {
+  position: absolute;
+  top: 50%;
+  right: 50%;
+  transform: translate(50%, -50%);
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: white;
+}
+
+.cost-legend {
+  flex: 1;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  margin-left: 0.8rem;
+}
+
+.legend-color.labor {
+  background-color: #0c4da2;
+}
+
+.legend-color.materials {
+  background-color: #4caf50;
+}
+
+.legend-label {
+  font-size: 1rem;
+  color: #333;
+  margin-left: 0.5rem;
+}
+
+.legend-value {
+  margin-right: auto;
   font-weight: 600;
-  color: #555;
-  margin-bottom: 0.75rem;
-  text-align: right;
+  color: #333;
+}
+
+.percentage {
+  font-size: 0.8rem;
+  color: #666;
+  margin-right: 0.5rem;
+}
+
+.specs-summary {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+}
+
+.specs-summary h3 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.2rem;
+  color: #333;
 }
 
 .specs-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
 }
 
 .spec-item {
   display: flex;
   flex-direction: column;
-  text-align: right;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 6px;
 }
 
 .spec-label {
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   color: #666;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
 }
 
 .spec-value {
-  font-size: 0.9rem;
+  font-size: 1rem;
+  font-weight: 600;
   color: #333;
 }
 
-/* Products Summary */
+.products-summary {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+}
+
 .products-summary h3 {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #555;
-  margin-bottom: 0.75rem;
-  text-align: right;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.2rem;
+  color: #333;
 }
 
-.products-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
 }
 
-.product-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem;
+.product-card {
   background-color: #f8f9fa;
-  border-radius: 4px;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.product-image-placeholder {
+  height: 120px;
+  background-color: #e0e0e0;
+}
+
+.product-info {
+  padding: 1rem;
 }
 
 .product-name {
-  font-size: 0.85rem;
+  font-size: 1rem;
+  font-weight: 600;
   color: #333;
+  margin-bottom: 0.5rem;
 }
 
 .product-price {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: #0c4da2;
-}
-
-/* Action Buttons */
-.action-buttons {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-  margin-top: auto;
-}
-
-.primary-button, .secondary-button {
-  font-family: inherit;
   font-size: 0.9rem;
-  font-weight: 500;
+  color: #0c4da2;
+  font-weight: 600;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.primary-button,
+.secondary-button {
+  padding: 1rem 2rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-  border-radius: 4px;
-  padding: 0.6rem 1rem;
-  transition: background-color 0.2s;
+  transition: all 0.3s;
+  flex: 1;
 }
 
 .primary-button {
@@ -1065,57 +710,64 @@ input:checked + .slider:before {
 }
 
 .secondary-button {
-  background-color: white;
+  background-color: transparent;
   color: #0c4da2;
   border: 1px solid #0c4da2;
 }
 
 .secondary-button:hover {
-  background-color: #f0f5ff;
+  background-color: #f0f7ff;
 }
 
-/* Empty Result State */
 .empty-result {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100%;
-  color: #888;
-  font-size: 0.9rem;
+  padding: 3rem;
+  color: #666;
+  font-size: 1.1rem;
   text-align: center;
-  padding: 2rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
 }
 
-/* Responsive Adjustments */
+/* Responsive adjustments */
 @media (max-width: 768px) {
-  .calculator-result-container {
+  .inputs-grid,
+  .specs-grid,
+  .products-grid,
+  .derived-values-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cost-breakdown {
     flex-direction: column;
-    height: auto;
   }
-  
-  .calculator-result-grid {
-    grid-template-columns: 1fr;
+
+  .step-content {
+    padding: 1rem;
   }
-  
-  .compact-calculator-container {
-    padding: 0.5rem;
-    height: auto;
+
+  .progress-steps {
+    padding: 1rem;
   }
-  
-  .calculator-panel, .results-panel {
-    max-height: 500px;
+
+  .step-number {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
   }
-  
-  .compact-input-group {
-    grid-template-columns: 1fr;
-    gap: 0.25rem;
+
+  .step-label {
+    font-size: 0.8rem;
   }
-  
-  .compact-input-group label {
-    text-align: right;
+
+  .step-connector {
+    margin: 0 0.5rem;
+    max-width: 50px;
   }
-  
+
   .action-buttons {
-    grid-template-columns: 1fr;
+    flex-direction: column;
   }
 }

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./MainContent.css";
 import dataService from "../../services/dataService";
 import { evaluateFormula } from "../../utils/formulaUtils";
+import { motion, AnimatePresence } from "framer-motion";
 
 const MainContent = ({ selectedService }) => {
   const [calculatorInputs, setCalculatorInputs] = useState({});
@@ -9,20 +10,26 @@ const MainContent = ({ selectedService }) => {
   const [autoCalculate, setAutoCalculate] = useState(true);
   const [currentGenerator, setCurrentGenerator] = useState(null);
   const [derivedInputs, setDerivedInputs] = useState({});
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isCalculating, setIsCalculating] = useState(false);
+  const [showTips, setShowTips] = useState(true);
 
   // Initialize calculator inputs when service changes
   useEffect(() => {
     if (selectedService) {
-      const generator = dataService.getGeneratorById(selectedService.foreign_key_generator);
-      
+      const generator = dataService.getGeneratorById(
+        selectedService.foreign_key_generator
+      );
+
       if (generator) {
         setCurrentGenerator(generator);
-        
+        setCurrentStep(1); // Reset to step 1 when service changes
+
         // Initialize inputs with default values from the generator
         const initialInputs = {};
         generator.inputs.forEach((input) => {
           // Use the default value from the JSON if available
-          if (input.hasOwnProperty('default')) {
+          if (input.hasOwnProperty("default")) {
             initialInputs[input.name] = input.default;
           } else {
             // Fallback to type-based defaults if no default is specified
@@ -37,9 +44,9 @@ const MainContent = ({ selectedService }) => {
             }
           }
         });
-        
+
         setCalculatorInputs(initialInputs);
-        
+
         // If auto-calculate is enabled, calculate with initial values
         if (autoCalculate) {
           setTimeout(() => calculatePrice(initialInputs), 0);
@@ -54,8 +61,14 @@ const MainContent = ({ selectedService }) => {
 
   // Auto-recalculate when inputs change
   useEffect(() => {
-    if (autoCalculate && selectedService && Object.keys(calculatorInputs).length > 0) {
+    if (
+      autoCalculate &&
+      selectedService &&
+      Object.keys(calculatorInputs).length > 0
+    ) {
+      setIsCalculating(true);
       calculatePrice(calculatorInputs);
+      setTimeout(() => setIsCalculating(false), 500); // Add a small delay for visual feedback
     }
   }, [calculatorInputs, autoCalculate]);
 
@@ -78,15 +91,21 @@ const MainContent = ({ selectedService }) => {
 
     const variables = {
       ...calculatorInputs,
-      price_unit: selectedService.price_unit
+      price_unit: selectedService.price_unit,
     };
 
     const newDerivedInputs = {};
-    currentGenerator.formulas.derived_inputs.forEach(derivedInput => {
+    currentGenerator.formulas.derived_inputs.forEach((derivedInput) => {
       try {
-        newDerivedInputs[derivedInput.name] = evaluateFormula(derivedInput.formula, variables);
+        newDerivedInputs[derivedInput.name] = evaluateFormula(
+          derivedInput.formula,
+          variables
+        );
       } catch (error) {
-        console.error(`Error calculating derived input ${derivedInput.name}:`, error);
+        console.error(
+          `Error calculating derived input ${derivedInput.name}:`,
+          error
+        );
         newDerivedInputs[derivedInput.name] = 0;
       }
     });
@@ -101,16 +120,14 @@ const MainContent = ({ selectedService }) => {
       console.log("========== CALCULATION DEBUG ==========");
       console.log("Selected Service:", selectedService);
       console.log("Current Generator:", currentGenerator);
-      
-      // Debug: Log localStorage data
-      console.log("LocalStorage Data:", JSON.parse(localStorage.getItem('buildingzData')));
-      
+      console.log("Input Values:", inputs);
+
       // Get the pricing formulas and price unit
       const priceFormula = currentGenerator.formulas.pricing.formula;
       const laborFormula = currentGenerator.formulas.labor.formula;
       const materialsFormula = currentGenerator.formulas.materials.formula;
       const priceUnit = selectedService.price_unit;
-      
+
       console.log("Price Formula:", priceFormula);
       console.log("Labor Formula:", laborFormula);
       console.log("Materials Formula:", materialsFormula);
@@ -119,128 +136,88 @@ const MainContent = ({ selectedService }) => {
       // Create variables object with all inputs and price_unit
       const variables = {
         ...inputs,
-        price_unit: priceUnit
+        price_unit: priceUnit,
       };
-      
+
       // Convert string inputs to numbers where possible for calculations
-      Object.keys(variables).forEach(key => {
+      Object.keys(variables).forEach((key) => {
         // If the input is a string that represents a number, convert it
-        if (typeof variables[key] === 'string' && !isNaN(variables[key]) && variables[key] !== '') {
+        if (
+          typeof variables[key] === "string" &&
+          !isNaN(variables[key]) &&
+          variables[key] !== ""
+        ) {
           variables[key] = parseFloat(variables[key]);
         }
         // If the input is an empty string, set to 0 for calculations
-        if (variables[key] === '') {
+        if (variables[key] === "") {
           variables[key] = 0;
         }
+        // Convert boolean values to numbers
+        if (typeof variables[key] === "boolean") {
+          variables[key] = variables[key] ? 1 : 0;
+        }
       });
-      
-      // Extract variable names from the formula to ensure all needed variables exist
-      const extractVariables = (formula) => {
-        if (!formula) return [];
-        // This regex finds identifiers that might be variable names
-        const matches = formula.match(/[a-zA-Z_][a-zA-Z0-9_]*/g) || [];
-        return [...new Set(matches)]; // Remove duplicates
-      };
-      
-      // Get all variables mentioned in formulas
-      const formulaVars = [
-        ...extractVariables(priceFormula),
-        ...extractVariables(laborFormula),
-        ...extractVariables(materialsFormula)
-      ];
-      
-      console.log("Variables extracted from formulas:", formulaVars);
-      
+
+      console.log("Variables after type conversion:", variables);
+
       // Add product prices to variables for dynamic access in formulas
       const allProducts = dataService.getProducts();
-      
+      console.log("All Products:", allProducts);
+
       // For each input that references a product ID, add its price as a variable
-      currentGenerator.inputs.forEach(input => {
-        if (input.type === 'select' && 
-            (input.option_type === 'product' || input.name.includes('product_id')) && 
-            inputs[input.name]) {
+      currentGenerator.inputs.forEach((input) => {
+        if (
+          input.type === "select" &&
+          (input.option_type === "product" ||
+            input.name.includes("product_id")) &&
+          inputs[input.name]
+        ) {
           const productId = inputs[input.name];
-          const product = allProducts.find(p => p.id === productId);
+          const product = allProducts.find((p) => p.id === productId);
+          console.log(`Looking for product ${productId}:`, product);
           if (product) {
             // Add product price with variable name pattern: {input_name}_price
             variables[`${input.name}_price`] = product.price;
             // Add product coverage with variable name pattern: {input_name}_coverage
             variables[`${input.name}_coverage`] = product.coverage || 1;
+            console.log(`Added product variables for ${input.name}:`, {
+              [`${input.name}_price`]: product.price,
+              [`${input.name}_coverage`]: product.coverage || 1,
+            });
           }
         }
       });
-      
-      // Check for any variable ending with _price that might be needed in the formula
-      formulaVars.forEach(varName => {
-        if (varName.endsWith('_price')) {
-          // If this price variable is not yet defined
-          if (variables[varName] === undefined) {
-            // Extract base name (remove _price suffix)
-            const baseName = varName.substring(0, varName.length - 6);
-            
-            // Check if we have this base variable in our inputs
-            if (variables[baseName] !== undefined) {
-              // Try to find the product by ID
-              const productId = variables[baseName];
-              const product = allProducts.find(p => p.id === productId);
-              
-              if (product) {
-                // Add the price and coverage variables
-                variables[varName] = product.price;
-                variables[`${baseName}_coverage`] = product.coverage || 1;
-              } else {
-                // Default values if product not found
-                variables[varName] = 0;
-                variables[`${baseName}_coverage`] = 1;
-              }
-            }
-          }
-        }
-      });
-      
-      // Final check: ensure all variables mentioned in formulas exist
-      // This prevents "X is not defined" errors
-      formulaVars.forEach(varName => {
-        if (variables[varName] === undefined) {
-          console.warn(`Formula references undefined variable: ${varName}, setting to 0`);
-          variables[varName] = 0;
-        }
-      });
-      
-      console.log("Input Variables with Product Prices:", variables);
-      
-      // Log each variable evaluation separately for debugging
-      console.log("Individual Variable Values:");
-      Object.entries(variables).forEach(([key, value]) => {
-        console.log(`  ${key}: ${value} (${typeof value})`);
-      });
-      
+
+      console.log("Final variables for formula:", variables);
+
       // Calculate prices using the formulas
-      console.log("Evaluating Price Formula...");
+      console.log("Evaluating formulas with variables:", variables);
       const totalPrice = evaluateFormula(priceFormula, variables);
-      console.log("Total Price Result:", totalPrice);
-      
-      console.log("Evaluating Labor Formula...");
-      const laborCost = laborFormula ? evaluateFormula(laborFormula, variables) : totalPrice * 0.6;
-      console.log("Labor Cost Result:", laborCost);
-      
-      console.log("Evaluating Materials Formula...");
-      const materialsCost = materialsFormula ? evaluateFormula(materialsFormula, variables) : totalPrice * 0.4;
-      console.log("Materials Cost Result:", materialsCost);
-      
+      console.log("Total Price:", totalPrice);
+
+      const laborCost = laborFormula
+        ? evaluateFormula(laborFormula, variables)
+        : totalPrice * 0.6;
+      console.log("Labor Cost:", laborCost);
+
+      const materialsCost = materialsFormula
+        ? evaluateFormula(materialsFormula, variables)
+        : totalPrice * 0.4;
+      console.log("Materials Cost:", materialsCost);
+
       // Get associated products
-      const serviceProducts = dataService.getProducts().filter((p) =>
-        selectedService.product_ids.includes(p.id)
-      );
-      
-      console.log("Associated Products:", serviceProducts);
-      console.log("Final Results:");
-      console.log("  Total Price:", totalPrice);
-      console.log("  Labor Cost:", laborCost);
-      console.log("  Materials Cost:", materialsCost);
-      console.log("  Total Sum Check:", laborCost + materialsCost);
-      console.log("  Difference from Total:", totalPrice - (laborCost + materialsCost));
-      console.log("======================================");
+      const serviceProducts = dataService
+        .getProducts()
+        .filter((p) => selectedService.product_ids.includes(p.id));
+      console.log("Service Products:", serviceProducts);
+
+      console.log("Setting calculation result:", {
+        totalPrice,
+        laborCost,
+        materialsCost,
+        currency: selectedService.currency,
+      });
 
       setCalculationResult({
         totalPrice: totalPrice,
@@ -248,12 +225,12 @@ const MainContent = ({ selectedService }) => {
         materialsCost: materialsCost,
         currency: selectedService.currency,
         inputs: { ...inputs },
-        products: serviceProducts
+        products: serviceProducts,
       });
     } catch (error) {
       console.error("Error calculating price:", error);
-      console.log("Error details:", error.message);
-      console.log("Error stack:", error.stack);
+      console.error("Error details:", error.message);
+      console.error("Error stack:", error.stack);
     }
   };
 
@@ -272,7 +249,10 @@ const MainContent = ({ selectedService }) => {
       });
     }
     // For condition IDs - check both name.includes and option_type
-    else if (input.name.includes("condition_id") || input.option_type === "condition") {
+    else if (
+      input.name.includes("condition_id") ||
+      input.option_type === "condition"
+    ) {
       return input.options.map((optionId) => {
         const condition = dataService.getConditionById(optionId);
         return (
@@ -288,6 +268,33 @@ const MainContent = ({ selectedService }) => {
         {option}
       </option>
     ));
+  };
+
+  // Next step handler
+  const handleNextStep = () => {
+    if (currentStep < 3) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  // Previous step handler
+  const handlePrevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  // Animation variants
+  const pageVariants = {
+    initial: { opacity: 0, x: 100 },
+    in: { opacity: 1, x: 0 },
+    out: { opacity: 0, x: -100 },
+  };
+
+  const pageTransition = {
+    type: "tween",
+    ease: "easeInOut",
+    duration: 0.3,
   };
 
   if (!selectedService) {
@@ -312,205 +319,498 @@ const MainContent = ({ selectedService }) => {
     );
   }
 
+  // Group inputs for step-based approach
+  const groupInputs = () => {
+    if (!currentGenerator || !currentGenerator.inputs) return [];
+
+    // If there are 3 or fewer inputs, put each in its own step
+    if (currentGenerator.inputs.length <= 3) {
+      return currentGenerator.inputs.map((input) => [input]);
+    }
+
+    // Otherwise, distribute inputs evenly across 2 steps
+    const midpoint = Math.ceil(currentGenerator.inputs.length / 2);
+    return [
+      currentGenerator.inputs.slice(0, midpoint),
+      currentGenerator.inputs.slice(midpoint),
+    ];
+  };
+
+  const inputGroups = groupInputs();
+
   return (
     <div className="main-content">
-      <div className="compact-calculator-container">
+      <div className="service-wizard">
+        {/* Service Header */}
         <div className="service-header">
           <h1>{selectedService.name}</h1>
           <p>{selectedService.description}</p>
         </div>
-        
-        <div className="calculator-result-grid">
-          {/* Left panel: Calculator inputs */}
-          <div className="calculator-panel">
-            <div className="panel-header">
-              <h2>تفاصيل المشروع</h2>
-              <div className="auto-calculate-toggle">
-                <label className="toggle-label">
-                  <input
-                    type="checkbox"
-                    checked={autoCalculate}
-                    onChange={(e) => setAutoCalculate(e.target.checked)}
-                  />
-                  <span className="toggle-text">حساب تلقائي</span>
-                </label>
-              </div>
-            </div>
-            
-            <div className="input-fields-container">
-              {currentGenerator.inputs.map((input) => (
-                <div key={input.id} className="compact-input-group">
-                  <label>{input.label}</label>
-                  
-                  {input.type === "number" && (
-                    <div className="number-input-wrapper">
-                      <input
-                        type="number"
-                        value={calculatorInputs[input.name] || 0}
-                        onChange={(e) =>
-                          handleInputChange(
-                            input.name,
-                            parseFloat(e.target.value) || 0
-                          )
-                        }
-                        min="0"
-                      />
-                      {input.unit && <span className="unit-badge">{input.unit}</span>}
-                    </div>
-                  )}
-                  
-                  {input.type === "select" && (
-                    <div className="select-wrapper">
-                      <select
-                        value={calculatorInputs[input.name] || input.options[0]}
-                        onChange={(e) =>
-                          handleInputChange(
-                            input.name,
-                            input.name.includes("_id")
-                              ? parseInt(e.target.value)
-                              : e.target.value
-                          )
-                        }
-                      >
-                        {renderSelectOptions(input)}
-                      </select>
-                    </div>
-                  )}
-                  
-                  {input.type === "boolean" && (
-                    <div className="switch-wrapper">
-                      <label className="switch">
-                        <input
-                          type="checkbox"
-                          checked={!!calculatorInputs[input.name]}
-                          onChange={(e) =>
-                            handleInputChange(input.name, e.target.checked)
-                          }
-                        />
-                        <span className="slider"></span>
-                        <span className="switch-text">{!!calculatorInputs[input.name] ? "نعم" : "لا"}</span>
-                      </label>
-                    </div>
-                  )}
-                </div>
-              ))}
 
-              {/* Derived Inputs Display - Compact version */}
-              {currentGenerator.formulas.derived_inputs && 
-               currentGenerator.formulas.derived_inputs.length > 0 && (
-                <div className="derived-values-section">
-                  <h3>القيم المحسوبة</h3>
-                  <div className="derived-values-grid">
-                    {currentGenerator.formulas.derived_inputs.map((input) => (
-                      <div key={input.name} className="derived-value-item">
-                        <span className="derived-label">{input.label}:</span>
-                        <span className="derived-number">
-                          {derivedInputs[input.name] !== undefined 
-                            ? `${derivedInputs[input.name]} ${input.unit || ''}`
-                            : 'جاري الحساب...'}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {!autoCalculate && (
-                <button className="calculate-button" onClick={() => calculatePrice()}>
-                  حساب التكلفة
-                </button>
-              )}
-            </div>
+        {/* Progress Steps */}
+        <div className="progress-steps">
+          <div
+            className={`step ${currentStep >= 1 ? "active" : ""} ${
+              currentStep > 1 ? "completed" : ""
+            }`}
+            onClick={() => setCurrentStep(1)}
+          >
+            <div className="step-number">1</div>
+            <div className="step-label">تفاصيل المشروع</div>
           </div>
+          <div className="step-connector"></div>
+          <div
+            className={`step ${currentStep >= 2 ? "active" : ""} ${
+              currentStep > 2 ? "completed" : ""
+            }`}
+            onClick={() => (currentStep > 1 ? setCurrentStep(2) : null)}
+          >
+            <div className="step-number">2</div>
+            <div className="step-label">خيارات إضافية</div>
+          </div>
+          <div className="step-connector"></div>
+          <div
+            className={`step ${currentStep === 3 ? "active" : ""}`}
+            onClick={() => (currentStep > 2 ? setCurrentStep(3) : null)}
+          >
+            <div className="step-number">3</div>
+            <div className="step-label">النتائج والتكلفة</div>
+          </div>
+        </div>
 
-          {/* Right panel: Results */}
-          <div className="results-panel">
-            <div className="panel-header">
-              <h2>تقدير التكلفة</h2>
-            </div>
-            
-            {calculationResult ? (
-              <div className="results-content">
-                <div className="price-summary">
-                  <div className="total-price-display">
-                    <span className="price-label">التكلفة الإجمالية:</span>
-                    <span className="price-value">
-                      {calculationResult.totalPrice.toLocaleString()} {calculationResult.currency}
-                    </span>
-                  </div>
-                  
-                  <div className="cost-breakdown">
-                    <div className="cost-item">
-                      <span>تكلفة العمالة:</span>
-                      <span>{calculationResult.laborCost.toLocaleString()} {calculationResult.currency}</span>
+        {/* Tips toggle */}
+        <div className="tips-toggle">
+          <button
+            className={`tips-button ${showTips ? "active" : ""}`}
+            onClick={() => setShowTips(!showTips)}
+          >
+            {showTips ? "إخفاء النصائح" : "إظهار النصائح"}
+          </button>
+        </div>
+
+        {/* Step Content */}
+        <div className="step-content-container">
+          <AnimatePresence mode="wait">
+            {/* Step 1: Basic Project Details */}
+            {currentStep === 1 && (
+              <motion.div
+                key="step1"
+                className="step-content"
+                initial="initial"
+                animate="in"
+                exit="out"
+                variants={pageVariants}
+                transition={pageTransition}
+              >
+                <div className="step-content-header">
+                  <h2>تفاصيل المشروع الأساسية</h2>
+                  {showTips && (
+                    <div className="tip-box">
+                      <div className="tip-icon">💡</div>
+                      <div className="tip-text">
+                        أدخل المعلومات الأساسية لمشروعك مثل المساحة والمواد
+                        المستخدمة للحصول على تقدير دقيق للتكلفة.
+                      </div>
                     </div>
-                    <div className="cost-item">
-                      <span>تكلفة المواد:</span>
-                      <span>{calculationResult.materialsCost.toLocaleString()} {calculationResult.currency}</span>
-                    </div>
-                  </div>
+                  )}
                 </div>
-                
-                <div className="input-summary">
-                  <h3>مواصفات المشروع</h3>
-                  <div className="specs-grid">
-                    {Object.entries(calculatorInputs).map(([key, value]) => {
-                      const input = currentGenerator.inputs.find(
-                        (input) => input.name === key
-                      );
-                      if (!input) return null;
 
-                      // Format the value based on input type
-                      let displayValue = value;
-                      if (
-                        input.type === "select" &&
-                        (input.name.endsWith("product_id") || input.option_type === "product")
-                      ) {
-                        const product = dataService.getProductById(value);
-                        displayValue = product
-                          ? `${product.name}`
-                          : value;
-                      } else if (input.type === "boolean") {
-                        displayValue = value ? "نعم" : "لا";
-                      } else if (input.unit) {
-                        displayValue = `${value} ${input.unit}`;
-                      }
+                <div className="inputs-grid">
+                  {inputGroups[0]?.map((input) => (
+                    <div key={input.id} className="input-card">
+                      <div className="input-card-header">
+                        <label>{input.label}</label>
+                        {input.unit && (
+                          <span className="unit-badge">{input.unit}</span>
+                        )}
+                      </div>
 
-                      return (
-                        <div key={key} className="spec-item">
-                          <span className="spec-label">{input.label}:</span>
-                          <span className="spec-value">{displayValue}</span>
+                      {input.type === "number" && (
+                        <div className="number-input-wrapper">
+                          <input
+                            type="number"
+                            value={calculatorInputs[input.name] || 0}
+                            onChange={(e) =>
+                              handleInputChange(
+                                input.name,
+                                parseFloat(e.target.value) || 0
+                              )
+                            }
+                            min="0"
+                          />
                         </div>
-                      );
-                    })}
-                  </div>
-                </div>
-                
-                {calculationResult.products && calculationResult.products.length > 0 && (
-                  <div className="products-summary">
-                    <h3>المنتجات المستخدمة</h3>
-                    <div className="products-list">
-                      {calculationResult.products.map(product => (
-                        <div key={product.id} className="product-item">
-                          <span className="product-name">{product.name}</span>
-                          <span className="product-price">{product.price} {product.currency}</span>
+                      )}
+
+                      {input.type === "select" && (
+                        <div className="select-wrapper">
+                          <select
+                            value={
+                              calculatorInputs[input.name] || input.options[0]
+                            }
+                            onChange={(e) =>
+                              handleInputChange(
+                                input.name,
+                                input.name.includes("_id")
+                                  ? parseInt(e.target.value)
+                                  : e.target.value
+                              )
+                            }
+                          >
+                            {renderSelectOptions(input)}
+                          </select>
                         </div>
-                      ))}
+                      )}
+
+                      {input.type === "boolean" && (
+                        <div className="switch-wrapper">
+                          <label className="switch">
+                            <input
+                              type="checkbox"
+                              checked={!!calculatorInputs[input.name]}
+                              onChange={(e) =>
+                                handleInputChange(input.name, e.target.checked)
+                              }
+                            />
+                            <span className="slider"></span>
+                            <span className="switch-text">
+                              {!!calculatorInputs[input.name] ? "نعم" : "لا"}
+                            </span>
+                          </label>
+                        </div>
+                      )}
                     </div>
+                  ))}
+                </div>
+
+                <div className="step-navigation">
+                  <button className="next-button" onClick={handleNextStep}>
+                    التالي <span className="button-icon">→</span>
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Step 2: Additional Options */}
+            {currentStep === 2 && (
+              <motion.div
+                key="step2"
+                className="step-content"
+                initial="initial"
+                animate="in"
+                exit="out"
+                variants={pageVariants}
+                transition={pageTransition}
+              >
+                <div className="step-content-header">
+                  <h2>خيارات إضافية</h2>
+                  {showTips && (
+                    <div className="tip-box">
+                      <div className="tip-icon">💡</div>
+                      <div className="tip-text">
+                        حدد الخيارات الإضافية لتخصيص مشروعك بشكل أفضل. هذه
+                        الخيارات قد تؤثر على التكلفة النهائية.
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="inputs-grid">
+                  {inputGroups[1]?.map((input) => (
+                    <div key={input.id} className="input-card">
+                      <div className="input-card-header">
+                        <label>{input.label}</label>
+                        {input.unit && (
+                          <span className="unit-badge">{input.unit}</span>
+                        )}
+                      </div>
+
+                      {input.type === "number" && (
+                        <div className="number-input-wrapper">
+                          <input
+                            type="number"
+                            value={calculatorInputs[input.name] || 0}
+                            onChange={(e) =>
+                              handleInputChange(
+                                input.name,
+                                parseFloat(e.target.value) || 0
+                              )
+                            }
+                            min="0"
+                          />
+                        </div>
+                      )}
+
+                      {input.type === "select" && (
+                        <div className="select-wrapper">
+                          <select
+                            value={
+                              calculatorInputs[input.name] || input.options[0]
+                            }
+                            onChange={(e) =>
+                              handleInputChange(
+                                input.name,
+                                input.name.includes("_id")
+                                  ? parseInt(e.target.value)
+                                  : e.target.value
+                              )
+                            }
+                          >
+                            {renderSelectOptions(input)}
+                          </select>
+                        </div>
+                      )}
+
+                      {input.type === "boolean" && (
+                        <div className="switch-wrapper">
+                          <label className="switch">
+                            <input
+                              type="checkbox"
+                              checked={!!calculatorInputs[input.name]}
+                              onChange={(e) =>
+                                handleInputChange(input.name, e.target.checked)
+                              }
+                            />
+                            <span className="slider"></span>
+                            <span className="switch-text">
+                              {!!calculatorInputs[input.name] ? "نعم" : "لا"}
+                            </span>
+                          </label>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+
+                  {/* Derived Inputs Display */}
+                  {currentGenerator.formulas.derived_inputs &&
+                    currentGenerator.formulas.derived_inputs.length > 0 && (
+                      <div className="derived-values-section">
+                        <h3>القيم المحسوبة</h3>
+                        <div className="derived-values-grid">
+                          {currentGenerator.formulas.derived_inputs.map(
+                            (input) => (
+                              <div
+                                key={input.name}
+                                className="derived-value-item"
+                              >
+                                <span className="derived-label">
+                                  {input.label}:
+                                </span>
+                                <span className="derived-number">
+                                  {derivedInputs[input.name] !== undefined
+                                    ? `${derivedInputs[input.name]} ${
+                                        input.unit || ""
+                                      }`
+                                    : "جاري الحساب..."}
+                                </span>
+                              </div>
+                            )
+                          )}
+                        </div>
+                      </div>
+                    )}
+                </div>
+
+                <div className="step-navigation">
+                  <button className="prev-button" onClick={handlePrevStep}>
+                    <span className="button-icon">←</span> السابق
+                  </button>
+                  <button className="next-button" onClick={handleNextStep}>
+                    النتائج <span className="button-icon">→</span>
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Step 3: Results and Cost */}
+            {currentStep === 3 && (
+              <motion.div
+                key="step3"
+                className="step-content"
+                initial="initial"
+                animate="in"
+                exit="out"
+                variants={pageVariants}
+                transition={pageTransition}
+              >
+                <div className="step-content-header">
+                  <h2>النتائج والتكلفة</h2>
+                  {showTips && (
+                    <div className="tip-box">
+                      <div className="tip-icon">💡</div>
+                      <div className="tip-text">
+                        هذه هي التكلفة التقديرية لمشروعك بناءً على المعلومات
+                        التي أدخلتها. يمكنك العودة وتعديل المدخلات لرؤية كيف
+                        تؤثر على التكلفة.
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {isCalculating ? (
+                  <div className="calculating-indicator">
+                    <div className="spinner"></div>
+                    <p>جاري حساب التكلفة...</p>
+                  </div>
+                ) : calculationResult ? (
+                  <div className="results-content">
+                    <div className="cost-summary-card">
+                      <div className="cost-header">
+                        <h3>التكلفة الإجمالية</h3>
+                        <div className="total-cost">
+                          {calculationResult.totalPrice.toLocaleString()}{" "}
+                          {calculationResult.currency}
+                        </div>
+                      </div>
+
+                      <div className="cost-breakdown">
+                        <div className="cost-pie-chart">
+                          <div
+                            className="pie-segment labor"
+                            style={{
+                              "--percentage": `${
+                                (calculationResult.laborCost /
+                                  calculationResult.totalPrice) *
+                                100
+                              }%`,
+                            }}
+                          ></div>
+                          <div
+                            className="pie-segment materials"
+                            style={{
+                              "--percentage": `${
+                                (calculationResult.materialsCost /
+                                  calculationResult.totalPrice) *
+                                100
+                              }%`,
+                            }}
+                          ></div>
+                          <div className="pie-center"></div>
+                        </div>
+
+                        <div className="cost-legend">
+                          <div className="legend-item">
+                            <div className="legend-color labor"></div>
+                            <div className="legend-label">العمالة:</div>
+                            <div className="legend-value">
+                              {calculationResult.laborCost.toLocaleString()}{" "}
+                              {calculationResult.currency}
+                              <span className="percentage">
+                                (
+                                {Math.round(
+                                  (calculationResult.laborCost /
+                                    calculationResult.totalPrice) *
+                                    100
+                                )}
+                                %)
+                              </span>
+                            </div>
+                          </div>
+                          <div className="legend-item">
+                            <div className="legend-color materials"></div>
+                            <div className="legend-label">المواد:</div>
+                            <div className="legend-value">
+                              {calculationResult.materialsCost.toLocaleString()}{" "}
+                              {calculationResult.currency}
+                              <span className="percentage">
+                                (
+                                {Math.round(
+                                  (calculationResult.materialsCost /
+                                    calculationResult.totalPrice) *
+                                    100
+                                )}
+                                %)
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="specs-summary">
+                      <h3>ملخص المشروع</h3>
+                      <div className="specs-grid">
+                        {Object.entries(calculatorInputs).map(
+                          ([key, value]) => {
+                            const input = currentGenerator.inputs.find(
+                              (input) => input.name === key
+                            );
+                            if (!input) return null;
+
+                            // Format the value based on input type
+                            let displayValue = value;
+                            if (
+                              input.type === "select" &&
+                              (input.name.endsWith("product_id") ||
+                                input.option_type === "product")
+                            ) {
+                              const product = dataService.getProductById(value);
+                              displayValue = product
+                                ? `${product.name}`
+                                : value;
+                            } else if (input.type === "boolean") {
+                              displayValue = value ? "نعم" : "لا";
+                            } else if (input.unit) {
+                              displayValue = `${value} ${input.unit}`;
+                            }
+
+                            return (
+                              <div key={key} className="spec-item">
+                                <span className="spec-label">
+                                  {input.label}:
+                                </span>
+                                <span className="spec-value">
+                                  {displayValue}
+                                </span>
+                              </div>
+                            );
+                          }
+                        )}
+                      </div>
+                    </div>
+
+                    {calculationResult.products &&
+                      calculationResult.products.length > 0 && (
+                        <div className="products-summary">
+                          <h3>المنتجات المستخدمة</h3>
+                          <div className="products-grid">
+                            {calculationResult.products.map((product) => (
+                              <div key={product.id} className="product-card">
+                                <div className="product-image-placeholder"></div>
+                                <div className="product-info">
+                                  <div className="product-name">
+                                    {product.name}
+                                  </div>
+                                  <div className="product-price">
+                                    {product.price} {product.currency}
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                    <div className="action-buttons">
+                      <button className="primary-button">متابعة للحجز</button>
+                      <button className="secondary-button">
+                        الحصول على عرض سعر مفصل
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="empty-result">
+                    <p>أدخل تفاصيل المشروع لرؤية تقدير التكلفة</p>
                   </div>
                 )}
-                
-                <div className="action-buttons">
-                  <button className="primary-button">متابعة للحجز</button>
-                  <button className="secondary-button">الحصول على عرض سعر مفصل</button>
+
+                <div className="step-navigation">
+                  <button className="prev-button" onClick={handlePrevStep}>
+                    <span className="button-icon">←</span> السابق
+                  </button>
                 </div>
-              </div>
-            ) : (
-              <div className="empty-result">
-                <p>أدخل تفاصيل المشروع لرؤية تقدير التكلفة</p>
-              </div>
+              </motion.div>
             )}
-          </div>
+          </AnimatePresence>
         </div>
       </div>
     </div>

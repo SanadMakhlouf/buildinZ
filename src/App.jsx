@@ -21,7 +21,7 @@ function App() {
           <Route path="/signup" element={<SignupPage />} />
         </Routes>
         
-        {/* Footer */}
+        Footer
         <footer className="app-footer">
           <div className="footer-links">
             <Link to="/" className="footer-link">الرئيسية</Link>
