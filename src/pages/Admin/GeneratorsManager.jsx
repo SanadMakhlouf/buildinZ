@@ -1018,20 +1018,30 @@ const GeneratorsManager = ({
               <InputLabel>Icon</InputLabel>
               <Select
                 value={inputForm.icon}
-                onChange={(e) => setInputForm({ ...inputForm, icon: e.target.value })}
+                onChange={(e) =>
+                  setInputForm({ ...inputForm, icon: e.target.value })
+                }
                 label="Icon"
               >
                 <MenuItem value="">
                   <em>None</em>
                 </MenuItem>
-                {Object.entries(availableIcons).map(([key, { icon: Icon, label }]) => (
-                  <MenuItem key={key} value={key}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <Icon />
-                      <span>{label}</span>
-                    </div>
-                  </MenuItem>
-                ))}
+                {Object.entries(availableIcons).map(
+                  ([key, { icon: Icon, label }]) => (
+                    <MenuItem key={key} value={key}>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                        }}
+                      >
+                        <Icon />
+                        <span>{label}</span>
+                      </div>
+                    </MenuItem>
+                  )
+                )}
               </Select>
             </FormControl>
           </div>
