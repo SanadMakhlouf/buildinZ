@@ -1,24 +1,78 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Paper, Button, TextField, Dialog, DialogActions, DialogContent,
-  DialogTitle, IconButton, FormControl, InputLabel, Select, MenuItem,
-  FormHelperText, Tabs, Tab, Box, Accordion, AccordionSummary, AccordionDetails,
-  Chip, Switch, FormControlLabel
-} from '@mui/material';
-import { Add, Edit, Delete, ExpandMore, Code, Input, Functions } from '@mui/icons-material';
-import dataService from '../../services/dataService';
-import './AdminStyles.css';
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  TextField,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  FormHelperText,
+  Tabs,
+  Tab,
+  Box,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Chip,
+  Switch,
+  FormControlLabel,
+  Grid,
+} from "@mui/material";
+import {
+  Add,
+  Edit,
+  Delete,
+  ExpandMore,
+  Code,
+  Input,
+  Functions,
+  Home,
+  Build,
+  Brush,
+  Construction,
+  Engineering,
+  Architecture,
+  Straighten,
+  Square,
+  Calculate,
+} from "@mui/icons-material";
+import dataService from "../../services/dataService";
+import "./AdminStyles.css";
 
-const GeneratorsManager = ({ 
-  generators, 
-  categories, 
-  inputTypes, 
-  optionTypes, 
-  units, 
-  products, 
-  conditions, 
-  onDataChange 
+// Available icons mapping
+const availableIcons = {
+  home: { icon: Home, label: "Home" },
+  build: { icon: Build, label: "Build" },
+  brush: { icon: Brush, label: "Brush" },
+  construction: { icon: Construction, label: "Construction" },
+  engineering: { icon: Engineering, label: "Engineering" },
+  architecture: { icon: Architecture, label: "Architecture" },
+  measure: { icon: Straighten, label: "Measure" },
+  area: { icon: Square, label: "Area" },
+  calculate: { icon: Calculate, label: "Calculate" },
+};
+
+const GeneratorsManager = ({
+  generators,
+  categories,
+  inputTypes,
+  optionTypes,
+  units,
+  products,
+  conditions,
+  onDataChange,
 }) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [openInputDialog, setOpenInputDialog] = useState(false);
@@ -27,39 +81,40 @@ const GeneratorsManager = ({
   const [currentInput, setCurrentInput] = useState(null);
   const [currentFormulaType, setCurrentFormulaType] = useState(null);
   const [generatorForm, setGeneratorForm] = useState({
-    name: '',
-    description: '',
-    category_id: '',
+    name: "",
+    description: "",
+    category_id: "",
     inputs: [],
     formulas: {
-      pricing: { formula: '', description: '' },
-      labor: { formula: '', description: '' },
-      materials: { formula: '', description: '' },
-      derived_inputs: []
-    }
+      pricing: { formula: "", description: "" },
+      labor: { formula: "", description: "" },
+      materials: { formula: "", description: "" },
+      derived_inputs: [],
+    },
   });
   const [inputForm, setInputForm] = useState({
-    id: '',
-    name: '',
-    label: '',
-    type: 'number',
-    unit: '',
+    id: "",
+    name: "",
+    label: "",
+    type: "number",
+    unit: "",
     required: false,
-    default: '',
+    default: "",
     options: [],
-    option_type: '',
-    order: 0
+    option_type: "",
+    order: 0,
+    icon: "",
   });
   const [formulaForm, setFormulaForm] = useState({
-    formula: '',
-    description: ''
+    formula: "",
+    description: "",
   });
   const [derivedInputForm, setDerivedInputForm] = useState({
-    name: '',
-    label: '',
-    formula: '',
-    unit: '',
-    description: ''
+    name: "",
+    label: "",
+    formula: "",
+    unit: "",
+    description: "",
   });
   const [activeTab, setActiveTab] = useState(0);
 
@@ -75,22 +130,22 @@ const GeneratorsManager = ({
           pricing: { ...generator.formulas.pricing },
           labor: { ...generator.formulas.labor },
           materials: { ...generator.formulas.materials },
-          derived_inputs: [...generator.formulas.derived_inputs]
-        }
+          derived_inputs: [...generator.formulas.derived_inputs],
+        },
       });
       setCurrentGenerator(generator);
     } else {
       setGeneratorForm({
-        name: '',
-        description: '',
-        category_id: categories.length > 0 ? categories[0].id : '',
+        name: "",
+        description: "",
+        category_id: categories.length > 0 ? categories[0].id : "",
         inputs: [],
         formulas: {
-          pricing: { formula: '', description: 'Total price calculation' },
-          labor: { formula: '', description: 'Labor cost calculation' },
-          materials: { formula: '', description: 'Materials cost calculation' },
-          derived_inputs: []
-        }
+          pricing: { formula: "", description: "Total price calculation" },
+          labor: { formula: "", description: "Labor cost calculation" },
+          materials: { formula: "", description: "Materials cost calculation" },
+          derived_inputs: [],
+        },
       });
       setCurrentGenerator(null);
     }
@@ -114,7 +169,7 @@ const GeneratorsManager = ({
   };
 
   const handleDeleteGenerator = (generatorId) => {
-    if (window.confirm('Are you sure you want to delete this generator?')) {
+    if (window.confirm("Are you sure you want to delete this generator?")) {
       dataService.deleteGenerator(generatorId);
       onDataChange();
     }
@@ -128,26 +183,28 @@ const GeneratorsManager = ({
         name: input.name,
         label: input.label,
         type: input.type,
-        unit: input.unit || '',
+        unit: input.unit || "",
         required: input.required || false,
-        default: input.default !== undefined ? input.default : '',
+        default: input.default !== undefined ? input.default : "",
         options: input.options || [],
-        option_type: input.option_type || '',
-        order: input.order || 0
+        option_type: input.option_type || "",
+        order: input.order || 0,
+        icon: input.icon || "",
       });
       setCurrentInput(input);
     } else {
       setInputForm({
         id: `input_${Date.now()}`,
-        name: '',
-        label: '',
-        type: 'number',
-        unit: '',
+        name: "",
+        label: "",
+        type: "number",
+        unit: "",
         required: false,
-        default: '',
+        default: "",
         options: [],
-        option_type: '',
-        order: generatorForm.inputs.length + 1
+        option_type: "",
+        order: generatorForm.inputs.length + 1,
+        icon: "",
       });
       setCurrentInput(null);
     }
@@ -160,10 +217,12 @@ const GeneratorsManager = ({
 
   const handleSaveInput = () => {
     const updatedInputs = [...generatorForm.inputs];
-    
+
     if (currentInput) {
       // Update existing input
-      const index = updatedInputs.findIndex(input => input.id === currentInput.id);
+      const index = updatedInputs.findIndex(
+        (input) => input.id === currentInput.id
+      );
       if (index !== -1) {
         updatedInputs[index] = { ...inputForm };
       }
@@ -171,78 +230,94 @@ const GeneratorsManager = ({
       // Add new input
       updatedInputs.push({ ...inputForm });
     }
-    
+
     setGeneratorForm({
       ...generatorForm,
-      inputs: updatedInputs
+      inputs: updatedInputs,
     });
-    
+
     handleCloseInputDialog();
   };
 
   const handleDeleteInput = (inputId) => {
-    const updatedInputs = generatorForm.inputs.filter(input => input.id !== inputId);
+    const updatedInputs = generatorForm.inputs.filter(
+      (input) => input.id !== inputId
+    );
     setGeneratorForm({
       ...generatorForm,
-      inputs: updatedInputs
+      inputs: updatedInputs,
     });
   };
 
   // Formula Dialog Handlers
   const handleOpenFormulaDialog = (formulaType) => {
     setCurrentFormulaType(formulaType);
-    
-    if (formulaType === 'derived') {
+
+    if (formulaType === "derived") {
       setDerivedInputForm({
-        name: '',
-        label: '',
-        formula: '',
-        unit: '',
-        description: ''
+        name: "",
+        label: "",
+        formula: "",
+        unit: "",
+        description: "",
       });
     } else {
       setFormulaForm({
         formula: generatorForm.formulas[formulaType].formula,
-        description: generatorForm.formulas[formulaType].description
+        description: generatorForm.formulas[formulaType].description,
       });
     }
-    
+
     setOpenFormulaDialog(true);
   };
 
   // Helper function to insert variable into formula
   const insertVariableIntoFormula = (variable) => {
-    if (currentFormulaType === 'derived') {
-      const textarea = document.getElementById('derived-formula-input');
+    if (currentFormulaType === "derived") {
+      const textarea = document.getElementById("derived-formula-input");
       if (textarea) {
         const start = textarea.selectionStart;
         const end = textarea.selectionEnd;
         const formula = derivedInputForm.formula;
-        const newFormula = formula.substring(0, start) + variable + formula.substring(end);
-        setDerivedInputForm({...derivedInputForm, formula: newFormula});
+        const newFormula =
+          formula.substring(0, start) + variable + formula.substring(end);
+        setDerivedInputForm({ ...derivedInputForm, formula: newFormula });
         // Set cursor position after the inserted variable
         setTimeout(() => {
           textarea.focus();
-          textarea.setSelectionRange(start + variable.length, start + variable.length);
+          textarea.setSelectionRange(
+            start + variable.length,
+            start + variable.length
+          );
         }, 50);
       } else {
-        setDerivedInputForm({...derivedInputForm, formula: derivedInputForm.formula + ' ' + variable});
+        setDerivedInputForm({
+          ...derivedInputForm,
+          formula: derivedInputForm.formula + " " + variable,
+        });
       }
     } else {
-      const textarea = document.getElementById('formula-input');
+      const textarea = document.getElementById("formula-input");
       if (textarea) {
         const start = textarea.selectionStart;
         const end = textarea.selectionEnd;
         const formula = formulaForm.formula;
-        const newFormula = formula.substring(0, start) + variable + formula.substring(end);
-        setFormulaForm({...formulaForm, formula: newFormula});
+        const newFormula =
+          formula.substring(0, start) + variable + formula.substring(end);
+        setFormulaForm({ ...formulaForm, formula: newFormula });
         // Set cursor position after the inserted variable
         setTimeout(() => {
           textarea.focus();
-          textarea.setSelectionRange(start + variable.length, start + variable.length);
+          textarea.setSelectionRange(
+            start + variable.length,
+            start + variable.length
+          );
         }, 50);
       } else {
-        setFormulaForm({...formulaForm, formula: formulaForm.formula + ' ' + variable});
+        setFormulaForm({
+          ...formulaForm,
+          formula: formulaForm.formula + " " + variable,
+        });
       }
     }
   };
@@ -250,61 +325,81 @@ const GeneratorsManager = ({
   // Helper function to insert math function into formula
   const insertMathFunction = (func) => {
     const funcText = {
-      'ceil': 'Math.ceil()',
-      'floor': 'Math.floor()',
-      'round': 'Math.round()',
-      'max': 'Math.max()',
-      'min': 'Math.min()',
-      'conditional': '? : ',
-      'multiply': ' * ',
-      'divide': ' / ',
-      'add': ' + ',
-      'subtract': ' - '
+      ceil: "Math.ceil()",
+      floor: "Math.floor()",
+      round: "Math.round()",
+      max: "Math.max()",
+      min: "Math.min()",
+      conditional: "? : ",
+      multiply: " * ",
+      divide: " / ",
+      add: " + ",
+      subtract: " - ",
     }[func];
 
-    if (currentFormulaType === 'derived') {
-      const textarea = document.getElementById('derived-formula-input');
+    if (currentFormulaType === "derived") {
+      const textarea = document.getElementById("derived-formula-input");
       if (textarea) {
         const start = textarea.selectionStart;
         const end = textarea.selectionEnd;
         const formula = derivedInputForm.formula;
-        const newFormula = formula.substring(0, start) + funcText + formula.substring(end);
-        setDerivedInputForm({...derivedInputForm, formula: newFormula});
+        const newFormula =
+          formula.substring(0, start) + funcText + formula.substring(end);
+        setDerivedInputForm({ ...derivedInputForm, formula: newFormula });
         // Set cursor position inside the function parentheses
         setTimeout(() => {
           textarea.focus();
-          if (func === 'conditional') {
+          if (func === "conditional") {
             textarea.setSelectionRange(start, start);
-          } else if (['multiply', 'divide', 'add', 'subtract'].includes(func)) {
-            textarea.setSelectionRange(start + funcText.length, start + funcText.length);
+          } else if (["multiply", "divide", "add", "subtract"].includes(func)) {
+            textarea.setSelectionRange(
+              start + funcText.length,
+              start + funcText.length
+            );
           } else {
-            textarea.setSelectionRange(start + funcText.length - 1, start + funcText.length - 1);
+            textarea.setSelectionRange(
+              start + funcText.length - 1,
+              start + funcText.length - 1
+            );
           }
         }, 50);
       } else {
-        setDerivedInputForm({...derivedInputForm, formula: derivedInputForm.formula + ' ' + funcText});
+        setDerivedInputForm({
+          ...derivedInputForm,
+          formula: derivedInputForm.formula + " " + funcText,
+        });
       }
     } else {
-      const textarea = document.getElementById('formula-input');
+      const textarea = document.getElementById("formula-input");
       if (textarea) {
         const start = textarea.selectionStart;
         const end = textarea.selectionEnd;
         const formula = formulaForm.formula;
-        const newFormula = formula.substring(0, start) + funcText + formula.substring(end);
-        setFormulaForm({...formulaForm, formula: newFormula});
+        const newFormula =
+          formula.substring(0, start) + funcText + formula.substring(end);
+        setFormulaForm({ ...formulaForm, formula: newFormula });
         // Set cursor position inside the function parentheses
         setTimeout(() => {
           textarea.focus();
-          if (func === 'conditional') {
+          if (func === "conditional") {
             textarea.setSelectionRange(start, start);
-          } else if (['multiply', 'divide', 'add', 'subtract'].includes(func)) {
-            textarea.setSelectionRange(start + funcText.length, start + funcText.length);
+          } else if (["multiply", "divide", "add", "subtract"].includes(func)) {
+            textarea.setSelectionRange(
+              start + funcText.length,
+              start + funcText.length
+            );
           } else {
-            textarea.setSelectionRange(start + funcText.length - 1, start + funcText.length - 1);
+            textarea.setSelectionRange(
+              start + funcText.length - 1,
+              start + funcText.length - 1
+            );
           }
         }, 50);
       } else {
-        setFormulaForm({...formulaForm, formula: formulaForm.formula + ' ' + funcText});
+        setFormulaForm({
+          ...formulaForm,
+          formula: formulaForm.formula + " " + funcText,
+        });
       }
     }
   };
@@ -314,15 +409,18 @@ const GeneratorsManager = ({
   };
 
   const handleSaveFormula = () => {
-    if (currentFormulaType === 'derived') {
+    if (currentFormulaType === "derived") {
       // Add new derived input
-      const updatedDerivedInputs = [...generatorForm.formulas.derived_inputs, derivedInputForm];
+      const updatedDerivedInputs = [
+        ...generatorForm.formulas.derived_inputs,
+        derivedInputForm,
+      ];
       setGeneratorForm({
         ...generatorForm,
         formulas: {
           ...generatorForm.formulas,
-          derived_inputs: updatedDerivedInputs
-        }
+          derived_inputs: updatedDerivedInputs,
+        },
       });
     } else {
       // Update formula
@@ -332,25 +430,25 @@ const GeneratorsManager = ({
           ...generatorForm.formulas,
           [currentFormulaType]: {
             formula: formulaForm.formula,
-            description: formulaForm.description
-          }
-        }
+            description: formulaForm.description,
+          },
+        },
       });
     }
-    
+
     handleCloseFormulaDialog();
   };
 
   const handleDeleteDerivedInput = (index) => {
     const updatedDerivedInputs = [...generatorForm.formulas.derived_inputs];
     updatedDerivedInputs.splice(index, 1);
-    
+
     setGeneratorForm({
       ...generatorForm,
       formulas: {
         ...generatorForm.formulas,
-        derived_inputs: updatedDerivedInputs
-      }
+        derived_inputs: updatedDerivedInputs,
+      },
     });
   };
 
@@ -362,9 +460,9 @@ const GeneratorsManager = ({
     <div className="generators-manager">
       <div className="section-header">
         <h2>Calculator Generators</h2>
-        <Button 
-          variant="contained" 
-          color="primary" 
+        <Button
+          variant="contained"
+          color="primary"
           startIcon={<Add />}
           onClick={() => handleOpenDialog()}
         >
@@ -386,24 +484,25 @@ const GeneratorsManager = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {generators.map(generator => (
+            {generators.map((generator) => (
               <TableRow key={generator.id}>
                 <TableCell>{generator.id}</TableCell>
                 <TableCell>{generator.name}</TableCell>
                 <TableCell>{generator.description}</TableCell>
                 <TableCell>
-                  {categories.find(c => c.id === generator.category_id)?.name || 'Unknown'}
+                  {categories.find((c) => c.id === generator.category_id)
+                    ?.name || "Unknown"}
                 </TableCell>
                 <TableCell>{generator.inputs.length}</TableCell>
                 <TableCell>
-                  <IconButton 
-                    size="small" 
+                  <IconButton
+                    size="small"
                     onClick={() => handleOpenDialog(generator)}
                   >
                     <Edit fontSize="small" />
                   </IconButton>
-                  <IconButton 
-                    size="small" 
+                  <IconButton
+                    size="small"
                     onClick={() => handleDeleteGenerator(generator.id)}
                   >
                     <Delete fontSize="small" />
@@ -416,15 +515,26 @@ const GeneratorsManager = ({
       </TableContainer>
 
       {/* Generator Dialog */}
-      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="md" fullWidth>
-        <DialogTitle>{currentGenerator ? 'Edit Generator' : 'Add Generator'}</DialogTitle>
+      <Dialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>
+          {currentGenerator ? "Edit Generator" : "Add Generator"}
+        </DialogTitle>
         <DialogContent>
-          <Tabs value={activeTab} onChange={handleTabChange} aria-label="generator tabs">
+          <Tabs
+            value={activeTab}
+            onChange={handleTabChange}
+            aria-label="generator tabs"
+          >
             <Tab label="Basic Info" />
             <Tab label="Inputs" />
             <Tab label="Formulas" />
           </Tabs>
-          
+
           <TabPanel value={activeTab} index={0}>
             <TextField
               autoFocus
@@ -432,7 +542,9 @@ const GeneratorsManager = ({
               label="Generator Name"
               fullWidth
               value={generatorForm.name}
-              onChange={(e) => setGeneratorForm({...generatorForm, name: e.target.value})}
+              onChange={(e) =>
+                setGeneratorForm({ ...generatorForm, name: e.target.value })
+              }
             />
             <TextField
               margin="dense"
@@ -441,38 +553,50 @@ const GeneratorsManager = ({
               multiline
               rows={2}
               value={generatorForm.description}
-              onChange={(e) => setGeneratorForm({...generatorForm, description: e.target.value})}
+              onChange={(e) =>
+                setGeneratorForm({
+                  ...generatorForm,
+                  description: e.target.value,
+                })
+              }
             />
             <FormControl fullWidth margin="dense">
               <InputLabel>Category</InputLabel>
               <Select
                 value={generatorForm.category_id}
-                onChange={(e) => setGeneratorForm({...generatorForm, category_id: e.target.value})}
+                onChange={(e) =>
+                  setGeneratorForm({
+                    ...generatorForm,
+                    category_id: e.target.value,
+                  })
+                }
                 label="Category"
               >
-                {categories.map(category => (
+                {categories.map((category) => (
                   <MenuItem key={category.id} value={category.id}>
                     {category.name}
                   </MenuItem>
                 ))}
               </Select>
-              <FormHelperText>Select the category this generator belongs to</FormHelperText>
+              <FormHelperText>
+                Select the category this generator belongs to
+              </FormHelperText>
             </FormControl>
           </TabPanel>
-          
+
           <TabPanel value={activeTab} index={1}>
             <div className="section-header">
               <h3>Input Fields</h3>
-              <Button 
-                variant="contained" 
-                color="primary" 
+              <Button
+                variant="contained"
+                color="primary"
                 startIcon={<Add />}
                 onClick={() => handleOpenInputDialog()}
               >
                 Add Input
               </Button>
             </div>
-            
+
             {generatorForm.inputs.length > 0 ? (
               <TableContainer component={Paper}>
                 <Table size="small">
@@ -489,29 +613,29 @@ const GeneratorsManager = ({
                   <TableBody>
                     {generatorForm.inputs
                       .sort((a, b) => a.order - b.order)
-                      .map(input => (
-                      <TableRow key={input.id}>
-                        <TableCell>{input.order}</TableCell>
-                        <TableCell>{input.name}</TableCell>
-                        <TableCell>{input.label}</TableCell>
-                        <TableCell>{input.type}</TableCell>
-                        <TableCell>{input.required ? 'Yes' : 'No'}</TableCell>
-                        <TableCell>
-                          <IconButton 
-                            size="small" 
-                            onClick={() => handleOpenInputDialog(input)}
-                          >
-                            <Edit fontSize="small" />
-                          </IconButton>
-                          <IconButton 
-                            size="small" 
-                            onClick={() => handleDeleteInput(input.id)}
-                          >
-                            <Delete fontSize="small" />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                      .map((input) => (
+                        <TableRow key={input.id}>
+                          <TableCell>{input.order}</TableCell>
+                          <TableCell>{input.name}</TableCell>
+                          <TableCell>{input.label}</TableCell>
+                          <TableCell>{input.type}</TableCell>
+                          <TableCell>{input.required ? "Yes" : "No"}</TableCell>
+                          <TableCell>
+                            <IconButton
+                              size="small"
+                              onClick={() => handleOpenInputDialog(input)}
+                            >
+                              <Edit fontSize="small" />
+                            </IconButton>
+                            <IconButton
+                              size="small"
+                              onClick={() => handleDeleteInput(input.id)}
+                            >
+                              <Delete fontSize="small" />
+                            </IconButton>
+                          </TableCell>
+                        </TableRow>
+                      ))}
                   </TableBody>
                 </Table>
               </TableContainer>
@@ -519,7 +643,7 @@ const GeneratorsManager = ({
               <div className="no-data-message">No inputs defined</div>
             )}
           </TabPanel>
-          
+
           <TabPanel value={activeTab} index={2}>
             <div className="formulas-section">
               <Accordion defaultExpanded>
@@ -532,13 +656,16 @@ const GeneratorsManager = ({
                 <AccordionDetails>
                   <div className="formula-content">
                     <div className="formula-display">
-                      <pre>{generatorForm.formulas.pricing.formula || 'No formula defined'}</pre>
+                      <pre>
+                        {generatorForm.formulas.pricing.formula ||
+                          "No formula defined"}
+                      </pre>
                     </div>
                     <div className="formula-actions">
-                      <Button 
-                        variant="outlined" 
+                      <Button
+                        variant="outlined"
                         startIcon={<Edit />}
-                        onClick={() => handleOpenFormulaDialog('pricing')}
+                        onClick={() => handleOpenFormulaDialog("pricing")}
                       >
                         Edit Formula
                       </Button>
@@ -546,7 +673,7 @@ const GeneratorsManager = ({
                   </div>
                 </AccordionDetails>
               </Accordion>
-              
+
               <Accordion>
                 <AccordionSummary expandIcon={<ExpandMore />}>
                   <div className="formula-header">
@@ -557,13 +684,16 @@ const GeneratorsManager = ({
                 <AccordionDetails>
                   <div className="formula-content">
                     <div className="formula-display">
-                      <pre>{generatorForm.formulas.labor.formula || 'No formula defined'}</pre>
+                      <pre>
+                        {generatorForm.formulas.labor.formula ||
+                          "No formula defined"}
+                      </pre>
                     </div>
                     <div className="formula-actions">
-                      <Button 
-                        variant="outlined" 
+                      <Button
+                        variant="outlined"
                         startIcon={<Edit />}
-                        onClick={() => handleOpenFormulaDialog('labor')}
+                        onClick={() => handleOpenFormulaDialog("labor")}
                       >
                         Edit Formula
                       </Button>
@@ -571,7 +701,7 @@ const GeneratorsManager = ({
                   </div>
                 </AccordionDetails>
               </Accordion>
-              
+
               <Accordion>
                 <AccordionSummary expandIcon={<ExpandMore />}>
                   <div className="formula-header">
@@ -582,13 +712,16 @@ const GeneratorsManager = ({
                 <AccordionDetails>
                   <div className="formula-content">
                     <div className="formula-display">
-                      <pre>{generatorForm.formulas.materials.formula || 'No formula defined'}</pre>
+                      <pre>
+                        {generatorForm.formulas.materials.formula ||
+                          "No formula defined"}
+                      </pre>
                     </div>
                     <div className="formula-actions">
-                      <Button 
-                        variant="outlined" 
+                      <Button
+                        variant="outlined"
                         startIcon={<Edit />}
-                        onClick={() => handleOpenFormulaDialog('materials')}
+                        onClick={() => handleOpenFormulaDialog("materials")}
                       >
                         Edit Formula
                       </Button>
@@ -596,20 +729,20 @@ const GeneratorsManager = ({
                   </div>
                 </AccordionDetails>
               </Accordion>
-              
+
               <div className="derived-inputs-section">
                 <div className="section-header">
                   <h3>Derived Inputs</h3>
-                  <Button 
-                    variant="contained" 
-                    color="primary" 
+                  <Button
+                    variant="contained"
+                    color="primary"
                     startIcon={<Add />}
-                    onClick={() => handleOpenFormulaDialog('derived')}
+                    onClick={() => handleOpenFormulaDialog("derived")}
                   >
                     Add Derived Input
                   </Button>
                 </div>
-                
+
                 {generatorForm.formulas.derived_inputs.length > 0 ? (
                   <TableContainer component={Paper}>
                     <Table size="small">
@@ -623,27 +756,33 @@ const GeneratorsManager = ({
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {generatorForm.formulas.derived_inputs.map((input, index) => (
-                          <TableRow key={index}>
-                            <TableCell>{input.name}</TableCell>
-                            <TableCell>{input.label}</TableCell>
-                            <TableCell>{input.formula}</TableCell>
-                            <TableCell>{input.unit}</TableCell>
-                            <TableCell>
-                              <IconButton 
-                                size="small" 
-                                onClick={() => handleDeleteDerivedInput(index)}
-                              >
-                                <Delete fontSize="small" />
-                              </IconButton>
-                            </TableCell>
-                          </TableRow>
-                        ))}
+                        {generatorForm.formulas.derived_inputs.map(
+                          (input, index) => (
+                            <TableRow key={index}>
+                              <TableCell>{input.name}</TableCell>
+                              <TableCell>{input.label}</TableCell>
+                              <TableCell>{input.formula}</TableCell>
+                              <TableCell>{input.unit}</TableCell>
+                              <TableCell>
+                                <IconButton
+                                  size="small"
+                                  onClick={() =>
+                                    handleDeleteDerivedInput(index)
+                                  }
+                                >
+                                  <Delete fontSize="small" />
+                                </IconButton>
+                              </TableCell>
+                            </TableRow>
+                          )
+                        )}
                       </TableBody>
                     </Table>
                   </TableContainer>
                 ) : (
-                  <div className="no-data-message">No derived inputs defined</div>
+                  <div className="no-data-message">
+                    No derived inputs defined
+                  </div>
                 )}
               </div>
             </div>
@@ -651,13 +790,22 @@ const GeneratorsManager = ({
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog}>Cancel</Button>
-          <Button onClick={handleSaveGenerator} color="primary">Save</Button>
+          <Button onClick={handleSaveGenerator} color="primary">
+            Save
+          </Button>
         </DialogActions>
       </Dialog>
 
       {/* Input Dialog */}
-      <Dialog open={openInputDialog} onClose={handleCloseInputDialog} maxWidth="md">
-        <DialogTitle>{currentInput ? 'Edit Input' : 'Add Input'}</DialogTitle>
+      <Dialog
+        open={openInputDialog}
+        onClose={handleCloseInputDialog}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>
+          {currentInput ? "Edit Input" : "Add New Input"}
+        </DialogTitle>
         <DialogContent>
           <div className="form-row">
             <TextField
@@ -665,7 +813,9 @@ const GeneratorsManager = ({
               margin="dense"
               label="Input Name"
               value={inputForm.name}
-              onChange={(e) => setInputForm({...inputForm, name: e.target.value})}
+              onChange={(e) =>
+                setInputForm({ ...inputForm, name: e.target.value })
+              }
               helperText="Variable name used in formulas"
               sx={{ mr: 2, flexGrow: 1 }}
             />
@@ -673,60 +823,73 @@ const GeneratorsManager = ({
               margin="dense"
               label="Display Label"
               value={inputForm.label}
-              onChange={(e) => setInputForm({...inputForm, label: e.target.value})}
+              onChange={(e) =>
+                setInputForm({ ...inputForm, label: e.target.value })
+              }
               helperText="Label shown to users"
               sx={{ flexGrow: 1 }}
             />
           </div>
-          
+
           <div className="form-row">
             <FormControl margin="dense" sx={{ mr: 2, minWidth: 150 }}>
               <InputLabel>Input Type</InputLabel>
               <Select
                 value={inputForm.type}
-                onChange={(e) => setInputForm({...inputForm, type: e.target.value})}
+                onChange={(e) =>
+                  setInputForm({ ...inputForm, type: e.target.value })
+                }
                 label="Input Type"
               >
-                {inputTypes.map(type => (
+                {inputTypes.map((type) => (
                   <MenuItem key={type.id} value={type.id}>
                     {type.name}
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
-            
+
             <TextField
               margin="dense"
               label="Order"
               type="number"
               value={inputForm.order}
-              onChange={(e) => setInputForm({...inputForm, order: parseInt(e.target.value) || 0})}
+              onChange={(e) =>
+                setInputForm({
+                  ...inputForm,
+                  order: parseInt(e.target.value) || 0,
+                })
+              }
               sx={{ width: 100, mr: 2 }}
             />
-            
+
             <FormControlLabel
               control={
                 <Switch
                   checked={inputForm.required}
-                  onChange={(e) => setInputForm({...inputForm, required: e.target.checked})}
+                  onChange={(e) =>
+                    setInputForm({ ...inputForm, required: e.target.checked })
+                  }
                 />
               }
               label="Required"
             />
           </div>
-          
-          {(inputForm.type === 'number' || inputForm.type === 'derived') && (
+
+          {(inputForm.type === "number" || inputForm.type === "derived") && (
             <FormControl margin="dense" fullWidth>
               <InputLabel>Unit</InputLabel>
               <Select
                 value={inputForm.unit}
-                onChange={(e) => setInputForm({...inputForm, unit: e.target.value})}
+                onChange={(e) =>
+                  setInputForm({ ...inputForm, unit: e.target.value })
+                }
                 label="Unit"
               >
                 <MenuItem value="">
                   <em>None</em>
                 </MenuItem>
-                {units.map(unit => (
+                {units.map((unit) => (
                   <MenuItem key={unit.id} value={unit.name}>
                     {unit.name}
                   </MenuItem>
@@ -734,41 +897,47 @@ const GeneratorsManager = ({
               </Select>
             </FormControl>
           )}
-          
-          {inputForm.type !== 'derived' && (
+
+          {inputForm.type !== "derived" && (
             <TextField
               margin="dense"
               label="Default Value"
               fullWidth
               value={inputForm.default}
-              onChange={(e) => setInputForm({...inputForm, default: e.target.value})}
+              onChange={(e) =>
+                setInputForm({ ...inputForm, default: e.target.value })
+              }
               helperText="Default value for this input"
             />
           )}
-          
-          {inputForm.type === 'select' && (
+
+          {inputForm.type === "select" && (
             <div className="select-options-section">
               <FormControl margin="dense" fullWidth>
                 <InputLabel>Option Type</InputLabel>
                 <Select
                   value={inputForm.option_type}
-                  onChange={(e) => setInputForm({...inputForm, option_type: e.target.value})}
+                  onChange={(e) =>
+                    setInputForm({ ...inputForm, option_type: e.target.value })
+                  }
                   label="Option Type"
                 >
-                  {optionTypes.map(type => (
+                  {optionTypes.map((type) => (
                     <MenuItem key={type.id} value={type.id}>
                       {type.name}
                     </MenuItem>
                   ))}
                 </Select>
-                <FormHelperText>Select the type of options for this dropdown</FormHelperText>
+                <FormHelperText>
+                  Select the type of options for this dropdown
+                </FormHelperText>
               </FormControl>
-              
+
               <div className="options-list">
                 <h4>Options</h4>
-                {inputForm.option_type === 'product' ? (
+                {inputForm.option_type === "product" ? (
                   <div className="product-options">
-                    {products.map(product => (
+                    {products.map((product) => (
                       <Chip
                         key={product.id}
                         label={`${product.name} (${product.id})`}
@@ -776,21 +945,27 @@ const GeneratorsManager = ({
                           const options = [...inputForm.options];
                           if (!options.includes(product.id)) {
                             options.push(product.id);
-                            setInputForm({...inputForm, options});
+                            setInputForm({ ...inputForm, options });
                           }
                         }}
                         onDelete={() => {
-                          const options = inputForm.options.filter(id => id !== product.id);
-                          setInputForm({...inputForm, options});
+                          const options = inputForm.options.filter(
+                            (id) => id !== product.id
+                          );
+                          setInputForm({ ...inputForm, options });
                         }}
-                        color={inputForm.options.includes(product.id) ? "primary" : "default"}
+                        color={
+                          inputForm.options.includes(product.id)
+                            ? "primary"
+                            : "default"
+                        }
                         sx={{ m: 0.5 }}
                       />
                     ))}
                   </div>
-                ) : inputForm.option_type === 'condition' ? (
+                ) : inputForm.option_type === "condition" ? (
                   <div className="condition-options">
-                    {conditions.map(condition => (
+                    {conditions.map((condition) => (
                       <Chip
                         key={condition.id}
                         label={`${condition.name} (${condition.id})`}
@@ -798,14 +973,20 @@ const GeneratorsManager = ({
                           const options = [...inputForm.options];
                           if (!options.includes(condition.id)) {
                             options.push(condition.id);
-                            setInputForm({...inputForm, options});
+                            setInputForm({ ...inputForm, options });
                           }
                         }}
                         onDelete={() => {
-                          const options = inputForm.options.filter(id => id !== condition.id);
-                          setInputForm({...inputForm, options});
+                          const options = inputForm.options.filter(
+                            (id) => id !== condition.id
+                          );
+                          setInputForm({ ...inputForm, options });
                         }}
-                        color={inputForm.options.includes(condition.id) ? "primary" : "default"}
+                        color={
+                          inputForm.options.includes(condition.id)
+                            ? "primary"
+                            : "default"
+                        }
                         sx={{ m: 0.5 }}
                       />
                     ))}
@@ -817,32 +998,71 @@ const GeneratorsManager = ({
                     fullWidth
                     multiline
                     rows={3}
-                    value={inputForm.options.join('\n')}
-                    onChange={(e) => setInputForm({...inputForm, options: e.target.value.split('\n').filter(Boolean)})}
+                    value={inputForm.options.join("\n")}
+                    onChange={(e) =>
+                      setInputForm({
+                        ...inputForm,
+                        options: e.target.value.split("\n").filter(Boolean),
+                      })
+                    }
                     helperText="Enter one option per line"
                   />
                 )}
               </div>
             </div>
           )}
+
+          {/* Icon Selection */}
+          <div className="form-row">
+            <FormControl fullWidth>
+              <InputLabel>Icon</InputLabel>
+              <Select
+                value={inputForm.icon}
+                onChange={(e) => setInputForm({ ...inputForm, icon: e.target.value })}
+                label="Icon"
+              >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
+                {Object.entries(availableIcons).map(([key, { icon: Icon, label }]) => (
+                  <MenuItem key={key} value={key}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Icon />
+                      <span>{label}</span>
+                    </div>
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </div>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseInputDialog}>Cancel</Button>
-          <Button onClick={handleSaveInput} color="primary">Save</Button>
+          <Button onClick={handleSaveInput} variant="contained" color="primary">
+            Save
+          </Button>
         </DialogActions>
       </Dialog>
 
       {/* Formula Dialog */}
-      <Dialog open={openFormulaDialog} onClose={handleCloseFormulaDialog} maxWidth="md" fullWidth>
+      <Dialog
+        open={openFormulaDialog}
+        onClose={handleCloseFormulaDialog}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>
-          {currentFormulaType === 'derived' 
-            ? 'Add Derived Input' 
-            : currentFormulaType 
-              ? `Edit ${currentFormulaType.charAt(0).toUpperCase() + currentFormulaType.slice(1)} Formula`
-              : 'Edit Formula'}
+          {currentFormulaType === "derived"
+            ? "Add Derived Input"
+            : currentFormulaType
+            ? `Edit ${
+                currentFormulaType.charAt(0).toUpperCase() +
+                currentFormulaType.slice(1)
+              } Formula`
+            : "Edit Formula"}
         </DialogTitle>
         <DialogContent>
-          {currentFormulaType === 'derived' ? (
+          {currentFormulaType === "derived" ? (
             <>
               <div className="form-row">
                 <TextField
@@ -850,7 +1070,12 @@ const GeneratorsManager = ({
                   margin="dense"
                   label="Input Name"
                   value={derivedInputForm.name}
-                  onChange={(e) => setDerivedInputForm({...derivedInputForm, name: e.target.value})}
+                  onChange={(e) =>
+                    setDerivedInputForm({
+                      ...derivedInputForm,
+                      name: e.target.value,
+                    })
+                  }
                   helperText="Variable name used in formulas"
                   sx={{ mr: 2, flexGrow: 1 }}
                 />
@@ -858,55 +1083,125 @@ const GeneratorsManager = ({
                   margin="dense"
                   label="Display Label"
                   value={derivedInputForm.label}
-                  onChange={(e) => setDerivedInputForm({...derivedInputForm, label: e.target.value})}
+                  onChange={(e) =>
+                    setDerivedInputForm({
+                      ...derivedInputForm,
+                      label: e.target.value,
+                    })
+                  }
                   helperText="Label shown to users"
                   sx={{ flexGrow: 1 }}
                 />
               </div>
-              
+
               <FormControl margin="dense" fullWidth sx={{ mb: 2 }}>
                 <InputLabel>Unit</InputLabel>
                 <Select
                   value={derivedInputForm.unit}
-                  onChange={(e) => setDerivedInputForm({...derivedInputForm, unit: e.target.value})}
+                  onChange={(e) =>
+                    setDerivedInputForm({
+                      ...derivedInputForm,
+                      unit: e.target.value,
+                    })
+                  }
                   label="Unit"
                 >
                   <MenuItem value="">
                     <em>None</em>
                   </MenuItem>
-                  {units.map(unit => (
+                  {units.map((unit) => (
                     <MenuItem key={unit.id} value={unit.name}>
                       {unit.name}
                     </MenuItem>
                   ))}
                 </Select>
               </FormControl>
-              
+
               <div className="formula-builder">
                 <h4>Formula Builder</h4>
                 <div className="formula-tools">
                   <div className="formula-section">
                     <h5>Math Functions</h5>
                     <div className="function-buttons">
-                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('ceil')}>Ceiling</Button>
-                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('floor')}>Floor</Button>
-                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('round')}>Round</Button>
-                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('max')}>Max</Button>
-                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('min')}>Min</Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => insertMathFunction("ceil")}
+                      >
+                        Ceiling
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => insertMathFunction("floor")}
+                      >
+                        Floor
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => insertMathFunction("round")}
+                      >
+                        Round
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => insertMathFunction("max")}
+                      >
+                        Max
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => insertMathFunction("min")}
+                      >
+                        Min
+                      </Button>
                     </div>
                   </div>
                   <div className="formula-section">
                     <h5>Operators</h5>
                     <div className="operator-buttons">
-                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('multiply')}>×</Button>
-                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('divide')}>÷</Button>
-                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('add')}>+</Button>
-                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('subtract')}>−</Button>
-                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('conditional')}>? :</Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => insertMathFunction("multiply")}
+                      >
+                        ×
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => insertMathFunction("divide")}
+                      >
+                        ÷
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => insertMathFunction("add")}
+                      >
+                        +
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => insertMathFunction("subtract")}
+                      >
+                        −
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => insertMathFunction("conditional")}
+                      >
+                        ? :
+                      </Button>
                     </div>
                   </div>
                 </div>
-                
+
                 <TextField
                   id="derived-formula-input"
                   margin="dense"
@@ -915,17 +1210,27 @@ const GeneratorsManager = ({
                   multiline
                   rows={3}
                   value={derivedInputForm.formula}
-                  onChange={(e) => setDerivedInputForm({...derivedInputForm, formula: e.target.value})}
+                  onChange={(e) =>
+                    setDerivedInputForm({
+                      ...derivedInputForm,
+                      formula: e.target.value,
+                    })
+                  }
                   helperText="JavaScript formula to calculate this derived input"
                 />
               </div>
-              
+
               <TextField
                 margin="dense"
                 label="Description"
                 fullWidth
                 value={derivedInputForm.description}
-                onChange={(e) => setDerivedInputForm({...derivedInputForm, description: e.target.value})}
+                onChange={(e) =>
+                  setDerivedInputForm({
+                    ...derivedInputForm,
+                    description: e.target.value,
+                  })
+                }
                 helperText="Description of what this derived input calculates"
               />
             </>
@@ -937,25 +1242,85 @@ const GeneratorsManager = ({
                   <div className="formula-section">
                     <h5>Math Functions</h5>
                     <div className="function-buttons">
-                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('ceil')}>Ceiling</Button>
-                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('floor')}>Floor</Button>
-                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('round')}>Round</Button>
-                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('max')}>Max</Button>
-                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('min')}>Min</Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => insertMathFunction("ceil")}
+                      >
+                        Ceiling
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => insertMathFunction("floor")}
+                      >
+                        Floor
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => insertMathFunction("round")}
+                      >
+                        Round
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => insertMathFunction("max")}
+                      >
+                        Max
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => insertMathFunction("min")}
+                      >
+                        Min
+                      </Button>
                     </div>
                   </div>
                   <div className="formula-section">
                     <h5>Operators</h5>
                     <div className="operator-buttons">
-                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('multiply')}>×</Button>
-                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('divide')}>÷</Button>
-                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('add')}>+</Button>
-                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('subtract')}>−</Button>
-                      <Button size="small" variant="outlined" onClick={() => insertMathFunction('conditional')}>? :</Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => insertMathFunction("multiply")}
+                      >
+                        ×
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => insertMathFunction("divide")}
+                      >
+                        ÷
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => insertMathFunction("add")}
+                      >
+                        +
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => insertMathFunction("subtract")}
+                      >
+                        −
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => insertMathFunction("conditional")}
+                      >
+                        ? :
+                      </Button>
                     </div>
                   </div>
                 </div>
-                
+
                 <TextField
                   id="formula-input"
                   autoFocus
@@ -965,26 +1330,33 @@ const GeneratorsManager = ({
                   multiline
                   rows={5}
                   value={formulaForm.formula}
-                  onChange={(e) => setFormulaForm({...formulaForm, formula: e.target.value})}
+                  onChange={(e) =>
+                    setFormulaForm({ ...formulaForm, formula: e.target.value })
+                  }
                   helperText="JavaScript formula to calculate the price"
                 />
               </div>
-              
+
               <TextField
                 margin="dense"
                 label="Description"
                 fullWidth
                 value={formulaForm.description}
-                onChange={(e) => setFormulaForm({...formulaForm, description: e.target.value})}
+                onChange={(e) =>
+                  setFormulaForm({
+                    ...formulaForm,
+                    description: e.target.value,
+                  })
+                }
                 helperText="Description of what this formula calculates"
               />
             </>
           )}
-          
+
           <div className="formula-help">
             <h4>Available Variables:</h4>
             <div className="variables-list">
-              {generatorForm.inputs.map(input => (
+              {generatorForm.inputs.map((input) => (
                 <Chip
                   key={input.id}
                   label={input.name}
@@ -999,31 +1371,40 @@ const GeneratorsManager = ({
                 variant="outlined"
                 size="small"
                 color="primary"
-                onClick={() => insertVariableIntoFormula('price_unit')}
+                onClick={() => insertVariableIntoFormula("price_unit")}
                 sx={{ m: 0.5 }}
               />
-              {generatorForm.inputs.filter(input => input.type === 'select' && input.option_type === 'product').map(input => (
-                <React.Fragment key={`${input.id}-price`}>
-                  <Chip
-                    label={`${input.name}_price`}
-                    variant="outlined"
-                    size="small"
-                    color="secondary"
-                    onClick={() => insertVariableIntoFormula(`${input.name}_price`)}
-                    sx={{ m: 0.5 }}
-                  />
-                  <Chip
-                    label={`${input.name}_coverage`}
-                    variant="outlined"
-                    size="small"
-                    color="secondary"
-                    onClick={() => insertVariableIntoFormula(`${input.name}_coverage`)}
-                    sx={{ m: 0.5 }}
-                  />
-                </React.Fragment>
-              ))}
+              {generatorForm.inputs
+                .filter(
+                  (input) =>
+                    input.type === "select" && input.option_type === "product"
+                )
+                .map((input) => (
+                  <React.Fragment key={`${input.id}-price`}>
+                    <Chip
+                      label={`${input.name}_price`}
+                      variant="outlined"
+                      size="small"
+                      color="secondary"
+                      onClick={() =>
+                        insertVariableIntoFormula(`${input.name}_price`)
+                      }
+                      sx={{ m: 0.5 }}
+                    />
+                    <Chip
+                      label={`${input.name}_coverage`}
+                      variant="outlined"
+                      size="small"
+                      color="secondary"
+                      onClick={() =>
+                        insertVariableIntoFormula(`${input.name}_coverage`)
+                      }
+                      sx={{ m: 0.5 }}
+                    />
+                  </React.Fragment>
+                ))}
             </div>
-            
+
             <h4>Formula Examples:</h4>
             <div className="formula-examples">
               <div className="example">
@@ -1032,20 +1413,28 @@ const GeneratorsManager = ({
               </div>
               <div className="example">
                 <h5>Product Price Calculation:</h5>
-                <pre>Math.ceil(area / paint_product_id_coverage) * paint_product_id_price</pre>
+                <pre>
+                  Math.ceil(area / paint_product_id_coverage) *
+                  paint_product_id_price
+                </pre>
               </div>
               <div className="example">
                 <h5>Conditional Calculation:</h5>
                 <pre>wall_condition_id === 15 ? area * 15 : area * 30</pre>
               </div>
             </div>
-            
-            <p>You can use JavaScript math functions like Math.ceil(), Math.floor(), etc.</p>
+
+            <p>
+              You can use JavaScript math functions like Math.ceil(),
+              Math.floor(), etc.
+            </p>
           </div>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseFormulaDialog}>Cancel</Button>
-          <Button onClick={handleSaveFormula} color="primary">Save</Button>
+          <Button onClick={handleSaveFormula} color="primary">
+            Save
+          </Button>
         </DialogActions>
       </Dialog>
     </div>
@@ -1064,13 +1453,9 @@ function TabPanel(props) {
       aria-labelledby={`generator-tab-${index}`}
       {...other}
     >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          {children}
-        </Box>
-      )}
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
   );
 }
 
-export default GeneratorsManager; 
+export default GeneratorsManager;

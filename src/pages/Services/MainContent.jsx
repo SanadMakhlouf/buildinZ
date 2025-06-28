@@ -3,6 +3,30 @@ import "./MainContent.css";
 import dataService from "../../services/dataService";
 import { evaluateFormula } from "../../utils/formulaUtils";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  Home,
+  Build,
+  Brush,
+  Construction,
+  Engineering,
+  Architecture,
+  Straighten,
+  Square,
+  Calculate,
+} from "@mui/icons-material";
+
+// Icon components mapping
+const iconComponents = {
+  home: Home,
+  build: Build,
+  brush: Brush,
+  construction: Construction,
+  engineering: Engineering,
+  architecture: Architecture,
+  measure: Straighten,
+  area: Square,
+  calculate: Calculate,
+};
 
 const MainContent = ({ selectedService }) => {
   const [calculatorInputs, setCalculatorInputs] = useState({});
@@ -165,6 +189,9 @@ const MainContent = ({ selectedService }) => {
       const allProducts = dataService.getProducts();
       console.log("All Products:", allProducts);
 
+      // Track selected products
+      const selectedProducts = [];
+
       // For each input that references a product ID, add its price as a variable
       currentGenerator.inputs.forEach((input) => {
         if (
@@ -185,6 +212,9 @@ const MainContent = ({ selectedService }) => {
               [`${input.name}_price`]: product.price,
               [`${input.name}_coverage`]: product.coverage || 1,
             });
+
+            // Add to selected products
+            selectedProducts.push(product);
           }
         }
       });
@@ -206,10 +236,15 @@ const MainContent = ({ selectedService }) => {
         : totalPrice * 0.4;
       console.log("Materials Cost:", materialsCost);
 
-      // Get associated products
-      const serviceProducts = dataService
-        .getProducts()
-        .filter((p) => selectedService.product_ids.includes(p.id));
+      // Get service products (only used if no products were selected by the client)
+      const serviceProducts =
+        selectedProducts.length > 0
+          ? selectedProducts
+          : dataService
+              .getProducts()
+              .filter((p) => selectedService.product_ids.includes(p.id));
+
+      console.log("Selected Products:", selectedProducts);
       console.log("Service Products:", serviceProducts);
 
       console.log("Setting calculation result:", {
@@ -225,7 +260,8 @@ const MainContent = ({ selectedService }) => {
         materialsCost: materialsCost,
         currency: selectedService.currency,
         inputs: { ...inputs },
-        products: serviceProducts,
+        products:
+          selectedProducts.length > 0 ? selectedProducts : serviceProducts,
       });
     } catch (error) {
       console.error("Error calculating price:", error);
@@ -419,9 +455,20 @@ const MainContent = ({ selectedService }) => {
                   {inputGroups[0]?.map((input) => (
                     <div key={input.id} className="input-card">
                       <div className="input-card-header">
-                        <label>{input.label}</label>
+                        <div className="input-label-group">
+                          <div className="input-label">
+                            {input.label}{" "}
+                            {input.icon && iconComponents[input.icon] && (
+                              <div className="input-icon">
+                                {React.createElement(
+                                  iconComponents[input.icon]
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </div>
                         {input.unit && (
-                          <span className="unit-badge">{input.unit}</span>
+                          <div className="unit-badge">{input.unit}</div>
                         )}
                       </div>
 
@@ -518,9 +565,16 @@ const MainContent = ({ selectedService }) => {
                   {inputGroups[1]?.map((input) => (
                     <div key={input.id} className="input-card">
                       <div className="input-card-header">
-                        <label>{input.label}</label>
+                        <div className="input-label-group">
+                          {input.icon && iconComponents[input.icon] && (
+                            <div className="input-icon">
+                              {React.createElement(iconComponents[input.icon])}
+                            </div>
+                          )}
+                          <div className="input-label">{input.label}</div>
+                        </div>
                         {input.unit && (
-                          <span className="unit-badge">{input.unit}</span>
+                          <div className="unit-badge">{input.unit}</div>
                         )}
                       </div>
 
@@ -768,27 +822,22 @@ const MainContent = ({ selectedService }) => {
                       </div>
                     </div>
 
-                    {calculationResult.products &&
-                      calculationResult.products.length > 0 && (
-                        <div className="products-summary">
-                          <h3>المنتجات المستخدمة</h3>
-                          <div className="products-grid">
-                            {calculationResult.products.map((product) => (
-                              <div key={product.id} className="product-card">
-                                <div className="product-image-placeholder"></div>
-                                <div className="product-info">
-                                  <div className="product-name">
-                                    {product.name}
-                                  </div>
-                                  <div className="product-price">
-                                    {product.price} {product.currency}
-                                  </div>
-                                </div>
+                    <div className="products-summary">
+                      <h3>المنتجات المستخدمة</h3>
+                      <div className="products-grid">
+                        {calculationResult.products.map((product) => (
+                          <div key={product.id} className="product-card">
+                            <div className="product-image-placeholder"></div>
+                            <div className="product-info">
+                              <div className="product-name">{product.name}</div>
+                              <div className="product-price">
+                                {product.price} {product.currency}
                               </div>
-                            ))}
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        ))}
+                      </div>
+                    </div>
 
                     <div className="action-buttons">
                       <button className="primary-button">متابعة للحجز</button>

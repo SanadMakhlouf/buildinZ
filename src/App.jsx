@@ -21,19 +21,6 @@ function App() {
           <Route path="/signup" element={<SignupPage />} />
         </Routes>
         
-        Footer
-        <footer className="app-footer">
-          <div className="footer-links">
-            <Link to="/" className="footer-link">الرئيسية</Link>
-            <Link to="/services" className="footer-link">الخدمات</Link>
-            <Link to="/admin" className="footer-link">لوحة التحكم</Link>
-            <Link to="/login" className="footer-link">تسجيل الدخول</Link>
-            <Link to="/signup" className="footer-link">إنشاء حساب</Link>
-          </div>
-          <div className="footer-copyright">
-            © {new Date().getFullYear()} BuildingZ - جميع الحقوق محفوظة
-          </div>
-        </footer>
       </div>
     </Router>
   );
