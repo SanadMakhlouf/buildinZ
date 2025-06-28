@@ -52,6 +52,11 @@
   color: rgba(255, 255, 255, 0.9);
 }
 
+/* Larger card for signup form */
+.signup-card {
+  max-width: 450px;
+}
+
 /* Password Strength Indicator */
 .password-strength {
   margin-top: 8px;
@@ -59,11 +64,11 @@
 
 .strength-bar {
   width: 100%;
-  height: 4px;
-  background: #e0e0e0;
+  height: 3px;
+  background: #e9ecef;
   border-radius: 2px;
   overflow: hidden;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
 }
 
 .strength-fill {
@@ -73,8 +78,8 @@
 }
 
 .strength-text {
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 500;
   transition: all 0.3s ease;
 }
 
@@ -82,46 +87,42 @@
 .password-match {
   display: flex;
   align-items: center;
-  margin-top: 8px;
-  color: #27ae60;
-  font-size: 0.9rem;
+  margin-top: 6px;
+  color: #28a745;
+  font-size: 12px;
   font-weight: 500;
 }
 
 .password-match i {
-  margin-left: 6px;
-  font-size: 0.8rem;
+  margin-left: 4px;
+  font-size: 10px;
 }
 
-/* Terms Group Styling */
+/* Terms Group */
 .terms-group {
-  margin-bottom: 30px;
+  margin-bottom: 24px;
 }
 
-.terms-checkbox {
-  display: flex;
+.terms-group .checkbox {
   align-items: flex-start;
-  cursor: pointer;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
-.terms-checkbox .checkbox-text {
-  font-size: 0.95rem;
-  color: #333;
-  font-weight: 500;
+.terms-group .checkbox span {
+  color: #6c757d;
+  font-size: 13px;
 }
 
 .terms-link {
   color: #0A3259;
   text-decoration: none;
   font-weight: 600;
-  margin: 0 3px;
-  transition: all 0.3s ease;
+  margin: 0 2px;
+  transition: color 0.2s ease;
 }
 
 .terms-link:hover {
-  color: #DAA520;
-  text-decoration: underline;
+  color: #083a4a;
 }
 
 /* Form Container Adjustments for Signup */
@@ -221,12 +222,12 @@
     margin-bottom: 20px;
   }
   
-  .terms-checkbox {
+  .terms-group .checkbox {
     align-items: flex-start;
   }
   
-  .terms-checkbox .checkbox-text {
-    font-size: 0.9rem;
+  .terms-group .checkbox span {
+    font-size: 12px;
     line-height: 1.5;
   }
 }
@@ -250,16 +251,20 @@
     font-size: 0.85rem;
   }
   
+  .signup-card {
+    max-width: none;
+  }
+  
   .strength-text {
-    font-size: 0.8rem;
+    font-size: 11px;
   }
   
   .password-match {
-    font-size: 0.85rem;
+    font-size: 11px;
   }
   
-  .terms-checkbox .checkbox-text {
-    font-size: 0.85rem;
+  .terms-group .checkbox span {
+    font-size: 12px;
   }
 }
 
