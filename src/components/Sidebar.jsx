@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../styles/Sidebar.css";
 import { motion, AnimatePresence } from "framer-motion";
+import dataService from "../services/dataService";
 
 const Sidebar = ({
   categories,
@@ -62,10 +63,12 @@ const Sidebar = ({
     if (expandedCategory === categoryId) {
       setExpandedCategory(null);
       setExpandedSubcategory(null);
+      setActiveService(null);
       if (onCategorySelect) onCategorySelect(null);
     } else {
       setExpandedCategory(categoryId);
       setExpandedSubcategory(null);
+      setActiveService(null);
       if (onCategorySelect) onCategorySelect(category);
     }
   };

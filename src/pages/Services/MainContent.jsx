@@ -333,6 +333,7 @@ const MainContent = ({ selectedService }) => {
     duration: 0.3,
   };
 
+  // Early return if no service is selected
   if (!selectedService) {
     return (
       <div className="main-content">
