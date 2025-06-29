@@ -531,7 +531,7 @@ const MainContent = ({ selectedService }) => {
 
                 <div className="step-navigation">
                   <button className="next-button" onClick={handleNextStep}>
-                    التالي <span className="button-icon">→</span>
+                    التالي <span className="button-icon">←</span>
                   </button>
                 </div>
               </motion.div>
@@ -666,10 +666,10 @@ const MainContent = ({ selectedService }) => {
 
                 <div className="step-navigation">
                   <button className="prev-button" onClick={handlePrevStep}>
-                    <span className="button-icon">←</span> السابق
+                    <span className="button-icon">→</span> السابق
                   </button>
                   <button className="next-button" onClick={handleNextStep}>
-                    النتائج <span className="button-icon">→</span>
+                    النتائج <span className="button-icon">←</span>
                   </button>
                 </div>
               </motion.div>
@@ -854,7 +854,7 @@ const MainContent = ({ selectedService }) => {
 
                 <div className="step-navigation">
                   <button className="prev-button" onClick={handlePrevStep}>
-                    <span className="button-icon">←</span> السابق
+                    <span className="button-icon">→</span> السابق
                   </button>
                 </div>
               </motion.div>
