@@ -2,18 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './LoadingScreen.css';
 
+// Move loadingPhases outside component to prevent recreation
+const loadingPhases = [
+  { phase: 'initializing', text: 'جاري التحضير...', duration: 1000 },
+  { phase: 'loading-services', text: 'تحميل الخدمات...', duration: 800 },
+  { phase: 'preparing-data', text: 'إعداد البيانات...', duration: 700 },
+  { phase: 'finalizing', text: 'اللمسة الأخيرة...', duration: 500 },
+  { phase: 'complete', text: 'مرحباً بك!', duration: 300 }
+];
+
 const LoadingScreen = ({ isLoading, onComplete }) => {
   const [progress, setProgress] = useState(0);
   const [currentPhase, setCurrentPhase] = useState('initializing');
   const [loadingText, setLoadingText] = useState('جاري التحضير...');
-
-  const loadingPhases = [
-    { phase: 'initializing', text: 'جاري التحضير...', duration: 1000 },
-    { phase: 'loading-services', text: 'تحميل الخدمات...', duration: 800 },
-    { phase: 'preparing-data', text: 'إعداد البيانات...', duration: 700 },
-    { phase: 'finalizing', text: 'اللمسة الأخيرة...', duration: 500 },
-    { phase: 'complete', text: 'مرحباً بك!', duration: 300 }
-  ];
 
   useEffect(() => {
     if (!isLoading) return;
@@ -49,7 +50,7 @@ const LoadingScreen = ({ isLoading, onComplete }) => {
     };
 
     updateProgress();
-  }, [isLoading, onComplete, loadingPhases]);
+  }, [isLoading, onComplete]);
 
   if (!isLoading) return null;
 
