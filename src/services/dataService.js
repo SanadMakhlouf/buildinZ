@@ -1,5 +1,5 @@
 import buildingzData from '../data/json/buildingzData.json';
-import { v4 as uuidv4 } from 'uuid';
+// import { v4 as uuidv4 } from 'uuid'; // Unused for now
 
 // In a real application, this would be a server API call
 // Here we're simulating it with localStorage for demo purposes

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSpring, animated, useTrail, useChain, useSpringRef } from 'react-spring';
-import { motion, useScroll, useTransform, useInView } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import AOS from 'aos';
@@ -18,7 +18,6 @@ const HomePage = () => {
   const [contentReady, setContentReady] = useState(false);
   const heroRef = useRef(null);
   const waveRef = useRef(null);
-  const particlesRef = useRef(null);
   const goldLineRef = useRef(null);
   const { scrollY } = useScroll();
 
@@ -139,7 +138,6 @@ const HomePage = () => {
   // Parallax transforms
   const y1 = useTransform(scrollY, [0, 1000], [0, -200]);
   const y2 = useTransform(scrollY, [0, 1000], [0, -100]);
-  const rotate = useTransform(scrollY, [0, 1000], [0, 360]);
 
   // Testimonials data
   const testimonials = [
@@ -248,8 +246,8 @@ const HomePage = () => {
                       <div className="btn-ripple"></div>
                     </Link>
                   ) : (
-                    <Link to="/services" className="secondary-btn glass-btn">
-                      <span className="btn-text">تصفح الخدمات</span>
+                    <Link to="/products" className="secondary-btn glass-btn">
+                      <span className="btn-text">تسوق المنتجات</span>
                     </Link>
                   )}
                 </animated.div>
@@ -421,20 +419,20 @@ const HomePage = () => {
                 ))}
               </div>
               <div className="app-buttons">
-                <a href="#" className="app-store-btn">
+                <button className="app-store-btn" onClick={() => alert('تطبيق App Store قريباً!')}>
                   <i className="fab fa-apple"></i>
                   <div className="btn-text">
                     <span className="small-text">تحميل من</span>
                     <span className="big-text">App Store</span>
                   </div>
-                </a>
-                <a href="#" className="play-store-btn">
+                </button>
+                <button className="play-store-btn" onClick={() => alert('تطبيق Google Play قريباً!')}>
                   <i className="fab fa-google-play"></i>
                   <div className="btn-text">
                     <span className="small-text">تحميل من</span>
                     <span className="big-text">Google Play</span>
                   </div>
-                </a>
+                </button>
               </div>
             </div>
             <div className="app-download-image">
@@ -665,9 +663,9 @@ const HomePage = () => {
                   {groupIndex === 2 && (
                     <div className="footer-social">
                       {['facebook-f', 'twitter', 'instagram', 'linkedin-in'].map((social, socialIndex) => (
-                        <a key={socialIndex} href="#">
+                        <button key={socialIndex} className="social-btn" onClick={() => alert(`${social} قريباً!`)}>
                           <i className={`fab fa-${social}`}></i>
-                        </a>
+                        </button>
                       ))}
                     </div>
                   )}

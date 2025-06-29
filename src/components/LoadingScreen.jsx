@@ -49,7 +49,7 @@ const LoadingScreen = ({ isLoading, onComplete }) => {
     };
 
     updateProgress();
-  }, [isLoading, onComplete]);
+  }, [isLoading, onComplete, loadingPhases]);
 
   if (!isLoading) return null;
 

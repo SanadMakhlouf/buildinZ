@@ -21,6 +21,7 @@ const Navbar = () => {
           <div className="nav-links">
             <Link to="/" className={`nav-link ${isActive("/")}`}>الرئيسية</Link>
             <Link to="/services" className={`nav-link ${isActive("/services")}`}>الخدمات</Link>
+            <Link to="/products" className={`nav-link ${isActive("/products")}`}>المتجر</Link>
             <Link to="/providers" className={`nav-link ${isActive("/providers")}`}>مقدمي الخدمات</Link>
             <Link to="/quotes" className={`nav-link ${isActive("/quotes")}`}>عروض الأسعار</Link>
             <Link to="/admin" className={`nav-link ${isActive("/admin")}`}>لوحة التحكم</Link>
