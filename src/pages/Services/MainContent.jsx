@@ -31,7 +31,7 @@ const iconComponents = {
 const MainContent = ({ selectedService }) => {
   const [calculatorInputs, setCalculatorInputs] = useState({});
   const [calculationResult, setCalculationResult] = useState(null);
-  const [autoCalculate] = useState(true);
+  const [autoCalculate, setAutoCalculate] = useState(true);
   const [currentGenerator, setCurrentGenerator] = useState(null);
   const [derivedInputs, setDerivedInputs] = useState({});
   const [currentStep, setCurrentStep] = useState(1);
@@ -81,7 +81,7 @@ const MainContent = ({ selectedService }) => {
     } else {
       setCurrentGenerator(null);
     }
-  }, [selectedService]);
+  }, [selectedService, autoCalculate]);
 
   // Auto-recalculate when inputs change
   useEffect(() => {
@@ -94,14 +94,14 @@ const MainContent = ({ selectedService }) => {
       calculatePrice(calculatorInputs);
       setTimeout(() => setIsCalculating(false), 500); // Add a small delay for visual feedback
     }
-  }, [calculatorInputs, autoCalculate, selectedService, currentGenerator]);
+  }, [calculatorInputs, autoCalculate]);
 
   // Calculate derived inputs whenever regular inputs change
   useEffect(() => {
     if (currentGenerator && Object.keys(calculatorInputs).length > 0) {
       calculateDerivedInputs();
     }
-  }, [calculatorInputs, currentGenerator, selectedService]);
+  }, [calculatorInputs, currentGenerator]);
 
   const handleInputChange = (name, value) => {
     setCalculatorInputs((prev) => ({
@@ -531,7 +531,7 @@ const MainContent = ({ selectedService }) => {
 
                 <div className="step-navigation">
                   <button className="next-button" onClick={handleNextStep}>
-                    التالي <span className="button-icon">←</span>
+                    التالي <span className="button-icon">→</span>
                   </button>
                 </div>
               </motion.div>
@@ -666,10 +666,10 @@ const MainContent = ({ selectedService }) => {
 
                 <div className="step-navigation">
                   <button className="prev-button" onClick={handlePrevStep}>
-                    <span className="button-icon">→</span> السابق
+                    <span className="button-icon">←</span> السابق
                   </button>
                   <button className="next-button" onClick={handleNextStep}>
-                    النتائج <span className="button-icon">←</span>
+                    النتائج <span className="button-icon">→</span>
                   </button>
                 </div>
               </motion.div>
@@ -854,7 +854,7 @@ const MainContent = ({ selectedService }) => {
 
                 <div className="step-navigation">
                   <button className="prev-button" onClick={handlePrevStep}>
-                    <span className="button-icon">→</span> السابق
+                    <span className="button-icon">←</span> السابق
                   </button>
                 </div>
               </motion.div>
