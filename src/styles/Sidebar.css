@@ -139,24 +139,17 @@
   justify-content: center;
   width: 40px;
   height: 40px;
-  border-radius: 10px;
-  background-color: #f0f7ff;
   margin-left: 1rem;
   transition: all 0.3s;
-  box-shadow: 0 2px 5px rgba(12, 77, 162, 0.1);
 }
 
 .category-header:hover .category-icon-container {
-  background-color: #e3f2fd;
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(12, 77, 162, 0.15);
 }
 
 .category-header.expanded .category-icon-container {
-  background-color: #0c4da2;
-  color: white;
+  color: #0c4da2;
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(12, 77, 162, 0.2);
 }
 
 .category-icon {
@@ -166,10 +159,11 @@
   justify-content: center;
   color: #0c4da2;
   transition: all 0.3s;
+  background: none;
 }
 
 .category-header.expanded .category-icon {
-  color: white;
+  color: #0c4da2;
 }
 
 .category-name {
