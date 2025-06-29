@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSpring, animated, useTrail, useChain, useSpringRef } from 'react-spring';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
@@ -9,27 +9,49 @@ import 'aos/dist/aos.css';
 
 import './HomePage.css';
 import buildingzData from '../../data/json/buildingzData.json';
+import LoadingScreen from '../../components/LoadingScreen';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const HomePage = () => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [contentReady, setContentReady] = useState(false);
   const heroRef = useRef(null);
   const waveRef = useRef(null);
   const particlesRef = useRef(null);
   const goldLineRef = useRef(null);
   const { scrollY } = useScroll();
 
-  // Initialize AOS
+  // Loading management
   useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      once: true,
-      easing: 'ease-out-cubic',
-    });
+    // Simulate loading time for assets and data
+    const loadingTimer = setTimeout(() => {
+      setContentReady(true);
+    }, 100); // Allow content to be ready quickly, loading screen handles the timing
+
+    return () => clearTimeout(loadingTimer);
   }, []);
+
+  // Initialize AOS after loading
+  useEffect(() => {
+    if (contentReady) {
+      AOS.init({
+        duration: 1000,
+        once: true,
+        easing: 'ease-out-cubic',
+      });
+    }
+  }, [contentReady]);
+
+  // Handle loading completion
+  const handleLoadingComplete = () => {
+    setIsLoading(false);
+  };
 
   // GSAP Animations
   useEffect(() => {
+    if (!contentReady || isLoading) return;
+    
     const ctx = gsap.context(() => {
       // Hero particles animation
       gsap.to('.particle', {
@@ -93,7 +115,7 @@ const HomePage = () => {
     }, heroRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [contentReady, isLoading]);
 
   // React Spring animations
   const heroAnimation = useSpring({
@@ -150,8 +172,17 @@ const HomePage = () => {
   ];
 
   return (
-    <div className="homepage" ref={heroRef}>
-      {/* Hero Section with Advanced Effects */}
+    <>
+      {/* Loading Screen */}
+      <LoadingScreen 
+        isLoading={isLoading} 
+        onComplete={handleLoadingComplete}
+      />
+      
+      {/* Main Homepage Content */}
+      {!isLoading && (
+        <div className="homepage" ref={heroRef}>
+          {/* Hero Section with Advanced Effects */}
       <section className="hero-section">
         {/* Animated Background Elements */}
         <div className="hero-bg-effects">
@@ -650,7 +681,9 @@ const HomePage = () => {
           </div>
         </div>
       </footer>
-    </div>
+        </div>
+      )}
+    </>
   );
 };
 
