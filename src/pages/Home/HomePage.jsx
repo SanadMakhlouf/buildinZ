@@ -1,7 +1,7 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSpring, animated, useTrail, useChain, useSpringRef } from 'react-spring';
-import { motion, useScroll, useTransform, useInView } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import AOS from 'aos';
@@ -9,27 +9,48 @@ import 'aos/dist/aos.css';
 
 import './HomePage.css';
 import buildingzData from '../../data/json/buildingzData.json';
+import LoadingScreen from '../../components/LoadingScreen';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const HomePage = () => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [contentReady, setContentReady] = useState(false);
   const heroRef = useRef(null);
   const waveRef = useRef(null);
-  const particlesRef = useRef(null);
   const goldLineRef = useRef(null);
   const { scrollY } = useScroll();
 
-  // Initialize AOS
+  // Loading management
   useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      once: true,
-      easing: 'ease-out-cubic',
-    });
+    // Simulate loading time for assets and data
+    const loadingTimer = setTimeout(() => {
+      setContentReady(true);
+    }, 100); // Allow content to be ready quickly, loading screen handles the timing
+
+    return () => clearTimeout(loadingTimer);
   }, []);
+
+  // Initialize AOS after loading
+  useEffect(() => {
+    if (contentReady) {
+      AOS.init({
+        duration: 1000,
+        once: true,
+        easing: 'ease-out-cubic',
+      });
+    }
+  }, [contentReady]);
+
+  // Handle loading completion
+  const handleLoadingComplete = () => {
+    setIsLoading(false);
+  };
 
   // GSAP Animations
   useEffect(() => {
+    if (!contentReady || isLoading) return;
+    
     const ctx = gsap.context(() => {
       // Hero particles animation
       gsap.to('.particle', {
@@ -93,7 +114,7 @@ const HomePage = () => {
     }, heroRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [contentReady, isLoading]);
 
   // React Spring animations
   const heroAnimation = useSpring({
@@ -117,7 +138,6 @@ const HomePage = () => {
   // Parallax transforms
   const y1 = useTransform(scrollY, [0, 1000], [0, -200]);
   const y2 = useTransform(scrollY, [0, 1000], [0, -100]);
-  const rotate = useTransform(scrollY, [0, 1000], [0, 360]);
 
   // Testimonials data
   const testimonials = [
@@ -150,8 +170,17 @@ const HomePage = () => {
   ];
 
   return (
-    <div className="homepage" ref={heroRef}>
-      {/* Hero Section with Advanced Effects */}
+    <>
+      {/* Loading Screen */}
+      <LoadingScreen 
+        isLoading={isLoading} 
+        onComplete={handleLoadingComplete}
+      />
+      
+      {/* Main Homepage Content */}
+      {!isLoading && (
+        <div className="homepage" ref={heroRef}>
+          {/* Hero Section with Advanced Effects */}
       <section className="hero-section">
         {/* Animated Background Elements */}
         <div className="hero-bg-effects">
@@ -217,8 +246,8 @@ const HomePage = () => {
                       <div className="btn-ripple"></div>
                     </Link>
                   ) : (
-                    <Link to="/services" className="secondary-btn glass-btn">
-                      <span className="btn-text">تصفح الخدمات</span>
+                    <Link to="/products" className="secondary-btn glass-btn">
+                      <span className="btn-text">تسوق المنتجات</span>
                     </Link>
                   )}
                 </animated.div>
@@ -390,20 +419,20 @@ const HomePage = () => {
                 ))}
               </div>
               <div className="app-buttons">
-                <a href="#" className="app-store-btn">
+                <button className="app-store-btn" onClick={() => alert('تطبيق App Store قريباً!')}>
                   <i className="fab fa-apple"></i>
                   <div className="btn-text">
                     <span className="small-text">تحميل من</span>
                     <span className="big-text">App Store</span>
                   </div>
-                </a>
-                <a href="#" className="play-store-btn">
+                </button>
+                <button className="play-store-btn" onClick={() => alert('تطبيق Google Play قريباً!')}>
                   <i className="fab fa-google-play"></i>
                   <div className="btn-text">
                     <span className="small-text">تحميل من</span>
                     <span className="big-text">Google Play</span>
                   </div>
-                </a>
+                </button>
               </div>
             </div>
             <div className="app-download-image">
@@ -634,9 +663,9 @@ const HomePage = () => {
                   {groupIndex === 2 && (
                     <div className="footer-social">
                       {['facebook-f', 'twitter', 'instagram', 'linkedin-in'].map((social, socialIndex) => (
-                        <a key={socialIndex} href="#">
+                        <button key={socialIndex} className="social-btn" onClick={() => alert(`${social} قريباً!`)}>
                           <i className={`fab fa-${social}`}></i>
-                        </a>
+                        </button>
                       ))}
                     </div>
                   )}
@@ -650,7 +679,9 @@ const HomePage = () => {
           </div>
         </div>
       </footer>
-    </div>
+        </div>
+      )}
+    </>
   );
 };
 

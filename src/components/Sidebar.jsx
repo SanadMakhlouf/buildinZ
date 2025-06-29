@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import "../styles/Sidebar.css";
-import dataService from "../services/dataService";
 import { motion, AnimatePresence } from "framer-motion";
 
 const Sidebar = ({

@@ -31,7 +31,7 @@ const iconComponents = {
 const MainContent = ({ selectedService }) => {
   const [calculatorInputs, setCalculatorInputs] = useState({});
   const [calculationResult, setCalculationResult] = useState(null);
-  const [autoCalculate, setAutoCalculate] = useState(true);
+  const [autoCalculate] = useState(true);
   const [currentGenerator, setCurrentGenerator] = useState(null);
   const [derivedInputs, setDerivedInputs] = useState({});
   const [currentStep, setCurrentStep] = useState(1);
@@ -81,7 +81,7 @@ const MainContent = ({ selectedService }) => {
     } else {
       setCurrentGenerator(null);
     }
-  }, [selectedService, autoCalculate]);
+  }, [selectedService]);
 
   // Auto-recalculate when inputs change
   useEffect(() => {
@@ -94,14 +94,14 @@ const MainContent = ({ selectedService }) => {
       calculatePrice(calculatorInputs);
       setTimeout(() => setIsCalculating(false), 500); // Add a small delay for visual feedback
     }
-  }, [calculatorInputs, autoCalculate]);
+  }, [calculatorInputs, autoCalculate, selectedService, currentGenerator]);
 
   // Calculate derived inputs whenever regular inputs change
   useEffect(() => {
     if (currentGenerator && Object.keys(calculatorInputs).length > 0) {
       calculateDerivedInputs();
     }
-  }, [calculatorInputs, currentGenerator]);
+  }, [calculatorInputs, currentGenerator, selectedService]);
 
   const handleInputChange = (name, value) => {
     setCalculatorInputs((prev) => ({
