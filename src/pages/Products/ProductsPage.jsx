@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import Toast from '../../components/Toast';
 import './ProductsPage.css';
 
@@ -222,20 +221,17 @@ const ProductsPage = () => {
 
   // Initialize data
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setProducts(sampleProducts);
-      setFilteredProducts(sampleProducts);
-      
-      const uniqueCategories = [...new Set(sampleProducts.map(p => p.category))];
-      setCategories(uniqueCategories.map(cat => ({
-        id: cat,
-        name: sampleProducts.find(p => p.category === cat)?.categoryName || cat
-      })));
-      
-      setIsLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
+    // Remove artificial delay - load immediately
+    setProducts(sampleProducts);
+    setFilteredProducts(sampleProducts);
+    
+    const uniqueCategories = [...new Set(sampleProducts.map(p => p.category))];
+    setCategories(uniqueCategories.map(cat => ({
+      id: cat,
+      name: sampleProducts.find(p => p.category === cat)?.categoryName || cat
+    })));
+    
+    setIsLoading(false);
   }, []);
 
   // Filter products
@@ -289,24 +285,23 @@ const ProductsPage = () => {
     
     setIsProcessing(true);
     
-    setTimeout(() => {
-      setCart(prevCart => {
-        const existingItem = prevCart.find(item => item.id === product.id);
-        if (existingItem) {
-          const updatedCart = prevCart.map(item =>
-            item.id === product.id
-              ? { ...item, quantity: item.quantity + quantity }
-              : item
-          );
-          showToast(`تم تحديث كمية ${product.name} في السلة`, 'success');
-          return updatedCart;
-        } else {
-          showToast(`تم إضافة ${product.name} للسلة بنجاح`, 'success');
-          return [...prevCart, { ...product, quantity }];
-        }
-      });
-      setIsProcessing(false);
-    }, 300);
+    // Remove artificial delay - instant response
+    setCart(prevCart => {
+      const existingItem = prevCart.find(item => item.id === product.id);
+      if (existingItem) {
+        const updatedCart = prevCart.map(item =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
+        );
+        showToast(`تم تحديث كمية ${product.name} في السلة`, 'success');
+        return updatedCart;
+      } else {
+        showToast(`تم إضافة ${product.name} للسلة بنجاح`, 'success');
+        return [...prevCart, { ...product, quantity }];
+      }
+    });
+    setIsProcessing(false);
   }, [isProcessing, showToast]);
 
   // Remove from cart
@@ -370,26 +365,24 @@ const ProductsPage = () => {
       notes: formData.get('notes')
     };
 
-    // Simulate API call
-    setTimeout(() => {
-      const orderNumber = `ORD-${Date.now()}`;
-      const orderDate = new Date().toLocaleDateString('ar-SA');
-      
-      setOrderData({
-        orderNumber,
-        orderDate,
-        customer: customerData,
-        items: [...cart],
-        total: cartTotal
-      });
+    // Process order immediately
+    const orderNumber = `ORD-${Date.now()}`;
+    const orderDate = new Date().toLocaleDateString('ar-SA');
+    
+    setOrderData({
+      orderNumber,
+      orderDate,
+      customer: customerData,
+      items: [...cart],
+      total: cartTotal
+    });
 
-      setCart([]);
-      setShowCheckout(false);
-      setOrderSuccess(true);
-      setIsProcessing(false);
-      
-      showToast('تم تأكيد طلبك بنجاح! ستصلك رسالة تأكيد قريباً', 'success');
-    }, 2000);
+    setCart([]);
+    setShowCheckout(false);
+    setOrderSuccess(true);
+    setIsProcessing(false);
+    
+    showToast('تم تأكيد طلبك بنجاح! ستصلك رسالة تأكيد قريباً', 'success');
   };
 
   // Quick buy function
@@ -397,9 +390,8 @@ const ProductsPage = () => {
     if (isProcessing) return;
     
     addToCart(product);
-    setTimeout(() => {
-      setShowCart(true);
-    }, 500);
+    // Instant cart display
+    setShowCart(true);
   }, [addToCart, isProcessing]);
 
   if (isLoading) {
@@ -500,14 +492,8 @@ const ProductsPage = () => {
           </div>
 
           {/* Filters Panel */}
-          <AnimatePresence>
-            {showFilters && (
-              <motion.div
-                className="filters-panel"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-              >
+          {showFilters && (
+            <div className="filters-panel">
                 <div className="filters-content">
                   <div className="filter-group">
                     <h3>الفئات</h3>
@@ -547,9 +533,8 @@ const ProductsPage = () => {
                     </div>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             )}
-          </AnimatePresence>
         </div>
       </div>
 
@@ -568,18 +553,13 @@ const ProductsPage = () => {
           </div>
 
           <div className={`products-container ${viewMode}`}>
-            <AnimatePresence>
-              {filteredProducts.map(product => (
-                <motion.div
-                  key={product.id}
-                  className={`product-card ${viewMode}`}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  whileHover={{ y: viewMode === 'grid' ? -5 : 0 }}
-                  onClick={() => setSelectedProduct(product)}
-                  style={{ cursor: 'pointer' }}
-                >
+            {filteredProducts.map(product => (
+              <div
+                key={product.id}
+                className={`product-card ${viewMode}`}
+                onClick={() => setSelectedProduct(product)}
+                style={{ cursor: 'pointer' }}
+              >
                   <div className="product-image">
                     <img 
                       src={product.image} 
@@ -671,17 +651,12 @@ const ProductsPage = () => {
                       </button>
                     </div>
                   </div>
-                </motion.div>
+                </div>
               ))}
-            </AnimatePresence>
           </div>
 
           {filteredProducts.length === 0 && (
-            <motion.div 
-              className="no-products"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
+            <div className="no-products">
               <i className="fas fa-search"></i>
               <h3>لا توجد منتجات</h3>
               <p>لم نجد منتجات تطابق معايير البحث الخاصة بك</p>
@@ -695,29 +670,19 @@ const ProductsPage = () => {
               >
                 إعادة تعيين الفلاتر
               </button>
-            </motion.div>
+            </div>
           )}
         </div>
       </div>
 
       {/* Shopping Cart Sidebar */}
-      <AnimatePresence>
-        {showCart && (
-          <>
-            <motion.div
-              className="cart-overlay"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setShowCart(false)}
-            />
-            <motion.div
-              className="cart-sidebar"
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            >
+      {showCart && (
+        <>
+          <div
+            className="cart-overlay"
+            onClick={() => setShowCart(false)}
+          />
+          <div className="cart-sidebar">
               <div className="cart-header">
                 <h3>سلة التسوق ({cartCount})</h3>
                 <button onClick={() => setShowCart(false)}>
@@ -738,15 +703,11 @@ const ProductsPage = () => {
                     </button>
                   </div>
                 ) : (
-                  <AnimatePresence>
-                    {cart.map(item => (
-                      <motion.div 
-                        key={item.id} 
-                        className="cart-item"
-                        initial={{ opacity: 0, x: 50 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -50 }}
-                      >
+                  cart.map(item => (
+                    <div 
+                      key={item.id} 
+                      className="cart-item"
+                    >
                         <img src={item.image} alt={item.name} />
                         <div className="item-details">
                           <h4>{item.name}</h4>
@@ -771,9 +732,8 @@ const ProductsPage = () => {
                         >
                           <i className="fas fa-times"></i>
                         </button>
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
+                      </div>
+                    ))
                 )}
               </div>
 
@@ -793,29 +753,20 @@ const ProductsPage = () => {
                   </button>
                 </div>
               )}
-            </motion.div>
+            </div>
           </>
         )}
-      </AnimatePresence>
 
       {/* Enhanced Product Details Modal */}
-      <AnimatePresence>
-        {selectedProduct && (
-          <motion.div
-            className="modal-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSelectedProduct(null)}
+      {selectedProduct && (
+        <div
+          className="modal-backdrop"
+          onClick={() => setSelectedProduct(null)}
+        >
+          <div
+            className="product-modal-container"
+            onClick={(e) => e.stopPropagation()}
           >
-            <motion.div
-              className="product-modal-container"
-              initial={{ opacity: 0, scale: 0.8, y: 100 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.8, y: 100 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              onClick={(e) => e.stopPropagation()}
-            >
               <button
                 className="modal-close-btn"
                 onClick={() => setSelectedProduct(null)}
@@ -965,29 +916,20 @@ const ProductsPage = () => {
                   </div>
                 </div>
               </div>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         )}
-      </AnimatePresence>
 
       {/* Enhanced Checkout Modal */}
-      <AnimatePresence>
-        {showCheckout && (
-          <motion.div
-            className="checkout-modal-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setShowCheckout(false)}
+      {showCheckout && (
+        <div
+          className="checkout-modal-backdrop"
+          onClick={() => setShowCheckout(false)}
+        >
+          <div
+            className="checkout-modal"
+            onClick={(e) => e.stopPropagation()}
           >
-            <motion.div
-              className="checkout-modal"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              onClick={(e) => e.stopPropagation()}
-            >
               <div className="checkout-header">
                 <h3>إتمام الشراء</h3>
                 <button 
@@ -1066,29 +1008,20 @@ const ProductsPage = () => {
                   </div>
                 </form>
               </div>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         )}
-      </AnimatePresence>
 
       {/* Enhanced Order Success Modal */}
-      <AnimatePresence>
-        {orderSuccess && orderData && (
-          <motion.div
-            className="order-success-modal-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setOrderSuccess(false)}
+      {orderSuccess && orderData && (
+        <div
+          className="order-success-modal-backdrop"
+          onClick={() => setOrderSuccess(false)}
+        >
+          <div
+            className="order-success-modal"
+            onClick={(e) => e.stopPropagation()}
           >
-            <motion.div
-              className="order-success-modal"
-              initial={{ opacity: 0, scale: 0.8, y: 100 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.8, y: 100 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              onClick={(e) => e.stopPropagation()}
-            >
               <div className="order-success-header">
                 <div className="order-success-icon">
                   <i className="fas fa-check-circle"></i>
@@ -1166,10 +1099,9 @@ const ProductsPage = () => {
                   </button>
                 </div>
               </div>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         )}
-      </AnimatePresence>
     </div>
   );
 };

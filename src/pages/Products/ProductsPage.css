@@ -7,6 +7,49 @@
   padding-top: 80px;
 }
 
+/* Simple CSS transitions for performance */
+.product-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.modal-backdrop {
+  animation: fadeIn 0.2s ease;
+}
+
+.product-modal-container {
+  animation: slideUp 0.2s ease;
+}
+
+.cart-sidebar {
+  animation: slideInRight 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
