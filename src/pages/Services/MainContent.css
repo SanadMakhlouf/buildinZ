@@ -65,6 +65,22 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  position: relative;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  margin-top: 30px;
+  cursor: pointer;
+}
+
+.column:hover {
+  box-shadow: 0 0 15px rgba(0, 102, 204, 0.2);
+  border-color: rgba(0, 102, 204, 0.2);
+  transform: translateY(-5px);
+}
+
+.column.active {
+  border-color: #0066cc;
+  box-shadow: 0 0 20px rgba(0, 102, 204, 0.3);
 }
 
 .column-header {
@@ -74,6 +90,7 @@
   border-bottom: 1px solid #eee;
   padding-bottom: 15px;
   margin-bottom: 15px;
+  margin-top: 15px;
 }
 
 .column-icon {
@@ -317,27 +334,33 @@ select.input-field {
 }
 
 .step-number {
+  position: absolute;
+  top: -20px;
+  right: 50%;
+  transform: translateX(50%);
   width: 40px;
   height: 40px;
+  background-color: #0066cc;
+  color: white;
   border-radius: 50%;
-  background-color: #f0f0f0;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 1.5rem;
   font-weight: bold;
-  color: #666;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 10;
 }
 
-.step.active .step-number {
-  background-color: #0c4da2;
-  color: white;
-  box-shadow: 0 0 0 4px rgba(12, 77, 162, 0.2);
+.column:hover .step-number {
+  background-color: #0052a3;
+  transform: translateX(50%) scale(1.1);
 }
 
-.step.completed .step-number {
-  background-color: #4caf50;
-  color: white;
+.column.active .step-number {
+  background-color: #004080;
+  transform: translateX(50%) scale(1.2);
 }
 
 .step-label {
@@ -838,4 +861,22 @@ input:checked + .slider:before {
   .action-buttons {
     flex-direction: column;
   }
+}
+
+.user-instructions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f7ff;
+  color: #0066cc;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 5px rgba(0, 102, 204, 0.1);
+  font-size: 1rem;
+  text-align: center;
+}
+
+.user-instructions svg {
+  color: #0066cc;
 }

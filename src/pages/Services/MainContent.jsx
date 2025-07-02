@@ -7,6 +7,8 @@ import {
   Settings,
   Assessment,
   Calculate,
+  TouchApp,
+  Info,
 } from "@mui/icons-material";
 
 const MainContent = ({ selectedService }) => {
@@ -15,6 +17,7 @@ const MainContent = ({ selectedService }) => {
   const [derivedInputs, setDerivedInputs] = useState({});
   const [isCalculating, setIsCalculating] = useState(false);
   const [debugInfo, setDebugInfo] = useState({});
+  const [activeStep, setActiveStep] = useState(1);
 
   // Initialize calculator inputs when service changes
   useEffect(() => {
@@ -175,9 +178,22 @@ const MainContent = ({ selectedService }) => {
   return (
     <div className="main-content">
       <div className="service-wizard">
+        <div className="user-instructions">
+          <Info style={{ fontSize: 20, marginLeft: 10 }} />
+          <span>
+            انقر على أي قسم للتركيز عليه أو مرر المؤشر فوقه لعرض المزيد من
+            المعلومات
+          </span>
+          <TouchApp style={{ fontSize: 20, marginRight: 10 }} />
+        </div>
         <div className="content-container">
           {/* First Column - Description */}
-          <div className="column">
+          <div
+            className={`column ${activeStep === 1 ? "active" : ""}`}
+            onClick={() => setActiveStep(1)}
+            onMouseEnter={() => !isCalculating && setActiveStep(1)}
+          >
+            <div className="step-number">1</div>
             <div className="column-header">
               <div className="column-icon">
                 <Description />
@@ -222,6 +238,7 @@ const MainContent = ({ selectedService }) => {
                               ? parseInt(e.target.value)
                               : e.target.value;
                           handleInputChange(input.name, value);
+                          setActiveStep(1);
                         }}
                       >
                         <option value="">اختر...</option>
@@ -281,8 +298,10 @@ const MainContent = ({ selectedService }) => {
                               ? parseFloat(e.target.value) || 0
                               : e.target.value;
                           handleInputChange(input.name, value);
+                          setActiveStep(1);
                         }}
                         placeholder={input.placeholder || "0"}
+                        onClick={() => setActiveStep(1)}
                       />
                     )}
                   </div>
@@ -292,7 +311,12 @@ const MainContent = ({ selectedService }) => {
           </div>
 
           {/* Second Column - Settings */}
-          <div className="column">
+          <div
+            className={`column ${activeStep === 2 ? "active" : ""}`}
+            onClick={() => setActiveStep(2)}
+            onMouseEnter={() => !isCalculating && setActiveStep(2)}
+          >
+            <div className="step-number">2</div>
             <div className="column-header">
               <div className="column-icon">
                 <Settings />
@@ -320,6 +344,7 @@ const MainContent = ({ selectedService }) => {
                               ? parseInt(e.target.value)
                               : e.target.value;
                           handleInputChange(input.name, value);
+                          setActiveStep(2);
                         }}
                       >
                         <option value="">اختر...</option>
@@ -379,8 +404,10 @@ const MainContent = ({ selectedService }) => {
                               ? parseFloat(e.target.value) || 0
                               : e.target.value;
                           handleInputChange(input.name, value);
+                          setActiveStep(2);
                         }}
                         placeholder={input.placeholder || "0"}
+                        onClick={() => setActiveStep(2)}
                       />
                     )}
                   </div>
@@ -390,7 +417,12 @@ const MainContent = ({ selectedService }) => {
           </div>
 
           {/* Third Column - Assessment */}
-          <div className="column">
+          <div
+            className={`column ${activeStep === 3 ? "active" : ""}`}
+            onClick={() => setActiveStep(3)}
+            onMouseEnter={() => !isCalculating && setActiveStep(3)}
+          >
+            <div className="step-number">3</div>
             <div className="column-header">
               <div className="column-icon">
                 <Assessment />
@@ -444,6 +476,7 @@ const MainContent = ({ selectedService }) => {
                               ? parseInt(e.target.value)
                               : e.target.value;
                           handleInputChange(input.name, value);
+                          setActiveStep(3);
                         }}
                       >
                         <option value="">اختر...</option>
@@ -503,8 +536,10 @@ const MainContent = ({ selectedService }) => {
                               ? parseFloat(e.target.value) || 0
                               : e.target.value;
                           handleInputChange(input.name, value);
+                          setActiveStep(3);
                         }}
                         placeholder={input.placeholder || "0"}
+                        onClick={() => setActiveStep(3)}
                       />
                     )}
                   </div>
