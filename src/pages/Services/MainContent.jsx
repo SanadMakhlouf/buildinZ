@@ -172,7 +172,7 @@ const MainContent = ({ selectedService }) => {
 
   // Format currency
   const formatCurrency = (amount) => {
-    return `${amount.toLocaleString("ar-SA")} ريال`;
+    return `${amount.toLocaleString("en-US")} درهم إماراتي`;
   };
 
   return (
@@ -447,7 +447,9 @@ const MainContent = ({ selectedService }) => {
                         <span className="calc-value">
                           {derivedInputs[item.name] !== undefined
                             ? typeof derivedInputs[item.name] === "number"
-                              ? `${derivedInputs[item.name]} ${item.unit || ""}`
+                              ? `${derivedInputs[item.name].toLocaleString(
+                                  "en-US"
+                                )} ${item.unit || ""}`
                               : derivedInputs[item.name]
                             : "0"}
                         </span>
