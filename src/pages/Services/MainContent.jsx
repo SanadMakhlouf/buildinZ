@@ -146,6 +146,28 @@ const MainContent = ({ selectedService }) => {
     }
   };
 
+  // Check if all required inputs are filled
+  const areAllInputsFilled = () => {
+    if (!currentGenerator || !currentGenerator.inputs) return false;
+
+    return currentGenerator.inputs.every((input) => {
+      // Skip optional inputs
+      if (input.optional) return true;
+
+      const value = inputs[input.name];
+      if (value === undefined || value === "") return false;
+      if (input.type === "number" && isNaN(value)) return false;
+      return true;
+    });
+  };
+
+  // Handle booking
+  const handleBooking = () => {
+    // Here you can implement the booking logic
+    console.log("Booking with inputs:", inputs);
+    console.log("Calculated values:", derivedInputs);
+  };
+
   // Early return if no service is selected
   if (!selectedService) {
     return (
@@ -217,6 +239,15 @@ const MainContent = ({ selectedService }) => {
                     </span>
                   </div>
                 </div>
+                <button
+                  className={`booking-button ${
+                    areAllInputsFilled() ? "active" : "disabled"
+                  }`}
+                  onClick={handleBooking}
+                  disabled={!areAllInputsFilled()}
+                >
+                  حجز الآن
+                </button>
               </div>
               <div className="input-groups-container">
                 {inputGroups[0].map((input) => (
