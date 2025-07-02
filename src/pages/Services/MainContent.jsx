@@ -9,6 +9,9 @@ import {
   Calculate,
   TouchApp,
   Info,
+  Brush,
+  Construction,
+  ElectricalServices,
 } from "@mui/icons-material";
 
 const MainContent = ({ selectedService }) => {
@@ -171,8 +174,31 @@ const MainContent = ({ selectedService }) => {
   // Early return if no service is selected
   if (!selectedService) {
     return (
-      <div className="empty-result">
-        <p>يرجى اختيار خدمة للبدء</p>
+      <div className="empty-state">
+        <div className="empty-state-animation">
+          <div className="circle-animation"></div>
+          <div className="icon-container">
+            <TouchApp style={{ fontSize: 50, color: "#0066cc" }} />
+          </div>
+        </div>
+        <h2>اختر خدمة للبدء</h2>
+        <p>
+          يمكنك اختيار إحدى الخدمات من القائمة على اليمين للبدء في حساب التكلفة
+        </p>
+        <div className="service-examples">
+          <div className="example-service">
+            <Brush />
+            <span>الدهان والديكور</span>
+          </div>
+          <div className="example-service">
+            <Construction />
+            <span>الأرضيات</span>
+          </div>
+          <div className="example-service">
+            <ElectricalServices />
+            <span>الكهرباء</span>
+          </div>
+        </div>
       </div>
     );
   }
