@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import './ProductsPage.css';
 import orderService from '../../services/orderService';
 import authService from '../../services/authService';
@@ -10,6 +11,10 @@ const logDebug = (message, data) => {
 };
 
 const ProductsPage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { productId } = useParams(); // Get productId from URL params
+  
   // State for products and filtering
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -18,6 +23,10 @@ const ProductsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // State for product modal
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [showProductModal, setShowProductModal] = useState(false);
   
   // State for shopping cart
   const [cart, setCart] = useState([]);
@@ -61,6 +70,22 @@ const ProductsPage = () => {
       setToast({ show: false, message: '', type: '' });
     }, 3000);
   };
+
+  // Handle product click to open modal
+  const handleProductClick = useCallback((product) => {
+    setSelectedProduct(product);
+    setShowProductModal(true);
+    // Update URL with product ID without reloading page
+    navigate(`/products/${product.id}`, { replace: true });
+  }, [navigate]);
+
+  // Close product modal
+  const handleCloseProductModal = useCallback(() => {
+    setShowProductModal(false);
+    setSelectedProduct(null);
+    // Reset URL to products page
+    navigate('/products', { replace: true });
+  }, [navigate]);
 
   // Add to cart function
   const handleAddToCart = (product) => {
@@ -340,6 +365,136 @@ const ProductsPage = () => {
     );
   };
 
+  // Render product modal
+  const renderProductModal = () => {
+    if (!selectedProduct) return null;
+    
+    return (
+      <div className="modal-backdrop" onClick={handleCloseProductModal}>
+        <div className="product-modal-container" onClick={e => e.stopPropagation()}>
+          <button className="modal-close-btn" onClick={handleCloseProductModal}>
+            <i className="fas fa-times"></i>
+          </button>
+          
+          <div className="modal-content-wrapper">
+            <div className="modal-image-section">
+              <img src={selectedProduct.image} alt={selectedProduct.name} />
+              {selectedProduct.discount > 0 && (
+                <div className="modal-discount-badge">
+                  خصم {selectedProduct.discount}%
+                </div>
+              )}
+            </div>
+            
+            <div className="modal-details-section">
+              <div className="product-header">
+                <div className="product-brand-tag">
+                  {selectedProduct.vendor || 'BuildingZ'}
+                </div>
+                <h2 className="product-title">{selectedProduct.name}</h2>
+                
+                <div className="product-rating-detailed">
+                  <div className="stars-container">
+                    {Array.from({ length: Math.floor(selectedProduct.rating || 0) }).map((_, i) => (
+                      <i key={i} className="fas fa-star filled"></i>
+                    ))}
+                    {selectedProduct.rating % 1 >= 0.5 && <i className="fas fa-star-half-alt filled"></i>}
+                    {Array.from({ length: Math.floor(5 - (selectedProduct.rating || 0)) }).map((_, i) => (
+                      <i key={i} className="far fa-star"></i>
+                    ))}
+                    <span className="rating-details">
+                      {selectedProduct.rating || 0} ({selectedProduct.reviews || 0} تقييم)
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="product-description-section">
+                <h4>الوصف</h4>
+                <p className="product-description-text">
+                  {selectedProduct.description || 'لا يوجد وصف متاح لهذا المنتج.'}
+                </p>
+              </div>
+              
+              {selectedProduct.specifications && Object.keys(selectedProduct.specifications).length > 0 && (
+                <div className="product-specifications">
+                  <h4>المواصفات</h4>
+                  <div className="specs-grid">
+                    {Object.entries(selectedProduct.specifications).map(([key, value]) => (
+                      <div key={key} className="spec-item">
+                        <span className="spec-label">{key}</span>
+                        <span className="spec-value">{value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              <div className="product-pricing-section">
+                <h4>السعر</h4>
+                <div className="price-container">
+                  <span className="current-price-large">
+                    {selectedProduct.price} درهم
+                  </span>
+                  {selectedProduct.originalPrice && (
+                    <span className="original-price-large">
+                      {selectedProduct.originalPrice} درهم
+                    </span>
+                  )}
+                  <div className={`stock-info ${selectedProduct.stock > 0 ? 'stock-available' : 'stock-unavailable'}`}>
+                    {selectedProduct.stock > 0 
+                      ? <><i className="fas fa-check-circle"></i> متوفر في المخزون</>
+                      : <><i className="fas fa-times-circle"></i> غير متوفر حالياً</>
+                    }
+                  </div>
+                </div>
+              </div>
+              
+              <div className="modal-actions-section">
+                <button 
+                  className="primary-action-btn"
+                  onClick={() => handleAddToCart(selectedProduct)}
+                  disabled={selectedProduct.stock <= 0 || isAddingToCart}
+                >
+                  <i className="fas fa-cart-plus"></i>
+                  أضف إلى السلة
+                </button>
+                
+                <button 
+                  className="secondary-action-btn"
+                  onClick={() => handleQuickBuy(selectedProduct)}
+                  disabled={selectedProduct.stock <= 0 || isProcessing}
+                >
+                  <i className="fas fa-bolt"></i>
+                  شراء سريع
+                </button>
+                
+                <button className="wishlist-action-btn">
+                  <i className="far fa-heart"></i>
+                </button>
+              </div>
+              
+              <div className="shipping-benefits">
+                <div className="benefit-item">
+                  <i className="fas fa-truck"></i>
+                  <span>توصيل سريع</span>
+                </div>
+                <div className="benefit-item">
+                  <i className="fas fa-shield-alt"></i>
+                  <span>ضمان جودة</span>
+                </div>
+                <div className="benefit-item">
+                  <i className="fas fa-exchange-alt"></i>
+                  <span>استبدال سهل</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // Render cart modal
   const renderCartModal = () => {
     // Cart modal implementation
@@ -357,6 +512,47 @@ const ProductsPage = () => {
     // Order success modal implementation
     return null; // Placeholder
   };
+
+  // Check for product ID in URL
+  useEffect(() => {
+    const loadProductFromId = async () => {
+      // If we have a productId from URL params
+      if (productId) {
+        logDebug('Product ID found in URL', productId);
+        
+        if (products.length > 0) {
+          // Try to find the product in our loaded products
+          const product = products.find(p => p.id.toString() === productId.toString());
+          
+          if (product) {
+            logDebug('Found product in loaded products', product);
+            setSelectedProduct(product);
+            setShowProductModal(true);
+          } else {
+            // Product not found in loaded products, try to fetch it directly
+            try {
+              logDebug('Fetching product by ID', productId);
+              const fetchedProduct = await productService.getProductById(productId);
+              
+              if (fetchedProduct) {
+                logDebug('Successfully fetched product by ID', fetchedProduct);
+                setSelectedProduct(fetchedProduct);
+                setShowProductModal(true);
+              } else {
+                logDebug('Product not found by ID', productId);
+                showToast('لم يتم العثور على المنتج المطلوب', 'error');
+              }
+            } catch (error) {
+              console.error('Error fetching product by ID:', error);
+              showToast('حدث خطأ أثناء تحميل المنتج', 'error');
+            }
+          }
+        }
+      }
+    };
+
+    loadProductFromId();
+  }, [productId, products]);
 
   // Fetch products from API
   useEffect(() => {
@@ -432,6 +628,15 @@ const ProductsPage = () => {
         )];
         setCategories(uniqueCategories);
         
+        // After loading products, check if we need to show a specific product (from URL)
+        if (productId && formattedProducts.length > 0) {
+          const product = formattedProducts.find(p => p.id.toString() === productId.toString());
+          if (product) {
+            setSelectedProduct(product);
+            setShowProductModal(true);
+          }
+        }
+        
       } catch (error) {
         console.error('Error fetching products:', error);
         setError('فشل في تحميل المنتجات. يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.');
@@ -443,7 +648,7 @@ const ProductsPage = () => {
     };
     
     fetchProducts();
-  }, []);
+  }, [productId]);
   
   // Fetch current user if logged in
   useEffect(() => {
@@ -548,7 +753,11 @@ const ProductsPage = () => {
             <div className="products-grid">
               {filteredProducts.length > 0 ? (
                 filteredProducts.map(product => (
-                  <div className="product-card" key={product.id}>
+                  <div 
+                    className="product-card" 
+                    key={product.id}
+                    onClick={() => handleProductClick(product)}
+                  >
                     <div className="product-image">
                       <img src={product.image} alt={product.name} />
                     </div>
@@ -572,7 +781,10 @@ const ProductsPage = () => {
                       </div>
                       <button
                         className="add-to-cart-btn"
-                        onClick={() => handleAddToCart(product)}
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent opening modal when clicking the button
+                          handleAddToCart(product);
+                        }}
                         disabled={isAddingToCart}
                       >
                         <i className="fas fa-cart-plus"></i>
@@ -586,6 +798,9 @@ const ProductsPage = () => {
               )}
             </div>
           </div>
+          
+          {/* Product Detail Modal */}
+          {showProductModal && renderProductModal()}
           
           {/* Shopping Cart Modal */}
           {showCart && renderCartModal()}
