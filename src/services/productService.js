@@ -68,18 +68,64 @@ const productService = {
       
       const response = await axiosInstance.get(url);
       
-      // Handle different response formats
+      console.log('[getProducts] Raw API response:', response.data);
+      
+      // Handle the specific API response structure
+      let productsArray = [];
+      
       if (Array.isArray(response.data)) {
-        return response.data;
+        // Response is directly an array
+        productsArray = response.data;
+      } else if (response.data && response.data.data && response.data.data.products && Array.isArray(response.data.data.products.data)) {
+        // Handle the specific nested structure: response.data.data.products.data
+        productsArray = response.data.data.products.data;
       } else if (response.data && Array.isArray(response.data.data)) {
-        return response.data.data;
+        // Response has data field with array
+        productsArray = response.data.data;
+      } else if (response.data && Array.isArray(response.data.products)) {
+        // Response has products field with array
+        productsArray = response.data.products;
       } else if (response.data && typeof response.data === 'object') {
-        // If the response is an object with products inside
-        return response.data.products || response.data.items || response.data.data || [];
+        // Response is an object, check if it has products inside
+        if (response.data.products && Array.isArray(response.data.products)) {
+          productsArray = response.data.products;
+        } else if (response.data.items && Array.isArray(response.data.items)) {
+          productsArray = response.data.items;
+        } else if (response.data.data && Array.isArray(response.data.data)) {
+          productsArray = response.data.data;
+        } else {
+          // If response.data is an object but not in expected format, try to convert it
+          console.warn('[getProducts] Unexpected response format, trying to extract products:', response.data);
+          
+          // Check if the response.data itself contains product-like objects
+          const keys = Object.keys(response.data);
+          if (keys.length > 0) {
+            // Try to find a key that might contain products
+            const productKey = keys.find(key => 
+              key.toLowerCase().includes('product') || 
+              key.toLowerCase().includes('item') ||
+              key.toLowerCase().includes('data')
+            );
+            
+            if (productKey && Array.isArray(response.data[productKey])) {
+              productsArray = response.data[productKey];
+            } else {
+              // If no array found, return empty array
+              console.warn('[getProducts] No products array found in response');
+              productsArray = [];
+            }
+          } else {
+            productsArray = [];
+          }
+        }
       } else {
         console.warn('[getProducts] Unexpected response format:', response.data);
-        return [];
+        productsArray = [];
       }
+      
+      console.log('[getProducts] Extracted products array:', productsArray);
+      return productsArray;
+      
     } catch (error) {
       console.error('[getProducts] Error:', error.response?.data || error.message);
       throw error;
