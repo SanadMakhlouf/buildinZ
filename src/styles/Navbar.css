@@ -70,8 +70,46 @@
 
 .auth-buttons {
   display: flex;
-  gap: 1rem;
-  order: 1;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-profile-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.user-profile-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #333;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+.user-profile-link:hover {
+  color: #007bff;
+}
+
+.user-profile-link i {
+  color: #6c757d;
+}
+
+.logout-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.logout-btn:hover {
+  background-color: #c82333;
 }
 
 .login-btn {
@@ -135,5 +173,10 @@
   .auth-buttons {
     flex-direction: column;
     gap: 0.5rem;
+  }
+  
+  .user-profile-section {
+    flex-direction: column;
+    gap: 10px;
   }
 }

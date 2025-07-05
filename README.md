@@ -289,6 +289,26 @@ font-family: 'Tajawal', 'IBM Plex Sans Arabic', 'Noto Sans Arabic', sans-serif;
    - Google OAuth registration
    - Form validation with error handling
 
+### 🔐 Authentication UI Improvements
+1. **Dynamic Navbar**
+   - Conditional rendering based on authentication state
+   - User name display after login
+   - Profile and logout options
+   - Role-based navigation visibility
+
+2. **Authentication State Management**
+   - Persistent login state
+   - Automatic user info retrieval
+   - Seamless logout functionality
+   - Protected route handling
+
+### Authentication UI Workflow
+1. User logs in
+2. Login/Signup buttons replaced with username
+3. Profile link becomes available
+4. Logout option added
+5. Admin routes conditionally rendered
+
 ### 👨‍💼 Admin Features
 1. **Admin Panel**
    - Dashboard overview
@@ -313,6 +333,41 @@ font-family: 'Tajawal', 'IBM Plex Sans Arabic', 'Noto Sans Arabic', sans-serif;
    - Service selection
    - Date and time scheduling
    - Customer information forms
+
+### 👤 User Profile Features
+1. **Profile Management**
+   - View and edit personal information
+   - Update contact details
+   - Account security options
+   - Delete account functionality
+
+2. **Order History**
+   - View past orders
+   - Order status tracking
+   - Detailed order information
+
+3. **Service Requests**
+   - Track service request history
+   - View request status
+   - Manage ongoing and completed requests
+
+4. **Responsive Design**
+   - Mobile-friendly layout
+   - Tabbed interface
+   - Adaptive sidebar navigation
+
+### Profile Page Sections
+- Personal Information
+- Order History
+- Service Requests
+- Account Settings
+
+### Profile Management Workflow
+1. User navigates to profile page
+2. View personal details
+3. Edit profile information
+4. View order and service request history
+5. Optional account deletion
 
 ---
 
@@ -955,3 +1010,32 @@ test: adding tests
 ---
 
 *This documentation is a living document and will be updated as the project evolves. For the most current information, please refer to the latest version in the repository.* 
+
+## Authentication
+
+### Features
+- User registration with email and password
+- Login with email and password
+- Password strength validation
+- Error handling for authentication
+- Remember me functionality
+- Basic form validation
+
+### Authentication Flow
+1. User can sign up using email, password, and full name
+2. Password strength is dynamically evaluated
+3. Form validates inputs before submission
+4. Successful signup redirects to login page
+5. Successful login redirects to services page
+
+### Security Considerations
+- Passwords are not stored in plain text
+- Client-side and server-side validation
+- Token-based authentication
+- Rate limiting on authentication endpoints
+
+### Future Improvements
+- Implement Google OAuth
+- Add two-factor authentication
+- Password reset functionality
+- Email verification

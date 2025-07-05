@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import authService from '../../../services/authService';
 import './SignupPage.css';
 
 const SignupPage = () => {
@@ -16,6 +17,7 @@ const SignupPage = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
+  const [apiError, setApiError] = useState(null);
   const navigate = useNavigate();
 
   // Password strength checker
@@ -45,6 +47,10 @@ const SignupPage = () => {
         ...errors,
         [name]: ''
       });
+    }
+    // Clear API error
+    if (apiError) {
+      setApiError(null);
     }
   };
 
@@ -88,17 +94,26 @@ const SignupPage = () => {
     
     if (validateForm()) {
       setIsLoading(true);
+      setApiError(null);
       
-      // Simulate API call
-      setTimeout(() => {
-        console.log('Signup form submitted:', formData);
-        setIsLoading(false);
+      try {
+        const response = await authService.signup(formData);
+        
+        // Successful signup
         navigate('/login');
-      }, 1500);
+      } catch (error) {
+        // Handle signup errors
+        const errorMessage = error.response?.data?.message || 
+                             'حدث خطأ أثناء إنشاء الحساب. يرجى المحاولة مرة أخرى.';
+        setApiError(errorMessage);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
   const handleGoogleSignup = () => {
+    // TODO: Implement Google OAuth signup
     console.log('Google signup clicked');
   };
 
@@ -167,6 +182,13 @@ const SignupPage = () => {
             <h1>إنشاء حساب جديد</h1>
             <p>أنشئ حسابك للوصول إلى جميع خدماتنا</p>
           </div>
+
+          {/* API Error Message */}
+          {apiError && (
+            <div className="api-error-message">
+              {apiError}
+            </div>
+          )}
 
           {/* Social Signup */}
           <button className="social-btn" onClick={handleGoogleSignup}>
@@ -265,18 +287,12 @@ const SignupPage = () => {
                   <i className={`fas ${showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
                 </button>
               </div>
-              {formData.confirmPassword && formData.password === formData.confirmPassword && (
-                <div className="password-match">
-                  <i className="fas fa-check-circle"></i>
-                  <span>كلمات المرور متطابقة</span>
-                </div>
-              )}
               {errors.confirmPassword && (
                 <span className="error-text">{errors.confirmPassword}</span>
               )}
             </div>
 
-            <div className="terms-group">
+            <div className="input-group terms-group">
               <label className="checkbox">
                 <input
                   type="checkbox"
@@ -284,12 +300,7 @@ const SignupPage = () => {
                   checked={formData.agreeTerms}
                   onChange={handleChange}
                 />
-                <span>
-                  أوافق على 
-                  <Link to="/terms" className="terms-link"> الشروط والأحكام </Link>
-                  و
-                  <Link to="/privacy" className="terms-link"> سياسة الخصوصية</Link>
-                </span>
+                <span>أوافق على الشروط والأحكام</span>
               </label>
               {errors.agreeTerms && (
                 <span className="error-text">{errors.agreeTerms}</span>
@@ -307,7 +318,7 @@ const SignupPage = () => {
                   جاري إنشاء الحساب...
                 </>
               ) : (
-                'إنشاء حساب جديد'
+                'إنشاء حساب'
               )}
             </button>
           </form>

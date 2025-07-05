@@ -1,6 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Toast from '../../components/Toast';
 import './ProductsPage.css';
+import { products as dummyProducts } from '../../data/dummyData';
+import orderService from '../../services/orderService';
+import authService from '../../services/authService';
+import productService from '../../services/productService';
+
+// Add this function at the top of the file, outside the component
+const logDebug = (message, data) => {
+  console.log(`[ProductsPage] ${message}`, data);
+};
 
 const ProductsPage = () => {
   const [products, setProducts] = useState([]);
@@ -22,170 +31,91 @@ const ProductsPage = () => {
   const [orderData, setOrderData] = useState(null);
   const [viewMode, setViewMode] = useState('grid');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [checkoutFormData, setCheckoutFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    notes: ''
+  });
+  const [formErrors, setFormErrors] = useState({});
+  const [error, setError] = useState(null);
 
-  // Sample product data
-  const sampleProducts = [
-    {
-      id: 1,
-      name: 'دريل كهربائي احترافي',
-      nameEn: 'Professional Electric Drill',
-      price: 299,
-      originalPrice: 399,
-      category: 'tools',
-      categoryName: 'أدوات',
-      image: 'https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=500',
-      rating: 4.5,
-      reviews: 128,
-      description: 'دريل كهربائي قوي ومتين مع مجموعة من الرؤوس المتنوعة. مصمم للاستخدام المهني والمنزلي مع ضمان الجودة والأداء العالي.',
-      features: ['قوة 800 واط', 'سرعة متغيرة', 'مقبض مريح', 'ضمان سنتين', 'مقاوم للغبار', 'إضاءة LED مدمجة'],
-      inStock: true,
-      stock: 25,
-      brand: 'BuildPro',
-      discount: 25,
-      weight: '1.2 كغم',
-      dimensions: '25 × 8 × 20 سم'
-    },
-    {
-      id: 2,
-      name: 'طقم مفاتيح شاملة',
-      nameEn: 'Complete Wrench Set',
-      price: 149,
-      originalPrice: 199,
-      category: 'tools',
-      categoryName: 'أدوات',
-      image: 'https://images.unsplash.com/photo-1609205807107-e8ec2120f9de?w=500',
-      rating: 4.8,
-      reviews: 89,
-      description: 'طقم مفاتيح كامل من الستانلس ستيل عالي الجودة. يشمل جميع الأحجام المطلوبة للاستخدام المهني والمنزلي.',
-      features: ['32 قطعة', 'ستانلس ستيل', 'حقيبة تنظيم', 'مقاومة للصدأ', 'مقابض مريحة', 'ضمان مدى الحياة'],
-      inStock: true,
-      stock: 40,
-      brand: 'ToolMaster',
-      discount: 25,
-      weight: '2.5 كغم',
-      dimensions: '35 × 25 × 5 سم'
-    },
-    {
-      id: 3,
-      name: 'مواد بناء - أسمنت',
-      nameEn: 'Construction Materials - Cement',
-      price: 45,
-      originalPrice: 50,
-      category: 'materials',
-      categoryName: 'مواد البناء',
-      image: 'https://images.unsplash.com/photo-1581094271901-8022df4466f9?w=500',
-      rating: 4.3,
-      reviews: 234,
-      description: 'أسمنت عالي الجودة مناسب لجميع أعمال البناء والإنشاءات. يوفر قوة تحمل عالية وثبات في جميع الظروف الجوية.',
-      features: ['كيس 50 كغم', 'جودة عالية', 'سريع التماسك', 'مقاوم للعوامل الجوية', 'مطابق للمواصفات', 'توصيل مجاني'],
-      inStock: true,
-      stock: 100,
-      brand: 'CementPro',
-      discount: 10,
-      weight: '50 كغم',
-      dimensions: '60 × 40 × 15 سم'
-    },
-    {
-      id: 4,
-      name: 'دهان داخلي فاخر',
-      nameEn: 'Premium Interior Paint',
-      price: 89,
-      originalPrice: 120,
-      category: 'paint',
-      categoryName: 'دهانات',
-      image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=500',
-      rating: 4.7,
-      reviews: 156,
-      description: 'دهان داخلي عالي الجودة بألوان متنوعة وتغطية ممتازة. مصنوع من مواد صديقة للبيئة وآمنة للاستخدام المنزلي.',
-      features: ['4 لتر', 'قابل للغسيل', 'بدون رائحة', 'تغطية 40 متر مربع', 'سريع الجفاف', '12 لون متاح'],
-      inStock: true,
-      stock: 60,
-      brand: 'ColorMax',
-      discount: 26,
-      weight: '4.2 كغم',
-      dimensions: '20 × 20 × 25 سم'
-    },
-    {
-      id: 5,
-      name: 'مجموعة براغي متنوعة',
-      nameEn: 'Assorted Screws Set',
-      price: 35,
-      originalPrice: 45,
-      category: 'hardware',
-      categoryName: 'أجهزة',
-      image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500',
-      rating: 4.4,
-      reviews: 92,
-      description: 'مجموعة شاملة من البراغي بأحجام وأنواع مختلفة. مناسبة لجميع أعمال التركيب والصيانة المنزلية والمهنية.',
-      features: ['200 قطعة', 'أحجام متنوعة', 'معدن مقاوم للصدأ', 'علبة تنظيم', 'جودة عالية', 'سهولة الاستخدام'],
-      inStock: true,
-      stock: 75,
-      brand: 'FastenPro',
-      discount: 22,
-      weight: '0.8 كغم',
-      dimensions: '15 × 10 × 8 سم'
-    },
-    {
-      id: 6,
-      name: 'منشار كهربائي دائري',
-      nameEn: 'Circular Electric Saw',
-      price: 449,
-      originalPrice: 599,
-      category: 'tools',
-      categoryName: 'أدوات',
-      image: 'https://images.unsplash.com/photo-1504148455328-c376907d081c?w=500',
-      rating: 4.6,
-      reviews: 67,
-      description: 'منشار كهربائي دائري قوي للقطع الدقيق في الخشب والمعادن. مزود بنظام أمان متقدم وتحكم دقيق في السرعة.',
-      features: ['1200 واط', 'شفرة 190mm', 'قاعدة قابلة للتعديل', 'نظام أمان متقدم', 'كابل 3 متر', 'حقيبة حمل'],
-      inStock: true,
-      stock: 15,
-      brand: 'CutMaster',
-      discount: 25,
-      weight: '3.8 كغم',
-      dimensions: '35 × 25 × 20 سم'
-    },
-    {
-      id: 7,
-      name: 'بلاط سيراميك فاخر',
-      nameEn: 'Premium Ceramic Tiles',
-      price: 25,
-      originalPrice: 35,
-      category: 'materials',
-      categoryName: 'مواد البناء',
-      image: 'https://images.unsplash.com/photo-1615971677499-5467cbab01c0?w=500',
-      rating: 4.5,
-      reviews: 203,
-      description: 'بلاط سيراميك عالي الجودة بتصاميم عصرية ومتنوعة. مقاوم للماء والبقع مع سهولة في التنظيف والصيانة.',
-      features: ['60x60 سم', 'مقاوم للماء', 'سهل التنظيف', 'متوفر بألوان متعددة', 'مقاوم للخدش', 'ضمان 10 سنوات'],
-      inStock: true,
-      stock: 200,
-      brand: 'TilePro',
-      discount: 29,
-      weight: '1.5 كغم/قطعة',
-      dimensions: '60 × 60 × 1 سم'
-    },
-    {
-      id: 8,
-      name: 'مولد كهرباء محمول',
-      nameEn: 'Portable Generator',
-      price: 899,
-      originalPrice: 1199,
-      category: 'electrical',
-      categoryName: 'كهربائيات',
-      image: 'https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=500',
-      rating: 4.8,
-      reviews: 45,
-      description: 'مولد كهرباء محمول وموثوق لجميع احتياجاتك. مناسب للاستخدام المنزلي والتجاري مع تشغيل هادئ وكفاءة عالية.',
-      features: ['3000 واط', 'تشغيل هادئ', 'خزان 15 لتر', 'بدء كهربائي', '4 مخارج كهرباء', 'عجلات للنقل'],
-      inStock: true,
-      stock: 8,
-      brand: 'PowerGen',
-      discount: 25,
-      weight: '45 كغم',
-      dimensions: '60 × 45 × 50 سم'
-    }
-  ];
+  // Fetch products from API
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setIsLoading(true);
+      try {
+        // Fetch products from API
+        const productsData = await productService.getProducts();
+        logDebug('Products fetched from API', productsData);
+        
+        // Transform data if needed to match our expected format
+        const formattedProducts = productsData.map(product => ({
+          id: product.id || product._id,
+          name: product.name,
+          price: product.price,
+          description: product.description,
+          image: product.image || 'https://via.placeholder.com/150',
+          category: product.category || 'uncategorized',
+          stock: product.stock || 10,
+          rating: product.rating || 4
+        }));
+        
+        setProducts(formattedProducts);
+        setFilteredProducts(formattedProducts);
+        
+        // Extract unique categories
+        const uniqueCategories = [...new Set(formattedProducts.map(product => product.category))];
+        setCategories(uniqueCategories);
+        
+      } catch (error) {
+        console.error('Error fetching products:', error);
+        setError('Failed to load products. Please try again later.');
+        
+        // Fallback to dummy data if API fails
+        logDebug('Using fallback dummy data', dummyProducts);
+        setProducts(dummyProducts);
+        setFilteredProducts(dummyProducts);
+        
+        // Extract unique categories from dummy data
+        const uniqueCategories = [...new Set(dummyProducts.map(product => product.category))];
+        setCategories(uniqueCategories);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchProducts();
+  }, []);
+  
+  // Fetch current user if logged in
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      try {
+        const user = await authService.getCurrentUser();
+        if (user) {
+          setCurrentUser(user);
+          
+          // Pre-fill checkout form with user data if available
+          setCheckoutFormData(prevState => ({
+            ...prevState,
+            name: user.name || prevState.name,
+            email: user.email || prevState.email,
+            phone: user.phone || prevState.phone,
+            address: user.address || prevState.address,
+            city: user.city || prevState.city
+          }));
+        }
+      } catch (error) {
+        console.error('Error fetching current user:', error);
+      }
+    };
+    
+    getCurrentUser();
+  }, []);
 
   // Show toast notification
   const showToast = useCallback((message, type = 'success') => {
@@ -219,61 +149,26 @@ const ProductsPage = () => {
     };
   }, [selectedProduct, showCheckout, showCart]);
 
-  // Initialize data
-  useEffect(() => {
-    // Remove artificial delay - load immediately
-    setProducts(sampleProducts);
-    setFilteredProducts(sampleProducts);
-    
-    const uniqueCategories = [...new Set(sampleProducts.map(p => p.category))];
-    setCategories(uniqueCategories.map(cat => ({
-      id: cat,
-      name: sampleProducts.find(p => p.category === cat)?.categoryName || cat
-    })));
-    
-    setIsLoading(false);
-  }, []);
-
   // Filter products
   useEffect(() => {
-    let filtered = products;
-
+    let results = products;
+    
     // Filter by category
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter(product => product.category === selectedCategory);
+      results = results.filter(product => product.category === selectedCategory);
     }
-
+    
     // Filter by search term
-    if (searchTerm) {
-      filtered = filtered.filter(product =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.nameEn.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.description.toLowerCase().includes(searchTerm.toLowerCase())
+    if (searchTerm.trim() !== '') {
+      const searchLower = searchTerm.toLowerCase();
+      results = results.filter(product => 
+        product.name.toLowerCase().includes(searchLower) || 
+        product.description.toLowerCase().includes(searchLower)
       );
     }
-
-    // Filter by price range
-    filtered = filtered.filter(product =>
-      product.price >= priceRange[0] && product.price <= priceRange[1]
-    );
-
-    // Sort products
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'price-low':
-          return a.price - b.price;
-        case 'price-high':
-          return b.price - a.price;
-        case 'rating':
-          return b.rating - a.rating;
-        case 'name':
-        default:
-          return a.name.localeCompare(b.name, 'ar');
-      }
-    });
-
-    setFilteredProducts(filtered);
-  }, [products, selectedCategory, searchTerm, priceRange, sortBy]);
+    
+    setFilteredProducts(results);
+  }, [selectedCategory, searchTerm, products]);
 
   // Calculate cart totals
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -348,41 +243,142 @@ const ProductsPage = () => {
     return wishlist.some(item => item.id === productId);
   }, [wishlist]);
 
+  // Handle checkout form input changes
+  const handleCheckoutInputChange = (e) => {
+    const { name, value } = e.target;
+    setCheckoutFormData(prevData => ({
+      ...prevData,
+      [name]: value
+    }));
+    
+    // Clear error for this field when user types
+    if (formErrors[name]) {
+      setFormErrors(prevErrors => ({
+        ...prevErrors,
+        [name]: ''
+      }));
+    }
+  };
+
+  // Validate checkout form
+  const validateCheckoutForm = () => {
+    const errors = {};
+    
+    if (!checkoutFormData.name.trim()) {
+      errors.name = 'الاسم الكامل مطلوب';
+    }
+    
+    if (!checkoutFormData.email.trim()) {
+      errors.email = 'البريد الإلكتروني مطلوب';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(checkoutFormData.email)) {
+      errors.email = 'البريد الإلكتروني غير صحيح';
+    }
+    
+    if (!checkoutFormData.phone.trim()) {
+      errors.phone = 'رقم الهاتف مطلوب';
+    } else if (!/^(\+?[0-9]{1,4}[-\s]?)?[0-9]{9,10}$/.test(checkoutFormData.phone.replace(/\s/g, ''))) {
+      errors.phone = 'رقم الهاتف غير صحيح';
+    }
+    
+    if (!checkoutFormData.address.trim()) {
+      errors.address = 'العنوان مطلوب';
+    }
+    
+    if (!checkoutFormData.city.trim()) {
+      errors.city = 'المدينة مطلوبة';
+    }
+    
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   // Handle checkout submission
-  const handleCheckoutSubmit = (e) => {
+  const handleCheckoutSubmit = async (e) => {
     e.preventDefault();
     
     if (isProcessing) return;
+    
+    // Validate form
+    if (!validateCheckoutForm()) {
+      showToast('يرجى تصحيح الأخطاء في النموذج', 'error');
+      return;
+    }
+    
     setIsProcessing(true);
+    logDebug('Processing checkout submission');
 
-    const formData = new FormData(e.target);
-    const customerData = {
-      name: formData.get('name'),
-      email: formData.get('email'),
-      phone: formData.get('phone'),
-      address: formData.get('address'),
-      city: formData.get('city'),
-      notes: formData.get('notes')
-    };
+    try {
+      // Prepare order data
+      const orderItems = cart.map(item => ({
+        product_id: item.id,
+        quantity: item.quantity,
+        price: item.price,
+        name: item.name
+      }));
+      
+      const orderRequest = {
+        items: orderItems,
+        customer_info: {
+          name: checkoutFormData.name,
+          email: checkoutFormData.email,
+          phone: checkoutFormData.phone,
+          address: checkoutFormData.address,
+          city: checkoutFormData.city,
+          notes: checkoutFormData.notes || ''
+        },
+        total_amount: cartTotal,
+        payment_method: 'cash_on_delivery' // Default payment method
+      };
+      
+      // If user is logged in, we don't need to send customer info again
+      if (currentUser) {
+        delete orderRequest.customer_info;
+      }
+      
+      logDebug('Sending order request', orderRequest);
+      
+      // Send order to API
+      const response = await orderService.createOrder(orderRequest);
+      logDebug('Order API response', response);
+      
+      // Check if we have a valid response
+      if (!response) {
+        logDebug('Empty response received');
+        throw new Error('لم يتم استلام رد من الخادم. يرجى المحاولة مرة أخرى.');
+      }
+      
+      // Generate a temporary order ID if none was provided
+      const orderId = response.data?.id || `ORD-${Date.now()}`;
+      
+      // Process successful order - handle both data field and direct response formats
+      setOrderData({
+        orderNumber: orderId,
+        orderDate: new Date().toLocaleDateString('ar-SA'),
+        customer: checkoutFormData,
+        items: [...cart],
+        total: cartTotal,
+        status: response.data?.status || 'pending',
+        message: response.message || 'تم إنشاء الطلب بنجاح',
+        apiResponse: response // Store the full response for debugging
+      });
 
-    // Process order immediately
-    const orderNumber = `ORD-${Date.now()}`;
-    const orderDate = new Date().toLocaleDateString('ar-SA');
-    
-    setOrderData({
-      orderNumber,
-      orderDate,
-      customer: customerData,
-      items: [...cart],
-      total: cartTotal
-    });
-
-    setCart([]);
-    setShowCheckout(false);
-    setOrderSuccess(true);
-    setIsProcessing(false);
-    
-    showToast('تم تأكيد طلبك بنجاح! ستصلك رسالة تأكيد قريباً', 'success');
+      setCart([]);
+      setShowCheckout(false);
+      setOrderSuccess(true);
+      showToast(response.message || 'تم تأكيد طلبك بنجاح! ستصلك رسالة تأكيد قريباً', 'success');
+      
+    } catch (error) {
+      logDebug('Order submission error', error);
+      
+      // Check if it's a network error
+      if (error.message && error.message.includes('Network Error')) {
+        showToast('خطأ في الاتصال بالخادم. يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.', 'error');
+      } else {
+        showToast(error.response?.data?.message || 'حدث خطأ أثناء إرسال الطلب، يرجى المحاولة مرة أخرى', 'error');
+      }
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   // Quick buy function
@@ -393,6 +389,170 @@ const ProductsPage = () => {
     // Instant cart display
     setShowCart(true);
   }, [addToCart, isProcessing]);
+
+  // Enhanced Order Success Modal
+  // Update the order success modal to show debugging information
+  const renderOrderSuccessModal = () => {
+    if (!orderSuccess || !orderData) return null;
+    
+    return (
+      <div
+        className="order-success-modal-backdrop"
+        onClick={() => setOrderSuccess(false)}
+      >
+        <div
+          className="order-success-modal"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="order-success-header">
+            <div className="order-success-icon">
+              <i className="fas fa-check-circle"></i>
+            </div>
+            <h3>تم تأكيد طلبك بنجاح!</h3>
+            <p>{orderData.message || 'شكراً لك، سيتم التواصل معك قريباً لتأكيد التفاصيل'}</p>
+            {orderData.status === 'local_test' && (
+              <div className="debug-note">
+                <i className="fas fa-info-circle"></i>
+                <span>هذا طلب اختباري محلي (API غير متصل)</span>
+              </div>
+            )}
+          </div>
+
+          <div className="order-success-content">
+            <div className="order-details">
+              <div className="order-number">
+                <strong>رقم الطلب: {orderData.orderNumber}</strong>
+              </div>
+              <div className="order-date">
+                تاريخ الطلب: {orderData.orderDate}
+              </div>
+              {orderData.status && (
+                <div className="order-status">
+                  الحالة: {orderData.status === 'pending' ? 'قيد المعالجة' : 
+                          orderData.status === 'completed' ? 'مكتمل' : 
+                          orderData.status === 'local_test' ? 'اختباري' : orderData.status}
+                </div>
+              )}
+            </div>
+
+            <div className="customer-info">
+              <h4>بيانات العميل:</h4>
+              <p><strong>الاسم:</strong> {orderData.customer.name}</p>
+              <p><strong>البريد الإلكتروني:</strong> {orderData.customer.email}</p>
+              <p><strong>رقم الهاتف:</strong> {orderData.customer.phone}</p>
+              <p><strong>العنوان:</strong> {orderData.customer.address}, {orderData.customer.city}</p>
+              {orderData.customer.notes && (
+                <p><strong>ملاحظات:</strong> {orderData.customer.notes}</p>
+              )}
+            </div>
+
+            <div className="order-summary">
+              <h4>تفاصيل الطلب:</h4>
+              {orderData.items.map(item => (
+                <div key={item.id} className="order-item">
+                  <span>{item.name} × {item.quantity}</span>
+                  <span>{item.price * item.quantity} درهم</span>
+                </div>
+              ))}
+              <div className="order-total">
+                <strong>المجموع الكلي: {orderData.total} درهم</strong>
+              </div>
+            </div>
+
+            <div className="next-steps">
+              <h4>الخطوات التالية:</h4>
+              <ul>
+                <li>
+                  <i className="fas fa-phone"></i>
+                  سيتم التواصل معك خلال 24 ساعة لتأكيد الطلب
+                </li>
+                <li>
+                  <i className="fas fa-truck"></i>
+                  التوصيل خلال 2-5 أيام عمل
+                </li>
+                <li>
+                  <i className="fas fa-credit-card"></i>
+                  الدفع عند الاستلام أو تحويل بنكي
+                </li>
+                <li>
+                  <i className="fas fa-envelope"></i>
+                  ستصلك رسالة تأكيد على البريد الإلكتروني
+                </li>
+              </ul>
+            </div>
+
+            {/* Add debug information in development mode */}
+            {process.env.NODE_ENV === 'development' && (
+              <div className="debug-info">
+                <details>
+                  <summary>معلومات التصحيح (للمطورين فقط)</summary>
+                  <pre>{JSON.stringify(orderData, null, 2)}</pre>
+                </details>
+              </div>
+            )}
+
+            <div className="success-actions">
+              <button
+                className="continue-shopping-btn"
+                onClick={() => {
+                  setOrderSuccess(false);
+                  setOrderData(null);
+                }}
+              >
+                <i className="fas fa-shopping-bag"></i>
+                متابعة التسوق
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Handle category selection
+  const handleCategoryChange = (category) => {
+    setSelectedCategory(category);
+    logDebug('Category changed to', category);
+  };
+
+  // Render category filters
+  const renderCategoryFilters = () => {
+    return (
+      <div className="category-filters">
+        <button
+          className={selectedCategory === 'all' ? 'active' : ''}
+          onClick={() => handleCategoryChange('all')}
+        >
+          جميع المنتجات
+        </button>
+        
+        {categories.map((category) => (
+          <button
+            key={category}
+            className={selectedCategory === category ? 'active' : ''}
+            onClick={() => handleCategoryChange(category)}
+          >
+            {getCategoryDisplayName(category)}
+          </button>
+        ))}
+      </div>
+    );
+  };
+  
+  // Helper function to get category display name
+  const getCategoryDisplayName = (categoryId) => {
+    // Map of category IDs to display names
+    const categoryNames = {
+      'tools': 'أدوات',
+      'materials': 'مواد البناء',
+      'paint': 'دهانات',
+      'hardware': 'أجهزة',
+      'electrical': 'كهربائيات',
+      'uncategorized': 'غير مصنف'
+    };
+    
+    return categoryNames[categoryId] || categoryId;
+  };
 
   if (isLoading) {
     return (
@@ -497,23 +657,7 @@ const ProductsPage = () => {
                 <div className="filters-content">
                   <div className="filter-group">
                     <h3>الفئات</h3>
-                    <div className="category-filters">
-                      <button
-                        className={selectedCategory === 'all' ? 'active' : ''}
-                        onClick={() => setSelectedCategory('all')}
-                      >
-                        جميع المنتجات
-                      </button>
-                      {categories.map(category => (
-                        <button
-                          key={category.id}
-                          className={selectedCategory === category.id ? 'active' : ''}
-                          onClick={() => setSelectedCategory(category.id)}
-                        >
-                          {category.name}
-                        </button>
-                      ))}
-                    </div>
+                    {renderCategoryFilters()}
                   </div>
 
                   <div className="filter-group">
@@ -955,30 +1099,77 @@ const ProductsPage = () => {
                 </div>
 
                 <form className="checkout-form" onSubmit={handleCheckoutSubmit}>
-                  <div className="form-group">
+                  <div className={`form-group ${formErrors.name ? 'has-error' : ''}`}>
                     <label>الاسم الكامل *</label>
-                    <input type="text" name="name" required placeholder="أدخل اسمك الكامل" />
+                    <input 
+                      type="text" 
+                      name="name" 
+                      value={checkoutFormData.name}
+                      onChange={handleCheckoutInputChange}
+                      placeholder="أدخل اسمك الكامل" 
+                    />
+                    {formErrors.name && <div className="error-message">{formErrors.name}</div>}
                   </div>
-                  <div className="form-group">
+                  <div className={`form-group ${formErrors.email ? 'has-error' : ''}`}>
                     <label>البريد الإلكتروني *</label>
-                    <input type="email" name="email" required placeholder="مثال: example@example.com" />
+                    <input 
+                      type="email" 
+                      name="email" 
+                      value={checkoutFormData.email}
+                      onChange={handleCheckoutInputChange}
+                      placeholder="مثال: example@example.com" 
+                    />
+                    {formErrors.email && <div className="error-message">{formErrors.email}</div>}
                   </div>
-                  <div className="form-group">
+                  <div className={`form-group ${formErrors.phone ? 'has-error' : ''}`}>
                     <label>رقم الهاتف *</label>
-                    <input type="tel" name="phone" required placeholder="05xxxxxxxx" />
+                    <input 
+                      type="tel" 
+                      name="phone" 
+                      value={checkoutFormData.phone}
+                      onChange={handleCheckoutInputChange}
+                      placeholder="05xxxxxxxx" 
+                    />
+                    {formErrors.phone && <div className="error-message">{formErrors.phone}</div>}
                   </div>
-                  <div className="form-group">
+                  <div className={`form-group ${formErrors.address ? 'has-error' : ''}`}>
                     <label>العنوان *</label>
-                    <input type="text" name="address" required placeholder="أدخل عنوانك بالتفصيل" />
+                    <input 
+                      type="text" 
+                      name="address" 
+                      value={checkoutFormData.address}
+                      onChange={handleCheckoutInputChange}
+                      placeholder="أدخل عنوانك بالتفصيل" 
+                    />
+                    {formErrors.address && <div className="error-message">{formErrors.address}</div>}
                   </div>
-                  <div className="form-group">
+                  <div className={`form-group ${formErrors.city ? 'has-error' : ''}`}>
                     <label>المدينة *</label>
-                    <input type="text" name="city" required placeholder="أدخل اسم المدينة" />
+                    <input 
+                      type="text" 
+                      name="city" 
+                      value={checkoutFormData.city}
+                      onChange={handleCheckoutInputChange}
+                      placeholder="أدخل اسم المدينة" 
+                    />
+                    {formErrors.city && <div className="error-message">{formErrors.city}</div>}
                   </div>
                   <div className="form-group">
                     <label>ملاحظات إضافية</label>
-                    <textarea name="notes" placeholder="يمكنك إضافة ملاحظات إضافية عن الطلب"></textarea>
+                    <textarea 
+                      name="notes" 
+                      value={checkoutFormData.notes}
+                      onChange={handleCheckoutInputChange}
+                      placeholder="يمكنك إضافة ملاحظات إضافية عن الطلب"
+                    ></textarea>
                   </div>
+                  
+                  {currentUser && (
+                    <div className="user-info-note">
+                      <i className="fas fa-info-circle"></i>
+                      <span>تم استخدام بياناتك المسجلة. يمكنك تعديلها إذا أردت.</span>
+                    </div>
+                  )}
                   
                   <div className="checkout-actions">
                     <button
@@ -1012,96 +1203,8 @@ const ProductsPage = () => {
           </div>
         )}
 
-      {/* Enhanced Order Success Modal */}
-      {orderSuccess && orderData && (
-        <div
-          className="order-success-modal-backdrop"
-          onClick={() => setOrderSuccess(false)}
-        >
-          <div
-            className="order-success-modal"
-            onClick={(e) => e.stopPropagation()}
-          >
-              <div className="order-success-header">
-                <div className="order-success-icon">
-                  <i className="fas fa-check-circle"></i>
-                </div>
-                <h3>تم تأكيد طلبك بنجاح!</h3>
-                <p>شكراً لك، سيتم التواصل معك قريباً لتأكيد التفاصيل</p>
-              </div>
-
-              <div className="order-success-content">
-                <div className="order-details">
-                  <div className="order-number">
-                    <strong>رقم الطلب: {orderData.orderNumber}</strong>
-                  </div>
-                  <div className="order-date">
-                    تاريخ الطلب: {orderData.orderDate}
-                  </div>
-                </div>
-
-                <div className="customer-info">
-                  <h4>بيانات العميل:</h4>
-                  <p><strong>الاسم:</strong> {orderData.customer.name}</p>
-                  <p><strong>البريد الإلكتروني:</strong> {orderData.customer.email}</p>
-                  <p><strong>رقم الهاتف:</strong> {orderData.customer.phone}</p>
-                  <p><strong>العنوان:</strong> {orderData.customer.address}, {orderData.customer.city}</p>
-                  {orderData.customer.notes && (
-                    <p><strong>ملاحظات:</strong> {orderData.customer.notes}</p>
-                  )}
-                </div>
-
-                <div className="order-summary">
-                  <h4>تفاصيل الطلب:</h4>
-                  {orderData.items.map(item => (
-                    <div key={item.id} className="order-item">
-                      <span>{item.name} × {item.quantity}</span>
-                      <span>{item.price * item.quantity} درهم</span>
-                    </div>
-                  ))}
-                  <div className="order-total">
-                    <strong>المجموع الكلي: {orderData.total} درهم</strong>
-                  </div>
-                </div>
-
-                <div className="next-steps">
-                  <h4>الخطوات التالية:</h4>
-                  <ul>
-                    <li>
-                      <i className="fas fa-phone"></i>
-                      سيتم التواصل معك خلال 24 ساعة لتأكيد الطلب
-                    </li>
-                    <li>
-                      <i className="fas fa-truck"></i>
-                      التوصيل خلال 2-5 أيام عمل
-                    </li>
-                    <li>
-                      <i className="fas fa-credit-card"></i>
-                      الدفع عند الاستلام أو تحويل بنكي
-                    </li>
-                    <li>
-                      <i className="fas fa-envelope"></i>
-                      ستصلك رسالة تأكيد على البريد الإلكتروني
-                    </li>
-                  </ul>
-                </div>
-
-                <div className="success-actions">
-                  <button
-                    className="continue-shopping-btn"
-                    onClick={() => {
-                      setOrderSuccess(false);
-                      setOrderData(null);
-                    }}
-                  >
-                    <i className="fas fa-shopping-bag"></i>
-                    متابعة التسوق
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+      {/* Use the new renderOrderSuccessModal function */}
+      {renderOrderSuccessModal()}
     </div>
   );
 };

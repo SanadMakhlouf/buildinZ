@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import authService from '../../../services/authService';
 import './LoginPage.css';
 
 const LoginPage = () => {
@@ -12,6 +13,7 @@ const LoginPage = () => {
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [apiError, setApiError] = useState(null);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -27,6 +29,10 @@ const LoginPage = () => {
         ...errors,
         [name]: ''
       });
+    }
+    // Clear API error
+    if (apiError) {
+      setApiError(null);
     }
   };
 
@@ -54,17 +60,30 @@ const LoginPage = () => {
     
     if (validateForm()) {
       setIsLoading(true);
+      setApiError(null);
       
-      // Simulate API call
-      setTimeout(() => {
-        console.log('Login form submitted:', formData);
-        setIsLoading(false);
+      try {
+        const response = await authService.login(
+          formData.email, 
+          formData.password, 
+          formData.rememberMe
+        );
+        
+        // Successful login
         navigate('/services');
-      }, 1500);
+      } catch (error) {
+        // Handle login errors
+        const errorMessage = error.response?.data?.message || 
+                             'حدث خطأ أثناء تسجيل الدخول. يرجى المحاولة مرة أخرى.';
+        setApiError(errorMessage);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
   const handleGoogleLogin = () => {
+    // TODO: Implement Google OAuth login
     console.log('Google login clicked');
   };
 
@@ -101,6 +120,13 @@ const LoginPage = () => {
             <h1>تسجيل الدخول</h1>
             <p>أدخل بياناتك للوصول إلى حسابك</p>
           </div>
+
+          {/* API Error Message */}
+          {apiError && (
+            <div className="api-error-message">
+              {apiError}
+            </div>
+          )}
 
           {/* Social Login */}
           <button className="social-btn" onClick={handleGoogleLogin}>
