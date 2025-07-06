@@ -360,7 +360,6 @@ select.input-field {
 
 .example-service:hover {
   transform: translateY(-5px);
-
 }
 
 .example-service svg {
@@ -966,15 +965,10 @@ input:checked + .slider:before {
 .user-instructions {
   display: flex;
   align-items: center;
-  justify-content: center;
-  background-color: #f0f7ff;
-  color: #0066cc;
-  padding: 8px;
-  border-radius: 8px;
-  margin: 10px;
-  box-shadow: 0 2px 5px rgba(0, 102, 204, 0.1);
-  font-size: 0.9rem;
-  text-align: center;
+  padding: 10px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  margin-bottom: 20px;
 }
 
 .user-instructions svg {
@@ -1041,4 +1035,269 @@ input:checked + .slider:before {
   transform: scale(0, 0);
   opacity: 0.3;
   transition: 0s;
+}
+
+/* Booking Modal Styles */
+.booking-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.booking-modal {
+  background-color: white;
+  border-radius: 8px;
+  padding: 20px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  direction: rtl;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.booking-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.booking-modal-header h2 {
+  margin: 0;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  color: #666;
+  transition: color 0.3s;
+}
+
+.close-button:hover {
+  color: #333;
+}
+
+.booking-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: #333;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #0066cc;
+  outline: none;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.submit-button,
+.cancel-button {
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  flex: 1;
+}
+
+.submit-button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+}
+
+.submit-button:hover {
+  background-color: #45a049;
+}
+
+.cancel-button {
+  background-color: #f5f5f5;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.cancel-button:hover {
+  background-color: #e8e8e8;
+}
+
+/* Add smooth animation for modal */
+.booking-modal {
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .booking-modal {
+    width: 95%;
+    padding: 15px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .submit-button,
+  .cancel-button {
+    width: 100%;
+  }
+}
+
+/* Success Message Styles */
+.success-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.success-icon {
+  font-size: 64px !important;
+  color: #4caf50;
+  margin-bottom: 20px;
+  animation: scaleIn 0.5s ease-out;
+}
+
+.success-message h3 {
+  color: #333;
+  margin: 0 0 10px 0;
+  font-size: 1.5rem;
+}
+
+.success-message p {
+  color: #666;
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* View Bookings Button */
+.view-bookings-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #1e88e5;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  margin-right: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.view-bookings-button:hover {
+  background-color: #1565c0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
+}
+
+.view-bookings-button svg {
+  font-size: 20px;
+}
+
+/* Pour s'assurer que le bouton est toujours visible */
+@media (max-width: 768px) {
+  .user-instructions {
+    flex-direction: column;
+    gap: 10px;
+    padding: 15px;
+  }
+
+  .view-bookings-button {
+    width: 100%;
+    justify-content: center;
+    margin-top: 10px;
+  }
+}
+
+.redirect-message {
+  color: #666;
+  font-size: 0.9rem;
+  margin-top: 15px;
+  font-style: italic;
+  animation: fadeInOut 2s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
