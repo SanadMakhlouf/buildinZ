@@ -17,6 +17,9 @@ import {
   Close,
   CheckCircle,
   List,
+  ArrowBack,
+  ArrowForward,
+  BookOnline,
 } from "@mui/icons-material";
 
 const MainContent = ({ selectedService }) => {
@@ -40,6 +43,21 @@ const MainContent = ({ selectedService }) => {
     additionalNotes: "",
   });
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if screen is mobile
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth <= 992);
+    };
+
+    checkIfMobile();
+    window.addEventListener("resize", checkIfMobile);
+
+    return () => {
+      window.removeEventListener("resize", checkIfMobile);
+    };
+  }, []);
 
   // Initialize calculator inputs when service changes
   useEffect(() => {
@@ -269,6 +287,20 @@ const MainContent = ({ selectedService }) => {
     return `${amount.toLocaleString("en-US")} درهم إماراتي`;
   };
 
+  // Handle next step
+  const goToNextStep = () => {
+    if (activeStep < 3) {
+      setActiveStep(activeStep + 1);
+    }
+  };
+
+  // Handle previous step
+  const goToPrevStep = () => {
+    if (activeStep > 1) {
+      setActiveStep(activeStep - 1);
+    }
+  };
+
   // Early return if no service is selected
   if (!selectedService) {
     return (
@@ -318,7 +350,7 @@ const MainContent = ({ selectedService }) => {
           <div
             className={`column ${activeStep === 1 ? "active" : ""}`}
             onClick={() => setActiveStep(1)}
-            onMouseEnter={() => !isCalculating && setActiveStep(1)}
+            onMouseEnter={() => !isCalculating && !isMobile && setActiveStep(1)}
           >
             <div className="step-number">1</div>
             <div className="column-header">
@@ -344,15 +376,17 @@ const MainContent = ({ selectedService }) => {
                     </span>
                   </div>
                 </div>
-                <button
-                  className={`booking-button ${
-                    areAllInputsFilled() ? "active" : "disabled"
-                  }`}
-                  onClick={handleBooking}
-                  disabled={!areAllInputsFilled()}
-                >
-                  حجز الآن
-                </button>
+                {!isMobile && (
+                  <button
+                    className={`booking-button ${
+                      areAllInputsFilled() ? "active" : "disabled"
+                    }`}
+                    onClick={handleBooking}
+                    disabled={!areAllInputsFilled()}
+                  >
+                    حجز الآن
+                  </button>
+                )}
               </div>
               <div className="input-groups-container">
                 {inputGroups[0].map((input) => (
@@ -450,7 +484,7 @@ const MainContent = ({ selectedService }) => {
           <div
             className={`column ${activeStep === 2 ? "active" : ""}`}
             onClick={() => setActiveStep(2)}
-            onMouseEnter={() => !isCalculating && setActiveStep(2)}
+            onMouseEnter={() => !isCalculating && !isMobile && setActiveStep(2)}
           >
             <div className="step-number">2</div>
             <div className="column-header">
@@ -552,18 +586,18 @@ const MainContent = ({ selectedService }) => {
             </div>
           </div>
 
-          {/* Third Column - Assessment */}
+          {/* Third Column - Results */}
           <div
             className={`column ${activeStep === 3 ? "active" : ""}`}
             onClick={() => setActiveStep(3)}
-            onMouseEnter={() => !isCalculating && setActiveStep(3)}
+            onMouseEnter={() => !isCalculating && !isMobile && setActiveStep(3)}
           >
             <div className="step-number">3</div>
             <div className="column-header">
               <div className="column-icon">
                 <Assessment />
               </div>
-              <h2>التقييم</h2>
+              <h2>النتائج</h2>
             </div>
             <div className="column-content">
               {isCalculating ? (
@@ -683,8 +717,63 @@ const MainContent = ({ selectedService }) => {
                   </div>
                 ))}
               </div>
+
+              {/* Bouton pour revenir à l'étape de réservation (visible uniquement sur mobile) */}
+              {isMobile && (
+                <div className="back-to-booking">
+                  <button
+                    className="back-to-booking-btn"
+                    onClick={() => {
+                      setActiveStep(1);
+                      handleBooking();
+                    }}
+                    disabled={!areAllInputsFilled()}
+                  >
+                    <BookOnline style={{ marginLeft: 8 }} />
+                    حجز الآن
+                  </button>
+                  {!areAllInputsFilled() && (
+                    <div className="booking-warning">
+                      يرجى ملء جميع الحقول المطلوبة أولاً
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
+
+          {/* Step Navigation for Mobile */}
+          {isMobile && (
+            <div className="step-navigation">
+              <button
+                className="prev-step-btn"
+                onClick={goToPrevStep}
+                disabled={activeStep === 1}
+              >
+                <ArrowForward /> السابق
+              </button>
+
+              <div className="step-indicator">
+                {[1, 2, 3].map((step) => (
+                  <div
+                    key={step}
+                    className={`step-dot ${
+                      activeStep === step ? "active" : ""
+                    }`}
+                    onClick={() => setActiveStep(step)}
+                  ></div>
+                ))}
+              </div>
+
+              <button
+                className="next-step-btn"
+                onClick={goToNextStep}
+                disabled={activeStep === 3}
+              >
+                التالي <ArrowBack />
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
