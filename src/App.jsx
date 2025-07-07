@@ -5,6 +5,7 @@ import Navbar from "./components/Navbar";
 import HomePage from './pages/Home/HomePage';
 import ServicesPage from './pages/Services/ServicesPage';
 import ProductsPage from './pages/Products/ProductsPage';
+import SearchPage from './pages/Search/SearchPage';
 import AdminPage from './pages/Admin/AdminPage';
 import LoginPage from './pages/Auth/Login/LoginPage';
 import SignupPage from './pages/Auth/Signup/SignupPage';
@@ -39,6 +40,7 @@ function App() {
           <Route path="/services" element={<ServicesPage />} />
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/products/:productId" element={<ProductsPage />} />
+          <Route path="/search" element={<SearchPage />} />
           <Route 
             path="/profile" 
             element={

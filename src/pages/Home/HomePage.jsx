@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useSpring, animated, useTrail, useChain, useSpringRef } from 'react-spring';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { gsap } from 'gsap';
@@ -16,10 +16,12 @@ gsap.registerPlugin(ScrollTrigger);
 const HomePage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [contentReady, setContentReady] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const heroRef = useRef(null);
   const waveRef = useRef(null);
   const goldLineRef = useRef(null);
   const { scrollY } = useScroll();
+  const navigate = useNavigate();
 
   // Loading management
   useEffect(() => {
@@ -45,6 +47,14 @@ const HomePage = () => {
   // Handle loading completion
   const handleLoadingComplete = () => {
     setIsLoading(false);
+  };
+
+  // Handle search submission
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+    }
   };
 
   // GSAP Animations
@@ -236,6 +246,28 @@ const HomePage = () => {
               نحن المنصة الأولى في الإمارات التي تتيح لك حجز خدمات موثوقة مثل التنظيف، الصيانة، التركيبات، وغيرها بضغطة زر.
             </motion.p>
             
+            {/* Search Input */}
+            <motion.form 
+              className="hero-search-form"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 0.9 }}
+              onSubmit={handleSearchSubmit}
+            >
+              <div className="search-input-container">
+                <input
+                  type="text"
+                  placeholder="ابحث عن خدمة أو منتج..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="hero-search-input"
+                />
+                <button type="submit" className="search-button">
+                  <i className="fas fa-search"></i>
+                </button>
+              </div>
+            </motion.form>
+            
             <div className="hero-buttons">
               {trail.map((style, index) => (
                 <animated.div key={index} style={style}>
@@ -261,6 +293,45 @@ const HomePage = () => {
           ref={waveRef}
           style={{ y: y2 }}
         ></motion.div>
+      </section>
+
+      {/* Categories Section with Hover Effects - Moved higher up */}
+      <section className="categories-section">
+        <div className="container">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="section-title">الأقسام الرئيسية <span className="highlight">للخدمات</span></h2>
+            <p className="section-description">اختر نوع الخدمة التي تحتاجها</p>
+          </motion.div>
+          
+          <div className="categories-grid">
+            {buildingzData.categories.map((category, index) => (
+              <Link to={`/services/${category.id}`} className="category-card" key={category.id}>
+                <div className="category-icon">
+                  <span>{category.icon}</span>
+                </div>
+                <h3 className="category-title">{category.name}</h3>
+                <p className="category-description">
+                  {category.subcategories.length} خدمة متاحة
+                </p>
+                <div className="category-arrow">
+                  <i className="fas fa-arrow-left"></i>
+                </div>
+              </Link>
+            ))}
+          </div>
+          
+          <div className="categories-action">
+            <Link to="/services" className="view-all-btn">
+              استعرض كل الخدمات
+              <i className="fas fa-arrow-left"></i>
+            </Link>
+          </div>
+        </div>
       </section>
 
       {/* Value Cards Section with Light Animations */}
@@ -353,45 +424,6 @@ const HomePage = () => {
                 <div className="stat-label">{stat.label}</div>
               </motion.div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Categories Section with Hover Effects */}
-      <section className="categories-section">
-        <div className="container">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="section-title">الأقسام الرئيسية <span className="highlight">للخدمات</span></h2>
-            <p className="section-description">اختر نوع الخدمة التي تحتاجها</p>
-          </motion.div>
-          
-          <div className="categories-grid">
-            {buildingzData.categories.map((category, index) => (
-              <Link to={`/services/${category.id}`} className="category-card" key={category.id}>
-                <div className="category-icon">
-                  <span>{category.icon}</span>
-                </div>
-                <h3 className="category-title">{category.name}</h3>
-                <p className="category-description">
-                  {category.subcategories.length} خدمة متاحة
-                </p>
-                <div className="category-arrow">
-                  <i className="fas fa-arrow-left"></i>
-                </div>
-              </Link>
-            ))}
-          </div>
-          
-          <div className="categories-action">
-            <Link to="/services" className="view-all-btn">
-              استعرض كل الخدمات
-              <i className="fas fa-arrow-left"></i>
-            </Link>
           </div>
         </div>
       </section>

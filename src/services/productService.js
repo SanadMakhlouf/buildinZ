@@ -1,4 +1,5 @@
 import axios from 'axios';
+import buildingzData from '../data/json/buildingzData.json';
 
 const API_BASE_URL = process.env.REACT_APP_BACKEND_API || '/api';
 
@@ -326,4 +327,52 @@ const productService = {
   }
 };
 
-export default productService; 
+export default productService;
+
+// Get all products
+export const getAllProducts = async () => {
+  try {
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return buildingzData.products;
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    throw error;
+  }
+};
+
+// Get products by category
+export const getProductsByCategory = async (categoryId) => {
+  try {
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 400));
+    return buildingzData.products.filter(p => p.categoryId === parseInt(categoryId));
+  } catch (error) {
+    console.error(`Error fetching products for category ${categoryId}:`, error);
+    throw error;
+  }
+};
+
+// Search products
+export const searchProducts = async (query) => {
+  try {
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 600));
+    
+    if (!query) return [];
+    
+    const normalizedQuery = query.toLowerCase().trim();
+    
+    return buildingzData.products.filter(product => {
+      return (
+        product.name.toLowerCase().includes(normalizedQuery) ||
+        product.description.toLowerCase().includes(normalizedQuery) ||
+        product.category.toLowerCase().includes(normalizedQuery) ||
+        product.tags?.some(tag => tag.toLowerCase().includes(normalizedQuery))
+      );
+    });
+  } catch (error) {
+    console.error('Error searching products:', error);
+    throw error;
+  }
+}; 

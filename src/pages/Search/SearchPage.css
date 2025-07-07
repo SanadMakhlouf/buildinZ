@@ -1,0 +1,250 @@
+.search-page {
+  padding: 40px 0;
+  min-height: 70vh;
+}
+
+.search-header {
+  margin-bottom: 40px;
+  text-align: right;
+}
+
+.search-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #0A3259;
+}
+
+.search-title .highlight {
+  color: #DAA520;
+}
+
+.search-stats {
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.search-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.spinner {
+  width: 60px;
+  height: 60px;
+  border: 5px solid rgba(218, 165, 32, 0.2);
+  border-radius: 50%;
+  border-top-color: #DAA520;
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.no-results {
+  text-align: center;
+  padding: 60px 0;
+}
+
+.no-results i {
+  font-size: 4rem;
+  color: #DAA520;
+  margin-bottom: 20px;
+}
+
+.no-results h2 {
+  font-size: 1.8rem;
+  color: #0A3259;
+  margin-bottom: 15px;
+}
+
+.no-results p {
+  color: #666;
+  margin-bottom: 30px;
+  font-size: 1.1rem;
+}
+
+.search-actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.browse-btn {
+  display: inline-block;
+  padding: 12px 24px;
+  background-color: #0A3259;
+  color: #fff;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.browse-btn:hover {
+  background-color: #DAA520;
+  transform: translateY(-3px);
+}
+
+.search-section {
+  margin-bottom: 50px;
+}
+
+.search-section .section-title {
+  font-size: 1.8rem;
+  color: #0A3259;
+  margin-bottom: 25px;
+  border-right: 4px solid #DAA520;
+  padding-right: 15px;
+}
+
+.services-grid,
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px;
+}
+
+.service-card,
+.product-card {
+  background-color: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+}
+
+.service-card:hover,
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.service-image,
+.product-image {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.service-image img,
+.product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.service-card:hover .service-image img,
+.product-card:hover .product-image img {
+  transform: scale(1.05);
+}
+
+.discount-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: #DAA520;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.service-content,
+.product-content {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.service-title,
+.product-title {
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+  color: #0A3259;
+  font-weight: 600;
+}
+
+.service-category,
+.product-category {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 15px;
+}
+
+.service-price,
+.product-price {
+  display: flex;
+  align-items: center;
+  margin-top: auto;
+}
+
+.price-value {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #0A3259;
+}
+
+.original-price {
+  margin-right: 10px;
+  text-decoration: line-through;
+  color: #999;
+  font-size: 0.9rem;
+}
+
+.product-rating {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.product-rating i {
+  color: #DAA520;
+  margin-left: 5px;
+}
+
+@media (max-width: 768px) {
+  .search-title {
+    font-size: 1.8rem;
+  }
+  
+  .search-actions {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .browse-btn {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .services-grid,
+  .products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .search-title {
+    font-size: 1.5rem;
+  }
+  
+  .services-grid,
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+} 

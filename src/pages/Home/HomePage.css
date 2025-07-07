@@ -268,6 +268,73 @@ p, a, button, input, textarea, select {
   }
 }
 
+/* Hero Search Form */
+.hero-search-form {
+  margin-bottom: 2rem;
+  width: 100%;
+  max-width: 600px;
+}
+
+.search-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.search-input-container:focus-within {
+  background-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 0 15px rgba(218, 165, 32, 0.3);
+  transform: translateY(-2px);
+}
+
+.hero-search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 16px 20px;
+  font-size: 1.1rem;
+  color: #fff;
+  outline: none;
+  width: 100%;
+}
+
+.hero-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.search-button {
+  background: linear-gradient(45deg, #DAA520, #FFD700);
+  border: none;
+  color: #0A3259;
+  font-size: 1.2rem;
+  padding: 16px 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-button:hover {
+  background: linear-gradient(45deg, #FFD700, #FFC400);
+  transform: scale(1.05);
+}
+
+.search-button i {
+  transition: transform 0.3s ease;
+}
+
+.search-button:hover i {
+  transform: scale(1.1);
+}
+
 /* Value Cards Section */
 .value-cards-section {
   padding: 80px 0;
@@ -1163,28 +1230,27 @@ p, a, button, input, textarea, select {
   .app-download-content,
   .contact-content {
     flex-direction: column;
+    gap: 2rem;
   }
   
   .about-image, 
   .app-download-image,
   .contact-image {
-    margin-top: 40px;
-    order: -1;
-  }
-  
-  .about-image img, 
-  .contact-image img {
-    max-width: 100%;
+    margin-top: 2rem;
   }
   
   .phone-mockup {
-    width: 240px;
-    height: 490px;
+    transform: scale(0.9);
+  }
+  
+  .hero-search-form {
+    max-width: 500px;
   }
 }
 
 @media (max-width: 768px) {
   .hero-section {
+    min-height: auto;
     padding: 60px 0;
   }
   
@@ -1202,10 +1268,10 @@ p, a, button, input, textarea, select {
   
   .value-cards-grid,
   .categories-grid,
-  .testimonials-grid,
   .latest-grid,
-  .clients-grid {
-    grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
+  .clients-grid,
+  .app-features {
+    grid-template-columns: repeat(2, 1fr);
   }
   
   .stats-grid {
@@ -1214,28 +1280,40 @@ p, a, button, input, textarea, select {
   
   .footer-content {
     flex-direction: column;
-    gap: 30px;
+    gap: 2rem;
   }
   
   .footer-links {
-    flex-direction: column;
+    grid-template-columns: repeat(2, 1fr);
   }
   
   .particle {
-    width: 3px;
-    height: 3px;
+    display: none;
   }
   
   .floating-shape {
-    opacity: 0.3;
+    display: none;
   }
   
   .gold-line {
-    height: 2px;
+    display: none;
   }
   
   .morphing-bg {
-    opacity: 0.5;
+    opacity: 0.3;
+  }
+  
+  .hero-search-form {
+    max-width: 100%;
+  }
+  
+  .hero-search-input {
+    font-size: 1rem;
+    padding: 14px 16px;
+  }
+  
+  .search-button {
+    padding: 14px 20px;
   }
 }
 
@@ -1250,21 +1328,33 @@ p, a, button, input, textarea, select {
   
   .hero-buttons,
   .app-buttons,
-  .latest-actions {
+  .cta-buttons,
+  .contact-buttons {
     flex-direction: column;
     width: 100%;
   }
   
   .primary-btn, 
-  .secondary-btn,
+  .secondary-btn, 
   .app-store-btn, 
-  .play-store-btn {
+  .play-store-btn,
+  .cta-button,
+  .contact-btn {
     width: 100%;
-    justify-content: center;
+    margin-bottom: 1rem;
   }
   
   .stats-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .hero-search-input {
+    font-size: 0.9rem;
+    padding: 12px 14px;
+  }
+  
+  .search-button {
+    padding: 12px 16px;
   }
 }
 
