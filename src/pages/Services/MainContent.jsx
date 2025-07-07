@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "./MainContent.css";
 import * as dataService from "../../services/dataService";
+import * as bookingService from "../../services/bookingService";
 import { evaluateFormula } from "../../utils/formulaUtils";
 import {
   Description,
@@ -12,15 +14,50 @@ import {
   Brush,
   Construction,
   ElectricalServices,
+  Close,
+  CheckCircle,
+  List,
+  ArrowBack,
+  ArrowForward,
+  BookOnline,
 } from "@mui/icons-material";
 
 const MainContent = ({ selectedService }) => {
+  const navigate = useNavigate();
   const [inputs, setInputs] = useState({});
   const [currentGenerator, setCurrentGenerator] = useState(null);
   const [derivedInputs, setDerivedInputs] = useState({});
   const [isCalculating, setIsCalculating] = useState(false);
   const [debugInfo, setDebugInfo] = useState({});
   const [activeStep, setActiveStep] = useState(1);
+  const [showBookingModal, setShowBookingModal] = useState(false);
+  const [bookingForm, setBookingForm] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    emirate: "",
+    area: "",
+    street: "",
+    building: "",
+    apartment: "",
+    additionalNotes: "",
+  });
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if screen is mobile
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth <= 992);
+    };
+
+    checkIfMobile();
+    window.addEventListener("resize", checkIfMobile);
+
+    return () => {
+      window.removeEventListener("resize", checkIfMobile);
+    };
+  }, []);
 
   // Initialize calculator inputs when service changes
   useEffect(() => {
@@ -164,11 +201,104 @@ const MainContent = ({ selectedService }) => {
     });
   };
 
-  // Handle booking
+  // Handle booking form input changes
+  const handleBookingFormChange = (field, value) => {
+    setBookingForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  // Handle booking form submission
+  const handleBookingSubmit = async (e) => {
+    e.preventDefault();
+
+    // Créer l'objet de réservation
+    const bookingData = {
+      customerDetails: bookingForm,
+      serviceDetails: {
+        serviceId: selectedService.id,
+        serviceName: selectedService.name,
+        inputs: inputs,
+        calculations: {
+          derivedInputs,
+          totalCost: derivedInputs.totalCost || 0,
+          laborCost: derivedInputs.laborCost || 0,
+          materialCost: derivedInputs.materialCost || 0,
+        },
+      },
+    };
+
+    // Sauvegarder la réservation
+    const result = await bookingService.saveBooking(bookingData);
+
+    if (result.success) {
+      // Réinitialiser le formulaire
+      setBookingForm({
+        fullName: "",
+        email: "",
+        phone: "",
+        emirate: "",
+        area: "",
+        street: "",
+        building: "",
+        apartment: "",
+        additionalNotes: "",
+      });
+
+      // Afficher le message de succès
+      setShowSuccessMessage(true);
+
+      // Attendre 2 secondes avant de rediriger
+      setTimeout(() => {
+        setShowBookingModal(false);
+        setShowSuccessMessage(false);
+        // Rediriger vers la page d'accueil
+        navigate("/");
+      }, 2000);
+    } else {
+      // Gérer l'erreur (vous pouvez ajouter un état pour afficher les erreurs)
+      console.error("Error saving booking:", result.error);
+    }
+  };
+
+  // Handle booking button click
   const handleBooking = () => {
-    // Here you can implement the booking logic
-    console.log("Booking with inputs:", inputs);
-    console.log("Calculated values:", derivedInputs);
+    setShowBookingModal(true);
+  };
+
+  // Group inputs into three parts
+  const inputGroups = (() => {
+    if (!currentGenerator || !currentGenerator.inputs) return [[], [], []];
+    const total = currentGenerator.inputs.length;
+    const perGroup = Math.ceil(total / 3);
+    return [
+      currentGenerator.inputs.slice(0, perGroup),
+      currentGenerator.inputs.slice(perGroup, perGroup * 2),
+      currentGenerator.inputs.slice(perGroup * 2),
+    ];
+  })();
+
+  // Calculate total cost
+  const totalCost = derivedInputs.totalCost || 0;
+
+  // Format currency
+  const formatCurrency = (amount) => {
+    return `${amount.toLocaleString("en-US")} درهم إماراتي`;
+  };
+
+  // Handle next step
+  const goToNextStep = () => {
+    if (activeStep < 3) {
+      setActiveStep(activeStep + 1);
+    }
+  };
+
+  // Handle previous step
+  const goToPrevStep = () => {
+    if (activeStep > 1) {
+      setActiveStep(activeStep - 1);
+    }
   };
 
   // Early return if no service is selected
@@ -203,26 +333,6 @@ const MainContent = ({ selectedService }) => {
     );
   }
 
-  // Group inputs into three parts
-  const inputGroups = (() => {
-    if (!currentGenerator || !currentGenerator.inputs) return [[], [], []];
-    const total = currentGenerator.inputs.length;
-    const perGroup = Math.ceil(total / 3);
-    return [
-      currentGenerator.inputs.slice(0, perGroup),
-      currentGenerator.inputs.slice(perGroup, perGroup * 2),
-      currentGenerator.inputs.slice(perGroup * 2),
-    ];
-  })();
-
-  // Calculate total cost
-  const totalCost = derivedInputs.totalCost || 0;
-
-  // Format currency
-  const formatCurrency = (amount) => {
-    return `${amount.toLocaleString("en-US")} درهم إماراتي`;
-  };
-
   return (
     <div className="main-content">
       <div className="service-wizard">
@@ -234,12 +344,13 @@ const MainContent = ({ selectedService }) => {
           </span>
           <TouchApp style={{ fontSize: 20, marginRight: 10 }} />
         </div>
+
         <div className="content-container">
           {/* First Column - Description */}
           <div
             className={`column ${activeStep === 1 ? "active" : ""}`}
             onClick={() => setActiveStep(1)}
-            onMouseEnter={() => !isCalculating && setActiveStep(1)}
+            onMouseEnter={() => !isCalculating && !isMobile && setActiveStep(1)}
           >
             <div className="step-number">1</div>
             <div className="column-header">
@@ -265,15 +376,17 @@ const MainContent = ({ selectedService }) => {
                     </span>
                   </div>
                 </div>
-                <button
-                  className={`booking-button ${
-                    areAllInputsFilled() ? "active" : "disabled"
-                  }`}
-                  onClick={handleBooking}
-                  disabled={!areAllInputsFilled()}
-                >
-                  حجز الآن
-                </button>
+                {!isMobile && (
+                  <button
+                    className={`booking-button ${
+                      areAllInputsFilled() ? "active" : "disabled"
+                    }`}
+                    onClick={handleBooking}
+                    disabled={!areAllInputsFilled()}
+                  >
+                    حجز الآن
+                  </button>
+                )}
               </div>
               <div className="input-groups-container">
                 {inputGroups[0].map((input) => (
@@ -371,7 +484,7 @@ const MainContent = ({ selectedService }) => {
           <div
             className={`column ${activeStep === 2 ? "active" : ""}`}
             onClick={() => setActiveStep(2)}
-            onMouseEnter={() => !isCalculating && setActiveStep(2)}
+            onMouseEnter={() => !isCalculating && !isMobile && setActiveStep(2)}
           >
             <div className="step-number">2</div>
             <div className="column-header">
@@ -473,18 +586,18 @@ const MainContent = ({ selectedService }) => {
             </div>
           </div>
 
-          {/* Third Column - Assessment */}
+          {/* Third Column - Results */}
           <div
             className={`column ${activeStep === 3 ? "active" : ""}`}
             onClick={() => setActiveStep(3)}
-            onMouseEnter={() => !isCalculating && setActiveStep(3)}
+            onMouseEnter={() => !isCalculating && !isMobile && setActiveStep(3)}
           >
             <div className="step-number">3</div>
             <div className="column-header">
               <div className="column-icon">
                 <Assessment />
               </div>
-              <h2>التقييم</h2>
+              <h2>النتائج</h2>
             </div>
             <div className="column-content">
               {isCalculating ? (
@@ -604,10 +717,233 @@ const MainContent = ({ selectedService }) => {
                   </div>
                 ))}
               </div>
+
+              {/* Bouton pour revenir à l'étape de réservation (visible uniquement sur mobile) */}
+              {isMobile && (
+                <div className="back-to-booking">
+                  <button
+                    className="back-to-booking-btn"
+                    onClick={() => {
+                      setActiveStep(1);
+                      handleBooking();
+                    }}
+                    disabled={!areAllInputsFilled()}
+                  >
+                    <BookOnline style={{ marginLeft: 8 }} />
+                    حجز الآن
+                  </button>
+                  {!areAllInputsFilled() && (
+                    <div className="booking-warning">
+                      يرجى ملء جميع الحقول المطلوبة أولاً
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
+
+          {/* Step Navigation for Mobile */}
+          {isMobile && (
+            <div className="step-navigation">
+              <button
+                className="prev-step-btn"
+                onClick={goToPrevStep}
+                disabled={activeStep === 1}
+              >
+                <ArrowForward /> السابق
+              </button>
+
+              <div className="step-indicator">
+                {[1, 2, 3].map((step) => (
+                  <div
+                    key={step}
+                    className={`step-dot ${
+                      activeStep === step ? "active" : ""
+                    }`}
+                    onClick={() => setActiveStep(step)}
+                  ></div>
+                ))}
+              </div>
+
+              <button
+                className="next-step-btn"
+                onClick={goToNextStep}
+                disabled={activeStep === 3}
+              >
+                التالي <ArrowBack />
+              </button>
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Booking Modal */}
+      {showBookingModal && (
+        <div className="booking-modal-overlay">
+          <div className="booking-modal">
+            <div className="booking-modal-header">
+              <h2>نموذج الحجز</h2>
+              <button
+                className="close-button"
+                onClick={() => setShowBookingModal(false)}
+              >
+                <Close />
+              </button>
+            </div>
+
+            {showSuccessMessage ? (
+              <div className="success-message">
+                <CheckCircle className="success-icon" />
+                <h3>تم تأكيد الحجز بنجاح!</h3>
+                <p>سنتواصل معك قريباً</p>
+                <p className="redirect-message">
+                  جاري التحويل إلى الصفحة الرئيسية...
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handleBookingSubmit} className="booking-form">
+                <div className="form-group">
+                  <label>الاسم الكامل</label>
+                  <input
+                    type="text"
+                    required
+                    value={bookingForm.fullName}
+                    onChange={(e) =>
+                      handleBookingFormChange("fullName", e.target.value)
+                    }
+                    placeholder="أدخل اسمك الكامل"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>البريد الإلكتروني</label>
+                  <input
+                    type="email"
+                    required
+                    value={bookingForm.email}
+                    onChange={(e) =>
+                      handleBookingFormChange("email", e.target.value)
+                    }
+                    placeholder="example@domain.com"
+                    dir="ltr"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>رقم الهاتف</label>
+                  <input
+                    type="tel"
+                    required
+                    value={bookingForm.phone}
+                    onChange={(e) =>
+                      handleBookingFormChange("phone", e.target.value)
+                    }
+                    placeholder="971XX XXXXXXX"
+                    dir="ltr"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>الإمارة</label>
+                  <select
+                    required
+                    value={bookingForm.emirate}
+                    onChange={(e) =>
+                      handleBookingFormChange("emirate", e.target.value)
+                    }
+                  >
+                    <option value="">اختر الإمارة</option>
+                    <option value="دبي">دبي</option>
+                    <option value="أبوظبي">أبوظبي</option>
+                    <option value="الشارقة">الشارقة</option>
+                    <option value="عجمان">عجمان</option>
+                    <option value="رأس الخيمة">رأس الخيمة</option>
+                    <option value="أم القيوين">أم القيوين</option>
+                    <option value="الفجيرة">الفجيرة</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>المنطقة</label>
+                  <input
+                    type="text"
+                    required
+                    value={bookingForm.area}
+                    onChange={(e) =>
+                      handleBookingFormChange("area", e.target.value)
+                    }
+                    placeholder="اسم المنطقة"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>الشارع</label>
+                  <input
+                    type="text"
+                    required
+                    value={bookingForm.street}
+                    onChange={(e) =>
+                      handleBookingFormChange("street", e.target.value)
+                    }
+                    placeholder="اسم/رقم الشارع"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>المبنى</label>
+                  <input
+                    type="text"
+                    required
+                    value={bookingForm.building}
+                    onChange={(e) =>
+                      handleBookingFormChange("building", e.target.value)
+                    }
+                    placeholder="اسم/رقم المبنى"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>رقم الشقة</label>
+                  <input
+                    type="text"
+                    required
+                    value={bookingForm.apartment}
+                    onChange={(e) =>
+                      handleBookingFormChange("apartment", e.target.value)
+                    }
+                    placeholder="رقم الشقة/الوحدة"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>ملاحظات إضافية</label>
+                  <textarea
+                    value={bookingForm.additionalNotes}
+                    onChange={(e) =>
+                      handleBookingFormChange("additionalNotes", e.target.value)
+                    }
+                    placeholder="أي معلومات إضافية تود إضافتها"
+                    rows="3"
+                  />
+                </div>
+
+                <div className="form-actions">
+                  <button type="submit" className="submit-button">
+                    تأكيد الحجز
+                  </button>
+                  <button
+                    type="button"
+                    className="cancel-button"
+                    onClick={() => setShowBookingModal(false)}
+                  >
+                    إلغاء
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
