@@ -94,18 +94,22 @@ const ProductsPage = () => {
     // Check if product is already in cart
     const existingItem = cart.find(item => item.id === product.id);
     
+    let updatedCart;
     if (existingItem) {
       // Update quantity if already in cart
-      const updatedCart = cart.map(item => 
+      updatedCart = cart.map(item => 
         item.id === product.id 
           ? { ...item, quantity: item.quantity + 1 } 
           : item
       );
-      setCart(updatedCart);
     } else {
       // Add new item to cart
-      setCart([...cart, { ...product, quantity: 1 }]);
+      updatedCart = [...cart, { ...product, quantity: 1 }];
     }
+    
+    // Save to state and localStorage
+    setCart(updatedCart);
+    localStorage.setItem('buildingz_cart', JSON.stringify(updatedCart));
     
     showToast(`تمت إضافة ${product.name} إلى سلة التسوق`, 'success');
     setIsAddingToCart(false);
@@ -121,13 +125,19 @@ const ProductsPage = () => {
         : item
     );
     
+    // Save to state and localStorage
     setCart(updatedCart);
+    localStorage.setItem('buildingz_cart', JSON.stringify(updatedCart));
   };
 
   // Remove from cart
   const removeFromCart = (productId) => {
     const updatedCart = cart.filter(item => item.id !== productId);
+    
+    // Save to state and localStorage
     setCart(updatedCart);
+    localStorage.setItem('buildingz_cart', JSON.stringify(updatedCart));
+    
     showToast('تم حذف المنتج من السلة', 'info');
   };
 
@@ -497,20 +507,328 @@ const ProductsPage = () => {
 
   // Render cart modal
   const renderCartModal = () => {
-    // Cart modal implementation
-    return null; // Placeholder
+    if (!showCart) return null;
+    
+    return (
+      <div className="modal-backdrop" onClick={() => setShowCart(false)}>
+        <div className="cart-modal-container" onClick={e => e.stopPropagation()}>
+          <button className="modal-close-btn" onClick={() => setShowCart(false)}>
+            <i className="fas fa-times"></i>
+          </button>
+          
+          <div className="cart-modal-header">
+            <h2>سلة التسوق</h2>
+            <span className="cart-item-count">{cart.length} منتج</span>
+          </div>
+          
+          {cart.length > 0 ? (
+            <>
+              <div className="cart-items-container">
+                {cart.map(item => (
+                  <div className="cart-item" key={item.id}>
+                    <div className="cart-item-image">
+                      <img src={item.image} alt={item.name} />
+                    </div>
+                    <div className="cart-item-details">
+                      <h4>{item.name}</h4>
+                      <div className="cart-item-price">{item.price} درهم</div>
+                    </div>
+                    <div className="cart-item-quantity">
+                      <button 
+                        onClick={() => updateCartQuantity(item.id, item.quantity - 1)}
+                        disabled={item.quantity <= 1}
+                      >
+                        <i className="fas fa-minus"></i>
+                      </button>
+                      <span>{item.quantity}</span>
+                      <button onClick={() => updateCartQuantity(item.id, item.quantity + 1)}>
+                        <i className="fas fa-plus"></i>
+                      </button>
+                    </div>
+                    <div className="cart-item-subtotal">
+                      {(item.price * item.quantity).toFixed(2)} درهم
+                    </div>
+                    <button 
+                      className="remove-item-btn"
+                      onClick={() => removeFromCart(item.id)}
+                    >
+                      <i className="fas fa-trash-alt"></i>
+                    </button>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="cart-summary">
+                <div className="cart-total">
+                  <span>المجموع:</span>
+                  <span>{cartTotal.toFixed(2)} درهم</span>
+                </div>
+                
+                <div className="cart-actions">
+                  <button 
+                    className="checkout-btn"
+                    onClick={() => {
+                      setShowCart(false);
+                      setShowCheckout(true);
+                    }}
+                  >
+                    إتمام الشراء
+                  </button>
+                  <button 
+                    className="continue-shopping-btn"
+                    onClick={() => setShowCart(false)}
+                  >
+                    مواصلة التسوق
+                  </button>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="empty-cart">
+              <div className="empty-cart-icon">
+                <i className="fas fa-shopping-cart"></i>
+              </div>
+              <h3>سلة التسوق فارغة</h3>
+              <p>لم تقم بإضافة أي منتجات إلى سلة التسوق بعد.</p>
+              <button 
+                className="continue-shopping-btn"
+                onClick={() => setShowCart(false)}
+              >
+                تصفح المنتجات
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
   };
 
   // Render checkout modal
   const renderCheckoutModal = () => {
-    // Checkout modal implementation
-    return null; // Placeholder
+    if (!showCheckout) return null;
+    
+    return (
+      <div className="modal-backdrop" onClick={() => setShowCheckout(false)}>
+        <div className="checkout-modal-container" onClick={e => e.stopPropagation()}>
+          <button className="modal-close-btn" onClick={() => setShowCheckout(false)}>
+            <i className="fas fa-times"></i>
+          </button>
+          
+          <div className="checkout-modal-header">
+            <h2>إتمام الطلب</h2>
+          </div>
+          
+          <div className="checkout-content">
+            <div className="checkout-form-container">
+              <form onSubmit={handleCheckoutSubmit}>
+                <div className="form-group">
+                  <label htmlFor="name">الاسم الكامل</label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={checkoutFormData.name}
+                    onChange={handleCheckoutInputChange}
+                    placeholder="أدخل الاسم الكامل"
+                    className={formErrors.name ? 'error' : ''}
+                  />
+                  {formErrors.name && <div className="error-message">{formErrors.name}</div>}
+                </div>
+                
+                <div className="form-group">
+                  <label htmlFor="email">البريد الإلكتروني</label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={checkoutFormData.email}
+                    onChange={handleCheckoutInputChange}
+                    placeholder="أدخل البريد الإلكتروني"
+                    className={formErrors.email ? 'error' : ''}
+                  />
+                  {formErrors.email && <div className="error-message">{formErrors.email}</div>}
+                </div>
+                
+                <div className="form-group">
+                  <label htmlFor="phone">رقم الهاتف</label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={checkoutFormData.phone}
+                    onChange={handleCheckoutInputChange}
+                    placeholder="أدخل رقم الهاتف"
+                    className={formErrors.phone ? 'error' : ''}
+                  />
+                  {formErrors.phone && <div className="error-message">{formErrors.phone}</div>}
+                </div>
+                
+                <div className="form-group">
+                  <label htmlFor="address">العنوان</label>
+                  <input
+                    type="text"
+                    id="address"
+                    name="address"
+                    value={checkoutFormData.address}
+                    onChange={handleCheckoutInputChange}
+                    placeholder="أدخل العنوان"
+                    className={formErrors.address ? 'error' : ''}
+                  />
+                  {formErrors.address && <div className="error-message">{formErrors.address}</div>}
+                </div>
+                
+                <div className="form-group">
+                  <label htmlFor="city">المدينة</label>
+                  <input
+                    type="text"
+                    id="city"
+                    name="city"
+                    value={checkoutFormData.city}
+                    onChange={handleCheckoutInputChange}
+                    placeholder="أدخل المدينة"
+                    className={formErrors.city ? 'error' : ''}
+                  />
+                  {formErrors.city && <div className="error-message">{formErrors.city}</div>}
+                </div>
+                
+                <div className="form-group">
+                  <label htmlFor="notes">ملاحظات إضافية (اختياري)</label>
+                  <textarea
+                    id="notes"
+                    name="notes"
+                    value={checkoutFormData.notes}
+                    onChange={handleCheckoutInputChange}
+                    placeholder="أي ملاحظات خاصة بالطلب"
+                    rows="3"
+                  ></textarea>
+                </div>
+                
+                <div className="payment-methods">
+                  <h3>طريقة الدفع</h3>
+                  <div className="payment-options">
+                    <div className="payment-option selected">
+                      <input
+                        type="radio"
+                        id="cash_on_delivery"
+                        name="payment_method"
+                        value="cash_on_delivery"
+                        defaultChecked
+                      />
+                      <label htmlFor="cash_on_delivery">
+                        <i className="fas fa-money-bill-wave"></i>
+                        الدفع عند الاستلام
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                
+                <button
+                  type="submit"
+                  className="submit-order-btn"
+                  disabled={isProcessing}
+                >
+                  {isProcessing ? (
+                    <>
+                      <span className="spinner"></span>
+                      جاري معالجة الطلب...
+                    </>
+                  ) : (
+                    'تأكيد الطلب'
+                  )}
+                </button>
+              </form>
+            </div>
+            
+            <div className="order-summary">
+              <h3>ملخص الطلب</h3>
+              <div className="order-items-summary">
+                {cart.map(item => (
+                  <div className="order-item" key={item.id}>
+                    <div className="order-item-details">
+                      <span className="item-name">{item.name}</span>
+                      <span className="item-quantity">x{item.quantity}</span>
+                    </div>
+                    <span className="item-price">
+                      {(item.price * item.quantity).toFixed(2)} درهم
+                    </span>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="order-totals">
+                <div className="subtotal-row">
+                  <span>المجموع الفرعي:</span>
+                  <span>{cartTotal.toFixed(2)} درهم</span>
+                </div>
+                <div className="shipping-row">
+                  <span>تكلفة الشحن:</span>
+                  <span>0.00 درهم</span>
+                </div>
+                <div className="total-row">
+                  <span>المجموع الكلي:</span>
+                  <span>{cartTotal.toFixed(2)} درهم</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   // Render order success modal
   const renderOrderSuccessModal = () => {
-    // Order success modal implementation
-    return null; // Placeholder
+    if (!orderSuccess) return null;
+    
+    return (
+      <div className="modal-backdrop">
+        <div className="success-modal-container">
+          <div className="success-icon">
+            <i className="fas fa-check-circle"></i>
+          </div>
+          
+          <h2>تم تأكيد طلبك بنجاح!</h2>
+          
+          <div className="order-details">
+            <div className="order-info-row">
+              <span>رقم الطلب:</span>
+              <span>{orderData?.orderNumber || 'N/A'}</span>
+            </div>
+            <div className="order-info-row">
+              <span>تاريخ الطلب:</span>
+              <span>{orderData?.orderDate || new Date().toLocaleDateString('ar-SA')}</span>
+            </div>
+            <div className="order-info-row">
+              <span>حالة الطلب:</span>
+              <span className="status-badge">
+                {orderData?.status || 'قيد المعالجة'}
+              </span>
+            </div>
+            <div className="order-info-row">
+              <span>المبلغ الإجمالي:</span>
+              <span>{orderData?.total?.toFixed(2) || cartTotal.toFixed(2)} درهم</span>
+            </div>
+          </div>
+          
+          <p className="success-message">
+            {orderData?.message || 'سيتم التواصل معك قريبًا لتأكيد تفاصيل الطلب والشحن.'}
+          </p>
+          
+          <div className="success-actions">
+            <button 
+              className="continue-shopping-btn"
+              onClick={() => {
+                setOrderSuccess(false);
+                setOrderData(null);
+                navigate('/products');
+              }}
+            >
+              العودة للتسوق
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   // Check for product ID in URL
@@ -702,6 +1020,24 @@ const ProductsPage = () => {
     
     setFilteredProducts(results);
   }, [selectedCategory, searchTerm, products]);
+
+  // Add this useEffect to load cart from localStorage
+  useEffect(() => {
+    // Load cart from localStorage
+    const savedCart = localStorage.getItem('buildingz_cart');
+    if (savedCart) {
+      try {
+        const parsedCart = JSON.parse(savedCart);
+        if (Array.isArray(parsedCart)) {
+          setCart(parsedCart);
+          logDebug('Cart loaded from localStorage', parsedCart);
+        }
+      } catch (error) {
+        console.error('Error parsing cart from localStorage:', error);
+        localStorage.removeItem('buildingz_cart');
+      }
+    }
+  }, []);
 
   // Render products page content
   return (
