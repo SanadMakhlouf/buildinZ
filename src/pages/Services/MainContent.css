@@ -7,6 +7,10 @@
   background-color: #f8f9fa;
   direction: rtl;
   overflow: hidden;
+  padding: 16px;
+  min-height: calc(100vh - 64px);
+  background-color: #f5f5f5;
+  margin-top: 64px;
 }
 
 .welcome-message,
@@ -312,7 +316,7 @@ select.input-field {
   text-align: center;
   padding: 20px;
   background: #fff;
-  margin: auto;
+
   margin-top: 120px;
 }
 
@@ -1378,4 +1382,361 @@ input:checked + .slider:before {
 
 .cancel-button:hover {
   background-color: #e8e8e8;
+}
+
+/* Products Grid */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  padding: 16px;
+}
+
+.product-card {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  max-height: 320px;
+}
+
+.product-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.product-image {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+
+.product-info {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.product-info h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #333;
+  line-height: 1.2;
+}
+
+.product-description {
+  color: #666;
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.product-price {
+  font-size: 1.1rem;
+  color: #0066cc;
+  font-weight: bold;
+  margin: 0;
+}
+
+.calculate-button {
+  width: 100%;
+  padding: 8px;
+  background-color: #0066cc;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: background-color 0.2s;
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+
+.calculate-button:hover {
+  background-color: #0052a3;
+}
+
+/* Calculator Modal */
+.calculator-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.calculator-modal {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.calculator-header {
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+}
+
+.calculator-content {
+  padding: 20px;
+}
+
+.product-summary {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.product-thumbnail {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.product-details h3 {
+  margin: 0 0 10px;
+}
+
+.product-base-price {
+  color: #0066cc;
+  font-weight: bold;
+}
+
+.calculator-inputs {
+  display: grid;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #333;
+}
+
+.unit-badge {
+  background-color: #e0e0e0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.input-field {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.calculation-results {
+  background-color: #f8f8f8;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.calculating-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid #eee;
+  border-top-color: #0066cc;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.total-cost {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.total-cost h3 {
+  margin: 0 0 10px;
+  color: #333;
+}
+
+.total-cost p {
+  font-size: 1.5rem;
+  color: #0066cc;
+  font-weight: bold;
+}
+
+.cost-breakdown {
+  display: grid;
+  gap: 10px;
+}
+
+.cost-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  background-color: white;
+  border-radius: 6px;
+}
+
+.derived-value {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  border-top: 1px solid #eee;
+}
+
+.booking-button {
+  width: 100%;
+  padding: 12px;
+  background-color: #00cc66;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+  transition: background-color 0.2s;
+}
+
+.booking-button:hover {
+  background-color: #00a352;
+}
+
+/* Booking Modal */
+.booking-modal {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.booking-modal-header {
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.booking-form {
+  padding: 20px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.submit-button {
+  flex: 1;
+  padding: 12px;
+  background-color: #00cc66;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.cancel-button {
+  flex: 1;
+  padding: 12px;
+  background-color: #ff4444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.success-message {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.success-message h3 {
+  color: #00cc66;
+  margin-bottom: 10px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .calculator-modal,
+  .booking-modal {
+    width: 95%;
+    margin: 10px;
+  }
+
+  .product-summary {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
 }
