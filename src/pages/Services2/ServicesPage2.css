@@ -1,0 +1,130 @@
+/* ServicesPage2.css - Main container styles */
+.services2-container {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #f8f8f8;
+  font-family: 'Cairo', 'Tajawal', sans-serif;
+  color: #333;
+  overflow-x: hidden;
+  padding-top: 70px; /* Add padding to account for navbar height */
+}
+
+/* Loading state */
+.services2-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+}
+
+.loader {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #0A3259;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  animation: rotation 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Common styles */
+.page-title {
+  font-size: 2.2rem;
+  color: #0A3259;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+  text-align: right;
+}
+
+.page-subtitle {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+  text-align: right;
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 20px;
+}
+
+.back-button:hover {
+  background: #f5f5f5;
+  transform: translateX(-5px);
+}
+
+.back-button svg {
+  font-size: 1.2rem;
+  transform: scaleX(-1); /* Flip for RTL */
+}
+
+/* Animations for page transitions */
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.page-transition-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 300ms, transform 300ms;
+}
+
+/* Responsive styles */
+@media (max-width: 1200px) {
+  .page-title {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 1.8rem;
+  }
+  
+  .page-subtitle {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-title {
+    font-size: 1.5rem;
+  }
+  
+  .services2-container {
+    padding: 0;
+  }
+} 

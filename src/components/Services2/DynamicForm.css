@@ -1,0 +1,559 @@
+.dynamic-form-page {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.dynamic-form-header {
+  margin-bottom: 2rem;
+}
+
+.form-container {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* Progress Bar */
+.form-progress {
+  margin-bottom: 2rem;
+}
+
+.progress-bar {
+  height: 8px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: #0A3259;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.progress-steps {
+  display: flex;
+  justify-content: space-between;
+}
+
+.progress-step {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  color: #666;
+  transition: all 0.3s ease;
+}
+
+.progress-step.active {
+  background-color: #0A3259;
+  color: white;
+  box-shadow: 0 0 0 3px rgba(10, 50, 89, 0.2);
+}
+
+.progress-step.completed {
+  background-color: #27ae60;
+  color: white;
+}
+
+/* Form Content */
+.form-content {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.form-step-container {
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+}
+
+.form-step {
+  width: 100%;
+}
+
+/* Image Select Field */
+.image-select-field label {
+  display: block;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  text-align: right;
+}
+
+.image-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.image-option {
+  border: 2px solid #f0f0f0;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.image-option:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+}
+
+.image-option.selected {
+  border-color: #0A3259;
+  box-shadow: 0 5px 15px rgba(10, 50, 89, 0.15);
+}
+
+.image-container {
+  height: 120px;
+  overflow: hidden;
+}
+
+.image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.image-option:hover .image-container img {
+  transform: scale(1.05);
+}
+
+.option-label {
+  padding: 0.8rem;
+  text-align: center;
+}
+
+.option-label span {
+  display: block;
+  font-size: 0.9rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.option-price {
+  margin-top: 0.3rem;
+  font-size: 0.8rem !important;
+  color: #666 !important;
+  font-weight: normal !important;
+}
+
+/* Number Field */
+.number-field label {
+  display: block;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  text-align: right;
+}
+
+.number-input-container {
+  position: relative;
+}
+
+.number-field input {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.1rem;
+  border: 2px solid #f0f0f0;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  text-align: right;
+}
+
+.number-field input:focus {
+  outline: none;
+  border-color: #0A3259;
+  box-shadow: 0 0 0 3px rgba(10, 50, 89, 0.1);
+}
+
+.input-unit {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Toggle Field */
+.toggle-field label {
+  display: block;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  text-align: right;
+}
+
+.toggle-options {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.toggle-option {
+  flex: 1;
+  padding: 1rem;
+  text-align: center;
+  background: #f8f8f8;
+  border: 2px solid #f0f0f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toggle-option:hover {
+  background: #f0f0f0;
+}
+
+.toggle-option.selected {
+  background: #0A3259;
+  color: white;
+  border-color: #0A3259;
+}
+
+/* Select Field */
+.select-field label {
+  display: block;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  text-align: right;
+}
+
+.select-field select {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1rem;
+  border: 2px solid #f0f0f0;
+  border-radius: 8px;
+  background-color: white;
+  transition: all 0.2s ease;
+  text-align: right;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 1rem center;
+  background-size: 1rem;
+}
+
+.select-field select:focus {
+  outline: none;
+  border-color: #0A3259;
+  box-shadow: 0 0 0 3px rgba(10, 50, 89, 0.1);
+}
+
+/* Color Field */
+.color-field label {
+  display: block;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  text-align: right;
+}
+
+.color-picker-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.color-field input[type="color"] {
+  width: 80px;
+  height: 50px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.color-value {
+  font-size: 1rem;
+  color: #666;
+}
+
+/* Price Summary */
+.price-summary {
+  position: sticky;
+  top: 2rem;
+}
+
+.price-card {
+  background: #f8f9fa;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.price-header {
+  background: #0A3259;
+  padding: 1rem;
+  color: white;
+  text-align: center;
+}
+
+.price-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.price-details {
+  padding: 1.5rem;
+}
+
+.service-name-summary,
+.form-data-summary {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.8rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid #eee;
+  font-size: 0.95rem;
+}
+
+.service-name-summary span:first-child,
+.form-data-summary span:first-child {
+  color: #666;
+  font-weight: 500;
+}
+
+.service-name-summary span:last-child,
+.form-data-summary span:last-child {
+  color: #333;
+  font-weight: 600;
+  max-width: 150px;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.total-price {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 2px solid #ddd;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.total-price span:last-child {
+  color: #0A3259;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.prev-button,
+.next-button,
+.submit-button,
+.back-to-services {
+  padding: 0.8rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.prev-button {
+  background-color: #f0f0f0;
+  color: #666;
+}
+
+.prev-button:hover {
+  background-color: #e0e0e0;
+}
+
+.next-button {
+  background-color: #0A3259;
+  color: white;
+}
+
+.next-button:hover {
+  background-color: #0d4b8c;
+}
+
+.submit-button {
+  background-color: #27ae60;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.submit-button:hover {
+  background-color: #219653;
+}
+
+.submit-button:disabled,
+.next-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Success Message */
+.success-message {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.success-icon {
+  color: #27ae60;
+  margin-bottom: 1.5rem;
+}
+
+.success-message h2 {
+  font-size: 1.8rem;
+  color: #333;
+  margin: 0 0 1rem;
+}
+
+.success-message p {
+  font-size: 1.1rem;
+  color: #666;
+  margin: 0 0 2rem;
+}
+
+.back-to-services {
+  background-color: #0A3259;
+  color: white;
+  margin: 0 auto;
+  display: inline-block;
+}
+
+.back-to-services:hover {
+  background-color: #0d4b8c;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+  .form-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .price-summary {
+    position: static;
+    margin-top: 2rem;
+  }
+  
+  .service-name-summary span:last-child,
+  .form-data-summary span:last-child {
+    max-width: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dynamic-form-page {
+    padding: 1.5rem 1rem;
+  }
+  
+  .form-container {
+    padding: 1.5rem;
+  }
+  
+  .image-options {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+  
+  .image-container {
+    height: 100px;
+  }
+  
+  .option-label {
+    padding: 0.6rem;
+  }
+  
+  .option-label span {
+    font-size: 0.85rem;
+  }
+  
+  .number-field input,
+  .select-field select {
+    padding: 0.8rem;
+    font-size: 1rem;
+  }
+  
+  .toggle-option {
+    padding: 0.8rem;
+    font-size: 0.9rem;
+  }
+  
+  .prev-button,
+  .next-button,
+  .submit-button {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-container {
+    padding: 1.2rem;
+  }
+  
+  .progress-step {
+    width: 25px;
+    height: 25px;
+    font-size: 0.8rem;
+  }
+  
+  .image-options {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .toggle-options {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+  
+  .prev-button,
+  .next-button,
+  .submit-button {
+    width: 100%;
+  }
+} 

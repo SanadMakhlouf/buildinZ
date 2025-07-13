@@ -1,0 +1,449 @@
+/* Search Modal Styles */
+:root {
+  --primary: #0A3259;
+  --primary-light: #1a4275;
+  --primary-dark: #072142;
+  --secondary: #DAA520;
+  --secondary-light: #e6b937;
+  --secondary-dark: #c79618;
+  --text-dark: #1e293b;
+  --text-light: #f8fafc;
+  --white: #ffffff;
+  --light-bg: #f8fafc;
+  --dark-bg: #0A3259;
+  --border-color: rgba(0, 0, 0, 0.1);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+  --transition: all 0.3s ease;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+}
+
+.search-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  z-index: 2000;
+  backdrop-filter: blur(4px);
+}
+
+.search-modal {
+  background-color: var(--white);
+  width: 100%;
+  max-width: 600px;
+  max-height: 80vh;
+  margin-top: 80px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  direction: rtl;
+  font-family: 'Cairo', 'Roboto', sans-serif;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Search Modal Header */
+.search-modal-header {
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.search-modal-back {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  color: var(--text-dark);
+  transition: var(--transition);
+}
+
+.search-modal-back:hover {
+  background-color: #f1f5f9;
+}
+
+.search-modal-form {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background-color: #f1f5f9;
+  border-radius: var(--radius-full);
+  padding: 0 0.75rem;
+  position: relative;
+}
+
+.search-modal-icon {
+  color: var(--primary);
+  margin-left: 0.5rem;
+}
+
+.search-modal-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0.75rem 0;
+  font-size: 1rem;
+  outline: none;
+  color: var(--text-dark);
+}
+
+.search-modal-clear {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  transition: var(--transition);
+}
+
+.search-modal-clear:hover {
+  color: var(--text-dark);
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.search-modal-submit {
+  background-color: var(--primary);
+  color: var(--white);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-full);
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  margin-right: 0.5rem;
+}
+
+.search-modal-submit:hover {
+  background-color: var(--primary-light);
+}
+
+/* Search Tabs */
+.search-modal-tabs {
+  display: flex;
+  padding: 0.75rem 1rem;
+  gap: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.search-tab {
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-full);
+  background: none;
+  border: none;
+  color: var(--text-dark);
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.search-tab:hover {
+  background-color: #f1f5f9;
+}
+
+.search-tab.active {
+  background-color: var(--primary);
+  color: var(--white);
+}
+
+.search-tab svg {
+  font-size: 0.9rem;
+}
+
+/* Search Content */
+.search-modal-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+/* Loading State */
+.search-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0;
+  color: var(--text-dark);
+}
+
+.search-loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f1f5f9;
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Search Results */
+.search-results {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.search-result-item {
+  display: flex;
+  padding: 0.75rem;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: var(--text-dark);
+  transition: var(--transition);
+}
+
+.search-result-item:hover {
+  background-color: #f1f5f9;
+}
+
+.search-result-image {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-left: 1rem;
+}
+
+.search-result-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.search-result-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.search-result-info h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.search-result-category {
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.search-result-price {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.search-result-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rating-value {
+  font-weight: 600;
+}
+
+.rating-stars {
+  color: var(--secondary);
+  font-size: 0.9rem;
+}
+
+.view-all-results {
+  display: block;
+  text-align: center;
+  padding: 0.75rem;
+  margin-top: 0.75rem;
+  background-color: #f1f5f9;
+  border-radius: var(--radius-md);
+  color: var(--primary);
+  font-weight: 500;
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.view-all-results:hover {
+  background-color: #e2e8f0;
+}
+
+/* No Results */
+.no-results {
+  text-align: center;
+  padding: 2rem 0;
+  color: var(--text-dark);
+}
+
+.no-results p {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.no-results span {
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+/* Empty Search */
+.empty-search {
+  text-align: center;
+  padding: 3rem 0;
+  color: #64748b;
+}
+
+/* Recent Searches */
+.recent-searches {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.recent-searches-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.recent-searches-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-dark);
+}
+
+.clear-all-searches {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.clear-all-searches:hover {
+  color: var(--primary);
+}
+
+.recent-searches-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.recent-search-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.recent-search-item:last-child {
+  border-bottom: none;
+}
+
+.recent-search-text {
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text-dark);
+  font-size: 0.95rem;
+  cursor: pointer;
+  padding: 0;
+  text-align: right;
+  flex: 1;
+}
+
+.recent-search-text svg {
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+.clear-search {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.clear-search:hover {
+  background-color: #f1f5f9;
+  color: var(--text-dark);
+}
+
+/* Responsive Styles */
+@media (max-width: 640px) {
+  .search-modal {
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    max-height: 100%;
+    margin-top: 0;
+    border-radius: 0;
+  }
+  
+  .search-modal-header {
+    padding: 0.75rem;
+  }
+  
+  .search-modal-tabs {
+    padding: 0.5rem 0.75rem;
+    gap: 0.5rem;
+  }
+  
+  .search-tab {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+  }
+} 

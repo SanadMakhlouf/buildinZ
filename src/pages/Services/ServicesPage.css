@@ -2,19 +2,34 @@
   min-height: calc(100vh - 60px); /* Adjust based on navbar height */
   display: flex;
   flex-direction: column;
-  overflow: auto; /* Allow scrolling */
+  background-color: #f6f7fb;
+  padding-top: 60px;
 }
 
 .services-container {
   display: flex;
   flex: 1;
-  height: auto; /* Remove fixed height */
-  overflow: visible; /* Allow content to be visible */
+  height: auto;
+  overflow: visible;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.05);
 }
 
 @media (max-width: 768px) {
   .services-container {
     flex-direction: column;
     height: auto;
+  }
+  
+  .services-page {
+    padding-top: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .services-page {
+    background-color: #f2f4f8;
   }
 } 
