@@ -1780,6 +1780,549 @@ export const categoriesData = [
         ]
       }
     ]
+  },
+  {
+    id: 6,
+    name: "الحدائق والمساحات الخارجية",
+    slug: "landscaping",
+    image: "https://images.unsplash.com/photo-1558904541-efa843a96f01?q=80&w=1200&auto=format&fit=crop",
+    description: "تصميم وتنسيق الحدائق والمساحات الخارجية",
+    subcategories: [
+      {
+        id: 601,
+        name: "تنسيق الحدائق",
+        slug: "garden-landscaping",
+        image: "https://images.unsplash.com/photo-1558904541-efa843a96f01?q=80&w=800&auto=format&fit=crop",
+        description: "تنسيق وتصميم الحدائق المنزلية والتجارية",
+        services: [
+          {
+            id: 6001,
+            name: "زراعة العشب",
+            slug: "lawn-installation",
+            image: "https://images.unsplash.com/photo-1558904541-efa843a96f01?q=80&w=600&auto=format&fit=crop",
+            description: "زراعة العشب الطبيعي والصناعي",
+            unit: "متر مربع",
+            basePrice: 35,
+            formSchema: {
+              title: "طلب زراعة عشب",
+              steps: [
+                {
+                  type: "image-select",
+                  label: "نوع العشب",
+                  field: "lawnType",
+                  options: [
+                    { label: "عشب طبيعي", image: "https://images.unsplash.com/photo-1558904541-efa843a96f01?q=80&w=400&auto=format&fit=crop", pricePerM2: 35 },
+                    { label: "عشب صناعي", image: "https://images.unsplash.com/photo-1553775282-20af80779df7?q=80&w=400&auto=format&fit=crop", pricePerM2: 85 },
+                    { label: "عشب هجين", image: "https://images.unsplash.com/photo-1562240020-ce31ccb0fa7d?q=80&w=400&auto=format&fit=crop", pricePerM2: 120 }
+                  ]
+                },
+                {
+                  type: "number",
+                  label: "المساحة (م²)",
+                  field: "area",
+                  min: 10,
+                  placeholder: "أدخل المساحة"
+                },
+                {
+                  type: "toggle",
+                  label: "هل تحتاج نظام ري؟",
+                  field: "irrigation",
+                  yesLabel: "نعم",
+                  noLabel: "لا",
+                  affectPrice: 25
+                }
+              ]
+            }
+          },
+          {
+            id: 6002,
+            name: "زراعة الأشجار",
+            slug: "tree-planting",
+            image: "https://images.unsplash.com/photo-1589923188900-85dae523342b?q=80&w=600&auto=format&fit=crop",
+            description: "زراعة الأشجار المثمرة والزينة",
+            unit: "شجرة",
+            basePrice: 120,
+            formSchema: {
+              title: "طلب زراعة أشجار",
+              steps: [
+                {
+                  type: "select",
+                  label: "نوع الأشجار",
+                  field: "treeType",
+                  options: [
+                    { label: "أشجار زينة", value: "ornamental", pricePerTree: 120 },
+                    { label: "أشجار مثمرة", value: "fruit", pricePerTree: 180 },
+                    { label: "أشجار ظل", value: "shade", pricePerTree: 250 }
+                  ]
+                },
+                {
+                  type: "number",
+                  label: "عدد الأشجار",
+                  field: "treeCount",
+                  min: 1,
+                  placeholder: "أدخل عدد الأشجار"
+                },
+                {
+                  type: "toggle",
+                  label: "هل تحتاج صيانة دورية؟",
+                  field: "maintenance",
+                  yesLabel: "نعم",
+                  noLabel: "لا",
+                  affectPrice: 50
+                }
+              ]
+            }
+          },
+          {
+            id: 6003,
+            name: "تركيب نوافير",
+            slug: "fountains",
+            image: "https://images.unsplash.com/photo-1534857574188-2a22e72b1a8e?q=80&w=600&auto=format&fit=crop",
+            description: "تركيب وصيانة النوافير والشلالات",
+            unit: "نافورة",
+            basePrice: 1500,
+            formSchema: {
+              title: "طلب تركيب نافورة",
+              steps: [
+                {
+                  type: "image-select",
+                  label: "نوع النافورة",
+                  field: "fountainType",
+                  options: [
+                    { label: "نافورة صغيرة", image: "https://images.unsplash.com/photo-1534857574188-2a22e72b1a8e?q=80&w=400&auto=format&fit=crop", price: 1500 },
+                    { label: "نافورة متوسطة", image: "https://images.unsplash.com/photo-1562240020-ce31ccb0fa7d?q=80&w=400&auto=format&fit=crop", price: 3500 },
+                    { label: "شلال مائي", image: "https://images.unsplash.com/photo-1553775282-20af80779df7?q=80&w=400&auto=format&fit=crop", price: 5000 }
+                  ]
+                },
+                {
+                  type: "toggle",
+                  label: "هل تحتاج إضاءة LED؟",
+                  field: "ledLighting",
+                  yesLabel: "نعم",
+                  noLabel: "لا",
+                  affectPrice: 800
+                },
+                {
+                  type: "toggle",
+                  label: "هل تحتاج تحكم عن بعد؟",
+                  field: "remoteControl",
+                  yesLabel: "نعم",
+                  noLabel: "لا",
+                  affectPrice: 500
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        id: 602,
+        name: "أثاث خارجي",
+        slug: "outdoor-furniture",
+        image: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?q=80&w=800&auto=format&fit=crop",
+        description: "أثاث وإكسسوارات للحدائق والمساحات الخارجية",
+        services: [
+          {
+            id: 6004,
+            name: "جلسات خارجية",
+            slug: "outdoor-seating",
+            image: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?q=80&w=600&auto=format&fit=crop",
+            description: "جلسات خارجية بتصاميم متنوعة",
+            unit: "طقم",
+            basePrice: 3500,
+            formSchema: {
+              title: "طلب جلسات خارجية",
+              steps: [
+                {
+                  type: "image-select",
+                  label: "نوع الجلسة",
+                  field: "seatingType",
+                  options: [
+                    { label: "جلسة راتان", image: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?q=80&w=400&auto=format&fit=crop", price: 3500 },
+                    { label: "جلسة خشبية", image: "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?q=80&w=400&auto=format&fit=crop", price: 4500 },
+                    { label: "جلسة ألمنيوم", image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=400&auto=format&fit=crop", price: 5800 }
+                  ]
+                },
+                {
+                  type: "select",
+                  label: "عدد المقاعد",
+                  field: "seatsCount",
+                  options: [
+                    { label: "4 مقاعد", value: "4", priceMultiplier: 1 },
+                    { label: "6 مقاعد", value: "6", priceMultiplier: 1.4 },
+                    { label: "8 مقاعد", value: "8", priceMultiplier: 1.8 }
+                  ]
+                },
+                {
+                  type: "toggle",
+                  label: "هل تحتاج مظلة؟",
+                  field: "umbrella",
+                  yesLabel: "نعم",
+                  noLabel: "لا",
+                  affectPrice: 800
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: 7,
+    name: "أنظمة الطاقة المتجددة",
+    slug: "renewable-energy",
+    image: "https://images.unsplash.com/photo-1509391366360-2e959784a276?q=80&w=1200&auto=format&fit=crop",
+    description: "أنظمة الطاقة الشمسية والمتجددة للمباني",
+    subcategories: [
+      {
+        id: 701,
+        name: "الطاقة الشمسية",
+        slug: "solar-energy",
+        image: "https://images.unsplash.com/photo-1509391366360-2e959784a276?q=80&w=800&auto=format&fit=crop",
+        description: "أنظمة الطاقة الشمسية للمنازل والمنشآت",
+        services: [
+          {
+            id: 7001,
+            name: "ألواح شمسية",
+            slug: "solar-panels",
+            image: "https://images.unsplash.com/photo-1509391366360-2e959784a276?q=80&w=600&auto=format&fit=crop",
+            description: "تركيب ألواح الطاقة الشمسية",
+            unit: "كيلوواط",
+            basePrice: 1800,
+            formSchema: {
+              title: "طلب ألواح شمسية",
+              steps: [
+                {
+                  type: "number",
+                  label: "القدرة المطلوبة (كيلوواط)",
+                  field: "capacity",
+                  min: 1,
+                  placeholder: "أدخل القدرة المطلوبة"
+                },
+                {
+                  type: "select",
+                  label: "نوع النظام",
+                  field: "systemType",
+                  options: [
+                    { label: "متصل بالشبكة", value: "grid-tied", pricePerKW: 1800 },
+                    { label: "مستقل مع بطاريات", value: "off-grid", pricePerKW: 2500 },
+                    { label: "هجين", value: "hybrid", pricePerKW: 2200 }
+                  ]
+                },
+                {
+                  type: "select",
+                  label: "جودة الألواح",
+                  field: "panelQuality",
+                  options: [
+                    { label: "اقتصادية", value: "economy", priceMultiplier: 0.8 },
+                    { label: "قياسية", value: "standard", priceMultiplier: 1 },
+                    { label: "ممتازة", value: "premium", priceMultiplier: 1.3 }
+                  ]
+                },
+                {
+                  type: "toggle",
+                  label: "هل تحتاج نظام تتبع؟",
+                  field: "trackingSystem",
+                  yesLabel: "نعم",
+                  noLabel: "لا",
+                  affectPrice: 5000
+                }
+              ]
+            }
+          },
+          {
+            id: 7002,
+            name: "سخانات شمسية",
+            slug: "solar-heaters",
+            image: "https://images.unsplash.com/photo-1521618755572-156ae0cdd74d?q=80&w=600&auto=format&fit=crop",
+            description: "سخانات مياه تعمل بالطاقة الشمسية",
+            unit: "سخان",
+            basePrice: 2500,
+            formSchema: {
+              title: "طلب سخان شمسي",
+              steps: [
+                {
+                  type: "select",
+                  label: "سعة السخان",
+                  field: "capacity",
+                  options: [
+                    { label: "150 لتر", value: "150", price: 2500 },
+                    { label: "200 لتر", value: "200", price: 3200 },
+                    { label: "300 لتر", value: "300", price: 4500 }
+                  ]
+                },
+                {
+                  type: "select",
+                  label: "نوع السخان",
+                  field: "heaterType",
+                  options: [
+                    { label: "أنابيب مفرغة", value: "evacuated-tube", priceMultiplier: 1 },
+                    { label: "لوح مسطح", value: "flat-plate", priceMultiplier: 1.2 }
+                  ]
+                },
+                {
+                  type: "toggle",
+                  label: "هل تحتاج سخان كهربائي احتياطي؟",
+                  field: "electricBackup",
+                  yesLabel: "نعم",
+                  noLabel: "لا",
+                  affectPrice: 500
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: 8,
+    name: "المسابح وبرك السباحة",
+    slug: "pools-spas",
+    image: "https://images.unsplash.com/photo-1575429198097-0414ec08e8cd?q=80&w=1200&auto=format&fit=crop",
+    description: "تصميم وإنشاء وصيانة المسابح وبرك السباحة",
+    subcategories: [
+      {
+        id: 801,
+        name: "إنشاء المسابح",
+        slug: "pool-construction",
+        image: "https://images.unsplash.com/photo-1575429198097-0414ec08e8cd?q=80&w=800&auto=format&fit=crop",
+        description: "تصميم وإنشاء المسابح بجميع الأنواع",
+        services: [
+          {
+            id: 8001,
+            name: "مسبح خرساني",
+            slug: "concrete-pool",
+            image: "https://images.unsplash.com/photo-1575429198097-0414ec08e8cd?q=80&w=600&auto=format&fit=crop",
+            description: "إنشاء مسابح خرسانية مخصصة",
+            unit: "متر مربع",
+            basePrice: 2000,
+            formSchema: {
+              title: "طلب إنشاء مسبح خرساني",
+              steps: [
+                {
+                  type: "number",
+                  label: "مساحة المسبح (م²)",
+                  field: "area",
+                  min: 15,
+                  placeholder: "أدخل مساحة المسبح"
+                },
+                {
+                  type: "select",
+                  label: "عمق المسبح",
+                  field: "depth",
+                  options: [
+                    { label: "1.2 متر", value: "1.2", priceMultiplier: 1 },
+                    { label: "1.5 متر", value: "1.5", priceMultiplier: 1.2 },
+                    { label: "1.8 متر", value: "1.8", priceMultiplier: 1.4 },
+                    { label: "متدرج العمق", value: "variable", priceMultiplier: 1.5 }
+                  ]
+                },
+                {
+                  type: "image-select",
+                  label: "نوع التشطيب",
+                  field: "finish",
+                  options: [
+                    { label: "سيراميك", image: "https://images.unsplash.com/photo-1562240020-ce31ccb0fa7d?q=80&w=400&auto=format&fit=crop", pricePerM2: 350 },
+                    { label: "موزاييك", image: "https://images.unsplash.com/photo-1575429198097-0414ec08e8cd?q=80&w=400&auto=format&fit=crop", pricePerM2: 550 },
+                    { label: "فسيفساء زجاجية", image: "https://images.unsplash.com/photo-1519293978507-9c6bb9f82eda?q=80&w=400&auto=format&fit=crop", pricePerM2: 750 }
+                  ]
+                },
+                {
+                  type: "toggle",
+                  label: "هل تحتاج نظام تسخين؟",
+                  field: "heatingSystem",
+                  yesLabel: "نعم",
+                  noLabel: "لا",
+                  affectPrice: 15000
+                },
+                {
+                  type: "toggle",
+                  label: "هل تحتاج إضاءة LED تحت الماء؟",
+                  field: "underwaterLighting",
+                  yesLabel: "نعم",
+                  noLabel: "لا",
+                  affectPrice: 5000
+                }
+              ]
+            }
+          },
+          {
+            id: 8002,
+            name: "مسبح فايبرجلاس",
+            slug: "fiberglass-pool",
+            image: "https://images.unsplash.com/photo-1562240020-ce31ccb0fa7d?q=80&w=600&auto=format&fit=crop",
+            description: "تركيب مسابح فايبرجلاس جاهزة",
+            unit: "مسبح",
+            basePrice: 35000,
+            formSchema: {
+              title: "طلب مسبح فايبرجلاس",
+              steps: [
+                {
+                  type: "select",
+                  label: "حجم المسبح",
+                  field: "poolSize",
+                  options: [
+                    { label: "صغير (4×2 متر)", value: "small", price: 35000 },
+                    { label: "متوسط (6×3 متر)", value: "medium", price: 48000 },
+                    { label: "كبير (8×4 متر)", value: "large", price: 65000 }
+                  ]
+                },
+                {
+                  type: "select",
+                  label: "لون المسبح",
+                  field: "poolColor",
+                  options: [
+                    { label: "أزرق فاتح", value: "light-blue", priceAdd: 0 },
+                    { label: "أزرق غامق", value: "dark-blue", priceAdd: 0 },
+                    { label: "أبيض", value: "white", priceAdd: 2000 },
+                    { label: "رمادي", value: "gray", priceAdd: 2000 }
+                  ]
+                },
+                {
+                  type: "toggle",
+                  label: "هل تحتاج سلم داخلي؟",
+                  field: "internalStairs",
+                  yesLabel: "نعم",
+                  noLabel: "لا",
+                  affectPrice: 3000
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        id: 802,
+        name: "صيانة المسابح",
+        slug: "pool-maintenance",
+        image: "https://images.unsplash.com/photo-1562240020-ce31ccb0fa7d?q=80&w=800&auto=format&fit=crop",
+        description: "خدمات صيانة وتنظيف المسابح",
+        services: [
+          {
+            id: 8003,
+            name: "صيانة دورية",
+            slug: "regular-maintenance",
+            image: "https://images.unsplash.com/photo-1562240020-ce31ccb0fa7d?q=80&w=600&auto=format&fit=crop",
+            description: "خدمة صيانة دورية للمسابح",
+            unit: "شهر",
+            basePrice: 800,
+            formSchema: {
+              title: "طلب صيانة دورية للمسبح",
+              steps: [
+                {
+                  type: "number",
+                  label: "مساحة المسبح (م²)",
+                  field: "area",
+                  min: 15,
+                  placeholder: "أدخل مساحة المسبح"
+                },
+                {
+                  type: "select",
+                  label: "عدد الزيارات",
+                  field: "visitsFrequency",
+                  options: [
+                    { label: "مرة أسبوعياً", value: "weekly", pricePerMonth: 800 },
+                    { label: "مرتين أسبوعياً", value: "twice-weekly", pricePerMonth: 1400 },
+                    { label: "يومياً", value: "daily", pricePerMonth: 3500 }
+                  ]
+                },
+                {
+                  type: "number",
+                  label: "مدة العقد (شهور)",
+                  field: "duration",
+                  min: 1,
+                  placeholder: "أدخل مدة العقد"
+                },
+                {
+                  type: "toggle",
+                  label: "هل تشمل المواد الكيميائية؟",
+                  field: "includeChemicals",
+                  yesLabel: "نعم",
+                  noLabel: "لا",
+                  affectPrice: 300
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: 9,
+    name: "الديكورات والإكسسوارات",
+    slug: "decor-accessories",
+    image: "https://images.unsplash.com/photo-1616046229478-9901c5536a45?q=80&w=1200&auto=format&fit=crop",
+    description: "ديكورات وإكسسوارات منزلية متنوعة",
+    subcategories: [
+      {
+        id: 901,
+        name: "الستائر والمفروشات",
+        slug: "curtains-textiles",
+        image: "https://images.unsplash.com/photo-1616046229478-9901c5536a45?q=80&w=800&auto=format&fit=crop",
+        description: "ستائر ومفروشات بتصاميم متنوعة",
+        services: [
+          {
+            id: 9001,
+            name: "ستائر مخصصة",
+            slug: "custom-curtains",
+            image: "https://images.unsplash.com/photo-1616046229478-9901c5536a45?q=80&w=600&auto=format&fit=crop",
+            description: "تفصيل وتركيب ستائر حسب المقاس",
+            unit: "متر مربع",
+            basePrice: 120,
+            formSchema: {
+              title: "طلب ستائر مخصصة",
+              steps: [
+                {
+                  type: "number",
+                  label: "العرض (متر)",
+                  field: "width",
+                  min: 1,
+                  placeholder: "أدخل عرض الستارة"
+                },
+                {
+                  type: "number",
+                  label: "الارتفاع (متر)",
+                  field: "height",
+                  min: 1,
+                  placeholder: "أدخل ارتفاع الستارة"
+                },
+                {
+                  type: "image-select",
+                  label: "نوع القماش",
+                  field: "fabricType",
+                  options: [
+                    { label: "قطن", image: "https://images.unsplash.com/photo-1616046229478-9901c5536a45?q=80&w=400&auto=format&fit=crop", pricePerM2: 120 },
+                    { label: "حرير", image: "https://images.unsplash.com/photo-1617103996702-96ff29b1c467?q=80&w=400&auto=format&fit=crop", pricePerM2: 280 },
+                    { label: "مخمل", image: "https://images.unsplash.com/photo-1615800001964-5afd0ae8e49a?q=80&w=400&auto=format&fit=crop", pricePerM2: 220 }
+                  ]
+                },
+                {
+                  type: "select",
+                  label: "نوع الستارة",
+                  field: "curtainType",
+                  options: [
+                    { label: "ستارة عادية", value: "regular", priceMultiplier: 1 },
+                    { label: "ستارة بليسيه", value: "pleated", priceMultiplier: 1.4 },
+                    { label: "ستارة رومانية", value: "roman", priceMultiplier: 1.6 }
+                  ]
+                },
+                {
+                  type: "toggle",
+                  label: "هل تحتاج تركيب؟",
+                  field: "installation",
+                  yesLabel: "نعم",
+                  noLabel: "لا",
+                  affectPrice: 150
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
   }
 ];
 
