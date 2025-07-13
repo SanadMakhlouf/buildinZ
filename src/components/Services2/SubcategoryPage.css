@@ -1,0 +1,257 @@
+.subcategory-page {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.subcategory-header {
+  margin-bottom: 2rem;
+}
+
+.subcategory-banner {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 3rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.banner-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.banner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.2) 100%);
+}
+
+.banner-content {
+  position: absolute;
+  top: 50%;
+  right: 3rem;
+  transform: translateY(-50%);
+  color: white;
+  z-index: 2;
+  text-align: right;
+}
+
+.banner-content h2 {
+  font-size: 3rem;
+  margin: 0;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.section-title {
+  font-size: 1.8rem;
+  color: #0A3259;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  text-align: right;
+}
+
+.subcategories-section {
+  position: relative;
+  margin-bottom: 3rem;
+}
+
+.subcategories-scroll-container {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  padding: 1rem 0;
+}
+
+.subcategories-scroll-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.subcategories-container {
+  display: flex;
+  gap: 1.5rem;
+  padding: 0.5rem;
+}
+
+.subcategory-card {
+  flex: 0 0 300px;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.subcategory-image-container {
+  height: 180px;
+  overflow: hidden;
+}
+
+.subcategory-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.subcategory-card:hover .subcategory-image {
+  transform: scale(1.05);
+}
+
+.subcategory-content {
+  padding: 1.5rem;
+  text-align: right;
+}
+
+.subcategory-content h3 {
+  font-size: 1.4rem;
+  color: #0A3259;
+  margin: 0 0 0.8rem;
+  font-weight: 600;
+}
+
+.subcategory-content p {
+  font-size: 0.95rem;
+  color: #666;
+  margin: 0 0 1.5rem;
+  line-height: 1.5;
+  height: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.subcategory-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  background-color: #0A3259;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.subcategory-button:hover {
+  background-color: #0d4b8c;
+}
+
+.subcategory-button svg {
+  transform: scaleX(-1); /* Flip for RTL */
+}
+
+.scroll-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  color: #666;
+  font-size: 0.9rem;
+  animation: pulse 2s infinite;
+}
+
+.scroll-icon {
+  animation: slideRight 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+@keyframes slideRight {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(5px); }
+}
+
+.no-subcategories {
+  background: #f5f5f5;
+  padding: 3rem;
+  border-radius: 12px;
+  text-align: center;
+  color: #666;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .subcategory-page {
+    padding: 1.5rem 1rem;
+  }
+  
+  .subcategory-banner {
+    height: 200px;
+    margin-bottom: 2rem;
+  }
+  
+  .banner-content h2 {
+    font-size: 2.2rem;
+  }
+  
+  .section-title {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .subcategory-card {
+    flex: 0 0 250px;
+  }
+  
+  .subcategory-image-container {
+    height: 150px;
+  }
+  
+  .subcategory-content h3 {
+    font-size: 1.2rem;
+  }
+  
+  .subcategory-content p {
+    font-size: 0.9rem;
+    height: 50px;
+  }
+  
+  .subcategory-button {
+    padding: 0.7rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .banner-content h2 {
+    font-size: 1.8rem;
+  }
+  
+  .subcategory-card {
+    flex: 0 0 220px;
+  }
+  
+  .subcategory-image-container {
+    height: 130px;
+  }
+  
+  .subcategory-content {
+    padding: 1.2rem;
+  }
+  
+  .subcategory-content h3 {
+    font-size: 1.1rem;
+  }
+} 

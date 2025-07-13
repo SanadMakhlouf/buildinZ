@@ -426,23 +426,23 @@ const ProductsPage = () => {
         
         <div className="filter-group">
           <h3>Categories</h3>
-          <div className="category-filters">
-            <button 
-              className={selectedCategory === 'all' ? 'active' : ''} 
-              onClick={() => handleCategoryChange('all')}
-            >
+      <div className="category-filters">
+        <button
+          className={selectedCategory === 'all' ? 'active' : ''}
+          onClick={() => handleCategoryChange('all')}
+        >
               All Categories
-            </button>
+        </button>
             {categories.map(category => (
-              <button 
+          <button
                 key={category.id} 
                 className={selectedCategory == category.id ? 'active' : ''} 
                 onClick={() => handleCategoryChange(category.id)}
               >
                 {category.icon} {category.name}
-              </button>
-            ))}
-          </div>
+          </button>
+        ))}
+      </div>
         </div>
         
         <div className="filter-group">
@@ -458,7 +458,7 @@ const ProductsPage = () => {
                   onChange={() => handleBrandChange(brand)}
                 />
                 <label htmlFor={`brand-${brand}`}>{brand === 'all' ? 'All Brands' : brand}</label>
-              </div>
+        </div>
             ))}
           </div>
         </div>
@@ -467,15 +467,15 @@ const ProductsPage = () => {
           <h3>Size</h3>
           <div className="size-filters">
             {sizes.map(size => (
-              <button 
+        <button 
                 key={size} 
                 className={sizeFilter === size ? 'size-btn active' : 'size-btn'} 
                 onClick={() => handleSizeChange(size)}
-              >
+        >
                 {size === 'all' ? 'All' : size}
-              </button>
+        </button>
             ))}
-          </div>
+      </div>
         </div>
         
         <div className="filter-group">
@@ -551,12 +551,12 @@ const ProductsPage = () => {
                 </button>
               </div>
               
-              <h2 className="product-title">{selectedProduct.name}</h2>
-              
-              <div className="product-rating-detailed">
-                <div className="stars-container">
+                <h2 className="product-title">{selectedProduct.name}</h2>
+                
+                <div className="product-rating-detailed">
+                  <div className="stars-container">
                   {renderStarRating(selectedProduct.rating || 0)}
-                </div>
+                  </div>
                 <div className="rating-details">
                   <span>{selectedProduct.reviews || 0} reviews</span>
                 </div>
@@ -594,7 +594,7 @@ const ProductsPage = () => {
                       {formatPrice(selectedProduct.original_price)}
                     </span>
                   )}
-                </div>
+                  </div>
                 
                 <div className="stock-info">
                   {selectedProduct.stock > 0 ? (
@@ -607,7 +607,7 @@ const ProductsPage = () => {
               
               <div className="modal-actions-section">
                 <button 
-                  className="primary-action-btn" 
+                  className="primary-action-btn"
                   onClick={(e) => handleAddToCart(selectedProduct, e)}
                   disabled={selectedProduct.stock <= 0}
                 >
@@ -643,29 +643,29 @@ const ProductsPage = () => {
   return (
     <div className="products-page">
       {/* Header section with search and cart */}
-      <div className="products-header">
+          <div className="products-header">
         <div className="container">
           <h1>Products</h1>
-          <div className="products-actions">
-            <div className="search-container">
-              <input
-                type="text"
+            <div className="products-actions">
+              <div className="search-container">
+                <input
+                  type="text"
                 placeholder="Search products..."
-                value={searchTerm}
+                  value={searchTerm}
                 onChange={handleSearchChange}
-              />
-              <button className="search-btn">
-                <i className="fas fa-search"></i>
-              </button>
-            </div>
+                />
+                <button className="search-btn">
+                  <i className="fas fa-search"></i>
+                </button>
+              </div>
             <button className="cart-btn" onClick={() => setShowCart(true)}>
-              <i className="fas fa-shopping-cart"></i>
+                <i className="fas fa-shopping-cart"></i>
               {cart.length > 0 && <span className="cart-count">{cart.length}</span>}
-            </button>
+              </button>
           </div>
-        </div>
-      </div>
-      
+            </div>
+          </div>
+
       {/* Main content section */}
       <div className="container">
         <div className="products-toolbar">
@@ -685,12 +685,12 @@ const ProductsPage = () => {
               <option value="rating">Best Rating</option>
               <option value="newest">Newest</option>
             </select>
-          </div>
+                </div>
           <div className="products-count">
             Showing {indexOfFirstProduct + 1}-{Math.min(indexOfLastProduct, totalProducts)} of {totalProducts} products
-          </div>
-        </div>
-        
+              </div>
+            </div>
+
         <div className="products-content">
           {/* Sidebar filters */}
           <div className={`products-sidebar ${showFilters ? 'show' : ''}`}>
@@ -698,14 +698,14 @@ const ProductsPage = () => {
           </div>
           
           {/* Products grid */}
-          <div className="products-grid">
+            <div className="products-grid">
             {currentProducts.map(product => (
-              <div 
-                key={product.id} 
+                  <div 
+                    key={product.id}
                 className="product-card" 
-                onClick={() => handleProductClick(product)}
-              >
-                <div className="product-image">
+                    onClick={() => handleProductClick(product)}
+                  >
+                    <div className="product-image">
                   <img src={product.image || 'https://via.placeholder.com/300?text=No+Image'} alt={product.name} />
                   {product.discount_percent > 0 && (
                     <div className="discount-badge">
@@ -718,31 +718,31 @@ const ProductsPage = () => {
                   >
                     <i className={wishlist.includes(product.id) ? 'fas fa-heart' : 'far fa-heart'}></i>
                   </button>
-                </div>
-                <div className="product-info">
+                    </div>
+                    <div className="product-info">
                   <div className="product-brand">{product.brand || 'Generic Brand'}</div>
-                  <h3>{product.name}</h3>
-                  <div className="product-price">
+                      <h3>{product.name}</h3>
+                      <div className="product-price">
                     <span className="current-price">{formatPrice(product.price)}</span>
                     {product.original_price && product.original_price > product.price && (
                       <span className="original-price">{formatPrice(product.original_price)}</span>
-                    )}
-                  </div>
+                        )}
+                      </div>
                   {renderStarRating(product.rating || 0)}
-                  <button 
-                    className="add-to-cart-btn" 
+                      <button
+                        className="add-to-cart-btn"
                     onClick={(e) => handleAddToCart(product, e)}
                     disabled={product.stock <= 0}
                   >
                     <i className="fas fa-shopping-cart"></i> 
                     {product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
-                  </button>
-                </div>
-              </div>
+                      </button>
+                    </div>
+                  </div>
             ))}
+            </div>
           </div>
-        </div>
-        
+          
         {/* Pagination */}
         {totalProducts > productsPerPage && (
           <div className="pagination">
@@ -791,14 +791,14 @@ const ProductsPage = () => {
       </div>
       
       {/* Toast notification */}
-      {toast.show && (
-        <div className={`toast ${toast.type}`}>
-          <span>{toast.message}</span>
+          {toast.show && (
+            <div className={`toast ${toast.type}`}>
+              <span>{toast.message}</span>
           <button onClick={() => setToast({ show: false, message: '', type: '' })}>
-            <i className="fas fa-times"></i>
-          </button>
-        </div>
-      )}
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+          )}
       
       {/* Product modal */}
       {showProductModal && renderProductModal()}

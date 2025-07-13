@@ -4,6 +4,7 @@ import "./App.css";
 import Navbar from "./components/Navbar";
 import HomePage from './pages/Home/HomePage';
 import ServicesPage from './pages/Services/ServicesPage';
+import ServicesPage2 from './pages/Services2/ServicesPage2';
 import ProductsPage from './pages/Products/ProductsPage';
 import SearchPage from './pages/Search/SearchPage';
 import AdminPage from './pages/Admin/AdminPage';
@@ -38,6 +39,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/services" element={<ServicesPage />} />
+          <Route path="/services2/*" element={<ServicesPage2 />} />
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/products/:productId" element={<ProductsPage />} />
           <Route path="/search" element={<SearchPage />} />
