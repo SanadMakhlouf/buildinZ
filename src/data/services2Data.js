@@ -2321,177 +2321,769 @@ export const categoriesData = [
             }
           }
         ]
+      },
+      {
+        id: 902,
+        name: "الإضاءة الديكورية",
+        slug: "decorative-lighting",
+        image: "https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?q=80&w=800&auto=format&fit=crop",
+        description: "إضاءة ديكورية للمنازل والمكاتب",
+        services: [
+          {
+            id: 9002,
+            name: "ثريات حديثة",
+            slug: "modern-chandeliers",
+            image: "https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?q=80&w=600&auto=format&fit=crop",
+            description: "ثريات بتصاميم عصرية وحديثة",
+            unit: "قطعة",
+            basePrice: 1200,
+            formSchema: {
+              title: "طلب ثريات حديثة",
+              steps: [
+                {
+                  type: "image-select",
+                  label: "اختر التصميم",
+                  field: "designType",
+                  options: [
+                    { label: "تصميم دائري", image: "https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?q=80&w=400&auto=format&fit=crop", price: 1200 },
+                    { label: "تصميم خطي", image: "https://images.unsplash.com/photo-1540932239986-30128078f3c5?q=80&w=400&auto=format&fit=crop", price: 1500 },
+                    { label: "تصميم هندسي", image: "https://images.unsplash.com/photo-1565814329452-e1efa11c5b89?q=80&w=400&auto=format&fit=crop", price: 1800 }
+                  ]
+                },
+                {
+                  type: "select",
+                  label: "المادة",
+                  field: "material",
+                  options: [
+                    { label: "كريستال", value: "crystal", priceMultiplier: 1.5 },
+                    { label: "معدن", value: "metal", priceMultiplier: 1 },
+                    { label: "خشب وزجاج", value: "wood-glass", priceMultiplier: 1.2 }
+                  ]
+                },
+                {
+                  type: "toggle",
+                  label: "هل تحتاج تركيب؟",
+                  field: "installation",
+                  yesLabel: "نعم",
+                  noLabel: "لا",
+                  affectPrice: 250
+                }
+              ]
+            }
+          },
+          {
+            id: 9003,
+            name: "مصابيح جدارية",
+            slug: "wall-sconces",
+            image: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?q=80&w=600&auto=format&fit=crop",
+            description: "مصابيح جدارية ديكورية",
+            unit: "قطعة",
+            basePrice: 350,
+            formSchema: {
+              title: "طلب مصابيح جدارية",
+              steps: [
+                {
+                  type: "image-select",
+                  label: "اختر النمط",
+                  field: "styleType",
+                  options: [
+                    { label: "نمط صناعي", image: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?q=80&w=400&auto=format&fit=crop", price: 350 },
+                    { label: "نمط كلاسيكي", image: "https://images.unsplash.com/photo-1540932239986-30128078f3c5?q=80&w=400&auto=format&fit=crop", price: 450 },
+                    { label: "نمط شرقي", image: "https://images.unsplash.com/photo-1565814329452-e1efa11c5b89?q=80&w=400&auto=format&fit=crop", price: 550 }
+                  ]
+                },
+                {
+                  type: "number",
+                  label: "عدد المصابيح",
+                  field: "quantity",
+                  min: 1,
+                  placeholder: "أدخل عدد المصابيح"
+                },
+                {
+                  type: "toggle",
+                  label: "هل تحتاج تركيب؟",
+                  field: "installation",
+                  yesLabel: "نعم",
+                  noLabel: "لا",
+                  affectPrice: 100
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        id: 903,
+        name: "السجاد والموكيت",
+        slug: "carpets-rugs",
+        image: "https://images.unsplash.com/photo-1584285418504-004a6b61c54e?q=80&w=800&auto=format&fit=crop",
+        description: "سجاد وموكيت بتصاميم متنوعة",
+        services: [
+          {
+            id: 9004,
+            name: "سجاد فاخر",
+            slug: "luxury-carpets",
+            image: "https://images.unsplash.com/photo-1584285418504-004a6b61c54e?q=80&w=600&auto=format&fit=crop",
+            description: "سجاد فاخر بتصاميم عصرية وكلاسيكية",
+            unit: "متر مربع",
+            basePrice: 450,
+            formSchema: {
+              title: "طلب سجاد فاخر",
+              steps: [
+                {
+                  type: "image-select",
+                  label: "اختر النمط",
+                  field: "carpetStyle",
+                  options: [
+                    { label: "نمط فارسي", image: "https://images.unsplash.com/photo-1584285418504-004a6b61c54e?q=80&w=400&auto=format&fit=crop", pricePerM2: 450 },
+                    { label: "نمط تركي", image: "https://images.unsplash.com/photo-1594040226829-7f251ab46d80?q=80&w=400&auto=format&fit=crop", pricePerM2: 550 },
+                    { label: "نمط مغربي", image: "https://images.unsplash.com/photo-1600607686527-b5a05b5e7803?q=80&w=400&auto=format&fit=crop", pricePerM2: 650 }
+                  ]
+                },
+                {
+                  type: "number",
+                  label: "المساحة (م²)",
+                  field: "area",
+                  min: 1,
+                  placeholder: "أدخل المساحة"
+                },
+                {
+                  type: "select",
+                  label: "المادة",
+                  field: "material",
+                  options: [
+                    { label: "صوف طبيعي", value: "wool", priceMultiplier: 1.3 },
+                    { label: "حرير", value: "silk", priceMultiplier: 2.5 },
+                    { label: "مواد صناعية", value: "synthetic", priceMultiplier: 0.8 }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: 10,
+    name: "البناء والإنشاءات",
+    slug: "construction",
+    image: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?q=80&w=1200&auto=format&fit=crop",
+    description: "خدمات البناء والإنشاءات للمنازل والمباني",
+    subcategories: [
+      {
+        id: 1001,
+        name: "الهيكل الإنشائي",
+        slug: "structural-work",
+        image: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?q=80&w=800&auto=format&fit=crop",
+        description: "أعمال الهيكل الإنشائي للمباني",
+        services: [
+          {
+            id: 10001,
+            name: "بناء هيكل خرساني",
+            slug: "concrete-structure",
+            image: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?q=80&w=600&auto=format&fit=crop",
+            description: "بناء هيكل خرساني للمباني",
+            unit: "متر مربع",
+            basePrice: 1200,
+            formSchema: {
+              title: "طلب بناء هيكل خرساني",
+              steps: [
+                {
+                  type: "number",
+                  label: "المساحة الإجمالية (م²)",
+                  field: "area",
+                  min: 50,
+                  placeholder: "أدخل المساحة الإجمالية"
+                },
+                {
+                  type: "select",
+                  label: "عدد الطوابق",
+                  field: "floors",
+                  options: [
+                    { label: "طابق واحد", value: 1, priceMultiplier: 1 },
+                    { label: "طابقين", value: 2, priceMultiplier: 1.8 },
+                    { label: "ثلاثة طوابق", value: 3, priceMultiplier: 2.5 }
+                  ]
+                },
+                {
+                  type: "select",
+                  label: "نوع الخرسانة",
+                  field: "concreteType",
+                  options: [
+                    { label: "خرسانة عادية", value: "regular", priceMultiplier: 1 },
+                    { label: "خرسانة مسلحة عالية المقاومة", value: "high-strength", priceMultiplier: 1.3 },
+                    { label: "خرسانة مقاومة للزلازل", value: "earthquake-resistant", priceMultiplier: 1.5 }
+                  ]
+                },
+                {
+                  type: "toggle",
+                  label: "هل تحتاج تصميم هندسي؟",
+                  field: "engineeringDesign",
+                  yesLabel: "نعم",
+                  noLabel: "لا",
+                  affectPrice: 15000
+                }
+              ]
+            }
+          },
+          {
+            id: 10002,
+            name: "بناء بالطوب",
+            slug: "brick-construction",
+            image: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=600&auto=format&fit=crop",
+            description: "بناء جدران وهياكل بالطوب",
+            unit: "متر مربع",
+            basePrice: 350,
+            formSchema: {
+              title: "طلب بناء بالطوب",
+              steps: [
+                {
+                  type: "number",
+                  label: "المساحة (م²)",
+                  field: "area",
+                  min: 10,
+                  placeholder: "أدخل المساحة"
+                },
+                {
+                  type: "select",
+                  label: "نوع الطوب",
+                  field: "brickType",
+                  options: [
+                    { label: "طوب أحمر", value: "red-brick", pricePerM2: 350 },
+                    { label: "طوب حراري", value: "thermal-brick", pricePerM2: 450 },
+                    { label: "طوب خفيف", value: "light-brick", pricePerM2: 400 }
+                  ]
+                },
+                {
+                  type: "select",
+                  label: "سماكة الجدار",
+                  field: "wallThickness",
+                  options: [
+                    { label: "10 سم", value: "10cm", priceMultiplier: 0.8 },
+                    { label: "20 سم", value: "20cm", priceMultiplier: 1 },
+                    { label: "30 سم", value: "30cm", priceMultiplier: 1.4 }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        id: 1002,
+        name: "أعمال الحفر والأساسات",
+        slug: "excavation-foundation",
+        image: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=800&auto=format&fit=crop",
+        description: "خدمات الحفر وبناء الأساسات",
+        services: [
+          {
+            id: 10003,
+            name: "حفر وتسوية",
+            slug: "excavation-leveling",
+            image: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=600&auto=format&fit=crop",
+            description: "أعمال الحفر وتسوية الأرض",
+            unit: "متر مكعب",
+            basePrice: 80,
+            formSchema: {
+              title: "طلب حفر وتسوية",
+              steps: [
+                {
+                  type: "number",
+                  label: "المساحة (م²)",
+                  field: "area",
+                  min: 50,
+                  placeholder: "أدخل المساحة"
+                },
+                {
+                  type: "number",
+                  label: "العمق (متر)",
+                  field: "depth",
+                  min: 0.5,
+                  placeholder: "أدخل العمق"
+                },
+                {
+                  type: "select",
+                  label: "نوع التربة",
+                  field: "soilType",
+                  options: [
+                    { label: "تربة رملية", value: "sandy", priceMultiplier: 1 },
+                    { label: "تربة طينية", value: "clay", priceMultiplier: 1.2 },
+                    { label: "تربة صخرية", value: "rocky", priceMultiplier: 1.8 }
+                  ]
+                },
+                {
+                  type: "toggle",
+                  label: "هل تحتاج نقل مخلفات الحفر؟",
+                  field: "wasteRemoval",
+                  yesLabel: "نعم",
+                  noLabel: "لا",
+                  affectPrice: 20
+                }
+              ]
+            }
+          },
+          {
+            id: 10004,
+            name: "بناء أساسات",
+            slug: "foundation-construction",
+            image: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?q=80&w=600&auto=format&fit=crop",
+            description: "بناء أساسات للمباني",
+            unit: "متر مكعب",
+            basePrice: 1500,
+            formSchema: {
+              title: "طلب بناء أساسات",
+              steps: [
+                {
+                  type: "number",
+                  label: "المساحة (م²)",
+                  field: "area",
+                  min: 50,
+                  placeholder: "أدخل المساحة"
+                },
+                {
+                  type: "select",
+                  label: "نوع الأساس",
+                  field: "foundationType",
+                  options: [
+                    { label: "أساس شريطي", value: "strip", pricePerM3: 1500 },
+                    { label: "أساس منفصل", value: "isolated", pricePerM3: 1800 },
+                    { label: "أساس لبشة", value: "raft", pricePerM3: 2200 }
+                  ]
+                },
+                {
+                  type: "select",
+                  label: "قوة الخرسانة",
+                  field: "concreteStrength",
+                  options: [
+                    { label: "25 ميجا باسكال", value: "25mpa", priceMultiplier: 1 },
+                    { label: "30 ميجا باسكال", value: "30mpa", priceMultiplier: 1.15 },
+                    { label: "35 ميجا باسكال", value: "35mpa", priceMultiplier: 1.3 }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: 11,
+    name: "الخدمات الهندسية",
+    slug: "engineering-services",
+    image: "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?q=80&w=1200&auto=format&fit=crop",
+    description: "خدمات هندسية متنوعة للمشاريع",
+    subcategories: [
+      {
+        id: 1101,
+        name: "التصميم الهندسي",
+        slug: "engineering-design",
+        image: "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?q=80&w=800&auto=format&fit=crop",
+        description: "خدمات التصميم الهندسي للمشاريع",
+        services: [
+          {
+            id: 11001,
+            name: "تصميم معماري",
+            slug: "architectural-design",
+            image: "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?q=80&w=600&auto=format&fit=crop",
+            description: "تصميم معماري للمباني والمنشآت",
+            unit: "متر مربع",
+            basePrice: 120,
+            formSchema: {
+              title: "طلب تصميم معماري",
+              steps: [
+                {
+                  type: "number",
+                  label: "المساحة الإجمالية (م²)",
+                  field: "area",
+                  min: 100,
+                  placeholder: "أدخل المساحة الإجمالية"
+                },
+                {
+                  type: "select",
+                  label: "نوع المبنى",
+                  field: "buildingType",
+                  options: [
+                    { label: "سكني", value: "residential", pricePerM2: 120 },
+                    { label: "تجاري", value: "commercial", pricePerM2: 150 },
+                    { label: "صناعي", value: "industrial", pricePerM2: 100 }
+                  ]
+                },
+                {
+                  type: "select",
+                  label: "مستوى التفاصيل",
+                  field: "detailLevel",
+                  options: [
+                    { label: "مخططات أساسية", value: "basic", priceMultiplier: 1 },
+                    { label: "مخططات تنفيذية", value: "detailed", priceMultiplier: 1.5 },
+                    { label: "مخططات كاملة مع تصور ثلاثي الأبعاد", value: "complete-3d", priceMultiplier: 2.2 }
+                  ]
+                },
+                {
+                  type: "toggle",
+                  label: "هل تحتاج مجسمات ثلاثية الأبعاد؟",
+                  field: "3dModels",
+                  yesLabel: "نعم",
+                  noLabel: "لا",
+                  affectPrice: 5000
+                }
+              ]
+            }
+          },
+          {
+            id: 11002,
+            name: "تصميم إنشائي",
+            slug: "structural-design",
+            image: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?q=80&w=600&auto=format&fit=crop",
+            description: "تصميم إنشائي للمباني",
+            unit: "متر مربع",
+            basePrice: 80,
+            formSchema: {
+              title: "طلب تصميم إنشائي",
+              steps: [
+                {
+                  type: "number",
+                  label: "المساحة الإجمالية (م²)",
+                  field: "area",
+                  min: 100,
+                  placeholder: "أدخل المساحة الإجمالية"
+                },
+                {
+                  type: "select",
+                  label: "عدد الطوابق",
+                  field: "floors",
+                  options: [
+                    { label: "طابق واحد", value: 1, priceMultiplier: 1 },
+                    { label: "طابقين", value: 2, priceMultiplier: 1.7 },
+                    { label: "ثلاثة طوابق", value: 3, priceMultiplier: 2.3 },
+                    { label: "أربعة طوابق أو أكثر", value: 4, priceMultiplier: 3 }
+                  ]
+                },
+                {
+                  type: "select",
+                  label: "نوع المبنى",
+                  field: "buildingType",
+                  options: [
+                    { label: "سكني", value: "residential", priceMultiplier: 1 },
+                    { label: "تجاري", value: "commercial", priceMultiplier: 1.2 },
+                    { label: "صناعي", value: "industrial", priceMultiplier: 1.5 }
+                  ]
+                },
+                {
+                  type: "toggle",
+                  label: "هل تحتاج تصميم مقاوم للزلازل؟",
+                  field: "earthquakeResistant",
+                  yesLabel: "نعم",
+                  noLabel: "لا",
+                  affectPrice: 10000
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        id: 1102,
+        name: "الإشراف الهندسي",
+        slug: "engineering-supervision",
+        image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800&auto=format&fit=crop",
+        description: "خدمات الإشراف الهندسي على المشاريع",
+        services: [
+          {
+            id: 11003,
+            name: "إشراف هندسي كامل",
+            slug: "full-supervision",
+            image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=600&auto=format&fit=crop",
+            description: "إشراف هندسي كامل على المشاريع",
+            unit: "شهر",
+            basePrice: 8000,
+            formSchema: {
+              title: "طلب إشراف هندسي كامل",
+              steps: [
+                {
+                  type: "number",
+                  label: "مدة المشروع (شهور)",
+                  field: "duration",
+                  min: 1,
+                  placeholder: "أدخل مدة المشروع"
+                },
+                {
+                  type: "number",
+                  label: "مساحة المشروع (م²)",
+                  field: "area",
+                  min: 100,
+                  placeholder: "أدخل مساحة المشروع"
+                },
+                {
+                  type: "select",
+                  label: "نوع المشروع",
+                  field: "projectType",
+                  options: [
+                    { label: "سكني", value: "residential", pricePerMonth: 8000 },
+                    { label: "تجاري", value: "commercial", pricePerMonth: 12000 },
+                    { label: "صناعي", value: "industrial", pricePerMonth: 15000 }
+                  ]
+                },
+                {
+                  type: "select",
+                  label: "عدد الزيارات الأسبوعية",
+                  field: "weeklyVisits",
+                  options: [
+                    { label: "زيارة واحدة", value: 1, priceMultiplier: 1 },
+                    { label: "زيارتين", value: 2, priceMultiplier: 1.5 },
+                    { label: "ثلاث زيارات", value: 3, priceMultiplier: 2 },
+                    { label: "إشراف يومي", value: 7, priceMultiplier: 3 }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            id: 11004,
+            name: "استشارات هندسية",
+            slug: "engineering-consultation",
+            image: "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?q=80&w=600&auto=format&fit=crop",
+            description: "استشارات هندسية متخصصة",
+            unit: "ساعة",
+            basePrice: 500,
+            formSchema: {
+              title: "طلب استشارات هندسية",
+              steps: [
+                {
+                  type: "number",
+                  label: "عدد الساعات",
+                  field: "hours",
+                  min: 1,
+                  placeholder: "أدخل عدد الساعات"
+                },
+                {
+                  type: "select",
+                  label: "نوع الاستشارة",
+                  field: "consultationType",
+                  options: [
+                    { label: "استشارة معمارية", value: "architectural", pricePerHour: 500 },
+                    { label: "استشارة إنشائية", value: "structural", pricePerHour: 600 },
+                    { label: "استشارة كهروميكانيكية", value: "mep", pricePerHour: 700 }
+                  ]
+                },
+                {
+                  type: "toggle",
+                  label: "هل تحتاج تقرير مكتوب؟",
+                  field: "writtenReport",
+                  yesLabel: "نعم",
+                  noLabel: "لا",
+                  affectPrice: 1000
+                }
+              ]
+            }
+          }
+        ]
       }
     ]
   }
 ];
 
-// Price calculation helper function
+// Dynamic price calculation helper function
 export const calculatePrice = (service, formData) => {
   if (!service || !formData) return 0;
   
   let totalPrice = 0;
   const schema = service.formSchema;
   
+  // Initialize with base price if no specific pricing is found
+  let basePriceApplied = false;
+  
   // Process each step in the form schema
   schema.steps.forEach(step => {
     const value = formData[step.field];
+    if (value === undefined || value === null) return;
     
     switch(step.type) {
       case 'image-select':
         const selectedOption = step.options.find(opt => opt.label === value);
         if (selectedOption) {
-          if (selectedOption.pricePerM2 && formData.area) {
-            // Area-based pricing
-            totalPrice = selectedOption.pricePerM2 * formData.area;
-          } else if (selectedOption.pricePerRoll && formData.rolls) {
-            // Roll-based pricing (wallpaper)
-            totalPrice = selectedOption.pricePerRoll * formData.rolls;
-          } else if (selectedOption.pricePerUnit && formData.points) {
-            // Unit-based pricing (LED lights)
-            totalPrice = selectedOption.pricePerUnit * formData.points;
-          } else if (selectedOption.pricePerCamera && formData.cameras) {
-            // Camera-based pricing
-            totalPrice = selectedOption.pricePerCamera * formData.cameras;
-          } else if (selectedOption.price) {
-            totalPrice += selectedOption.price;
-          } else if (selectedOption.priceAdd) {
-            totalPrice += selectedOption.priceAdd;
-          }
+          // Handle all possible price properties dynamically
+          Object.keys(selectedOption).forEach(key => {
+            if (key.startsWith('price')) {
+              if (key === 'price') {
+                totalPrice += selectedOption.price;
+                basePriceApplied = true;
+              } else if (key === 'pricePerM2' && formData.area) {
+                totalPrice = selectedOption.pricePerM2 * formData.area;
+                basePriceApplied = true;
+              } else if (key === 'pricePerRoll' && formData.rolls) {
+                totalPrice = selectedOption.pricePerRoll * formData.rolls;
+                basePriceApplied = true;
+              } else if (key === 'pricePerUnit' && formData.points) {
+                totalPrice = selectedOption.pricePerUnit * formData.points;
+                basePriceApplied = true;
+              } else if (key === 'pricePerCamera' && formData.cameras) {
+                totalPrice = selectedOption.pricePerCamera * formData.cameras;
+                basePriceApplied = true;
+              } else if (key === 'pricePerTree' && formData.treeCount) {
+                totalPrice = selectedOption.pricePerTree * formData.treeCount;
+                basePriceApplied = true;
+              } else if (key === 'pricePerM3' && formData.area && formData.depth) {
+                totalPrice = selectedOption.pricePerM3 * formData.area * formData.depth;
+                basePriceApplied = true;
+              } else if (key === 'pricePerHour' && formData.hours) {
+                totalPrice = selectedOption.pricePerHour * formData.hours;
+                basePriceApplied = true;
+              } else if (key === 'pricePerMonth' && formData.duration) {
+                totalPrice = selectedOption.pricePerMonth * formData.duration;
+                basePriceApplied = true;
+              } else if (key === 'priceAdd') {
+                totalPrice += selectedOption.priceAdd;
+              } else if (key === 'priceKW' && formData.capacity) {
+                totalPrice = selectedOption.priceKW * formData.capacity;
+                basePriceApplied = true;
+              }
+            }
+          });
         }
         break;
         
       case 'number':
-        if (step.field === 'area' && !totalPrice) {
-          // If area hasn't been calculated yet, use base price
+        // Handle different number field types
+        if (step.field === 'area' && !basePriceApplied) {
+          // For area-based pricing
           totalPrice = service.basePrice * (value || 1);
-        } else if (step.field === 'points' && service.slug === 'electrical-wiring') {
-          // For electrical points
+          basePriceApplied = true;
+        } else if (step.field === 'quantity' && !basePriceApplied) {
+          // For quantity-based items
           totalPrice = service.basePrice * (value || 1);
-        } else if (step.field === 'breakers') {
-          // For electrical panels
-          totalPrice += value * 50; // 50 per breaker
-        } else if (step.field === 'distance') {
-          // For moving services
-          totalPrice += value * 5; // 5 per km
-        } else if (step.field === 'duration' && formData.maintenanceType) {
-          // For maintenance contracts
-          const maintenanceOption = schema.steps.find(s => s.field === 'maintenanceType')
-            ?.options.find(o => o.value === formData.maintenanceType);
-          if (maintenanceOption) {
-            totalPrice = maintenanceOption.pricePerMonth * value;
+          basePriceApplied = true;
+        } else if (step.field === 'width' && step.field === 'height') {
+          // For width x height calculations (like curtains)
+          const width = formData.width || 1;
+          const height = formData.height || 1;
+          const area = width * height;
+          
+          // Find if there's a fabric type with pricePerM2
+          const fabricStep = schema.steps.find(s => s.field === 'fabricType');
+          if (fabricStep) {
+            const selectedFabric = fabricStep.options.find(opt => opt.label === formData.fabricType);
+            if (selectedFabric && selectedFabric.pricePerM2) {
+              totalPrice = selectedFabric.pricePerM2 * area;
+              basePriceApplied = true;
+            }
           }
-        } else if (step.field === 'duration' && formData.storageType) {
-          // For storage services
-          const storageOption = schema.steps.find(s => s.field === 'storageType')
-            ?.options.find(o => o.value === formData.storageType);
-          if (storageOption && formData.volume) {
-            totalPrice = storageOption.pricePerM3 * formData.volume * value;
+        } else if (step.field === 'hours' && !basePriceApplied) {
+          // For hourly services
+          const consultationStep = schema.steps.find(s => s.field === 'consultationType');
+          if (consultationStep) {
+            const selectedType = consultationStep.options.find(opt => opt.value === formData.consultationType);
+            if (selectedType && selectedType.pricePerHour) {
+              totalPrice = selectedType.pricePerHour * value;
+              basePriceApplied = true;
+            } else {
+              totalPrice = service.basePrice * value;
+              basePriceApplied = true;
+            }
           }
-        } else if (step.field === 'length' && formData.material) {
-          // For kitchen design
-          const materialOption = schema.steps.find(s => s.field === 'material')
-            ?.options.find(o => o.label === formData.material);
-          if (materialOption) {
-            totalPrice = materialOption.pricePerMeter * value;
+        } else if (step.field === 'depth' && formData.area && !basePriceApplied) {
+          // For volume calculations (area * depth)
+          const soilStep = schema.steps.find(s => s.field === 'soilType');
+          if (soilStep) {
+            const selectedSoil = soilStep.options.find(opt => opt.value === formData.soilType);
+            const baseVolumePrice = service.basePrice * formData.area * value;
+            if (selectedSoil && selectedSoil.priceMultiplier) {
+              totalPrice = baseVolumePrice * selectedSoil.priceMultiplier;
+            } else {
+              totalPrice = baseVolumePrice;
+            }
+            basePriceApplied = true;
           }
         }
         break;
         
       case 'toggle':
         if (value === true && step.affectPrice) {
-          if (step.field === 'installation' && formData.area) {
-            totalPrice += step.affectPrice * formData.area;
-          } else if (step.field === 'installation' && formData.rolls) {
-            totalPrice += step.affectPrice * formData.rolls;
-          } else if (step.field === 'remoteControl' && formData.points) {
-            totalPrice += step.affectPrice * formData.points;
-          } else if (step.field === 'motionSensors' && formData.rooms) {
-            totalPrice += step.affectPrice * formData.rooms;
-          } else if (step.field === 'soundInsulation' && formData.area) {
-            totalPrice += step.affectPrice * formData.area;
-          } else if (step.field === 'hiddenLighting' && formData.area) {
-            totalPrice += step.affectPrice * formData.area;
-          } else if (step.field === 'copperPiping' && formData.units) {
-            totalPrice += step.affectPrice * formData.units;
-          } else if (step.field === 'insulation' && formData.points) {
-            totalPrice += step.affectPrice * formData.points;
-          } else if (step.field === 'colorNightVision' && formData.cameras) {
-            totalPrice += step.affectPrice * formData.cameras;
-          } else if (step.field === 'monitoringCenter' && formData.sensors) {
-            totalPrice += step.affectPrice * formData.sensors;
-          } else if (step.field === 'remoteControl' && formData.locks) {
-            totalPrice += step.affectPrice * formData.locks;
-          } else if (step.field === 'lightSensors' && formData.windows) {
-            totalPrice += step.affectPrice * formData.windows;
-          } else if (step.field === 'wallTreatment' && formData.area) {
-            totalPrice += step.affectPrice * formData.area;
-          } else if (step.field === 'automaticIrrigation' && formData.area) {
-            totalPrice += step.affectPrice * formData.area;
-          } else if (step.field === 'gardenLighting' && formData.area) {
-            totalPrice += step.affectPrice * formData.area;
-          } else if (step.field === 'sanitization' && formData.area) {
-            totalPrice += step.affectPrice * formData.area;
-          } else if (step.field === 'externalWindows' && formData.area) {
-            totalPrice += step.affectPrice * formData.area;
-          } else if (step.field === 'warranty10years' && formData.area) {
-            totalPrice += step.affectPrice * formData.area;
-          } else if (step.field === 'protectionLayer' && formData.area) {
-            totalPrice += step.affectPrice * formData.area;
-          } else {
-            totalPrice += step.affectPrice;
-          }
+          // Dynamically determine what to multiply the affectPrice by
+          let multiplier = 1;
+          
+          // Common multiplier fields
+          const multiplierFields = {
+            'area': formData.area,
+            'rolls': formData.rolls,
+            'points': formData.points,
+            'cameras': formData.cameras,
+            'rooms': formData.rooms,
+            'windows': formData.windows,
+            'locks': formData.locks,
+            'sensors': formData.sensors,
+            'units': formData.units,
+            'treeCount': formData.treeCount
+          };
+          
+          // Find the appropriate multiplier based on the toggle field and available form data
+          Object.keys(multiplierFields).forEach(field => {
+            if (multiplierFields[field] && 
+                (step.field === 'installation' || 
+                 step.field.includes(field) || 
+                 service.unit.includes(field.replace('Count', '')))) {
+              multiplier = multiplierFields[field];
+            }
+          });
+          
+          totalPrice += step.affectPrice * multiplier;
         }
         break;
         
       case 'select':
         const selected = step.options.find(opt => opt.value === value || opt.label === value);
         if (selected) {
+          // Handle price multipliers
           if (selected.priceMultiplier) {
             totalPrice = totalPrice * selected.priceMultiplier;
           }
-          if (selected.priceAdd && formData.area) {
-            totalPrice += selected.priceAdd * formData.area;
-          } else if (selected.priceAdd) {
-            totalPrice += selected.priceAdd;
-          }
-          if (selected.price) {
-            if (step.field === 'panelType' || step.field === 'capacity' || 
-                step.field === 'controlType' || step.field === 'recordingSystem' ||
-                step.field === 'systemType' || step.field === 'screenSize' ||
-                step.field === 'treatmentType' || step.field === 'truckSize' ||
-                step.field === 'furnitureType') {
-              totalPrice += selected.price;
+          
+          // Handle different price types
+          Object.keys(selected).forEach(key => {
+            if (key.startsWith('price')) {
+              if (key === 'price' && !basePriceApplied) {
+                totalPrice = selected.price;
+                basePriceApplied = true;
+              } else if (key === 'priceAdd') {
+                if (formData.area) {
+                  totalPrice += selected.priceAdd * formData.area;
+                } else {
+                  totalPrice += selected.priceAdd;
+                }
+              } else if (key === 'pricePerM2' && formData.area) {
+                totalPrice = selected.pricePerM2 * formData.area;
+                basePriceApplied = true;
+              } else if (key === 'pricePerM3' && formData.volume) {
+                let volumeMultiplier = formData.duration || 1;
+                totalPrice = selected.pricePerM3 * formData.volume * volumeMultiplier;
+                basePriceApplied = true;
+              } else if (key === 'pricePerMonth' && formData.duration) {
+                totalPrice = selected.pricePerMonth * formData.duration;
+                basePriceApplied = true;
+              } else if (key === 'pricePerHour' && formData.hours) {
+                totalPrice = selected.pricePerHour * formData.hours;
+                basePriceApplied = true;
+              } else if (key === 'pricePerRoom' && formData.rooms) {
+                totalPrice = selected.pricePerRoom * formData.rooms;
+                basePriceApplied = true;
+              } else if (key === 'pricePerWindow' && formData.windows) {
+                totalPrice = selected.pricePerWindow * formData.windows;
+                basePriceApplied = true;
+              } else if (key === 'pricePerLock' && formData.locks) {
+                totalPrice = selected.pricePerLock * formData.locks;
+                basePriceApplied = true;
+              } else if (key === 'pricePerKW' && formData.capacity) {
+                totalPrice = selected.pricePerKW * formData.capacity;
+                basePriceApplied = true;
+              }
             }
-          }
-          if (selected.pricePerRoom && formData.rooms) {
-            totalPrice = selected.pricePerRoom * formData.rooms;
-          }
-          if (selected.pricePerWindow && formData.windows) {
-            totalPrice = selected.pricePerWindow * formData.windows;
-          }
-          if (selected.pricePerLock && formData.locks) {
-            totalPrice = selected.pricePerLock * formData.locks;
-          }
-          if (selected.pricePerM2 && formData.area) {
-            if (step.field === 'systemType' && service.slug === 'central-ac') {
-              totalPrice = selected.pricePerM2 * formData.area;
-            } else if (step.field === 'buildingType' || step.field === 'surfaceType' || 
-                       step.field === 'insulationType' || step.field === 'insulationLevel' ||
-                       step.field === 'architecturalStyle' || step.field === 'gardenStyle') {
-              totalPrice = selected.pricePerM2 * formData.area;
-            }
-          }
-          if (selected.pricePerMonth && formData.duration) {
-            totalPrice = selected.pricePerMonth * formData.duration;
-          }
-          if (selected.pricePerM3 && formData.volume && formData.duration) {
-            totalPrice = selected.pricePerM3 * formData.volume * formData.duration;
-          }
-          if (selected.pricePerMeter && formData.length) {
-            totalPrice = selected.pricePerMeter * formData.length;
-          }
+          });
         }
+        break;
+        
+      case 'color-picker':
+        // Color picker doesn't affect price directly
         break;
         
       default:
@@ -2500,8 +3092,13 @@ export const calculatePrice = (service, formData) => {
   });
   
   // If no price calculated yet, use base price
-  if (totalPrice === 0) {
-    totalPrice = service.basePrice;
+  if (totalPrice === 0 || !basePriceApplied) {
+    // Apply base price with quantity if available
+    if (formData.quantity) {
+      totalPrice = service.basePrice * formData.quantity;
+    } else {
+      totalPrice = service.basePrice;
+    }
   }
   
   return Math.round(totalPrice);
