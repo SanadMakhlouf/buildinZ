@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import './SearchPage.css';
-import { searchProducts } from '../../services/productService';
+import productService from '../../services/productService';
 import { searchServices } from '../../services/serviceService';
+
+// Define a base64 encoded placeholder image to avoid external requests
+const PLACEHOLDER_IMAGE_SMALL = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZWVlZWVlIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMThweCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgYWxpZ25tZW50LWJhc2VsaW5lPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmaWxsPSIjOTk5OTk5Ij5ObyBJbWFnZTwvdGV4dD48L3N2Zz4=';
 
 const SearchPage = () => {
   const [searchParams] = useSearchParams();
@@ -16,10 +19,21 @@ const SearchPage = () => {
       setIsLoading(true);
       try {
         // Search for products and services in parallel
-        const [productsData, servicesData] = await Promise.all([
-          searchProducts(query),
+        const [productsResponse, servicesData] = await Promise.all([
+          productService.searchProducts(query),
           searchServices(query)
         ]);
+        
+        // Extract products from the response based on the API structure
+        let productsData = [];
+        if (productsResponse && productsResponse.data) {
+          // Handle different response structures
+          if (Array.isArray(productsResponse.data)) {
+            productsData = productsResponse.data;
+          } else if (productsResponse.data.products) {
+            productsData = productsResponse.data.products;
+          }
+        }
         
         setProducts(productsData);
         setServices(servicesData);
@@ -36,6 +50,25 @@ const SearchPage = () => {
       setIsLoading(false);
     }
   }, [query]);
+
+  // Format price with currency
+  const formatPrice = (price) => {
+    try {
+      if (price === null || price === undefined) {
+        return 'SAR 0.00';
+      }
+      
+      const numericPrice = typeof price === 'string' ? parseFloat(price) : price;
+      
+      if (isNaN(numericPrice)) {
+        return 'SAR 0.00';
+      }
+      
+      return `SAR ${numericPrice.toFixed(2)}`;
+    } catch (error) {
+      return 'SAR 0.00';
+    }
+  };
 
   return (
     <div className="search-page">
@@ -98,26 +131,42 @@ const SearchPage = () => {
                       {products.map(product => (
                         <Link to={`/products/${product.id}`} key={product.id} className="product-card">
                           <div className="product-image">
-                            <img src={product.image} alt={product.name} />
+                            <img 
+                              src={product.primary_image_url || 
+                                (product.images && product.images.length > 0 ? 
+                                  product.images[0] : 
+                                  PLACEHOLDER_IMAGE_SMALL)} 
+                              alt={product.name}
+                              onError={(e) => {
+                                e.target.onerror = null; // Prevent infinite loop
+                                e.target.src = PLACEHOLDER_IMAGE_SMALL;
+                              }}
+                            />
                             {product.discountPercentage > 0 && (
                               <div className="discount-badge">{product.discountPercentage}% خصم</div>
                             )}
                           </div>
                           <div className="product-content">
                             <h3 className="product-title">{product.name}</h3>
-                            <p className="product-category">{product.category}</p>
+                            <p className="product-category">
+                              {product.category?.name || product.category || ''}
+                            </p>
                             <div className="product-price">
-                              <span className="price-value">{product.price} درهم</span>
+                              <span className="price-value">
+                                {formatPrice(product.price)}
+                              </span>
                               {product.discountPercentage > 0 && (
                                 <span className="original-price">
                                   {Math.round(product.price / (1 - product.discountPercentage / 100))} درهم
                                 </span>
                               )}
                             </div>
-                            <div className="product-rating">
-                              <i className="fas fa-star"></i>
-                              <span>{product.rating}</span>
-                            </div>
+                            {product.rating && (
+                              <div className="product-rating">
+                                <i className="fas fa-star"></i>
+                                <span>{product.rating}</span>
+                              </div>
+                            )}
                           </div>
                         </Link>
                       ))}

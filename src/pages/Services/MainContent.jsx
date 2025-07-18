@@ -22,6 +22,9 @@ import {
   BookOnline,
 } from "@mui/icons-material";
 
+const PLACEHOLDER_IMAGE_SMALL = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZWVlZWVlIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTJweCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgYWxpZ25tZW50LWJhc2VsaW5lPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmaWxsPSIjOTk5OTk5Ij5ObyBJbWFnZTwvdGV4dD48L3N2Zz4=';
+const PLACEHOLDER_IMAGE = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZWVlZWVlIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTZweCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgYWxpZ25tZW50LWJhc2VsaW5lPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmaWxsPSIjOTk5OTk5Ij5ObyBJbWFnZTwvdGV4dD48L3N2Zz4=';
+
 const MainContent = ({ selectedService }) => {
   const navigate = useNavigate();
   const [inputs, setInputs] = useState({});
@@ -337,9 +340,13 @@ const MainContent = ({ selectedService }) => {
         {products.map((product) => (
           <div key={product.id} className="product-card">
             <img
-              src={product.image || "https://via.placeholder.com/200"}
+              src={product.image || PLACEHOLDER_IMAGE}
               alt={product.name}
               className="product-image"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = PLACEHOLDER_IMAGE;
+              }}
             />
             <div className="product-info">
               <h3>{product.name}</h3>
@@ -387,11 +394,13 @@ const MainContent = ({ selectedService }) => {
               {/* Product Summary */}
               <div className="product-summary">
                 <img
-                  src={
-                    selectedProduct.image || "https://via.placeholder.com/100"
-                  }
+                  src={selectedProduct.image || PLACEHOLDER_IMAGE_SMALL}
                   alt={selectedProduct.name}
                   className="product-thumbnail"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = PLACEHOLDER_IMAGE_SMALL;
+                  }}
                 />
                 <div className="product-details">
                   <h3>{selectedProduct.name}</h3>

@@ -11,6 +11,8 @@ import {
 import '../styles/SearchModal.css';
 import { Link } from 'react-router-dom';
 
+const PLACEHOLDER_ICON = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2VlZWVlZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjEwcHgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGFsaWdubWVudC1iYXNlbGluZT0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZmlsbD0iIzk5OTk5OSI+SWNvbjwvdGV4dD48L3N2Zz4=';
+
 const SearchModal = ({ isOpen, onClose }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -81,7 +83,7 @@ const SearchModal = ({ isOpen, onClose }) => {
             id: 'p1',
             type: 'product',
             name: 'أدوات كهربائية',
-            image: 'https://via.placeholder.com/60',
+            image: PLACEHOLDER_ICON,
             price: '١٥٠ درهم',
             category: 'أدوات'
           },
@@ -89,7 +91,7 @@ const SearchModal = ({ isOpen, onClose }) => {
             id: 'p2',
             type: 'product',
             name: 'معدات بناء',
-            image: 'https://via.placeholder.com/60',
+            image: PLACEHOLDER_ICON,
             price: '٣٠٠ درهم',
             category: 'معدات'
           }
@@ -103,7 +105,7 @@ const SearchModal = ({ isOpen, onClose }) => {
             id: 's1',
             type: 'service',
             name: 'خدمات صيانة',
-            image: 'https://via.placeholder.com/60',
+            image: PLACEHOLDER_ICON,
             rating: 4.5,
             category: 'صيانة'
           },
@@ -111,7 +113,7 @@ const SearchModal = ({ isOpen, onClose }) => {
             id: 's2',
             type: 'service',
             name: 'خدمات تنظيف',
-            image: 'https://via.placeholder.com/60',
+            image: PLACEHOLDER_ICON,
             rating: 4.2,
             category: 'تنظيف'
           }
@@ -188,7 +190,7 @@ const SearchModal = ({ isOpen, onClose }) => {
           id: 'p1',
           type: 'product',
           name: 'أدوات كهربائية',
-          image: 'https://via.placeholder.com/60',
+          image: PLACEHOLDER_ICON,
           price: '١٥٠ درهم',
           category: 'أدوات'
         },
@@ -196,7 +198,7 @@ const SearchModal = ({ isOpen, onClose }) => {
           id: 's1',
           type: 'service',
           name: 'خدمات صيانة',
-          image: 'https://via.placeholder.com/60',
+          image: PLACEHOLDER_ICON,
           rating: 4.5,
           category: 'صيانة'
         }
@@ -223,7 +225,7 @@ const SearchModal = ({ isOpen, onClose }) => {
               id: 'p1',
               type: 'product',
               name: 'أدوات كهربائية',
-              image: 'https://via.placeholder.com/60',
+              image: PLACEHOLDER_ICON,
               price: '١٥٠ درهم',
               category: 'أدوات'
             },
@@ -231,7 +233,7 @@ const SearchModal = ({ isOpen, onClose }) => {
               id: 'p2',
               type: 'product',
               name: 'معدات بناء',
-              image: 'https://via.placeholder.com/60',
+              image: PLACEHOLDER_ICON,
               price: '٣٠٠ درهم',
               category: 'معدات'
             }
@@ -245,7 +247,7 @@ const SearchModal = ({ isOpen, onClose }) => {
               id: 's1',
               type: 'service',
               name: 'خدمات صيانة',
-              image: 'https://via.placeholder.com/60',
+              image: PLACEHOLDER_ICON,
               rating: 4.5,
               category: 'صيانة'
             },
@@ -253,7 +255,7 @@ const SearchModal = ({ isOpen, onClose }) => {
               id: 's2',
               type: 'service',
               name: 'خدمات تنظيف',
-              image: 'https://via.placeholder.com/60',
+              image: PLACEHOLDER_ICON,
               rating: 4.2,
               category: 'تنظيف'
             }

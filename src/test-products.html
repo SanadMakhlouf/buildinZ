@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Products</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .product-image {
+            height: 200px;
+            overflow: hidden;
+        }
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .product-info {
+            padding: 15px;
+        }
+        .product-brand {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .product-name {
+            margin: 5px 0;
+            font-size: 1.1rem;
+        }
+        .product-price {
+            font-weight: bold;
+            color: #0A3259;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Products</h1>
+    <div class="products-grid" id="products-container"></div>
+
+    <script>
+        // Base64 encoded placeholder image
+        const PLACEHOLDER_IMAGE = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZWVlZWVlIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMThweCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgYWxpZ25tZW50LWJhc2VsaW5lPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmaWxsPSIjOTk5OTk5Ij5ObyBJbWFnZTwvdGV4dD48L3N2Zz4=';
+        
+        // Mock data from the API response
+        const mockProductsData = {
+            "success": true,
+            "message": "Products retrieved successfully",
+            "data": {
+                "products": [
+                    {
+                        "id": 22,
+                        "vendor_profile_id": 1,
+                        "category_id": 3,
+                        "name": "czxzxc",
+                        "description": "zcx",
+                        "price": "213.00",
+                        "stock_quantity": 12,
+                        "sku": "zxc",
+                        "images": [
+                            "http://localhost:8000/storage/products/fGag5luE0OeWmXUW5VWKbyiwswmeXksx40XrBh20.png"
+                        ],
+                        "specifications": null,
+                        "is_active": true,
+                        "weight": null,
+                        "dimensions": null,
+                        "category": {
+                            "id": 3,
+                            "name": "Plumbing Supplies",
+                            "description": "Plumbing fixtures, pipes, and fittings"
+                        },
+                        "primary_image_url": "http://localhost:8000/storage/products/fGag5luE0OeWmXUW5VWKbyiwswmeXksx40XrBh20.png"
+                    },
+                    {
+                        "id": 21,
+                        "vendor_profile_id": 1,
+                        "category_id": 3,
+                        "name": "mohamed",
+                        "description": "haw",
+                        "price": "100.00",
+                        "stock_quantity": 100,
+                        "sku": "addsa",
+                        "images": [
+                            "http://localhost:8000/storage/products/NJtNKuIakNncSegqnDwZDcx9chGeNwRh1ITGJ0K4.jpg"
+                        ],
+                        "specifications": null,
+                        "is_active": true,
+                        "weight": null,
+                        "dimensions": null,
+                        "category": {
+                            "id": 3,
+                            "name": "Plumbing Supplies",
+                            "description": "Plumbing fixtures, pipes, and fittings"
+                        },
+                        "primary_image_url": "http://localhost:8000/storage/products/NJtNKuIakNncSegqnDwZDcx9chGeNwRh1ITGJ0K4.jpg"
+                    },
+                    {
+                        "id": 1,
+                        "vendor_profile_id": 1,
+                        "category_id": 3,
+                        "name": "molestias quia ipsam",
+                        "description": "Quod velit est unde quia. Ratione tempora voluptatem magnam rem.",
+                        "price": "432.75",
+                        "stock_quantity": 49,
+                        "sku": "SKU-KIT5YUJR",
+                        "images": [
+                            "https://via.placeholder.com/640x480.png/00aa99?text=products+qui",
+                            "https://via.placeholder.com/640x480.png/003377?text=products+dolorum"
+                        ],
+                        "specifications": {
+                            "color": "MediumVioletRed",
+                            "material": "dolorem",
+                            "warranty": "1 year"
+                        },
+                        "is_active": true,
+                        "weight": "8.49",
+                        "dimensions": {
+                            "length": 96.03,
+                            "width": 98.44,
+                            "height": 6.26
+                        },
+                        "category": {
+                            "id": 3,
+                            "name": "Plumbing Supplies",
+                            "description": "Plumbing fixtures, pipes, and fittings"
+                        },
+                        "primary_image_url": "https://via.placeholder.com/640x480.png/00aa99?text=products+qui"
+                    }
+                ]
+            }
+        };
+
+        // Format price with currency
+        function formatPrice(price) {
+            try {
+                // Handle null or undefined values
+                if (price === null || price === undefined) {
+                    return 'SAR 0.00';
+                }
+                
+                // Convert price to number if it's a string
+                const numericPrice = typeof price === 'string' ? parseFloat(price) : price;
+                
+                // Check if price is a valid number
+                if (isNaN(numericPrice)) {
+                    console.warn('Invalid price value:', price);
+                    return 'SAR 0.00';
+                }
+                
+                return `SAR ${numericPrice.toFixed(2)}`;
+            } catch (error) {
+                console.error('Error formatting price:', error, 'Value:', price);
+                return 'SAR 0.00';
+            }
+        }
+
+        // Display products
+        function displayProducts() {
+            const productsContainer = document.getElementById('products-container');
+            const products = mockProductsData.data.products;
+            
+            products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                
+                const imageUrl = product.primary_image_url || 
+                    (product.images && product.images.length > 0 ? 
+                        product.images[0] : 
+                        PLACEHOLDER_IMAGE);
+                
+                productCard.innerHTML = `
+                    <div class="product-image">
+                        <img src="${imageUrl}" alt="${product.name}" onerror="this.onerror=null; this.src='${PLACEHOLDER_IMAGE}'">
+                    </div>
+                    <div class="product-info">
+                        <div class="product-brand">${product.category ? product.category.name : 'Generic Brand'}</div>
+                        <h3 class="product-name">${product.name}</h3>
+                        <div class="product-price">${formatPrice(product.price)}</div>
+                    </div>
+                `;
+                
+                productsContainer.appendChild(productCard);
+            });
+        }
+
+        // Initialize
+        displayProducts();
+    </script>
+</body>
+</html> 
