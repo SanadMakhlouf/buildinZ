@@ -83,10 +83,7 @@ const Navbar = () => {
           {/* Logo */}
           <div className="navbar-logo">
             <Link to="/" className="logo-link">
-              <div className="logo-icon">
-                <span className="logo-letter">ب</span>
-              </div>
-              <span className="logo-text">بيلدينغ زد</span>
+              <img src="/logo.png" alt="BuildingZ Logo" className="logo-image" style={{ height: '80px' }} />
             </Link>
           </div>
 

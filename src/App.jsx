@@ -6,6 +6,7 @@ import HomePage from './pages/Home/HomePage';
 import ServicesPage from './pages/Services/ServicesPage';
 import ServicesPage2 from './pages/Services2/ServicesPage2';
 import ProductsPage from './pages/Products/ProductsPage';
+import CartPage from './pages/Cart/CartPage';
 import SearchPage from './pages/Search/SearchPage';
 import AdminPage from './pages/Admin/AdminPage';
 import LoginPage from './pages/Auth/Login/LoginPage';
@@ -43,6 +44,7 @@ function App() {
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/products/:productId" element={<ProductsPage />} />
           <Route path="/search" element={<SearchPage />} />
+          <Route path="/cart" element={<CartPage />} />
           <Route 
             path="/profile" 
             element={

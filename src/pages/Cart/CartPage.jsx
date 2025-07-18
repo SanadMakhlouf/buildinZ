@@ -1,15 +1,15 @@
 import React from 'react';
-import './ProductsPage.css';
+import './CartPage.css';
 
-const ProductsPage = () => {
+const CartPage = () => {
   return (
-    <div className="products-page">
+    <div className="cart-page">
       <div className="container">
-        <h1>Products Page</h1>
+        <h1>Cart Page</h1>
         <p>This page is under construction.</p>
       </div>
     </div>
   );
 };
 
-export default ProductsPage; 
+export default CartPage; 

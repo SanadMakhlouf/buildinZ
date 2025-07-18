@@ -67,6 +67,17 @@
   gap: 0.75rem;
 }
 
+.logo-image {
+  height: 40px;
+  width: auto;
+  transition: var(--transition);
+  object-fit: contain;
+}
+
+.navbar-scrolled .logo-image {
+  height: 36px;
+}
+
 .logo-icon {
   width: 36px;
   height: 36px;
@@ -249,7 +260,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transform: translate(-30%, -30%);
 }
 
 /* Profile Button */
