@@ -18,6 +18,8 @@ import {
 import './HomePage.css';
 import addressService from '../../services/addressService';
 import mockupImage from '../../assets/app-mockup';
+// Import hero background image
+import heroBgImage from '../../assets/images/hero-bg.png';
 
 const HomePage = () => {
   // State variables
@@ -257,7 +259,12 @@ const HomePage = () => {
   return (
     <div className="homepage">
       {/* Hero Section - KEEP INTACT but with enhancements */}
-      <section className="hero-section" ref={heroRef}>
+      <section className="hero-section" ref={heroRef} style={{
+        background: `linear-gradient(rgba(10, 50, 89, 0.8), rgba(10, 50, 89, 0.8)), url(${heroBgImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}>
         <div className="container">
           <div className={`hero-content ${animateHero ? 'visible' : ''}`}>
             <div className="hero-location">
@@ -338,12 +345,7 @@ const HomePage = () => {
             </div>
           </div>
           
-          <div className={`hero-image ${animateHero ? 'visible' : ''}`}>
-            <div className="hero-image-container">
-              <div className="image-overlay"></div>
-              {/* Hero image is set in CSS */}
-            </div>
-          </div>
+
         </div>
         
         {/* Scroll indicator */}
