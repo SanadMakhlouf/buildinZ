@@ -62,6 +62,35 @@ export const authService = {
     }
   },
 
+  async requestPasswordReset(email) {
+    try {
+      const response = await axiosInstance.post('/forgot-password', {
+        email
+      });
+      
+      return response.data;
+    } catch (error) {
+      console.error('Password reset request error:', error.response?.data || error.message);
+      throw error;
+    }
+  },
+  
+  async resetPassword(token, email, password, passwordConfirmation) {
+    try {
+      const response = await axiosInstance.post('/reset-password', {
+        token,
+        email,
+        password,
+        password_confirmation: passwordConfirmation
+      });
+      
+      return response.data;
+    } catch (error) {
+      console.error('Password reset error:', error.response?.data || error.message);
+      throw error;
+    }
+  },
+
   logout() {
     // Clear local storage
     localStorage.removeItem('token');

@@ -1,0 +1,115 @@
+.auto-location-detector {
+  margin-bottom: 1.5rem;
+}
+
+.auto-location-status {
+  padding: 1rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 0.95rem;
+}
+
+.auto-location-status i {
+  font-size: 1.2rem;
+}
+
+.auto-location-status.detecting,
+.auto-location-status.creating {
+  background-color: #e2f0fd;
+  color: #0c63e4;
+  border: 1px solid #b6d4fe;
+}
+
+.auto-location-status.success {
+  background-color: #d1e7dd;
+  color: #0f5132;
+  border: 1px solid #badbcc;
+}
+
+.auto-location-status.exists {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffecb5;
+}
+
+.auto-location-status.error {
+  background-color: #f8d7da;
+  color: #842029;
+  border: 1px solid #f5c2c7;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.auto-location-status.error span {
+  margin-bottom: 0.8rem;
+}
+
+.error-actions {
+  display: flex;
+  gap: 0.8rem;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.auto-location-status button {
+  background-color: transparent;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.auto-location-status button.retry-btn {
+  color: #842029;
+}
+
+.auto-location-status button.manual-entry-btn {
+  color: #0A3259;
+  border-color: #0A3259;
+}
+
+.auto-location-status button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.auto-location-status button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.auto-location-status.success.fallback {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffecb5;
+}
+
+@media (max-width: 576px) {
+  .auto-location-status {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: center;
+  }
+  
+  .auto-location-status.error {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .error-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .auto-location-status button {
+    margin-top: 0.5rem;
+    width: 100%;
+    justify-content: center;
+  }
+} 

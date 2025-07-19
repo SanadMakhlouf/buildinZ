@@ -1,7 +1,74 @@
-/* Import the base auth styles */
+/* Import base auth styles */
 @import '../Login/LoginPage.css';
 
-/* Signup-specific styles */
+/* Signup specific styles */
+.signup-card {
+  max-width: 460px;
+}
+
+/* Terms Group */
+.terms-group {
+  margin-bottom: 24px;
+}
+
+.terms-checkbox span {
+  line-height: 1.5;
+}
+
+.terms-link {
+  color: #0A3259;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.terms-link:hover {
+  color: #072442;
+  text-decoration: underline;
+}
+
+/* Signup Success */
+.signup-success {
+  text-align: center;
+  padding: 30px 0;
+}
+
+.signup-success .success-icon {
+  font-size: 72px;
+  color: #28a745;
+  margin-bottom: 24px;
+  animation: scaleIn 0.5s ease-out;
+}
+
+.signup-success h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #212529;
+  margin-bottom: 12px;
+}
+
+.signup-success p {
+  color: #6c757d;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .terms-link {
+    color: #0d6efd;
+  }
+  
+  .terms-link:hover {
+    color: #0b5ed7;
+  }
+  
+  .signup-success .success-icon {
+    color: #2ea043;
+  }
+  
+  .signup-success h2 {
+    color: #e6e6e6;
+  }
+}
 
 /* Welcome Section Extensions for Signup */
 .auth-welcome .welcome-benefits {

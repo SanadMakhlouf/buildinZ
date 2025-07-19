@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import profileService from '../../services/profileService';
 import authService from '../../services/authService';
+import AddressManager from '../../components/Profile/AddressManager';
 import './ProfilePage.css';
 
 // Icons for the sidebar and profile sections
@@ -21,6 +22,7 @@ const icons = {
   email: "fas fa-envelope",
   role: "fas fa-user-tag",
   address: "fas fa-map-marker-alt",
+  addresses: "fas fa-map-marked-alt",
   error: "fas fa-exclamation-circle"
 };
 
@@ -479,6 +481,12 @@ const ProfilePage = () => {
     </div>
   );
 
+  const renderAddressesTab = () => (
+    <div className="addresses-section">
+      <AddressManager />
+    </div>
+  );
+
   const renderNotificationsTab = () => (
     <div className="notifications-section">
       <h2>الإشعارات</h2>
@@ -531,6 +539,8 @@ const ProfilePage = () => {
     switch (activeTab) {
       case 'profile':
         return renderProfileTab();
+      case 'addresses':
+        return renderAddressesTab();
       case 'orders':
         return renderOrdersTab();
       case 'services':
@@ -578,6 +588,13 @@ const ProfilePage = () => {
           >
             <i className={icons.profile}></i>
             <span>الملف الشخصي</span>
+          </div>
+          <div 
+            className={`sidebar-item ${activeTab === 'addresses' ? 'active' : ''}`}
+            onClick={() => setActiveTab('addresses')}
+          >
+            <i className={icons.addresses}></i>
+            <span>العناوين</span>
           </div>
           <div 
             className={`sidebar-item ${activeTab === 'orders' ? 'active' : ''}`}

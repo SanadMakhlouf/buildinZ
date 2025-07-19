@@ -550,3 +550,174 @@
     flex-direction: column;
   }
 } 
+
+/* Loading Container */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 0;
+  color: var(--primary);
+}
+
+.loading-container .loading-icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: var(--secondary);
+}
+
+.loading-spinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  font-size: 1.1rem;
+}
+
+.loading-text {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-dark);
+}
+
+/* Disabled states */
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+input:disabled,
+.type-option:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Save button with spinner */
+.save-button svg,
+.confirm-location-button svg {
+  margin: 0 0.25rem;
+}
+
+/* Current location button with spinner */
+.current-location-button svg {
+  margin-right: 0.25rem;
+} 
+
+/* Error message styles */
+.modal-error {
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  margin: 0.5rem 1.5rem 1rem;
+  display: flex;
+  align-items: center;
+  color: #ef4444;
+  font-size: 0.9rem;
+}
+
+.modal-error svg {
+  margin-left: 0.5rem;
+}
+
+.modal-error.center {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  gap: 1rem;
+}
+
+.modal-error.center svg {
+  margin: 0;
+  font-size: 2rem;
+}
+
+/* Auth error styles */
+.modal-auth-error {
+  background-color: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  margin: 0.5rem 1.5rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #3b82f6;
+  font-size: 0.9rem;
+}
+
+.modal-auth-error svg {
+  margin-left: 0.5rem;
+}
+
+.modal-auth-error.center {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  gap: 1rem;
+  margin: 2rem auto;
+  max-width: 80%;
+}
+
+.modal-auth-error.center svg {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.modal-login-btn {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.modal-login-btn:hover {
+  background-color: #2563eb;
+}
+
+.retry-btn {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.retry-btn:hover {
+  background-color: #dc2626;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .modal-error,
+  .modal-auth-error {
+    margin: 0.5rem 1rem 1rem;
+    padding: 0.5rem;
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+  
+  .modal-error svg,
+  .modal-auth-error svg {
+    margin: 0 0 0.5rem;
+  }
+  
+  .modal-login-btn,
+  .retry-btn {
+    width: 100%;
+  }
+} 

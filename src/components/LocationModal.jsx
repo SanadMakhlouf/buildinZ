@@ -11,7 +11,9 @@ import {
   faCheck, 
   faEdit,
   faMapMarkerAlt,
-  faSpinner
+  faSpinner,
+  faExclamationTriangle,
+  faLock
 } from '@fortawesome/free-solid-svg-icons';
 import '../styles/LocationModal.css';
 import { 
@@ -20,8 +22,11 @@ import {
   deleteAddress, 
   setDefaultAddress, 
   getDefaultAddress,
-  formatAddress
+  formatAddress,
+  validateAddress,
+  updateAddress
 } from '../utils/addressUtils';
+import authService from '../services/authService';
 
 const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
   const [view, setView] = useState('map'); // 'map' or 'saved'
@@ -35,6 +40,9 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
   const [editingAddress, setEditingAddress] = useState(null);
   const [mapsLoaded, setMapsLoaded] = useState(false);
   const [loadingMap, setLoadingMap] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [authError, setAuthError] = useState(false);
   
   const modalRef = useRef(null);
   const mapRef = useRef(null);
@@ -74,16 +82,43 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
   // Load saved addresses
   useEffect(() => {
     if (isOpen) {
-      setSavedAddresses(getSavedAddresses());
+      const loadAddresses = async () => {
+        setIsLoading(true);
+        setAuthError(false);
+        setError(null);
+        
+        // Skip loading addresses if not authenticated
+        if (!authService.isAuthenticated()) {
+          setAuthError(true);
+          setIsLoading(false);
+          return;
+        }
+        
+        try {
+          const addresses = await getSavedAddresses();
+          setSavedAddresses(addresses);
+          
+          // Check if there's a default address
+          const defaultAddress = await getDefaultAddress();
+          if (defaultAddress && defaultAddress.latitude && defaultAddress.longitude) {
+            setMapCenter({
+              lat: parseFloat(defaultAddress.latitude),
+              lng: parseFloat(defaultAddress.longitude)
+            });
+          }
+        } catch (error) {
+          console.error('Error loading addresses:', error);
+          if (error.code === "UNAUTHENTICATED") {
+            setAuthError(true);
+          } else {
+            setError('لم نتمكن من تحميل العناوين. يرجى المحاولة مرة أخرى.');
+          }
+        } finally {
+          setIsLoading(false);
+        }
+      };
       
-      // Check if there's a default address
-      const defaultAddress = getDefaultAddress();
-      if (defaultAddress && defaultAddress.geometry && defaultAddress.geometry.location) {
-        setMapCenter({
-          lat: parseFloat(defaultAddress.geometry.location.lat),
-          lng: parseFloat(defaultAddress.geometry.location.lng)
-        });
-      }
+      loadAddresses();
     }
   }, [isOpen]);
 
@@ -200,6 +235,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
     } catch (error) {
       console.error("Error initializing Google Maps:", error);
       setLoadingMap(false);
+      setError('لم نتمكن من تحميل الخريطة. يرجى المحاولة مرة أخرى.');
     }
   }, [isOpen, mapCenter, mapsLoaded]);
 
@@ -223,6 +259,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
   // Handle getting user's current location
   const handleGetCurrentLocation = () => {
     if (navigator.geolocation) {
+      setIsLoading(true);
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
@@ -238,81 +275,192 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
               geocoderRef.current.geocode({ location: newCenter }, (results, status) => {
                 if (status === 'OK' && results[0]) {
                   setSelectedLocation(results[0]);
+                } else {
+                  setError('لم نتمكن من تحديد العنوان بناءً على الموقع. يرجى المحاولة مرة أخرى.');
                 }
+                setIsLoading(false);
               });
+            } else {
+              setIsLoading(false);
             }
+          } else {
+            setIsLoading(false);
           }
           
           setMapCenter(newCenter);
         },
         (error) => {
           console.error("Error getting location:", error);
-          alert("لم نتمكن من تحديد موقعك. يرجى السماح بالوصول إلى الموقع أو إدخال العنوان يدويًا.");
+          setError("لم نتمكن من تحديد موقعك. يرجى السماح بالوصول إلى الموقع أو إدخال العنوان يدويًا.");
+          setIsLoading(false);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
         }
       );
     } else {
-      alert("متصفحك لا يدعم تحديد الموقع.");
+      setError("متصفحك لا يدعم تحديد الموقع.");
     }
   };
 
-  const handleSaveAddress = () => {
+  const handleSaveAddress = async () => {
     if (!selectedLocation) return;
     
-    setIsSaving(true);
-    
-    // Create address object
-    const addressData = {
-      ...selectedLocation,
-      name: addressName || 'العنوان الرئيسي',
-      type: addressType,
-      displayAddress: formatAddress(selectedLocation.address_components)
-    };
-    
-    // Save address
-    if (editingAddress) {
-      // Update existing address
-      const updatedAddresses = savedAddresses.map(addr => 
-        addr.id === editingAddress.id ? { ...addr, ...addressData } : addr
-      );
-      setSavedAddresses(updatedAddresses);
-      localStorage.setItem('savedAddresses', JSON.stringify(updatedAddresses));
-    } else {
-      // Add new address
-      const updatedAddresses = saveAddress(addressData);
-      setSavedAddresses(updatedAddresses);
+    // Check authentication
+    if (!authService.isAuthenticated()) {
+      setAuthError(true);
+      return;
     }
     
-    // Reset form
-    setAddressName('');
-    setAddressType('home');
-    setEditingAddress(null);
-    setIsSaving(false);
-    setView('saved');
+    setIsSaving(true);
+    setError(null);
+    
+    try {
+      // Create address object
+      const addressData = {
+        ...selectedLocation,
+        name: addressName || 'العنوان الرئيسي',
+        type: addressType,
+        displayAddress: formatAddress(selectedLocation.address_components),
+        isDefault: editingAddress ? editingAddress.is_default : false
+      };
+      
+      // Save address
+      if (editingAddress) {
+        // Update existing address
+        const updatedAddresses = await updateAddress(editingAddress.id, addressData);
+        if (updatedAddresses) {
+          setSavedAddresses(updatedAddresses);
+          
+          // Reset form
+          setAddressName('');
+          setAddressType('home');
+          setEditingAddress(null);
+          setView('saved');
+        }
+      } else {
+        // Add new address
+        const updatedAddresses = await saveAddress(addressData);
+        if (updatedAddresses) {
+          setSavedAddresses(updatedAddresses);
+          
+          // Reset form
+          setAddressName('');
+          setAddressType('home');
+          setEditingAddress(null);
+          setView('saved');
+        }
+      }
+    } catch (error) {
+      console.error('Error saving address:', error);
+      if (error.code === "UNAUTHENTICATED") {
+        setAuthError(true);
+      } else {
+        setError('حدث خطأ أثناء حفظ العنوان. يرجى المحاولة مرة أخرى.');
+      }
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const handleDeleteAddress = (id) => {
-    const updatedAddresses = deleteAddress(id);
-    setSavedAddresses(updatedAddresses);
+  const handleDeleteAddress = async (id) => {
+    if (!authService.isAuthenticated()) {
+      setAuthError(true);
+      return;
+    }
+    
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const updatedAddresses = await deleteAddress(id);
+      setSavedAddresses(updatedAddresses);
+    } catch (error) {
+      console.error('Error deleting address:', error);
+      if (error.code === "UNAUTHENTICATED") {
+        setAuthError(true);
+      } else {
+        setError('حدث خطأ أثناء حذف العنوان. يرجى المحاولة مرة أخرى.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleSetDefaultAddress = (id) => {
-    const updatedAddresses = setDefaultAddress(id);
-    setSavedAddresses(updatedAddresses);
+  const handleSetDefaultAddress = async (id) => {
+    if (!authService.isAuthenticated()) {
+      setAuthError(true);
+      return;
+    }
+    
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const updatedAddresses = await setDefaultAddress(id);
+      setSavedAddresses(updatedAddresses);
+    } catch (error) {
+      console.error('Error setting default address:', error);
+      if (error.code === "UNAUTHENTICATED") {
+        setAuthError(true);
+      } else {
+        setError('حدث خطأ أثناء تعيين العنوان الافتراضي. يرجى المحاولة مرة أخرى.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleSelectSavedAddress = (address) => {
-    handleSetDefaultAddress(address.id);
-    onSelectLocation(address.displayAddress || address.formatted_address);
-    onClose();
+  const handleSelectSavedAddress = async (address) => {
+    if (!authService.isAuthenticated()) {
+      setAuthError(true);
+      return;
+    }
+    
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      await handleSetDefaultAddress(address.id);
+      
+      // Format the address for display
+      let displayAddr;
+      if (address.address_components) {
+        displayAddr = formatAddress(address.address_components);
+      } else {
+        displayAddr = `${address.address_line1}, ${address.city}, ${address.state} ${address.postal_code}`;
+      }
+      
+      onSelectLocation(displayAddr);
+      onClose();
+    } catch (error) {
+      console.error('Error selecting address:', error);
+      if (error.code === "UNAUTHENTICATED") {
+        setAuthError(true);
+      }
+      setIsLoading(false);
+    }
   };
 
   const handleEditAddress = (address) => {
+    if (!authService.isAuthenticated()) {
+      setAuthError(true);
+      return;
+    }
+    
     setEditingAddress(address);
     setAddressName(address.name);
     setAddressType(address.type || 'home');
     
     // Set map center to address location
-    if (address.geometry && address.geometry.location) {
+    if (address.latitude && address.longitude) {
+      setMapCenter({
+        lat: parseFloat(address.latitude),
+        lng: parseFloat(address.longitude)
+      });
+    } else if (address.geometry && address.geometry.location) {
       const lat = typeof address.geometry.location.lat === 'function' 
         ? address.geometry.location.lat() 
         : parseFloat(address.geometry.location.lat);
@@ -328,12 +476,46 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
     setView('map');
   };
 
-  const handleConfirmLocation = () => {
+  const handleConfirmLocation = async () => {
     if (!selectedLocation) return;
     
-    const displayAddress = formatAddress(selectedLocation.address_components) || selectedLocation.formatted_address;
-    onSelectLocation(displayAddress);
-    onClose();
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      // If we have a Google Maps place object, format the address
+      let displayAddress;
+      if (selectedLocation.address_components) {
+        displayAddress = formatAddress(selectedLocation.address_components) || selectedLocation.formatted_address;
+      } else {
+        // Try to validate the address first
+        try {
+          const fullAddress = `${selectedLocation.address_line1}, ${selectedLocation.city}, ${selectedLocation.state} ${selectedLocation.postal_code}`;
+          const validationResult = await validateAddress(fullAddress);
+          
+          if (validationResult.success) {
+            displayAddress = validationResult.data.formatted_address;
+          } else {
+            displayAddress = fullAddress;
+          }
+        } catch (error) {
+          displayAddress = `${selectedLocation.address_line1}, ${selectedLocation.city}, ${selectedLocation.state} ${selectedLocation.postal_code}`;
+        }
+      }
+      
+      onSelectLocation(displayAddress);
+      onClose();
+    } catch (error) {
+      console.error('Error confirming location:', error);
+      setError('حدث خطأ أثناء تأكيد الموقع. يرجى المحاولة مرة أخرى.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const handleLogin = () => {
+    // Redirect to login page with return URL
+    window.location.href = `/login?returnUrl=${encodeURIComponent(window.location.pathname)}`;
   };
 
   const renderMapView = () => (
@@ -348,16 +530,39 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
             placeholder="ابحث عن منطقة، شارع، معلم..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            disabled={isLoading || isSaving}
           />
         </div>
         <button 
           className="current-location-button"
           onClick={handleGetCurrentLocation}
+          disabled={isLoading || isSaving}
         >
-          <FontAwesomeIcon icon={faLocationDot} />
-          <span>حدد موقعي</span>
+          {isLoading ? (
+            <FontAwesomeIcon icon={faSpinner} spin />
+          ) : (
+            <>
+              <FontAwesomeIcon icon={faLocationDot} />
+              <span>حدد موقعي</span>
+            </>
+          )}
         </button>
       </div>
+      
+      {error && (
+        <div className="modal-error">
+          <FontAwesomeIcon icon={faExclamationTriangle} /> {error}
+        </div>
+      )}
+      
+      {authError && (
+        <div className="modal-auth-error">
+          <FontAwesomeIcon icon={faLock} /> قم بتسجيل الدخول لإدارة العناوين
+          <button className="modal-login-btn" onClick={handleLogin}>
+            تسجيل الدخول
+          </button>
+        </div>
+      )}
       
       <div className="location-map-container">
         <div className="map-instruction">
@@ -370,7 +575,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
           </div>
         )}
         <div ref={mapRef} className="google-map"></div>
-        {loadingMap && mapsLoaded && (
+        {(loadingMap || isLoading) && mapsLoaded && (
           <div className="map-loading">
             <FontAwesomeIcon icon={faSpinner} spin className="loading-icon" />
             <p>جاري تحميل الخريطة...</p>
@@ -382,7 +587,10 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
         <div className="location-details">
           <div className="selected-address">
             <FontAwesomeIcon icon={faLocationDot} className="address-icon" />
-            <span>{selectedLocation.formatted_address}</span>
+            <span>
+              {selectedLocation.formatted_address || 
+               `${selectedLocation.address_line1 || ''}, ${selectedLocation.city || ''}, ${selectedLocation.state || ''} ${selectedLocation.postal_code || ''}`}
+            </span>
           </div>
           
           <div className="save-address-form">
@@ -393,6 +601,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
                 placeholder="مثال: المنزل، العمل..."
                 value={addressName}
                 onChange={(e) => setAddressName(e.target.value)}
+                disabled={isLoading || isSaving || authError}
               />
             </div>
             
@@ -402,6 +611,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
                 <button 
                   className={`type-option ${addressType === 'home' ? 'active' : ''}`}
                   onClick={() => setAddressType('home')}
+                  disabled={isLoading || isSaving || authError}
                 >
                   <FontAwesomeIcon icon={faHome} />
                   <span>منزل</span>
@@ -409,6 +619,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
                 <button 
                   className={`type-option ${addressType === 'work' ? 'active' : ''}`}
                   onClick={() => setAddressType('work')}
+                  disabled={isLoading || isSaving || authError}
                 >
                   <FontAwesomeIcon icon={faBuilding} />
                   <span>عمل</span>
@@ -416,6 +627,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
                 <button 
                   className={`type-option ${addressType === 'other' ? 'active' : ''}`}
                   onClick={() => setAddressType('other')}
+                  disabled={isLoading || isSaving || authError}
                 >
                   <FontAwesomeIcon icon={faLocationDot} />
                   <span>آخر</span>
@@ -430,6 +642,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
         <button 
           className="secondary-button"
           onClick={() => setView('saved')}
+          disabled={isLoading || isSaving}
         >
           العناوين المحفوظة
         </button>
@@ -438,16 +651,24 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
           <button 
             className="save-button"
             onClick={handleSaveAddress}
-            disabled={!selectedLocation || isSaving}
+            disabled={!selectedLocation || isLoading || isSaving || authError}
           >
-            {editingAddress ? 'تحديث العنوان' : 'حفظ العنوان'}
+            {isSaving ? (
+              <FontAwesomeIcon icon={faSpinner} spin />
+            ) : (
+              editingAddress ? 'تحديث العنوان' : 'حفظ العنوان'
+            )}
           </button>
           <button 
             className="confirm-location-button"
             onClick={handleConfirmLocation}
-            disabled={!selectedLocation}
+            disabled={!selectedLocation || isLoading || isSaving}
           >
-            تأكيد الموقع
+            {isLoading ? (
+              <FontAwesomeIcon icon={faSpinner} spin />
+            ) : (
+              'تأكيد الموقع'
+            )}
           </button>
         </div>
       </div>
@@ -457,13 +678,35 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
   const renderSavedAddressesView = () => (
     <>
       <div className="saved-addresses-container">
-        {savedAddresses.length === 0 ? (
+        {authError ? (
+          <div className="modal-auth-error center">
+            <FontAwesomeIcon icon={faLock} size="2x" />
+            <p>قم بتسجيل الدخول لعرض العناوين المحفوظة</p>
+            <button className="modal-login-btn" onClick={handleLogin}>
+              تسجيل الدخول
+            </button>
+          </div>
+        ) : isLoading ? (
+          <div className="loading-container">
+            <FontAwesomeIcon icon={faSpinner} spin className="loading-icon" />
+            <p>جاري تحميل العناوين...</p>
+          </div>
+        ) : error ? (
+          <div className="modal-error center">
+            <FontAwesomeIcon icon={faExclamationTriangle} />
+            <p>{error}</p>
+            <button className="retry-btn" onClick={() => window.location.reload()}>
+              إعادة المحاولة
+            </button>
+          </div>
+        ) : savedAddresses.length === 0 ? (
           <div className="no-addresses">
             <FontAwesomeIcon icon={faLocationDot} className="no-address-icon" />
             <p>لا توجد عناوين محفوظة</p>
             <button 
               className="add-address-button"
               onClick={() => setView('map')}
+              disabled={isLoading}
             >
               <FontAwesomeIcon icon={faPlus} />
               <span>إضافة عنوان جديد</span>
@@ -475,7 +718,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
               {savedAddresses.map((address) => (
                 <div 
                   key={address.id} 
-                  className={`address-item ${address.isDefault ? 'default' : ''}`}
+                  className={`address-item ${address.is_default ? 'default' : ''}`}
                 >
                   <div 
                     className="address-content"
@@ -494,21 +737,23 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
                     <div className="address-info">
                       <div className="address-name">
                         {address.name}
-                        {address.isDefault && (
+                        {address.is_default && (
                           <span className="default-badge">الافتراضي</span>
                         )}
                       </div>
                       <div className="address-text">
-                        {address.displayAddress || address.formatted_address}
+                        {address.displayAddress || 
+                         `${address.address_line1}, ${address.city}, ${address.state} ${address.postal_code}`}
                       </div>
                     </div>
                   </div>
                   <div className="address-actions">
-                    {!address.isDefault && (
+                    {!address.is_default && (
                       <button 
                         className="action-btn set-default-btn"
                         onClick={() => handleSetDefaultAddress(address.id)}
                         title="تعيين كافتراضي"
+                        disabled={isLoading}
                       >
                         <FontAwesomeIcon icon={faCheck} />
                       </button>
@@ -517,6 +762,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
                       className="action-btn edit-btn"
                       onClick={() => handleEditAddress(address)}
                       title="تعديل"
+                      disabled={isLoading}
                     >
                       <FontAwesomeIcon icon={faEdit} />
                     </button>
@@ -524,6 +770,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
                       className="action-btn delete-btn"
                       onClick={() => handleDeleteAddress(address.id)}
                       title="حذف"
+                      disabled={isLoading}
                     >
                       <FontAwesomeIcon icon={faTrash} />
                     </button>
@@ -539,6 +786,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
                 setAddressType('home');
                 setView('map');
               }}
+              disabled={isLoading}
             >
               <FontAwesomeIcon icon={faPlus} />
               <span>إضافة عنوان جديد</span>
@@ -551,6 +799,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
         <button 
           className="secondary-button"
           onClick={() => setView('map')}
+          disabled={isLoading}
         >
           العودة إلى الخريطة
         </button>
@@ -567,7 +816,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
           <h2>
             {view === 'map' ? 'تحديد العنوان' : 'العناوين المحفوظة'}
           </h2>
-          <button className="close-button" onClick={onClose}>
+          <button className="close-button" onClick={onClose} disabled={isLoading || isSaving}>
             <FontAwesomeIcon icon={faTimes} />
           </button>
         </div>

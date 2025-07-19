@@ -1,45 +1,80 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import authService from '../../../services/authService';
-import './SignupPage.css';
+import './LoginPage.css';
+import './ForgotPassword.css';
 
-const SignupPage = () => {
+const ResetPassword = () => {
   const [formData, setFormData] = useState({
-    fullName: '',
     email: '',
     password: '',
     confirmPassword: '',
-    agreeTerms: false
+    token: ''
   });
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [passwordStrength, setPasswordStrength] = useState(0);
   const [apiError, setApiError] = useState(null);
-  const [signupSuccess, setSignupSuccess] = useState(false);
+  const [resetSuccess, setResetSuccess] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState(0);
+  const [passwordRequirements, setPasswordRequirements] = useState({
+    length: false,
+    uppercase: false,
+    lowercase: false,
+    number: false,
+    special: false
+  });
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Password strength checker
+  // Extract token and email from URL query params
   useEffect(() => {
-    const checkPasswordStrength = (password) => {
-      let strength = 0;
-      if (password.length >= 6) strength++;
-      if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
-      if (password.match(/\d/)) strength++;
-      if (password.match(/[^a-zA-Z\d]/)) strength++;
-      return strength;
-    };
+    const queryParams = new URLSearchParams(location.search);
+    const token = queryParams.get('token');
+    const email = queryParams.get('email');
+    
+    if (token && email) {
+      setFormData(prev => ({
+        ...prev,
+        token,
+        email
+      }));
+    } else {
+      // If token or email is missing, show error
+      setApiError('رابط إعادة تعيين كلمة المرور غير صالح أو منتهي الصلاحية.');
+    }
+  }, [location]);
 
-    setPasswordStrength(checkPasswordStrength(formData.password));
+  // Password strength and requirements checker
+  useEffect(() => {
+    const password = formData.password;
+    const reqs = {
+      length: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      lowercase: /[a-z]/.test(password),
+      number: /[0-9]/.test(password),
+      special: /[^A-Za-z0-9]/.test(password)
+    };
+    
+    setPasswordRequirements(reqs);
+    
+    // Calculate strength
+    let strength = 0;
+    if (reqs.length) strength++;
+    if (reqs.uppercase && reqs.lowercase) strength++;
+    if (reqs.number) strength++;
+    if (reqs.special) strength++;
+    
+    setPasswordStrength(strength);
   }, [formData.password]);
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: value
     });
     
     // Clear error when user starts typing
@@ -58,32 +93,22 @@ const SignupPage = () => {
   const validateForm = () => {
     const newErrors = {};
     
-    if (!formData.fullName) {
-      newErrors.fullName = 'الاسم الكامل مطلوب';
-    } else if (formData.fullName.length < 2) {
-      newErrors.fullName = 'الاسم يجب أن يكون حرفين على الأقل';
-    }
-    
-    if (!formData.email) {
-      newErrors.email = 'البريد الإلكتروني مطلوب';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'البريد الإلكتروني غير صالح';
-    }
-    
     if (!formData.password) {
       newErrors.password = 'كلمة المرور مطلوبة';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+    } else if (formData.password.length < 8) {
+      newErrors.password = 'كلمة المرور يجب أن تكون 8 أحرف على الأقل';
+    } else if (!passwordRequirements.uppercase || !passwordRequirements.lowercase) {
+      newErrors.password = 'كلمة المرور يجب أن تحتوي على حروف كبيرة وصغيرة';
+    } else if (!passwordRequirements.number) {
+      newErrors.password = 'كلمة المرور يجب أن تحتوي على رقم واحد على الأقل';
+    } else if (!passwordRequirements.special) {
+      newErrors.password = 'كلمة المرور يجب أن تحتوي على رمز خاص واحد على الأقل';
     }
     
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = 'تأكيد كلمة المرور مطلوب';
     } else if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'كلمات المرور غير متطابقة';
-    }
-    
-    if (!formData.agreeTerms) {
-      newErrors.agreeTerms = 'يجب الموافقة على الشروط والأحكام';
     }
     
     setErrors(newErrors);
@@ -98,31 +123,43 @@ const SignupPage = () => {
       setApiError(null);
       
       try {
-        const response = await authService.signup(formData);
+        const response = await authService.resetPassword(
+          formData.token,
+          formData.email,
+          formData.password,
+          formData.confirmPassword
+        );
         
-        // Show success animation
-        setSignupSuccess(true);
-        
-        // Redirect after a short delay
-        setTimeout(() => {
-          navigate('/login', { 
-            state: { message: 'تم إنشاء الحساب بنجاح. يمكنك الآن تسجيل الدخول.' } 
-          });
-        }, 2000);
+        if (response.success) {
+          // Show success message
+          setResetSuccess(true);
+        } else {
+          setApiError(response.message || 'حدث خطأ أثناء إعادة تعيين كلمة المرور. يرجى المحاولة مرة أخرى.');
+        }
       } catch (error) {
-        // Handle signup errors
-        const errorMessage = error.response?.data?.message || 
-                             'حدث خطأ أثناء إنشاء الحساب. يرجى المحاولة مرة أخرى.';
-        setApiError(errorMessage);
+        // Handle validation errors
+        if (error.response?.data?.code === 'VALIDATION_ERROR') {
+          const validationErrors = error.response.data.errors || {};
+          const newErrors = {};
+          
+          if (validationErrors.token) {
+            setApiError('رابط إعادة تعيين كلمة المرور غير صالح أو منتهي الصلاحية.');
+          } else if (validationErrors.email) {
+            newErrors.email = validationErrors.email[0];
+          } else if (validationErrors.password) {
+            newErrors.password = validationErrors.password[0];
+          }
+          
+          setErrors(newErrors);
+        } else if (error.response?.data?.code === 'PASSWORD_RESET_FAILED') {
+          setApiError('رابط إعادة تعيين كلمة المرور غير صالح أو منتهي الصلاحية.');
+        } else {
+          setApiError('حدث خطأ أثناء إعادة تعيين كلمة المرور. يرجى المحاولة مرة أخرى.');
+        }
       } finally {
         setIsLoading(false);
       }
     }
-  };
-
-  const handleGoogleSignup = () => {
-    // TODO: Implement Google OAuth signup
-    console.log('Google signup clicked');
   };
 
   const getPasswordStrengthText = () => {
@@ -172,24 +209,24 @@ const SignupPage = () => {
         <Link to="/" className="auth-logo">
           <span className="logo-text">BuildingZ</span>
         </Link>
-        <Link to="/" className="back-link">
-          العودة للرئيسية
+        <Link to="/login" className="back-link">
+          العودة لتسجيل الدخول
         </Link>
       </motion.nav>
 
       {/* Main Content */}
       <div className="auth-main">
         <motion.div 
-          className="auth-card signup-card"
+          className="auth-card"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
           <AnimatePresence mode="wait">
-            {signupSuccess ? (
+            {resetSuccess ? (
               <motion.div 
                 key="success"
-                className="signup-success"
+                className="reset-success"
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0 }}
@@ -197,20 +234,23 @@ const SignupPage = () => {
                 <div className="success-icon">
                   <i className="fas fa-check-circle"></i>
                 </div>
-                <h2>تم إنشاء الحساب بنجاح</h2>
-                <p>جاري تحويلك لصفحة تسجيل الدخول...</p>
+                <h2>تم إعادة تعيين كلمة المرور</h2>
+                <p>تم إعادة تعيين كلمة المرور الخاصة بك بنجاح. يمكنك الآن تسجيل الدخول باستخدام كلمة المرور الجديدة.</p>
+                <Link to="/login" className="return-login-btn">
+                  تسجيل الدخول
+                </Link>
               </motion.div>
             ) : (
               <motion.div
-                key="signup-form"
+                key="form"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
                 {/* Header */}
                 <div className="auth-header">
-                  <h1>إنشاء حساب جديد</h1>
-                  <p>أنشئ حسابك للوصول إلى جميع خدماتنا</p>
+                  <h1>إعادة تعيين كلمة المرور</h1>
+                  <p>أدخل كلمة المرور الجديدة لحسابك</p>
                 </div>
 
                 {/* API Error Message */}
@@ -227,42 +267,8 @@ const SignupPage = () => {
                   )}
                 </AnimatePresence>
 
-                {/* Social Signup */}
-                <button className="social-btn" onClick={handleGoogleSignup}>
-                  <i className="fab fa-google"></i>
-                  <span>إنشاء حساب مع Google</span>
-                </button>
-
-                <div className="divider">
-                  <span>أو</span>
-                </div>
-
                 {/* Form */}
                 <form className="auth-form" onSubmit={handleSubmit}>
-                  <div className="input-group">
-                    <input
-                      type="text"
-                      name="fullName"
-                      value={formData.fullName}
-                      onChange={handleChange}
-                      placeholder="الاسم الكامل"
-                      className={errors.fullName ? 'error' : ''}
-                      autoComplete="name"
-                    />
-                    <AnimatePresence>
-                      {errors.fullName && (
-                        <motion.span 
-                          className="error-text"
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0 }}
-                        >
-                          {errors.fullName}
-                        </motion.span>
-                      )}
-                    </AnimatePresence>
-                  </div>
-
                   <div className="input-group">
                     <input
                       type="email"
@@ -270,8 +276,8 @@ const SignupPage = () => {
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="البريد الإلكتروني"
-                      className={errors.email ? 'error' : ''}
-                      autoComplete="email"
+                      readOnly
+                      className="readonly-input"
                     />
                     <AnimatePresence>
                       {errors.email && (
@@ -294,7 +300,7 @@ const SignupPage = () => {
                         name="password"
                         value={formData.password}
                         onChange={handleChange}
-                        placeholder="كلمة المرور"
+                        placeholder="كلمة المرور الجديدة"
                         className={errors.password ? 'error' : ''}
                         autoComplete="new-password"
                       />
@@ -321,20 +327,44 @@ const SignupPage = () => {
                     </AnimatePresence>
                     
                     {formData.password && (
-                      <div className="password-strength">
-                        <div className="strength-meter">
-                          <div 
-                            className="strength-meter-fill" 
-                            style={{
-                              width: `${(passwordStrength / 4) * 100}%`,
-                              backgroundColor: getPasswordStrengthColor()
-                            }}
-                          ></div>
+                      <>
+                        <div className="password-strength">
+                          <div className="strength-meter">
+                            <div 
+                              className="strength-meter-fill" 
+                              style={{
+                                width: `${(passwordStrength / 4) * 100}%`,
+                                backgroundColor: getPasswordStrengthColor()
+                              }}
+                            ></div>
+                          </div>
+                          <span className="strength-text" style={{ color: getPasswordStrengthColor() }}>
+                            {getPasswordStrengthText()}
+                          </span>
                         </div>
-                        <span className="strength-text" style={{ color: getPasswordStrengthColor() }}>
-                          {getPasswordStrengthText()}
-                        </span>
-                      </div>
+                        
+                        <div className="password-requirements">
+                          <p>يجب أن تحتوي كلمة المرور على:</p>
+                          <ul>
+                            <li className={passwordRequirements.length ? 'met' : ''}>
+                              <i className={`fas ${passwordRequirements.length ? 'fa-check' : 'fa-times'}`}></i>
+                              8 أحرف على الأقل
+                            </li>
+                            <li className={(passwordRequirements.uppercase && passwordRequirements.lowercase) ? 'met' : ''}>
+                              <i className={`fas ${(passwordRequirements.uppercase && passwordRequirements.lowercase) ? 'fa-check' : 'fa-times'}`}></i>
+                              حروف كبيرة وصغيرة
+                            </li>
+                            <li className={passwordRequirements.number ? 'met' : ''}>
+                              <i className={`fas ${passwordRequirements.number ? 'fa-check' : 'fa-times'}`}></i>
+                              رقم واحد على الأقل
+                            </li>
+                            <li className={passwordRequirements.special ? 'met' : ''}>
+                              <i className={`fas ${passwordRequirements.special ? 'fa-check' : 'fa-times'}`}></i>
+                              رمز خاص واحد على الأقل (!@#$%^&*)
+                            </li>
+                          </ul>
+                        </div>
+                      </>
                     )}
                   </div>
 
@@ -372,32 +402,6 @@ const SignupPage = () => {
                     </AnimatePresence>
                   </div>
 
-                  <div className="terms-group">
-                    <label className="checkbox terms-checkbox">
-                      <input
-                        type="checkbox"
-                        name="agreeTerms"
-                        checked={formData.agreeTerms}
-                        onChange={handleChange}
-                      />
-                      <span>
-                        أوافق على <Link to="/terms" className="terms-link">الشروط والأحكام</Link> و <Link to="/privacy" className="terms-link">سياسة الخصوصية</Link>
-                      </span>
-                    </label>
-                    <AnimatePresence>
-                      {errors.agreeTerms && (
-                        <motion.span 
-                          className="error-text"
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0 }}
-                        >
-                          {errors.agreeTerms}
-                        </motion.span>
-                      )}
-                    </AnimatePresence>
-                  </div>
-
                   <motion.button 
                     type="submit" 
                     className="submit-btn"
@@ -408,19 +412,13 @@ const SignupPage = () => {
                     {isLoading ? (
                       <>
                         <i className="fas fa-spinner fa-spin"></i>
-                        جاري إنشاء الحساب...
+                        جاري إعادة التعيين...
                       </>
                     ) : (
-                      'إنشاء حساب'
+                      'إعادة تعيين كلمة المرور'
                     )}
                   </motion.button>
                 </form>
-
-                {/* Footer */}
-                <div className="auth-footer">
-                  <span>لديك حساب بالفعل؟</span>
-                  <Link to="/login" className="switch-link">تسجيل الدخول</Link>
-                </div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -430,4 +428,4 @@ const SignupPage = () => {
   );
 };
 
-export default SignupPage; 
+export default ResetPassword; 

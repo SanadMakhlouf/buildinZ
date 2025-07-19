@@ -11,6 +11,8 @@ import SearchPage from './pages/Search/SearchPage';
 import AdminPage from './pages/Admin/AdminPage';
 import LoginPage from './pages/Auth/Login/LoginPage';
 import SignupPage from './pages/Auth/Signup/SignupPage';
+import ForgotPassword from './pages/Auth/Login/ForgotPassword';
+import ResetPassword from './pages/Auth/Login/ResetPassword';
 import ProfilePage from './pages/Profile/ProfilePage';
 import authService from './services/authService';
 
@@ -63,6 +65,8 @@ function App() {
           />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
         </Routes>
       </div>
     </Router>

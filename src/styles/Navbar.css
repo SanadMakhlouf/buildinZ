@@ -58,24 +58,22 @@
 .navbar-logo {
   display: flex;
   align-items: center;
+  margin-right: 1rem;
 }
 
 .logo-link {
   display: flex;
   align-items: center;
   text-decoration: none;
-  gap: 0.75rem;
 }
 
 .logo-image {
-  height: 40px;
-  width: auto;
   transition: var(--transition);
   object-fit: contain;
 }
 
 .navbar-scrolled .logo-image {
-  height: 36px;
+  transform: scale(0.9);
 }
 
 .logo-icon {
@@ -428,12 +426,16 @@
 /* Responsive Design */
 @media (max-width: 1024px) {
   .navbar-nav {
-    gap: 1.5rem;
+    gap: 1.25rem;
     margin: 0 1rem;
   }
   
   .search-wrapper.active .search-container {
     width: 250px;
+  }
+  
+  .logo-image {
+    height: 50px !important;
   }
 }
 
@@ -457,8 +459,12 @@
   }
   
   .location-button .action-label,
-  .search-wrapper {
+  .profile-button .action-label {
     display: none;
+  }
+  
+  .logo-image {
+    height: 45px !important;
   }
 }
 
@@ -468,11 +474,38 @@
   }
   
   .logo-text {
-    font-size: 1.25rem;
+    display: none;
   }
   
   .notification-wrapper,
-  .cart-wrapper {
+  .profile-wrapper {
     display: none;
+  }
+  
+  .navbar-actions {
+    gap: 0.25rem;
+  }
+  
+  .action-button {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .logo-image {
+    height: 40px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    height: 60px;
+  }
+  
+  .navbar-scrolled {
+    height: 55px;
+  }
+  
+  .logo-image {
+    height: 35px !important;
   }
 }

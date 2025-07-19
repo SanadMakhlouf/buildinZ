@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import authService from '../../../services/authService';
 import './LoginPage.css';
 
@@ -15,6 +15,18 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  const [loginSuccess, setLoginSuccess] = useState(false);
+
+  // Check for redirect parameters
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const redirectMessage = params.get('message');
+    
+    if (redirectMessage) {
+      setApiError(redirectMessage);
+    }
+  }, [location]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -69,8 +81,13 @@ const LoginPage = () => {
           formData.rememberMe
         );
         
-        // Successful login
-        navigate('/services');
+        // Show success animation
+        setLoginSuccess(true);
+        
+        // Redirect after a short delay
+        setTimeout(() => {
+          navigate('/services');
+        }, 1000);
       } catch (error) {
         // Handle login errors
         const errorMessage = error.response?.data?.message || 
@@ -115,104 +132,159 @@ const LoginPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          {/* Header */}
-          <div className="auth-header">
-            <h1>تسجيل الدخول</h1>
-            <p>أدخل بياناتك للوصول إلى حسابك</p>
-          </div>
+          <AnimatePresence mode="wait">
+            {loginSuccess ? (
+              <motion.div 
+                key="success"
+                className="login-success"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <div className="success-icon">
+                  <i className="fas fa-check-circle"></i>
+                </div>
+                <h2>تم تسجيل الدخول بنجاح</h2>
+                <p>جاري تحويلك...</p>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="login-form"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                {/* Header */}
+                <div className="auth-header">
+                  <h1>تسجيل الدخول</h1>
+                  <p>أدخل بياناتك للوصول إلى حسابك</p>
+                </div>
 
-          {/* API Error Message */}
-          {apiError && (
-            <div className="api-error-message">
-              {apiError}
-            </div>
-          )}
+                {/* API Error Message */}
+                <AnimatePresence>
+                  {apiError && (
+                    <motion.div 
+                      className="api-error-message"
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                    >
+                      {apiError}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
-          {/* Social Login */}
-          <button className="social-btn" onClick={handleGoogleLogin}>
-            <i className="fab fa-google"></i>
-            <span>متابعة مع Google</span>
-          </button>
-
-          <div className="divider">
-            <span>أو</span>
-          </div>
-
-          {/* Form */}
-          <form className="auth-form" onSubmit={handleSubmit}>
-            <div className="input-group">
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="البريد الإلكتروني"
-                className={errors.email ? 'error' : ''}
-              />
-              {errors.email && (
-                <span className="error-text">{errors.email}</span>
-              )}
-            </div>
-
-            <div className="input-group">
-              <div className="password-input">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="كلمة المرور"
-                  className={errors.password ? 'error' : ''}
-                />
-                <button
-                  type="button"
-                  className="password-toggle"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                {/* Social Login */}
+                <button className="social-btn" onClick={handleGoogleLogin}>
+                  <i className="fab fa-google"></i>
+                  <span>متابعة مع Google</span>
                 </button>
-              </div>
-              {errors.password && (
-                <span className="error-text">{errors.password}</span>
-              )}
-            </div>
 
-            <div className="form-options">
-              <label className="checkbox">
-                <input
-                  type="checkbox"
-                  name="rememberMe"
-                  checked={formData.rememberMe}
-                  onChange={handleChange}
-                />
-                <span>تذكرني</span>
-              </label>
-              <Link to="/forgot-password" className="forgot-link">
-                نسيت كلمة المرور؟
-              </Link>
-            </div>
+                <div className="divider">
+                  <span>أو</span>
+                </div>
 
-            <button 
-              type="submit" 
-              className="submit-btn"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <i className="fas fa-spinner fa-spin"></i>
-                  جاري تسجيل الدخول...
-                </>
-              ) : (
-                'تسجيل الدخول'
-              )}
-            </button>
-          </form>
+                {/* Form */}
+                <form className="auth-form" onSubmit={handleSubmit}>
+                  <div className="input-group">
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder="البريد الإلكتروني"
+                      className={errors.email ? 'error' : ''}
+                      autoComplete="email"
+                    />
+                    <AnimatePresence>
+                      {errors.email && (
+                        <motion.span 
+                          className="error-text"
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0 }}
+                        >
+                          {errors.email}
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
+                  </div>
 
-          {/* Footer */}
-          <div className="auth-footer">
-            <span>ليس لديك حساب؟</span>
-            <Link to="/signup" className="switch-link">إنشاء حساب جديد</Link>
-          </div>
+                  <div className="input-group">
+                    <div className="password-input">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        placeholder="كلمة المرور"
+                        className={errors.password ? 'error' : ''}
+                        autoComplete="current-password"
+                      />
+                      <button
+                        type="button"
+                        className="password-toggle"
+                        onClick={() => setShowPassword(!showPassword)}
+                        aria-label={showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
+                      >
+                        <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                      </button>
+                    </div>
+                    <AnimatePresence>
+                      {errors.password && (
+                        <motion.span 
+                          className="error-text"
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0 }}
+                        >
+                          {errors.password}
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  <div className="form-options">
+                    <label className="checkbox">
+                      <input
+                        type="checkbox"
+                        name="rememberMe"
+                        checked={formData.rememberMe}
+                        onChange={handleChange}
+                      />
+                      <span>تذكرني</span>
+                    </label>
+                    <Link to="/forgot-password" className="forgot-link">
+                      نسيت كلمة المرور؟
+                    </Link>
+                  </div>
+
+                  <motion.button 
+                    type="submit" 
+                    className="submit-btn"
+                    disabled={isLoading}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    {isLoading ? (
+                      <>
+                        <i className="fas fa-spinner fa-spin"></i>
+                        جاري تسجيل الدخول...
+                      </>
+                    ) : (
+                      'تسجيل الدخول'
+                    )}
+                  </motion.button>
+                </form>
+
+                {/* Footer */}
+                <div className="auth-footer">
+                  <span>ليس لديك حساب؟</span>
+                  <Link to="/signup" className="switch-link">إنشاء حساب جديد</Link>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
       </div>
     </div>

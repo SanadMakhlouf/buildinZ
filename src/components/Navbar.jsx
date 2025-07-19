@@ -5,7 +5,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faSearch, 
   faBars, 
-  faLocationDot, 
   faBell, 
   faShoppingBag, 
   faUser,
@@ -16,9 +15,7 @@ import {
   faQuestionCircle,
   faHeart
 } from '@fortawesome/free-solid-svg-icons';
-import LocationModal from './LocationModal';
 import SearchModal from './SearchModal';
-import { getDefaultAddress } from '../utils/addressUtils';
 
 const Navbar = () => {
   const location = useLocation();
@@ -27,9 +24,7 @@ const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notificationCount] = useState(3);
   const [cartCount] = useState(2);
-  const [locationModalOpen, setLocationModalOpen] = useState(false);
   const [searchModalOpen, setSearchModalOpen] = useState(false);
-  const [currentLocation, setCurrentLocation] = useState("دبي");
 
   // Handle scroll effect
   useEffect(() => {
@@ -47,14 +42,6 @@ const Navbar = () => {
     };
   }, []);
 
-  // Load default address
-  useEffect(() => {
-    const defaultAddress = getDefaultAddress();
-    if (defaultAddress) {
-      setCurrentLocation(defaultAddress.displayAddress || defaultAddress.formatted_address || "دبي");
-    }
-  }, []);
-
   // Close mobile menu when route changes
   useEffect(() => {
     setMobileMenuOpen(false);
@@ -68,14 +55,6 @@ const Navbar = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
 
-  const openLocationModal = () => {
-    setLocationModalOpen(true);
-  };
-
-  const handleLocationSelect = (selectedLocation) => {
-    setCurrentLocation(selectedLocation);
-  };
-
   return (
     <>
       <header className={`navbar ${scrolled ? 'navbar-scrolled' : ''}`} dir="rtl">
@@ -83,7 +62,7 @@ const Navbar = () => {
           {/* Logo */}
           <div className="navbar-logo">
             <Link to="/" className="logo-link">
-              <img src="/logo.png" alt="BuildingZ Logo" className="logo-image" style={{ height: '80px' }} />
+              <img src="/logo.png" alt="BuildingZ Logo" className="logo-image" style={{ height: '60px', width: 'auto' }} />
             </Link>
           </div>
 
@@ -114,12 +93,6 @@ const Navbar = () => {
                 <FontAwesomeIcon icon={faSearch} />
               </button>
             </div>
-
-            {/* Location */}
-            <button className="action-button location-button" onClick={openLocationModal}>
-              <FontAwesomeIcon icon={faLocationDot} />
-              <span className="action-label">{currentLocation}</span>
-            </button>
 
             {/* Notifications */}
             <div className="notification-wrapper">
@@ -202,36 +175,21 @@ const Navbar = () => {
                 <FontAwesomeIcon icon={faStore} />
                 <span>المتجر</span>
               </Link>
+              <Link to="/about" className="mobile-nav-link">
+                <FontAwesomeIcon icon={faQuestionCircle} />
+                <span>من نحن</span>
+              </Link>
               <Link to="/favorites" className="mobile-nav-link">
                 <FontAwesomeIcon icon={faHeart} />
                 <span>المفضلة</span>
               </Link>
-              <Link to="/help" className="mobile-nav-link">
-                <FontAwesomeIcon icon={faQuestionCircle} />
-                <span>المساعدة</span>
-              </Link>
             </nav>
-
-            {/* Mobile User Actions */}
-            <div className="mobile-user-actions">
-              <Link to="/profile" className="mobile-user-button">
-                <FontAwesomeIcon icon={faUser} />
-                <span>حسابي</span>
-              </Link>
-            </div>
           </div>
         </div>
       </header>
 
-      {/* Location Modal */}
-      <LocationModal 
-        isOpen={locationModalOpen}
-        onClose={() => setLocationModalOpen(false)}
-        onSelectLocation={handleLocationSelect}
-      />
-
       {/* Search Modal */}
-      <SearchModal
+      <SearchModal 
         isOpen={searchModalOpen}
         onClose={() => setSearchModalOpen(false)}
       />

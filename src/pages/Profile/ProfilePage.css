@@ -537,3 +537,17 @@
 .input-group.has-error input:focus {
   animation: shake 0.6s;
 } 
+
+.addresses-section {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.addresses-section h2 {
+  margin-bottom: 1.8rem;
+  color: #0A3259;
+  border-bottom: 2px solid #DAA520;
+  padding-bottom: 12px;
+  font-size: 1.8rem;
+  font-weight: 600;
+} 

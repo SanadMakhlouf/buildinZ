@@ -1,342 +1,497 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import AOS from 'aos';
-import 'aos/dist/aos.css';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+  faMapMarkerAlt, faSearch, faClock, faCheckCircle, 
+  faShieldAlt, faUserFriends, faStar, faHandshake,
+  faAppleAlt, faPlay, faArrowRight, faTools,
+  faHome, faWrench, faPaintRoller, faBolt, faWater,
+  faUserCheck, faMoneyBillWave, faHeadset, faQuoteRight,
+  faChevronDown, faChevronUp, faCheck, faPhone, faEnvelope
+} from '@fortawesome/free-solid-svg-icons';
+import { faApple, faGooglePlay } from '@fortawesome/free-brands-svg-icons';
 import './HomePage.css';
-import buildingzData from '../../data/json/buildingzData.json';
-import SkeletonLoader from '../../components/SkeletonLoader';
+import addressService from '../../services/addressService';
+import mockupImage from '../../assets/app-mockup';
 
 const HomePage = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [contentReady, setContentReady] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  // Keep existing state variables
+  const [isDetectingLocation, setIsDetectingLocation] = useState(false);
+  const [locationStatus, setLocationStatus] = useState(null);
+  const [isFallbackLocation, setIsFallbackLocation] = useState(false);
+  
+  // Add new state variables for enhanced interactions
+  const [activeFeature, setActiveFeature] = useState(null);
+  const [animateHero, setAnimateHero] = useState(false);
+  const [showScrollIndicator, setShowScrollIndicator] = useState(true);
+  
   const navigate = useNavigate();
-
-  // Loading management
+  
+  // Refs for scroll animations
+  const featuresRef = useRef(null);
+  const testimonialsRef = useRef(null);
+  const howItWorksRef = useRef(null);
+  const ctaRef = useRef(null);
+  const appDownloadRef = useRef(null);
+  const heroRef = useRef(null);
+  
+  // Initialize animations and effects
   useEffect(() => {
-    // Simulate loading time for assets and data
-    const loadingTimer = setTimeout(() => {
-      setContentReady(true);
-      
-      // Force the loading to complete after a set time
-      const forceCompleteTimer = setTimeout(() => {
-        setIsLoading(false);
-      }, 1500); // Force completion after 1.5 seconds
-      
-      return () => clearTimeout(forceCompleteTimer);
-    }, 100);
-
-    return () => clearTimeout(loadingTimer);
-  }, []);
-
-  // Initialize AOS after loading
-  useEffect(() => {
-    if (contentReady) {
-      AOS.init({
-        duration: 1000,
-        once: true,
-        easing: 'ease-out-cubic',
+    // Trigger hero animation after a short delay
+    setTimeout(() => {
+      setAnimateHero(true);
+    }, 500);
+    
+    // Hide scroll indicator when user scrolls
+    const handleScroll = () => {
+      if (window.scrollY > 100) {
+        setShowScrollIndicator(false);
+      } else {
+        setShowScrollIndicator(true);
+      }
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    
+    // Setup intersection observer for animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const elements = entry.target.querySelectorAll('.fade-in, .stagger-item');
+          elements.forEach((el, index) => {
+            setTimeout(() => {
+              el.classList.add('visible');
+            }, index * 100);
+          });
+        }
       });
+    }, observerOptions);
+    
+    // Observe all sections with animations
+    const animatedSections = document.querySelectorAll('.feature-section, .testimonials-section, .how-it-works-section, .cta-section, .app-download-section');
+    animatedSections.forEach(section => {
+      observer.observe(section);
+    });
+    
+    // Detect user location
+    detectUserLocation();
+    
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+  
+  // Keep existing detectUserLocation function
+  const detectUserLocation = async () => {
+    setIsDetectingLocation(true);
+    setLocationStatus('جاري تحديد موقعك...');
+    
+    try {
+      const locationData = await addressService.getCurrentLocation();
+      
+      // Check if this is a fallback location (Dubai)
+      const isFallback = locationData.latitude === 25.2048 && locationData.longitude === 55.2708;
+      setIsFallbackLocation(isFallback);
+      
+      if (isFallback) {
+        setLocationStatus('تم استخدام موقع افتراضي (إمارة دبي)');
+      } else {
+        setLocationStatus(locationData.formatted_address || 'تم تحديد موقعك بنجاح');
+      }
+    } catch (error) {
+      console.error('Error getting location:', error);
+      
+      // Get a more specific error message based on the error code
+      let errorMessage = 'لم نتمكن من تحديد موقعك. يرجى المحاولة مرة أخرى.';
+      
+      if (error.code) {
+        switch (error.code) {
+          case 'PERMISSION_DENIED':
+            errorMessage = 'تم رفض إذن الموقع. يرجى تمكين الوصول إلى الموقع في إعدادات المتصفح.';
+            break;
+          case 'POSITION_UNAVAILABLE':
+            errorMessage = 'موقعك الحالي غير متاح. تم استخدام موقع افتراضي.';
+            setIsFallbackLocation(true);
+            break;
+          case 'TIMEOUT':
+            errorMessage = 'انتهت مهلة طلب الموقع. يرجى المحاولة مرة أخرى.';
+            break;
+          case 'GEOLOCATION_NOT_SUPPORTED':
+            errorMessage = 'متصفحك لا يدعم تحديد الموقع.';
+            break;
+        }
+      }
+      
+      setLocationStatus(errorMessage);
+    } finally {
+      setIsDetectingLocation(false);
     }
-  }, [contentReady]);
-
-  // Handle loading completion - this can be triggered by the skeleton loader
-  const handleLoadingComplete = () => {
-    setIsLoading(false);
   };
 
-  // Handle search submission
-  const handleSearchSubmit = (e) => {
+  // Handle search form submission
+  const handleSearch = (e) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
-    }
+    navigate('/services');
   };
-
+  
+  // Scroll to section
+  const scrollToSection = (ref) => {
+    ref.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+  
+  // Feature hover handler
+  const handleFeatureHover = (index) => {
+    setActiveFeature(index);
+  };
+  
+  // Features data
+  const features = [
+    {
+      icon: faCheckCircle,
+      title: "خدمات مضمونة",
+      description: "خدمات مضمونة، مدعومة بتقييمات عملاء حقيقيين"
+    },
+    {
+      icon: faMoneyBillWave,
+      title: "أسعار واضحة",
+      description: "أسعار واضحة دون مفاجآت"
+    },
+    {
+      icon: faUserCheck,
+      title: "فريق محترف",
+      description: "فريق محترف ومدرّب بعناية"
+    },
+    {
+      icon: faHeadset,
+      title: "دعم فني متواصل",
+      description: "دعم فني متواصل على مدار الساعة"
+    }
+  ];
+  
   // Testimonials data
   const testimonials = [
     {
-      id: 1,
-      text: "جربت خدمة تركيب من BuildingZ وكان الفني محترف ووصل في الوقت المحدد!",
-      name: "خالد",
-      location: "دبي"
+      text: "تجربة رائعة مع Buildinz! وصل الفني في الموعد المحدد تماماً وأنجز العمل باحترافية عالية. سأستخدم الخدمة مرة أخرى بالتأكيد.",
+      name: "أحمد محمد",
+      location: "دبي",
+      rating: 5
     },
     {
-      id: 2,
-      text: "أطلب من التطبيق خدمات تنظيف بشكل أسبوعي. جودة ممتازة وسهولة في التعامل.",
-      name: "مريم",
-      location: "أبوظبي"
+      text: "سهولة في الحجز ودقة في المواعيد وجودة ممتازة في العمل. أنصح بشدة بخدمات Buildinz لأي شخص يبحث عن خدمات منزلية موثوقة.",
+      name: "سارة عبدالله",
+      location: "أبوظبي",
+      rating: 5
     },
     {
-      id: 3,
-      text: "كل شيء تم إلكترونيًا وبسهولة، فريق الدعم ساعدني فوراً لما واجهت مشكلة بسيطة.",
-      name: "أحمد",
-      location: "الشارقة"
+      text: "الأسعار شفافة تماماً والخدمة ممتازة. لم أعد أقلق بشأن الصيانة المنزلية بعد اكتشافي لـ Buildinz.",
+      name: "خالد العلي",
+      location: "الشارقة",
+      rating: 4
     }
   ];
-
-  // Stats data
-  const stats = [
-    { id: 1, icon: "fa-check", value: "15,000+", label: "خدمة منفذة بنجاح" },
-    { id: 2, icon: "fa-tools", value: "300+", label: "فني ومزود خدمة نشط" },
-    { id: 3, icon: "fa-city", value: "100%", label: "تغطية شاملة لكل الإمارات" },
-    { id: 4, icon: "fa-star", value: "4.8/5", label: "معدل رضا العملاء" }
-  ];
-
-  // Group categories by type
-  const serviceGroups = [
-    {
-      title: "التنظيف العام",
-      services: [
-        { id: 101, name: "تنظيف المنزل", icon: "🧹", image: "/images/services/home-cleaning.jpg" },
-        { id: 102, name: "تنظيف الأثاث", icon: "🛋️", image: "/images/services/furniture-cleaning.jpg" },
-        { id: 103, name: "تنظيف السجاد", icon: "🧶", image: "/images/services/carpet-cleaning.jpg" },
-        { id: 104, name: "تنظيف المكيفات", icon: "❄️", image: "/images/services/ac-cleaning.jpg" },
-        { id: 105, name: "تنظيف الغسيل والكي", icon: "👕", image: "/images/services/laundry-cleaning.jpg" }
-      ]
-    },
-    {
-      title: "صالون وسبا في المنزل",
-      services: [
-        { id: 201, name: "صالون نسائي", icon: "💇‍♀️", image: "/images/services/women-salon.jpg" },
-        { id: 202, name: "سبا نسائي", icon: "💆‍♀️", image: "/images/services/women-spa.jpg" },
-        { id: 203, name: "صالون رجالي", icon: "💇‍♂️", image: "/images/services/men-salon.jpg" },
-        { id: 204, name: "سبا رجالي", icon: "💆‍♂️", image: "/images/services/men-spa.jpg" },
-        { id: 205, name: "العناية بالشعر", icon: "✂️", image: "/images/services/hair-care.jpg" }
-      ]
-    },
-    {
-      title: "الصيانة والتركيب",
-      services: [
-        { id: 301, name: "الصيانة العامة", icon: "🔧", image: "/images/services/handyman.jpg" },
-        { id: 302, name: "دهان المنزل", icon: "🎨", image: "/images/services/home-painting.jpg" }
-      ]
-    },
-    {
-      title: "الرعاية الصحية في المنزل",
-      services: [
-        { id: 401, name: "فحوصات منزلية", icon: "🩺", image: "/images/services/lab-tests.jpg" },
-        { id: 402, name: "العلاج الطبيعي", icon: "🧠", image: "/images/services/physiotherapy.jpg" },
-        { id: 403, name: "استشارات طبية", icon: "👨‍⚕️", image: "/images/services/doctor-consultation.jpg" },
-        { id: 404, name: "فحوصات PCR", icon: "🧪", image: "/images/services/pcr-test.jpg" },
-        { id: 405, name: "رعاية التمريض", icon: "👩‍⚕️", image: "/images/services/nurse-care.jpg" }
-      ]
-    }
-  ];
-
-  // Features for "Why Choose Us" section
-  const features = [
-    {
-      id: 1,
-      title: "أفضل المحترفين",
-      description: "فنيونا من أفضل المحترفين في مجالاتهم، بمعدل تقييم 4.8/5 من العملاء.",
-      icon: "⭐"
-    },
-    {
-      id: 2,
-      title: "توفر بنفس اليوم",
-      description: "احجز خدمتك في أي وقت، وحتى في نفس اليوم، بكل سهولة.",
-      icon: "🕒"
-    },
-    {
-      id: 3,
-      title: "جودة وقيمة مضمونة",
-      description: "خدماتنا ذات جودة عالية وبأسعار تنافسية، مع ضمان رضا العميل.",
-      icon: "✅"
-    },
-    {
-      id: 4,
-      title: "تطبيق سهل الاستخدام",
-      description: "تطبيقنا سهل الاستخدام ويوفر كل ما تحتاجه من خدمات منزلية.",
-      icon: "📱"
-    }
-  ];
-
+  
   return (
-    <>
-      {/* Loading Screen */}
-      <SkeletonLoader 
-        isLoading={isLoading} 
-        onComplete={handleLoadingComplete}
-      />
-      
-      {/* Main Homepage Content */}
-      {!isLoading && (
-        <div className="homepage">
-          {/* Hero Section */}
-          <section className="hero-section">
-            <div className="container">
-              <div className="hero-content">
-                <h1 className="hero-title">
-                  أنجز كل خدماتك المنزلية والتجارية بسهولة مع{' '}
-                  <span className="highlight">BuildingZ</span>
-                </h1>
-                
-                <p className="hero-description">
-                  نحن المنصة الأولى في الإمارات التي تتيح لك حجز خدمات موثوقة مثل التنظيف، الصيانة، التركيبات، وغيرها بضغطة زر.
-                </p>
-                
-                {/* Search Input */}
-                <form className="hero-search-form" onSubmit={handleSearchSubmit}>
-                  <div className="search-input-container">
-                    <input
-                      type="text"
-                      className="hero-search-input"
-                      placeholder="ابحث عن خدمة..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                    <button type="submit" className="search-button">
-                      <i className="fas fa-search"></i>
-                    </button>
-                  </div>
-                </form>
-
-                <div className="hero-buttons">
-                  <Link to="/services" className="primary-btn">
-                    <i className="fas fa-tools btn-icon"></i>
-                    استكشف الخدمات
-                  </Link>
-                  <Link to="/products" className="secondary-btn">
-                    <i className="fas fa-box-open btn-icon"></i>
-                    تصفح المنتجات
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Service Categories Section */}
-          {serviceGroups.map((group, index) => (
-            <section key={index} className="service-category-section">
-              <div className="container">
-                <div className="section-header">
-                  <h2 className="section-title">{group.title}</h2>
-                  <div className="section-actions">
-                    <Link to={`/services?category=${encodeURIComponent(group.title)}`} className="see-all-link">
-                      عرض الكل <i className="fas fa-arrow-left"></i>
-                    </Link>
-                  </div>
-                </div>
-                
-                <div className="services-grid">
-                  {group.services.map(service => (
-                    <Link to={`/services?id=${service.id}`} key={service.id} className="service-card">
-                      <div className="service-image">
-                        <div className="service-icon">{service.icon}</div>
-                      </div>
-                      <h3 className="service-name">{service.name}</h3>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </section>
-          ))}
-
-          {/* Why Choose Us Section */}
-          <section className="why-choose-us-section">
-            <div className="container">
-              <h2 className="section-title">هناك العديد من الأسباب لاختيار BuildingZ!</h2>
-              <p className="section-description">إليك أهم ما يميزنا</p>
+    <div className="homepage">
+      {/* Hero Section - KEEP INTACT but with enhancements */}
+      <section className="hero-section" ref={heroRef}>
+        <div className="container">
+          <div className={`hero-content ${animateHero ? 'visible' : ''}`}>
+            <div className="hero-location">
+              <h3 className="location-heading">
+                <FontAwesomeIcon icon={faMapMarkerAlt} />
+                الموقع الحالي
+              </h3>
               
-              <div className="features-grid">
-                {features.map(feature => (
-                  <div key={feature.id} className="feature-card" data-aos="fade-up">
-                    <div className="feature-icon">{feature.icon}</div>
-                    <h3 className="feature-title">{feature.title}</h3>
-                    <p className="feature-description">{feature.description}</p>
-                  </div>
-                ))}
+              <div className={`location-status ${isDetectingLocation ? 'detecting' : ''} ${locationStatus && !isDetectingLocation ? (isFallbackLocation ? 'fallback' : 'success') : ''}`}>
+                <FontAwesomeIcon icon={isDetectingLocation ? faClock : (isFallbackLocation ? faMapMarkerAlt : faCheckCircle)} spin={isDetectingLocation} />
+                <span>{locationStatus || 'يرجى السماح بالوصول إلى موقعك'}</span>
+                
+                {!isDetectingLocation && (
+                  <button onClick={detectUserLocation} disabled={isDetectingLocation}>
+                    <FontAwesomeIcon icon={faMapMarkerAlt} />
+                    تحديث الموقع
+                  </button>
+                )}
               </div>
             </div>
-          </section>
-
-          {/* Testimonials Section */}
-          <section className="testimonials-section">
-            <div className="container">
-              <h2 className="section-title">ماذا يقول العملاء عن BuildingZ</h2>
-              <p className="section-description">BuildingZ حاصل على تقييم 4.8 من 5 بناءً على 1525 تقييم</p>
-              
-              <div className="testimonials-grid">
-                {testimonials.map(testimonial => (
-                  <div key={testimonial.id} className="testimonial-card" data-aos="fade-up">
-                    <div className="testimonial-stars">
-                      {[...Array(5)].map((_, i) => (
-                        <i key={i} className="fas fa-star"></i>
-                      ))}
-                    </div>
-                    <p className="testimonial-text">{testimonial.text}</p>
-                    <div className="testimonial-author">
-                      <div className="author-name">{testimonial.name}</div>
-                      <div className="author-location">{testimonial.location}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* App Download Section */}
-          <section className="app-download-section">
-            <div className="container">
-              <div className="app-content">
-                <div className="app-text">
-                  <h2 className="section-title">إدارة جميع المهام بنقرة واحدة!</h2>
-                  <p className="section-description">تتبع وإدارة مواعيدك، حجز الخدمات، ومتابعة الفنيين بكل سهولة.</p>
-                  
-                  <div className="app-buttons">
-                    <a href="#" className="app-store-btn">
-                      <i className="fab fa-apple"></i>
-                      <div className="btn-text">
-                        <span className="small-text">تحميل من</span>
-                        <span className="big-text">App Store</span>
-                      </div>
-                    </a>
-                    <a href="#" className="play-store-btn">
-                      <i className="fab fa-google-play"></i>
-                      <div className="btn-text">
-                        <span className="small-text">تحميل من</span>
-                        <span className="big-text">Google Play</span>
-                      </div>
-                    </a>
-                  </div>
+            
+            <h1 className="hero-title">مرحباً بك في Buildinz – حيث تبدأ الراحة وتنتهي المهام</h1>
+            <p className="hero-description">
+              هل تبحث عن طريقة سهلة، سريعة وموثوقة لإنجاز الأعمال في منزلك أو مكان عملك؟
+              مع Buildinz، لم يعد الأمر معقداً. نحن هنا لنقدم لك حلاً شاملاً لكل ما تحتاجه.
+            </p>
+            
+            <div className="hero-search-form">
+              <form onSubmit={handleSearch}>
+                <div className="search-input-container">
+                  <FontAwesomeIcon icon={faSearch} className="search-icon" />
+                  <input 
+                    type="text" 
+                    className="hero-search-input" 
+                    placeholder="ما الخدمة التي تبحث عنها؟" 
+                  />
+                  <button type="submit" className="search-button">
+                    بحث <FontAwesomeIcon icon={faSearch} />
+                  </button>
                 </div>
-                <div className="app-image">
-                  <img src="/images/app-mockup.png" alt="BuildingZ App" className="app-mockup" />
-                </div>
+              </form>
+            </div>
+            
+            <div className="popular-searches">
+              <span className="popular-label">الأكثر بحثاً:</span>
+              <div className="popular-tags">
+                <button>تنظيف المنزل</button>
+                <button>صيانة التكييف</button>
+                <button>سباكة</button>
+                <button>كهرباء</button>
               </div>
             </div>
-          </section>
-
-          {/* Promise Section */}
-          <section className="promise-section">
-            <div className="container">
-              <div className="promise-content">
-                <div className="promise-icon">
-                  <i className="fas fa-shield-alt"></i>
-                </div>
-                <h2 className="promise-title">وعد BuildingZ - التميز في كل منزل</h2>
-                <p className="promise-text">
-                  في BuildingZ، نلتزم بأعلى معايير الخدمة المنزلية. فريقنا المدرب يقدم تجربة خدمة متميزة، مما يضمن أن منزلك في أيدٍ خبيرة. راحة بالك هي أولويتنا.
-                </p>
-              </div>
-            </div>
-          </section>
-
-          {/* Footer CTA Section */}
-          <section className="cta-section">
-            <div className="container">
-              <h2 className="cta-title">جاهز لتجربة أفضل خدمات منزلية؟</h2>
-              <p className="cta-description">انضم إلى آلاف العملاء السعداء واحصل على خدمة استثنائية اليوم.</p>
-              <Link to="/services" className="cta-button">
-                احجز خدمة الآن <i className="fas fa-arrow-left"></i>
+            
+            <div className="hero-buttons">
+              <Link to="/services" className="primary-btn">
+                <FontAwesomeIcon icon={faSearch} className="btn-icon" />
+                استكشف الخدمات
+              </Link>
+              <Link to="/signup" className="secondary-btn">
+                <FontAwesomeIcon icon={faUserFriends} className="btn-icon" />
+                انضم إلينا
               </Link>
             </div>
-          </section>
+            
+            <div className="hero-stats">
+              <div className="stat-item">
+                <span className="stat-value">500+</span>
+                <span className="stat-label">خدمة متاحة</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-value">10,000+</span>
+                <span className="stat-label">عميل سعيد</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-value">4.8/5</span>
+                <span className="stat-label">تقييم العملاء</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className={`hero-image ${animateHero ? 'visible' : ''}`}>
+            <div className="hero-image-container">
+              <div className="image-overlay"></div>
+              {/* Hero image is set in CSS */}
+            </div>
+          </div>
         </div>
-      )}
-    </>
+        
+        {/* Scroll indicator */}
+        {showScrollIndicator && (
+          <div className="scroll-indicator" onClick={() => scrollToSection(featuresRef)}>
+            <span>اكتشف المزيد</span>
+            <FontAwesomeIcon icon={faChevronDown} bounce />
+          </div>
+        )}
+      </section>
+      
+      {/* Features Section */}
+      <section className="feature-section" ref={featuresRef}>
+        <div className="feature-container">
+          <div className="section-title fade-in">
+            <h2>كل ما تحتاجه في مكان واحد</h2>
+            <p>لا داعي للبحث الطويل أو الاتصالات المملة. فقط اختر الخدمة، حدّد الوقت والمكان، ونحن نتكفّل بالباقي.</p>
+          </div>
+          
+          <div className="feature-grid">
+            {features.map((feature, index) => (
+              <div 
+                className="feature-card stagger-item" 
+                key={index}
+                onMouseEnter={() => handleFeatureHover(index)}
+                onMouseLeave={() => handleFeatureHover(null)}
+              >
+                <div className={`feature-icon ${activeFeature === index ? 'active' : ''}`}>
+                  <FontAwesomeIcon icon={feature.icon} style={{ '--i': index }} />
+                </div>
+                <h3>{feature.title}</h3>
+                <p>{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+      
+      {/* How It Works Section */}
+      <section className="how-it-works-section" ref={howItWorksRef}>
+        <div className="steps-container">
+          <div className="section-title fade-in">
+            <h2>كيف تعمل Buildinz؟</h2>
+            <p>من أول نقرة إلى إنجاز المهمة، Buildinz تضمن لك تجربة خالية من المتاعب.</p>
+          </div>
+          
+          <div className="steps-list">
+            <div className="step-item stagger-item">
+              <div className="step-number">1</div>
+              <div className="step-content">
+                <h3>اختر الخدمة</h3>
+                <p>تصفح مجموعة واسعة من الخدمات واختر ما يناسب احتياجاتك</p>
+              </div>
+              <div className="step-image">
+                <FontAwesomeIcon icon={faSearch} size="4x" color="#0A3259" />
+              </div>
+            </div>
+            
+            <div className="step-item stagger-item">
+              <div className="step-number">2</div>
+              <div className="step-content">
+                <h3>حدد الوقت والمكان</h3>
+                <p>اختر الوقت المناسب لك وأدخل موقعك</p>
+              </div>
+              <div className="step-image">
+                <FontAwesomeIcon icon={faClock} size="4x" color="#0A3259" />
+              </div>
+            </div>
+            
+            <div className="step-item stagger-item">
+              <div className="step-number">3</div>
+              <div className="step-content">
+                <h3>استمتع بالخدمة</h3>
+                <p>سيصل الفني المختص في الموعد المحدد لإنجاز المهمة باحترافية</p>
+              </div>
+              <div className="step-image">
+                <FontAwesomeIcon icon={faHandshake} size="4x" color="#0A3259" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      {/* Testimonials Section */}
+      <section className="testimonials-section" ref={testimonialsRef}>
+        <div className="testimonial-container">
+          <div className="section-title fade-in">
+            <h2>ماذا يقول عملاؤنا؟</h2>
+            <p>آراء عملائنا هي أفضل شهادة على جودة خدماتنا</p>
+          </div>
+          
+          <div className="testimonial-grid">
+            {testimonials.map((testimonial, index) => (
+              <div className="testimonial-card stagger-item" key={index}>
+                <div className="testimonial-rating">
+                  {[...Array(5)].map((_, i) => (
+                    <FontAwesomeIcon 
+                      key={i} 
+                      icon={faStar} 
+                      className={i < testimonial.rating ? 'star-filled' : 'star-empty'} 
+                    />
+                  ))}
+                </div>
+                <p className="testimonial-text">
+                  {testimonial.text}
+                </p>
+                <div className="testimonial-author">
+                  <div className="author-avatar">
+                    <FontAwesomeIcon icon={faUserFriends} />
+                  </div>
+                  <div className="author-info">
+                    <h4>{testimonial.name}</h4>
+                    <p>{testimonial.location}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+      
+      {/* App Download Section */}
+      <section className="app-download-section" ref={appDownloadRef}>
+        <div className="floating-shape shape-1"></div>
+        <div className="floating-shape shape-2"></div>
+        <div className="floating-shape shape-3"></div>
+        
+        <div className="app-download-container">
+          <div className="app-content fade-in">
+            <h2>حمل التطبيق واطلب في أي وقت</h2>
+            <p>جرب سهولة الحجز والتتبع من خلال تطبيق Buildinz الجديد كلياً.</p>
+            <div className="app-buttons">
+              <a href="#" className="app-button">
+                <FontAwesomeIcon icon={faApple} />
+                <span>App Store</span>
+              </a>
+              <a href="#" className="app-button">
+                <FontAwesomeIcon icon={faGooglePlay} />
+                <span>Google Play</span>
+              </a>
+            </div>
+            
+            <div className="app-features">
+              <div className="app-feature">
+                <FontAwesomeIcon icon={faCheck} />
+                <span>سهولة الحجز والدفع</span>
+              </div>
+              <div className="app-feature">
+                <FontAwesomeIcon icon={faCheck} />
+                <span>تتبع الفني في الوقت الفعلي</span>
+              </div>
+              <div className="app-feature">
+                <FontAwesomeIcon icon={faCheck} />
+                <span>إشعارات فورية</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="app-image fade-in">
+            <img src={mockupImage} alt="Buildinz App" />
+          </div>
+        </div>
+      </section>
+      
+      {/* CTA Section */}
+      <section className="cta-section" ref={ctaRef}>
+        <div className="cta-container">
+          <div className="cta-content fade-in">
+            <h2>جاهز تخفف عن نفسك؟</h2>
+            <p>سجّل الآن وابدأ أول تجربة لك معنا – ولن تكون الأخيرة. نحن نهتم بكل التفاصيل، لتستمتع أنت براحة البال.</p>
+            <Link to="/signup" className="cta-button">
+              ابدأ الآن <FontAwesomeIcon icon={faArrowRight} />
+            </Link>
+            
+            <div className="cta-contact">
+              <div className="contact-item">
+                <FontAwesomeIcon icon={faPhone} />
+                <span>+971 XX XXX XXXX</span>
+              </div>
+              <div className="contact-item">
+                <FontAwesomeIcon icon={faEnvelope} />
+                <span>info@buildinz.com</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <button className="back-to-top" onClick={() => scrollToSection(heroRef)}>
+          <FontAwesomeIcon icon={faChevronUp} />
+        </button>
+      </section>
+      
+      {/* Final Message Section */}
+      <section className="feature-section">
+        <div className="feature-container">
+          <div className="section-title fade-in">
+            <h2>الراحة تبدأ هنا</h2>
+            <p>
+              سواء كنت في المنزل أو في المكتب، Buildinz هي الطريقة الذكية لإنجاز الأمور بسرعة وبجودة عالية.
+              استمتع بتجربة سلسة، واضحة، ومريحة – كما يجب أن تكون.
+            </p>
+            <h3 className="mt-4">Buildinz – خلّي كل شي أسهل.</h3>
+          </div>
+        </div>
+      </section>
+    </div>
   );
 };
 

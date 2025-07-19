@@ -6,7 +6,9 @@ import {
   faStore, 
   faTools, 
   faHistory,
-  faArrowLeft
+  faArrowLeft,
+  faFire,
+  faChevronRight
 } from '@fortawesome/free-solid-svg-icons';
 import '../styles/SearchModal.css';
 import { Link } from 'react-router-dom';
@@ -19,6 +21,13 @@ const SearchModal = ({ isOpen, onClose }) => {
   const [recentSearches, setRecentSearches] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('all'); // 'all', 'products', 'services'
+  const [trendingSearches] = useState([
+    'تنظيف المنزل',
+    'صيانة مكيفات',
+    'سباكة',
+    'كهرباء',
+    'دهان'
+  ]);
   
   const modalRef = useRef(null);
   const searchInputRef = useRef(null);
@@ -153,7 +162,8 @@ const SearchModal = ({ isOpen, onClose }) => {
   };
 
   // Clear a specific recent search
-  const clearRecentSearch = (index) => {
+  const clearRecentSearch = (index, e) => {
+    e.stopPropagation(); // Prevent triggering the parent click
     try {
       const updatedSearches = [...recentSearches];
       updatedSearches.splice(index, 1);
@@ -175,7 +185,7 @@ const SearchModal = ({ isOpen, onClose }) => {
     }
   };
 
-  // Use a recent search (renamed from useRecentSearch)
+  // Use a recent search
   const handleRecentSearch = (query) => {
     setSearchQuery(query);
     // Move this search to the top
@@ -185,6 +195,36 @@ const SearchModal = ({ isOpen, onClose }) => {
     setIsLoading(true);
     setTimeout(() => {
       // Similar mock results as handleSearch
+      setSearchResults([
+        {
+          id: 'p1',
+          type: 'product',
+          name: 'أدوات كهربائية',
+          image: PLACEHOLDER_ICON,
+          price: '١٥٠ درهم',
+          category: 'أدوات'
+        },
+        {
+          id: 's1',
+          type: 'service',
+          name: 'خدمات صيانة',
+          image: PLACEHOLDER_ICON,
+          rating: 4.5,
+          category: 'صيانة'
+        }
+      ]);
+      setIsLoading(false);
+    }, 500);
+  };
+
+  // Handle trending search
+  const handleTrendingSearch = (query) => {
+    setSearchQuery(query);
+    saveRecentSearch(query);
+    
+    // Trigger search
+    setIsLoading(true);
+    setTimeout(() => {
       setSearchResults([
         {
           id: 'p1',
@@ -262,12 +302,18 @@ const SearchModal = ({ isOpen, onClose }) => {
           ];
         }
         
-        setSearchResults(tab === 'all' ? results : results.filter(item => 
-          (tab === 'products' && item.type === 'product') || 
-          (tab === 'services' && item.type === 'service')
-        ));
+        setSearchResults(results);
         setIsLoading(false);
-      }, 300);
+      }, 500);
+    }
+  };
+
+  // Clear search
+  const clearSearch = () => {
+    setSearchQuery('');
+    setSearchResults([]);
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
     }
   };
 
@@ -276,51 +322,50 @@ const SearchModal = ({ isOpen, onClose }) => {
   return (
     <div className="search-modal-overlay">
       <div className="search-modal" ref={modalRef}>
+        {/* Search Modal Header */}
         <div className="search-modal-header">
-          <div className="search-modal-back" onClick={onClose}>
+          <button className="search-modal-back" onClick={onClose}>
             <FontAwesomeIcon icon={faArrowLeft} />
-          </div>
+          </button>
+          
           <form className="search-modal-form" onSubmit={handleSearch}>
             <FontAwesomeIcon icon={faSearch} className="search-modal-icon" />
             <input
-              ref={searchInputRef}
               type="text"
               className="search-modal-input"
-              placeholder="ابحث عن منتجات، خدمات..."
+              placeholder="ابحث عن منتج أو خدمة..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              autoFocus
+              ref={searchInputRef}
             />
             {searchQuery && (
-              <button 
+              <button
                 type="button"
                 className="search-modal-clear"
-                onClick={() => setSearchQuery('')}
+                onClick={clearSearch}
               >
                 <FontAwesomeIcon icon={faTimes} />
               </button>
             )}
-            <button type="submit" className="search-modal-submit">
-              بحث
-            </button>
           </form>
         </div>
-        
+
+        {/* Search Tabs */}
         <div className="search-modal-tabs">
-          <button 
+          <button
             className={`search-tab ${activeTab === 'all' ? 'active' : ''}`}
             onClick={() => handleTabChange('all')}
           >
             الكل
           </button>
-          <button 
+          <button
             className={`search-tab ${activeTab === 'products' ? 'active' : ''}`}
             onClick={() => handleTabChange('products')}
           >
             <FontAwesomeIcon icon={faStore} />
             <span>المنتجات</span>
           </button>
-          <button 
+          <button
             className={`search-tab ${activeTab === 'services' ? 'active' : ''}`}
             onClick={() => handleTabChange('services')}
           >
@@ -328,86 +373,128 @@ const SearchModal = ({ isOpen, onClose }) => {
             <span>الخدمات</span>
           </button>
         </div>
-        
+
+        {/* Search Content */}
         <div className="search-modal-content">
-          {isLoading ? (
+          {/* Loading State */}
+          {isLoading && (
             <div className="search-loading">
               <div className="search-loading-spinner"></div>
               <p>جاري البحث...</p>
             </div>
-          ) : searchResults.length > 0 ? (
+          )}
+
+          {/* Search Results */}
+          {!isLoading && searchResults.length > 0 && (
             <div className="search-results">
+              <h3 className="results-title">نتائج البحث</h3>
+              
               {searchResults.map((result) => (
-                <Link 
-                  to={result.type === 'product' ? `/products/${result.id}` : `/services/${result.id}`}
+                <Link
+                  to={`/${result.type === 'product' ? 'products' : 'services'}?id=${result.id}`}
                   className="search-result-item"
                   key={`${result.type}-${result.id}`}
-                  onClick={onClose}
                 >
                   <div className="search-result-image">
                     <img src={result.image} alt={result.name} />
                   </div>
                   <div className="search-result-info">
                     <h4>{result.name}</h4>
-                    <span className="search-result-category">{result.category}</span>
-                    {result.type === 'product' ? (
-                      <span className="search-result-price">{result.price}</span>
-                    ) : (
+                    <div className="search-result-category">{result.category}</div>
+                    {result.type === 'product' && (
+                      <div className="search-result-price">{result.price}</div>
+                    )}
+                    {result.type === 'service' && (
                       <div className="search-result-rating">
                         <span className="rating-value">{result.rating}</span>
-                        <span className="rating-stars">★★★★★</span>
+                        <div className="rating-stars">
+                          {'★'.repeat(Math.floor(result.rating))}
+                          {'☆'.repeat(5 - Math.floor(result.rating))}
+                        </div>
                       </div>
                     )}
                   </div>
                 </Link>
               ))}
               
-              <Link to={`/search?q=${encodeURIComponent(searchQuery)}`} className="view-all-results" onClick={onClose}>
+              <Link to={`/search?q=${encodeURIComponent(searchQuery)}`} className="view-all-results">
                 عرض جميع النتائج
+                <FontAwesomeIcon icon={faChevronRight} />
               </Link>
             </div>
-          ) : searchQuery.trim() ? (
+          )}
+
+          {/* No Results */}
+          {!isLoading && searchQuery && searchResults.length === 0 && (
             <div className="no-results">
-              <p>لا توجد نتائج لـ "{searchQuery}"</p>
-              <span>يرجى التحقق من الإملاء أو استخدام كلمات مفتاحية أخرى</span>
+              <p>لم يتم العثور على نتائج لـ <span>"{searchQuery}"</span></p>
+              <p>حاول استخدام كلمات مختلفة أو تحقق من الإملاء</p>
             </div>
-          ) : recentSearches.length > 0 ? (
-            <div className="recent-searches">
-              <div className="recent-searches-header">
-                <h3>
-                  <FontAwesomeIcon icon={faHistory} />
-                  <span>عمليات البحث الأخيرة</span>
-                </h3>
-                <button 
-                  className="clear-all-searches"
-                  onClick={clearAllRecentSearches}
-                >
-                  مسح الكل
-                </button>
-              </div>
-              <ul className="recent-searches-list">
-                {recentSearches.map((search, index) => (
-                  <li key={index} className="recent-search-item">
-                    <button 
-                      className="recent-search-text"
-                      onClick={() => handleRecentSearch(search)}
-                    >
-                      <FontAwesomeIcon icon={faHistory} />
-                      <span>{search}</span>
-                    </button>
-                    <button 
-                      className="clear-search"
-                      onClick={() => clearRecentSearch(index)}
-                    >
-                      <FontAwesomeIcon icon={faTimes} />
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : (
+          )}
+
+          {/* Empty Search - Show Recent & Trending */}
+          {!isLoading && !searchQuery && (
             <div className="empty-search">
-              <p>ابدأ البحث عن المنتجات والخدمات</p>
+              {/* Recent Searches */}
+              {recentSearches.length > 0 && (
+                <div className="recent-searches">
+                  <div className="recent-searches-header">
+                    <h3>
+                      <FontAwesomeIcon icon={faHistory} />
+                      عمليات البحث الأخيرة
+                    </h3>
+                    <button className="clear-all-searches" onClick={clearAllRecentSearches}>
+                      مسح الكل
+                    </button>
+                  </div>
+                  
+                  <div className="recent-searches-list">
+                    {recentSearches.map((search, index) => (
+                      <div
+                        key={index}
+                        className="recent-search-item"
+                        onClick={() => handleRecentSearch(search)}
+                      >
+                        <div className="recent-search-text">
+                          <FontAwesomeIcon icon={faHistory} />
+                          <span>{search}</span>
+                        </div>
+                        <button
+                          className="clear-search"
+                          onClick={(e) => clearRecentSearch(index, e)}
+                        >
+                          <FontAwesomeIcon icon={faTimes} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Trending Searches */}
+              <div className="trending-searches">
+                <div className="trending-searches-header">
+                  <h3>
+                    <FontAwesomeIcon icon={faFire} />
+                    الأكثر بحثاً
+                  </h3>
+                </div>
+                
+                <div className="trending-searches-list">
+                  {trendingSearches.map((search, index) => (
+                    <div
+                      key={index}
+                      className="trending-search-item"
+                      onClick={() => handleTrendingSearch(search)}
+                    >
+                      <div className="trending-search-text">
+                        <span className="trending-number">{index + 1}</span>
+                        <span>{search}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
         </div>
