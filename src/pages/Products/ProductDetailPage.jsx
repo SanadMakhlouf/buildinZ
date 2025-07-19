@@ -7,8 +7,16 @@ import {
   faShoppingCart,
   faStar,
   faHeart,
-  faShare
+  faShare,
+  faCopy,
+  faWhatsapp,
+  faTelegram
 } from '@fortawesome/free-solid-svg-icons';
+import { 
+  faFacebook, 
+  faTwitter, 
+  faInstagram 
+} from '@fortawesome/free-brands-svg-icons';
 import productService from '../../services/productService';
 import './ProductDetailPage.css';
 
@@ -64,13 +72,48 @@ const ProductDetailPage = () => {
   };
 
   const handleAddToCart = () => {
-    // TODO: Implement cart functionality
     console.log('تمت إضافة المنتج للسلة:', product.id, 'الكمية:', quantity);
   };
 
   const handleAddToWishlist = () => {
-    // TODO: Implement wishlist functionality
     console.log('تمت إضافة المنتج للمفضلة:', product.id);
+  };
+
+  const handleSocialShare = (platform) => {
+    const productUrl = window.location.href;
+    const productTitle = product.name;
+    const productDescription = product.description || '';
+
+    let shareUrl = '';
+    
+    switch (platform) {
+      case 'facebook':
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(productUrl)}`;
+        break;
+      case 'twitter':
+        shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(productUrl)}&text=${encodeURIComponent(productTitle)}`;
+        break;
+      case 'whatsapp':
+        shareUrl = `https://wa.me/?text=${encodeURIComponent(`${productTitle} - ${productUrl}`)}`;
+        break;
+      case 'telegram':
+        shareUrl = `https://t.me/share/url?url=${encodeURIComponent(productUrl)}&text=${encodeURIComponent(productTitle)}`;
+        break;
+      case 'instagram':
+        navigator.clipboard.writeText(`${productTitle} - ${productUrl}`);
+        alert('تم نسخ رابط المنتج! يمكنك مشاركته على Instagram');
+        return;
+      case 'copy':
+        navigator.clipboard.writeText(productUrl);
+        alert('تم نسخ رابط المنتج!');
+        return;
+      default:
+        return;
+    }
+
+    if (shareUrl) {
+      window.open(shareUrl, '_blank', 'width=600,height=400');
+    }
   };
 
   if (loading) {
@@ -130,35 +173,89 @@ const ProductDetailPage = () => {
 
       <div className="container">
         <div className="product-detail-container">
-          {/* Left Side - Images */}
+          {/* Left Side - Images & Widgets */}
           <div className="product-images-section">
-            {availableImages.length > 1 && (
-              <div className="image-thumbnails">
-                {availableImages.map((url, index) => (
-                  <div 
-                    key={index} 
-                    className={`thumbnail ${selectedImage === index ? 'active' : ''}`}
-                    onClick={() => setSelectedImage(index)}
-                  >
-                    <img 
-                      src={url} 
-                      alt={`${product.name} - عرض ${index + 1}`} 
-                      onError={handleImageError} 
-                    />
-                  </div>
-                ))}
+            <div className="images-container">
+              {availableImages.length > 1 && (
+                <div className="image-thumbnails">
+                  {availableImages.map((url, index) => (
+                    <div 
+                      key={index} 
+                      className={`thumbnail ${selectedImage === index ? 'active' : ''}`}
+                      onClick={() => setSelectedImage(index)}
+                    >
+                      <img 
+                        src={url} 
+                        alt={`${product.name} - عرض ${index + 1}`} 
+                        onError={handleImageError} 
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              <div className="main-image-container">
+                <div className="main-image">
+                  <img 
+                    src={availableImages.length > 0 
+                      ? availableImages[selectedImage] 
+                      : 'https://via.placeholder.com/500x500?text=صورة+غير+متوفرة'} 
+                    alt={product.name} 
+                    onError={handleImageError}
+                  />
+                </div>
               </div>
-            )}
-            
-            <div className="main-image-container">
-              <div className="main-image">
-                <img 
-                  src={availableImages.length > 0 
-                    ? availableImages[selectedImage] 
-                    : 'https://via.placeholder.com/500x500?text=صورة+غير+متوفرة'} 
-                  alt={product.name} 
-                  onError={handleImageError}
-                />
+            </div>
+
+            {/* Product Widgets */}
+            <div className="product-widgets">
+              {/* Social Share Widget */}
+              <div className="social-share-widget">
+                <h3 className="widget-title">مشاركة المنتج</h3>
+                <div className="social-buttons">
+                  <button 
+                    className="social-btn facebook" 
+                    onClick={() => handleSocialShare('facebook')}
+                    title="مشاركة على فيسبوك"
+                  >
+                    <FontAwesomeIcon icon={faFacebook} />
+                  </button>
+                  <button 
+                    className="social-btn twitter" 
+                    onClick={() => handleSocialShare('twitter')}
+                    title="مشاركة على تويتر"
+                  >
+                    <FontAwesomeIcon icon={faTwitter} />
+                  </button>
+                  <button 
+                    className="social-btn whatsapp" 
+                    onClick={() => handleSocialShare('whatsapp')}
+                    title="مشاركة على واتساب"
+                  >
+                    <FontAwesomeIcon icon={faWhatsapp} />
+                  </button>
+                  <button 
+                    className="social-btn instagram" 
+                    onClick={() => handleSocialShare('instagram')}
+                    title="مشاركة على انستغرام"
+                  >
+                    <FontAwesomeIcon icon={faInstagram} />
+                  </button>
+                  <button 
+                    className="social-btn telegram" 
+                    onClick={() => handleSocialShare('telegram')}
+                    title="مشاركة على تيليجرام"
+                  >
+                    <FontAwesomeIcon icon={faTelegram} />
+                  </button>
+                  <button 
+                    className="social-btn copy" 
+                    onClick={() => handleSocialShare('copy')}
+                    title="نسخ الرابط"
+                  >
+                    <FontAwesomeIcon icon={faCopy} />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
