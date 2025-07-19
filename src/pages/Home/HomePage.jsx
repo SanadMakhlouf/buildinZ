@@ -7,23 +7,30 @@ import {
   faAppleAlt, faPlay, faArrowRight, faTools,
   faHome, faWrench, faPaintRoller, faBolt, faWater,
   faUserCheck, faMoneyBillWave, faHeadset, faQuoteRight,
-  faChevronDown, faChevronUp, faCheck, faPhone, faEnvelope
+  faChevronDown, faChevronUp, faCheck, faPhone, faEnvelope,
+  faCouch, faArrowLeft, faArrowRight as faArrowRightSolid,
+  faMapMarkerAlt as faMapMarkerAltSolid
 } from '@fortawesome/free-solid-svg-icons';
-import { faApple, faGooglePlay } from '@fortawesome/free-brands-svg-icons';
+import { 
+  faApple, faGooglePlay, faFacebookF, faTwitter, 
+  faInstagram, faLinkedinIn, faWhatsapp 
+} from '@fortawesome/free-brands-svg-icons';
 import './HomePage.css';
 import addressService from '../../services/addressService';
 import mockupImage from '../../assets/app-mockup';
 
 const HomePage = () => {
-  // Keep existing state variables
+  // State variables
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
   const [locationStatus, setLocationStatus] = useState(null);
   const [isFallbackLocation, setIsFallbackLocation] = useState(false);
   
-  // Add new state variables for enhanced interactions
+  // Interactive state variables
   const [activeFeature, setActiveFeature] = useState(null);
   const [animateHero, setAnimateHero] = useState(false);
   const [showScrollIndicator, setShowScrollIndicator] = useState(true);
+  const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const [email, setEmail] = useState('');
   
   const navigate = useNavigate();
   
@@ -34,6 +41,7 @@ const HomePage = () => {
   const ctaRef = useRef(null);
   const appDownloadRef = useRef(null);
   const heroRef = useRef(null);
+  const finalSectionRef = useRef(null);
   
   // Initialize animations and effects
   useEffect(() => {
@@ -73,7 +81,7 @@ const HomePage = () => {
     }, observerOptions);
     
     // Observe all sections with animations
-    const animatedSections = document.querySelectorAll('.feature-section, .testimonials-section, .how-it-works-section, .cta-section, .app-download-section');
+    const animatedSections = document.querySelectorAll('.feature-section, .testimonials-section, .how-it-works-section, .cta-section, .app-download-section, .final-section');
     animatedSections.forEach(section => {
       observer.observe(section);
     });
@@ -87,7 +95,7 @@ const HomePage = () => {
     };
   }, []);
   
-  // Keep existing detectUserLocation function
+  // Detect user location
   const detectUserLocation = async () => {
     setIsDetectingLocation(true);
     setLocationStatus('جاري تحديد موقعك...');
@@ -140,6 +148,18 @@ const HomePage = () => {
     navigate('/services');
   };
   
+  // Handle newsletter subscription
+  const handleNewsletterSubmit = (e) => {
+    e.preventDefault();
+    if (email) {
+      // Here you would typically call an API to subscribe the user
+      console.log('Newsletter subscription:', email);
+      setEmail('');
+      // Show success message (you can add a toast notification here)
+      alert('تم الاشتراك بنجاح في النشرة الإخبارية!');
+    }
+  };
+  
   // Scroll to section
   const scrollToSection = (ref) => {
     ref.current?.scrollIntoView({ behavior: 'smooth' });
@@ -148,6 +168,15 @@ const HomePage = () => {
   // Feature hover handler
   const handleFeatureHover = (index) => {
     setActiveFeature(index);
+  };
+  
+  // Navigate testimonials
+  const navigateTestimonials = (direction) => {
+    if (direction === 'next') {
+      setActiveTestimonial(prev => (prev + 1) % testimonials.length);
+    } else {
+      setActiveTestimonial(prev => (prev - 1 + testimonials.length) % testimonials.length);
+    }
   };
   
   // Features data
@@ -174,6 +203,28 @@ const HomePage = () => {
     }
   ];
   
+  // Steps data
+  const steps = [
+    {
+      number: 1,
+      title: "اختر الخدمة",
+      description: "تصفح مجموعة واسعة من الخدمات واختر ما يناسب احتياجاتك",
+      icon: faSearch
+    },
+    {
+      number: 2,
+      title: "حدد الوقت والمكان",
+      description: "اختر الوقت المناسب لك وأدخل موقعك",
+      icon: faClock
+    },
+    {
+      number: 3,
+      title: "استمتع بالخدمة",
+      description: "سيصل الفني المختص في الموعد المحدد لإنجاز المهمة باحترافية",
+      icon: faHandshake
+    }
+  ];
+  
   // Testimonials data
   const testimonials = [
     {
@@ -194,6 +245,13 @@ const HomePage = () => {
       location: "الشارقة",
       rating: 4
     }
+  ];
+  
+  // App features data
+  const appFeatures = [
+    "سهولة الحجز والدفع",
+    "تتبع الفني في الوقت الفعلي",
+    "إشعارات فورية"
   ];
   
   return (
@@ -324,7 +382,7 @@ const HomePage = () => {
         </div>
       </section>
       
-      {/* How It Works Section */}
+      {/* How It Works Section - Vertical Timeline */}
       <section className="how-it-works-section" ref={howItWorksRef}>
         <div className="steps-container">
           <div className="section-title fade-in">
@@ -333,38 +391,18 @@ const HomePage = () => {
           </div>
           
           <div className="steps-list">
-            <div className="step-item stagger-item">
-              <div className="step-number">1</div>
-              <div className="step-content">
-                <h3>اختر الخدمة</h3>
-                <p>تصفح مجموعة واسعة من الخدمات واختر ما يناسب احتياجاتك</p>
+            {steps.map((step) => (
+              <div className="step-item stagger-item" key={step.number}>
+                <div className="step-number">{step.number}</div>
+                <div className="step-content">
+                  <h3>{step.title}</h3>
+                  <p>{step.description}</p>
+                </div>
+                <div className="step-image">
+                  <FontAwesomeIcon icon={step.icon} />
+                </div>
               </div>
-              <div className="step-image">
-                <FontAwesomeIcon icon={faSearch} size="4x" color="#0A3259" />
-              </div>
-            </div>
-            
-            <div className="step-item stagger-item">
-              <div className="step-number">2</div>
-              <div className="step-content">
-                <h3>حدد الوقت والمكان</h3>
-                <p>اختر الوقت المناسب لك وأدخل موقعك</p>
-              </div>
-              <div className="step-image">
-                <FontAwesomeIcon icon={faClock} size="4x" color="#0A3259" />
-              </div>
-            </div>
-            
-            <div className="step-item stagger-item">
-              <div className="step-number">3</div>
-              <div className="step-content">
-                <h3>استمتع بالخدمة</h3>
-                <p>سيصل الفني المختص في الموعد المحدد لإنجاز المهمة باحترافية</p>
-              </div>
-              <div className="step-image">
-                <FontAwesomeIcon icon={faHandshake} size="4x" color="#0A3259" />
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -379,7 +417,10 @@ const HomePage = () => {
           
           <div className="testimonial-grid">
             {testimonials.map((testimonial, index) => (
-              <div className="testimonial-card stagger-item" key={index}>
+              <div 
+                className={`testimonial-card stagger-item ${index === activeTestimonial ? 'active' : ''}`} 
+                key={index}
+              >
                 <div className="testimonial-rating">
                   {[...Array(5)].map((_, i) => (
                     <FontAwesomeIcon 
@@ -403,6 +444,24 @@ const HomePage = () => {
                 </div>
               </div>
             ))}
+          </div>
+          
+          {/* Testimonial navigation controls for mobile */}
+          <div className="testimonial-controls">
+            <button 
+              className="testimonial-control-btn" 
+              onClick={() => navigateTestimonials('prev')}
+              aria-label="Previous testimonial"
+            >
+              <FontAwesomeIcon icon={faArrowRight} />
+            </button>
+            <button 
+              className="testimonial-control-btn" 
+              onClick={() => navigateTestimonials('next')}
+              aria-label="Next testimonial"
+            >
+              <FontAwesomeIcon icon={faArrowLeft} />
+            </button>
           </div>
         </div>
       </section>
@@ -429,18 +488,12 @@ const HomePage = () => {
             </div>
             
             <div className="app-features">
-              <div className="app-feature">
-                <FontAwesomeIcon icon={faCheck} />
-                <span>سهولة الحجز والدفع</span>
-              </div>
-              <div className="app-feature">
-                <FontAwesomeIcon icon={faCheck} />
-                <span>تتبع الفني في الوقت الفعلي</span>
-              </div>
-              <div className="app-feature">
-                <FontAwesomeIcon icon={faCheck} />
-                <span>إشعارات فورية</span>
-              </div>
+              {appFeatures.map((feature, index) => (
+                <div className="app-feature" key={index}>
+                  <FontAwesomeIcon icon={faCheck} />
+                  <span>{feature}</span>
+                </div>
+              ))}
             </div>
           </div>
           
@@ -457,7 +510,7 @@ const HomePage = () => {
             <h2>جاهز تخفف عن نفسك؟</h2>
             <p>سجّل الآن وابدأ أول تجربة لك معنا – ولن تكون الأخيرة. نحن نهتم بكل التفاصيل، لتستمتع أنت براحة البال.</p>
             <Link to="/signup" className="cta-button">
-              ابدأ الآن <FontAwesomeIcon icon={faArrowRight} />
+              ابدأ الآن <FontAwesomeIcon icon={faArrowRightSolid} />
             </Link>
             
             <div className="cta-contact">
@@ -478,19 +531,137 @@ const HomePage = () => {
         </button>
       </section>
       
-      {/* Final Message Section */}
-      <section className="feature-section">
-        <div className="feature-container">
+      {/* Final Message Section - IMPROVED */}
+      <section className="final-section" ref={finalSectionRef}>
+        <div className="container">
           <div className="section-title fade-in">
+            <FontAwesomeIcon icon={faCouch} className="relaxation-icon" />
             <h2>الراحة تبدأ هنا</h2>
             <p>
               سواء كنت في المنزل أو في المكتب، Buildinz هي الطريقة الذكية لإنجاز الأمور بسرعة وبجودة عالية.
               استمتع بتجربة سلسة، واضحة، ومريحة – كما يجب أن تكون.
             </p>
-            <h3 className="mt-4">Buildinz – خلّي كل شي أسهل.</h3>
+            <Link to="/services" className="final-cta-button">
+              <FontAwesomeIcon icon={faSearch} />
+              ابدأ رحلتك معنا
+            </Link>
+            <h3>Buildinz – خلّي كل شي أسهل.</h3>
           </div>
         </div>
       </section>
+
+      {/* Footer Section - NEW */}
+      <footer className="footer">
+        <div className="footer-container">
+          <div className="footer-content">
+            {/* About Section */}
+            <div className="footer-section footer-about">
+              <div className="footer-logo">
+                <FontAwesomeIcon icon={faTools} />
+                Buildinz
+              </div>
+              <p>
+                منصة شاملة تربط بين العملاء ومقدمي الخدمات المنزلية والمهنية في دولة الإمارات العربية المتحدة.
+                نحن نضمن لك خدمة عالية الجودة وتجربة مريحة وآمنة.
+              </p>
+              <div className="footer-social">
+                <a href="#" className="social-link" aria-label="Facebook">
+                  <FontAwesomeIcon icon={faFacebookF} />
+                </a>
+                <a href="#" className="social-link" aria-label="Twitter">
+                  <FontAwesomeIcon icon={faTwitter} />
+                </a>
+                <a href="#" className="social-link" aria-label="Instagram">
+                  <FontAwesomeIcon icon={faInstagram} />
+                </a>
+                <a href="#" className="social-link" aria-label="LinkedIn">
+                  <FontAwesomeIcon icon={faLinkedinIn} />
+                </a>
+                <a href="#" className="social-link" aria-label="WhatsApp">
+                  <FontAwesomeIcon icon={faWhatsapp} />
+                </a>
+              </div>
+              <div className="footer-certificates">
+                <span className="certificate-badge">مرخص تجارياً</span>
+                <span className="certificate-badge">معتمد</span>
+              </div>
+            </div>
+
+            {/* Quick Links */}
+            <div className="footer-section footer-links">
+              <h3>روابط سريعة</h3>
+              <ul>
+                <li><Link to="/services">الخدمات</Link></li>
+                <li><Link to="/about">من نحن</Link></li>
+                <li><Link to="/how-it-works">كيف نعمل</Link></li>
+                <li><Link to="/pricing">الأسعار</Link></li>
+                <li><Link to="/become-provider">انضم كمقدم خدمة</Link></li>
+                <li><Link to="/careers">الوظائف</Link></li>
+                <li><Link to="/blog">المدونة</Link></li>
+              </ul>
+            </div>
+
+            {/* Support */}
+            <div className="footer-section footer-links">
+              <h3>الدعم والمساعدة</h3>
+              <ul>
+                <li><Link to="/help">مركز المساعدة</Link></li>
+                <li><Link to="/faq">الأسئلة الشائعة</Link></li>
+                <li><Link to="/contact">تواصل معنا</Link></li>
+                <li><Link to="/feedback">تقييم الخدمة</Link></li>
+                <li><Link to="/report-issue">بلاغ مشكلة</Link></li>
+                <li><Link to="/safety">الأمان والسلامة</Link></li>
+                <li><Link to="/insurance">التأمين</Link></li>
+              </ul>
+            </div>
+
+            {/* Contact & Newsletter */}
+            <div className="footer-section footer-contact">
+              <h3>تواصل معنا</h3>
+              <div className="contact-info">
+                <FontAwesomeIcon icon={faPhone} />
+                <span>+971 XX XXX XXXX</span>
+              </div>
+              <div className="contact-info">
+                <FontAwesomeIcon icon={faEnvelope} />
+                <span>info@buildinz.com</span>
+              </div>
+              <div className="contact-info">
+                <FontAwesomeIcon icon={faMapMarkerAltSolid} />
+                <span>دبي، الإمارات العربية المتحدة</span>
+              </div>
+              
+              <div className="footer-newsletter">
+                <h3>النشرة الإخبارية</h3>
+                <p>اشترك لتحصل على آخر العروض والأخبار</p>
+                <form className="newsletter-form" onSubmit={handleNewsletterSubmit}>
+                  <input
+                    type="email"
+                    placeholder="أدخل بريدك الإلكتروني"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="newsletter-input"
+                    required
+                  />
+                  <button type="submit" className="newsletter-btn">
+                    اشتراك
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <div className="footer-bottom">
+            <p>&copy; 2024 Buildinz. جميع الحقوق محفوظة.</p>
+            <div className="footer-bottom-links">
+              <Link to="/privacy">سياسة الخصوصية</Link>
+              <Link to="/terms">الشروط والأحكام</Link>
+              <Link to="/cookies">سياسة ملفات تعريف الارتباط</Link>
+              <Link to="/accessibility">إمكانية الوصول</Link>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
