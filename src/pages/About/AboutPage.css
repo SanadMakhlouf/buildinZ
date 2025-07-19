@@ -17,7 +17,7 @@
 .about-hero {
   position: relative;
   min-height: 500px;
-  background-image: url('/assets/images/about-hero.jpg');
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
   background-size: cover;
   background-position: center;
   color: #fff;
@@ -392,7 +392,7 @@
 
 /* CTA Section */
 .about-cta {
-  background: linear-gradient(rgba(10, 50, 89, 0.9), rgba(10, 50, 89, 0.9)), url('/assets/images/about-cta-bg.jpg');
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
   background-size: cover;
   background-position: center;
   color: #fff;

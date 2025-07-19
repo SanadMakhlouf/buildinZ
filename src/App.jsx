@@ -14,6 +14,9 @@ import SignupPage from './pages/Auth/Signup/SignupPage';
 import ForgotPassword from './pages/Auth/Login/ForgotPassword';
 import ResetPassword from './pages/Auth/Login/ResetPassword';
 import ProfilePage from './pages/Profile/ProfilePage';
+import AboutPage from './pages/About/AboutPage';
+import FAQPage from './pages/FAQ/FAQPage';
+import PrivacyPage from './pages/Privacy/PrivacyPage';
 import authService from './services/authService';
 
 // Protected Route Component
@@ -67,6 +70,9 @@ function App() {
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/faq" element={<FAQPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
         </Routes>
       </div>
     </Router>
