@@ -86,9 +86,6 @@
 
 /* Main Content */
 .product-detail-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 3rem;
   padding: 2rem 0;
   background: white;
   border-radius: var(--border-radius-lg);
@@ -96,12 +93,14 @@
   margin-top: 1rem;
 }
 
-/* Left Side - Images */
+.product-detail-column {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Images Section */
 .product-images-section {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  direction: ltr;
+  margin-bottom: 2rem;
 }
 
 .images-container {
@@ -176,21 +175,15 @@
   transform: scale(1.02);
 }
 
-/* Social Media & Action Widgets */
-.product-widgets {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-top: 1rem;
-  direction: rtl;
-}
-
+/* Social Media Widget */
 .social-share-widget {
   background: white;
   border-radius: var(--border-radius-sm);
   padding: 1rem;
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--bg-dark);
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .widget-title {
@@ -231,22 +224,27 @@
 
 .social-btn.facebook {
   background: #1877f2;
+  color: white;
 }
 
 .social-btn.twitter {
   background: #1da1f2;
+  color: white;
 }
 
 .social-btn.whatsapp {
   background: #25d366;
+  color: white;
 }
 
 .social-btn.instagram {
   background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);
+  color: white;
 }
 
 .social-btn.telegram {
   background: #0088cc;
+  color: #000;
 }
 
 .social-btn.copy {
@@ -405,7 +403,6 @@
 
 /* Right Side - Product Info */
 .product-info-section {
-  padding-right: 2rem;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;

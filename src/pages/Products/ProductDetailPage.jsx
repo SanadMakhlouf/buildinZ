@@ -8,14 +8,14 @@ import {
   faStar,
   faHeart,
   faShare,
-  faCopy,
-  faWhatsapp,
-  faTelegram
+  faCopy
 } from '@fortawesome/free-solid-svg-icons';
 import { 
   faFacebook, 
   faTwitter, 
-  faInstagram 
+  faInstagram,
+  faWhatsapp,
+  faTelegram
 } from '@fortawesome/free-brands-svg-icons';
 import productService from '../../services/productService';
 import './ProductDetailPage.css';
@@ -173,42 +173,145 @@ const ProductDetailPage = () => {
 
       <div className="container">
         <div className="product-detail-container">
-          {/* Left Side - Images & Widgets */}
-          <div className="product-images-section">
-            <div className="images-container">
-              {availableImages.length > 1 && (
-                <div className="image-thumbnails">
-                  {availableImages.map((url, index) => (
-                    <div 
-                      key={index} 
-                      className={`thumbnail ${selectedImage === index ? 'active' : ''}`}
-                      onClick={() => setSelectedImage(index)}
-                    >
-                      <img 
-                        src={url} 
-                        alt={`${product.name} - عرض ${index + 1}`} 
-                        onError={handleImageError} 
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
-              
-              <div className="main-image-container">
-                <div className="main-image">
-                  <img 
-                    src={availableImages.length > 0 
-                      ? availableImages[selectedImage] 
-                      : 'https://via.placeholder.com/500x500?text=صورة+غير+متوفرة'} 
-                    alt={product.name} 
-                    onError={handleImageError}
-                  />
+          <div className="product-detail-column">
+            {/* Main Product Image */}
+            <div className="product-images-section">
+              <div className="images-container">
+                {availableImages.length > 1 && (
+                  <div className="image-thumbnails">
+                    {availableImages.map((url, index) => (
+                      <div 
+                        key={`thumb-${index}`}
+                        className={`thumbnail ${selectedImage === index ? 'active' : ''}`}
+                        onClick={() => setSelectedImage(index)}
+                      >
+                        <img 
+                          src={url} 
+                          alt={`${product.name} - عرض ${index + 1}`} 
+                          onError={handleImageError} 
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                <div className="main-image-container">
+                  <div className="main-image">
+                    <img 
+                      src={availableImages.length > 0 
+                        ? availableImages[selectedImage] 
+                        : 'https://via.placeholder.com/500x500?text=صورة+غير+متوفرة'} 
+                      alt={product.name} 
+                      onError={handleImageError}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Product Widgets */}
-            <div className="product-widgets">
+            {/* Product Info */}
+            <div className="product-info-section">
+              <div className="product-header">
+                <h1 className="product-name">{product.name}</h1>
+                {product.description && (
+                  <div className="product-subtitle">{product.description}</div>
+                )}
+              </div>
+
+              <div className="product-price-section">
+                <div className="price-container">
+                  <span className="price-amount">{parseFloat(product.price).toFixed(0)}</span>
+                  <span className="currency">درهم</span>
+                </div>
+                <div className="price-note">السعر شامل ضريبة القيمة المضافة</div>
+              </div>
+
+              {/* Rating Section - Only show if reviews exist */}
+              {product.reviews && product.reviews.length > 0 && (
+                <div className="rating-section">
+                  <div className="stars">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <FontAwesomeIcon
+                        key={`star-${star}`}
+                        icon={faStar}
+                        className={`star ${star <= 4 ? '' : 'empty'}`}
+                      />
+                    ))}
+                  </div>
+                  <span className="rating-count">({product.reviews.length} تقييم)</span>
+                </div>
+              )}
+
+              {/* Product Options */}
+              <div className="product-options">
+                {product.specifications && (
+                  <div className="option-group">
+                    <span className="option-label">اختر اللون</span>
+                    <div className="option-value">{product.specifications}</div>
+                  </div>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="action-buttons">
+                {product.stock_quantity > 0 ? (
+                  <>
+                    <div className="quantity-selector">
+                      <span className="quantity-label">الكمية:</span>
+                      <div className="quantity-controls">
+                        <button 
+                          className="quantity-btn" 
+                          onClick={decreaseQuantity} 
+                          disabled={quantity <= 1}
+                        >
+                          -
+                        </button>
+                        <input 
+                          type="number" 
+                          value={quantity} 
+                          onChange={(e) => {
+                            const val = parseInt(e.target.value);
+                            if (!isNaN(val) && val > 0 && val <= product.stock_quantity) {
+                              setQuantity(val);
+                            }
+                          }} 
+                          min="1" 
+                          max={product.stock_quantity}
+                          className="quantity-input"
+                        />
+                        <button 
+                          className="quantity-btn" 
+                          onClick={increaseQuantity} 
+                          disabled={quantity >= product.stock_quantity}
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <button 
+                      className="add-to-cart-btn"
+                      onClick={handleAddToCart}
+                    >
+                      <FontAwesomeIcon icon={faShoppingCart} /> إضافة إلى السلة
+                    </button>
+                  </>
+                ) : (
+                  <button className="add-to-cart-btn" disabled>
+                    غير متوفر في المخزون
+                  </button>
+                )}
+                
+                <div className="secondary-actions">
+                  <button className="secondary-btn" onClick={handleAddToWishlist}>
+                    <FontAwesomeIcon icon={faHeart} /> إضافة للمفضلة
+                  </button>
+                  <button className="secondary-btn">
+                    <FontAwesomeIcon icon={faShare} /> مشاركة المنتج
+                  </button>
+                </div>
+              </div>
+
               {/* Social Share Widget */}
               <div className="social-share-widget">
                 <h3 className="widget-title">مشاركة المنتج</h3>
@@ -257,126 +360,22 @@ const ProductDetailPage = () => {
                   </button>
                 </div>
               </div>
-            </div>
-          </div>
 
-          {/* Right Side - Product Info */}
-          <div className="product-info-section">
-            <div className="product-header">
-              <h1 className="product-name">{product.name}</h1>
-              {product.description && (
-                <div className="product-subtitle">{product.description}</div>
-              )}
-            </div>
-
-            <div className="product-price-section">
-              <div className="price-container">
-                <span className="price-amount">{parseFloat(product.price).toFixed(0)}</span>
-                <span className="currency">درهم</span>
+              {/* Additional Info */}
+              <div className="how-to-get">
+                <h3>كيفية الحصول على المنتج</h3>
+                {product.vendor_profile && (
+                  <p>متوفر من {product.vendor_profile.business_name}</p>
+                )}
+                {product.stock_quantity > 0 && (
+                  <p>متوفر في المخزون ({product.stock_quantity} قطعة)</p>
+                )}
+                {product.sku && (
+                  <p>رقم المنتج: {product.sku}</p>
+                )}
+                <p>التوصيل متاح لجميع أنحاء دولة الإمارات العربية المتحدة</p>
+                <p>خدمة عملاء متاحة 24/7</p>
               </div>
-              <div className="price-note">السعر شامل ضريبة القيمة المضافة</div>
-            </div>
-
-            {/* Rating Section - Only show if reviews exist */}
-            {product.reviews && product.reviews.length > 0 && (
-              <div className="rating-section">
-                <div className="stars">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <FontAwesomeIcon
-                      key={star}
-                      icon={faStar}
-                      className={`star ${star <= 4 ? '' : 'empty'}`}
-                    />
-                  ))}
-                </div>
-                <span className="rating-count">({product.reviews.length} تقييم)</span>
-              </div>
-            )}
-
-            {/* Product Options */}
-            <div className="product-options">
-              {product.specifications && (
-                <div className="option-group">
-                  <span className="option-label">اختر اللون</span>
-                  <div className="option-value">{product.specifications}</div>
-                </div>
-              )}
-            </div>
-
-            {/* Action Buttons */}
-            <div className="action-buttons">
-              {product.stock_quantity > 0 ? (
-                <>
-                  <div className="quantity-selector">
-                    <span className="quantity-label">الكمية:</span>
-                    <div className="quantity-controls">
-                      <button 
-                        className="quantity-btn" 
-                        onClick={decreaseQuantity} 
-                        disabled={quantity <= 1}
-                      >
-                        -
-                      </button>
-                      <input 
-                        type="number" 
-                        value={quantity} 
-                        onChange={(e) => {
-                          const val = parseInt(e.target.value);
-                          if (!isNaN(val) && val > 0 && val <= product.stock_quantity) {
-                            setQuantity(val);
-                          }
-                        }} 
-                        min="1" 
-                        max={product.stock_quantity}
-                        className="quantity-input"
-                      />
-                      <button 
-                        className="quantity-btn" 
-                        onClick={increaseQuantity} 
-                        disabled={quantity >= product.stock_quantity}
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <button 
-                    className="add-to-cart-btn"
-                    onClick={handleAddToCart}
-                  >
-                    <FontAwesomeIcon icon={faShoppingCart} /> إضافة إلى السلة
-                  </button>
-                </>
-              ) : (
-                <button className="add-to-cart-btn" disabled>
-                  غير متوفر في المخزون
-                </button>
-              )}
-              
-              <div className="secondary-actions">
-                <button className="secondary-btn" onClick={handleAddToWishlist}>
-                  <FontAwesomeIcon icon={faHeart} /> إضافة للمفضلة
-                </button>
-                <button className="secondary-btn">
-                  <FontAwesomeIcon icon={faShare} /> مشاركة المنتج
-                </button>
-              </div>
-            </div>
-
-            {/* Additional Info */}
-            <div className="how-to-get">
-              <h3>كيفية الحصول على المنتج</h3>
-              {product.vendor_profile && (
-                <p>متوفر من {product.vendor_profile.business_name}</p>
-              )}
-              {product.stock_quantity > 0 && (
-                <p>متوفر في المخزون ({product.stock_quantity} قطعة)</p>
-              )}
-              {product.sku && (
-                <p>رقم المنتج: {product.sku}</p>
-              )}
-              <p>التوصيل متاح لجميع أنحاء دولة الإمارات العربية المتحدة</p>
-              <p>خدمة عملاء متاحة 24/7</p>
             </div>
           </div>
         </div>
