@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faArrowLeft, 
@@ -10,7 +10,8 @@ import {
   faSpinner,
   faExclamationTriangle,
   faCheck,
-  faShare
+  faShare,
+  faHome
 } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as faHeartOutline } from '@fortawesome/free-regular-svg-icons';
 import productService from '../../services/productService';
@@ -155,7 +156,7 @@ const ProductDetailPage = () => {
             <FontAwesomeIcon icon={faArrowLeft} /> العودة إلى المنتجات
           </button>
           <div className="breadcrumb-path">
-            <span onClick={() => navigate('/')}>الرئيسية</span> / 
+            <span onClick={() => navigate('/')}><FontAwesomeIcon icon={faHome} /> الرئيسية</span> / 
             <span onClick={() => navigate('/products')}>المنتجات</span> / 
             <span onClick={() => navigate(`/products/category/${product.category?.slug}`)}>{product.category?.name}</span> / 
             <span className="current">{product.name}</span>
@@ -216,27 +217,7 @@ const ProductDetailPage = () => {
               </div>
             )}
             
-            <div className="product-description">
-              <h3>الوصف</h3>
-              <p>{product.description || 'لا يوجد وصف متاح لهذا المنتج.'}</p>
-            </div>
-            
-            {/* Specifications if available */}
-            {product.specifications && Object.keys(product.specifications).length > 0 && (
-              <div className="product-specifications">
-                <h3>المواصفات</h3>
-                <ul>
-                  {Object.entries(product.specifications).map(([key, value]) => (
-                    <li key={key}>
-                      <span className="spec-name">{key}:</span>
-                      <span className="spec-value">{value}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            
-            {/* Actions */}
+            {/* Actions - Moved up before description */}
             {product.stock_quantity > 0 && (
               <div className="product-actions">
                 <div className="quantity-selector">
@@ -274,13 +255,34 @@ const ProductDetailPage = () => {
                 <button 
                   className={`wishlist-btn ${inWishlist ? 'active' : ''}`}
                   onClick={toggleWishlist}
+                  title={inWishlist ? "إزالة من المفضلة" : "إضافة للمفضلة"}
                 >
                   <FontAwesomeIcon icon={inWishlist ? faHeart : faHeartOutline} />
                 </button>
                 
-                <button className="share-btn">
+                <button className="share-btn" title="مشاركة">
                   <FontAwesomeIcon icon={faShare} />
                 </button>
+              </div>
+            )}
+            
+            <div className="product-description">
+              <h3>الوصف</h3>
+              <p>{product.description || 'لا يوجد وصف متاح لهذا المنتج.'}</p>
+            </div>
+            
+            {/* Specifications if available */}
+            {product.specifications && Object.keys(product.specifications).length > 0 && (
+              <div className="product-specifications">
+                <h3>المواصفات</h3>
+                <ul>
+                  {Object.entries(product.specifications).map(([key, value]) => (
+                    <li key={key}>
+                      <span className="spec-name">{key}:</span>
+                      <span className="spec-value">{value}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             )}
             

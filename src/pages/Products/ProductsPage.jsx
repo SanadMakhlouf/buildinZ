@@ -67,20 +67,16 @@ const ProductsPage = () => {
         const formattedProducts = productsArray.map(product => ({
           id: product.id,
           name: product.name,
-          brand: product.vendor_profile?.business_name || 'Unknown',
+          brand: product.vendor_profile?.business_name || 'Buildingz',
           category: product.category?.name || 'Uncategorized',
           price: parseFloat(product.price),
           originalPrice: parseFloat(product.price) * 1.2, // Example markup for original price
-          rating: (Math.random() * 2 + 3).toFixed(1), // Random rating between 3-5 since it's not in the API
-          reviews: Math.floor(Math.random() * 100), // Random review count
+          discount: Math.floor(Math.random() * 30), // Random discount
           image: product.primary_image_url || 
                  (product.image_urls && product.image_urls.length > 0 ? product.image_urls[0] : 
                   (product.images && product.images.length > 0 ? product.images[0] : 
                    'https://via.placeholder.com/300x300?text=صورة+غير+متوفرة')),
-          discount: Math.floor(Math.random() * 30), // Random discount
-          inStock: product.stock_quantity > 0,
-          isBestSeller: Math.random() > 0.8, // Random bestseller flag
-          description: product.description
+          inStock: product.stock_quantity > 0
         }));
         
         setProducts(formattedProducts);
@@ -202,35 +198,17 @@ const ProductsPage = () => {
     });
   };
 
-  // Rating stars component
-  const StarRating = ({ rating = 0, size = 'sm' }) => {
-    // Ensure rating is a number and between 0-5
-    const numRating = parseFloat(rating) || 0;
-    const safeRating = Math.max(0, Math.min(5, numRating));
-    
-    const fullStars = Math.floor(safeRating);
-    const hasHalfStar = safeRating % 1 >= 0.5;
-    
+  // Star rating component
+  const StarRating = ({ rating = 0 }) => {
     return (
-      <div className={`star-rating ${size}`}>
+      <div className="star-rating">
         {[...Array(5)].map((_, i) => (
           <FontAwesomeIcon
             key={i}
-            icon={
-              i < fullStars 
-                ? faStar 
-                : i === fullStars && hasHalfStar 
-                  ? faStarHalfAlt 
-                  : faStar
-            }
-            className={
-              i < fullStars || (i === fullStars && hasHalfStar)
-                ? 'star-filled'
-                : 'star-empty'
-            }
+            icon={faStar}
+            className={i < Math.floor(rating) ? 'star-filled' : 'star-empty'}
           />
         ))}
-        <span className="rating-text">({safeRating.toFixed(1)})</span>
       </div>
     );
   };
@@ -242,24 +220,35 @@ const ProductsPage = () => {
       e.target.src = 'https://via.placeholder.com/300x300?text=صورة+غير+متوفرة';
     };
     
+    const handleCardClick = () => {
+      navigate(`/products/${product.id}`);
+    };
+    
+    // Calculate discount percentage
+    const discountPercentage = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
+    
     return (
-      <div className={`product-card ${viewMode}`}>
+      <div 
+        className="product-card" 
+        onClick={handleCardClick}
+        style={{ cursor: 'pointer' }}
+      >
         <div className="product-image-container">
+          {discountPercentage > 0 && (
+            <span className="discount-badge">خصم {discountPercentage}%</span>
+          )}
           <img 
             src={product.image} 
             alt={product.name} 
             className="product-image" 
             onError={handleImageError} 
           />
-          {product.isBestSeller && <span className="best-seller-badge">الأكثر مبيعاً</span>}
-          {product.discount > 0 && (
-            <span className="discount-badge">خصم {product.discount}%</span>
-          )}
           <div className="product-actions">
             <button 
               className={`action-btn wishlist-btn ${wishlist.includes(product.id) ? 'active' : ''}`}
               onClick={(e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 toggleWishlist(product.id);
               }}
               title="إضافة للمفضلة"
@@ -267,19 +256,10 @@ const ProductsPage = () => {
               <FontAwesomeIcon icon={wishlist.includes(product.id) ? faHeart : faHeartOutline} />
             </button>
             <button 
-              className="action-btn view-btn" 
-              title="عرض سريع"
-              onClick={(e) => {
-                e.preventDefault();
-                navigate(`/products/${product.id}`);
-              }}
-            >
-              <FontAwesomeIcon icon={faEye} />
-            </button>
-            <button 
               className="action-btn cart-btn"
               onClick={(e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 addToCart(product);
               }}
               title="إضافة للسلة"
@@ -291,21 +271,20 @@ const ProductsPage = () => {
         
         <div className="product-info">
           <div className="product-brand">{product.brand}</div>
-          <h3 className="product-name">
-            <a href={`/products/${product.id}`} onClick={(e) => {
-              e.preventDefault();
-              navigate(`/products/${product.id}`);
-            }}>
-              {product.name}
-            </a>
-          </h3>
-          <StarRating rating={parseFloat(product.rating)} />
-          <div className="product-price">
-            <span className="current-price">{product.price} درهم</span>
-            {product.originalPrice > product.price && (
-              <span className="original-price">{product.originalPrice} درهم</span>
-            )}
+          <h3 className="product-name">{product.name}</h3>
+          
+          <div className="rating-container">
+            <StarRating rating={4.7} />
+            <span className="rating-value">(4.7)</span>
           </div>
+          
+          <div className="product-price-container">
+            <div className="product-price">
+              <span className="original-price">{product.originalPrice.toFixed(0)} درهم</span>
+              <span className="current-price">{product.price.toFixed(0)} درهم</span>
+            </div>
+          </div>
+          
           {!product.inStock && <div className="out-of-stock">غير متوفر</div>}
         </div>
       </div>
