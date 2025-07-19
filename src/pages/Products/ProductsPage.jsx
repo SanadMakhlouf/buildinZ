@@ -21,6 +21,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as faHeartOutline } from '@fortawesome/free-regular-svg-icons';
 import './ProductsPage.css';
+import { useNavigate } from 'react-router-dom';
 
 const ProductsPage = () => {
   const [products, setProducts] = useState([]);
@@ -41,6 +42,7 @@ const ProductsPage = () => {
   const [cart, setCart] = useState([]);
 
   const filtersRef = useRef(null);
+  const navigate = useNavigate();
 
   // Fetch products from API
   useEffect(() => {
@@ -55,6 +57,7 @@ const ProductsPage = () => {
         throw new Error('Failed to fetch products');
       }
       const responseData = await response.json();
+      console.log('API Response:', responseData); // Debug log
       
       // Check if response has the expected structure
       if (responseData.success && responseData.data && Array.isArray(responseData.data.products)) {
@@ -70,7 +73,10 @@ const ProductsPage = () => {
           originalPrice: parseFloat(product.price) * 1.2, // Example markup for original price
           rating: (Math.random() * 2 + 3).toFixed(1), // Random rating between 3-5 since it's not in the API
           reviews: Math.floor(Math.random() * 100), // Random review count
-          image: product.primary_image_url || (product.images && product.images.length > 0 ? product.images[0] : 'https://via.placeholder.com/300x300'),
+          image: product.primary_image_url || 
+                 (product.image_urls && product.image_urls.length > 0 ? product.image_urls[0] : 
+                  (product.images && product.images.length > 0 ? product.images[0] : 
+                   'https://via.placeholder.com/300x300?text=صورة+غير+متوفرة')),
           discount: Math.floor(Math.random() * 30), // Random discount
           inStock: product.stock_quantity > 0,
           isBestSeller: Math.random() > 0.8, // Random bestseller flag
@@ -263,7 +269,10 @@ const ProductsPage = () => {
             <button 
               className="action-btn view-btn" 
               title="عرض سريع"
-              onClick={(e) => e.preventDefault()}
+              onClick={(e) => {
+                e.preventDefault();
+                navigate(`/products/${product.id}`);
+              }}
             >
               <FontAwesomeIcon icon={faEye} />
             </button>
@@ -282,7 +291,14 @@ const ProductsPage = () => {
         
         <div className="product-info">
           <div className="product-brand">{product.brand}</div>
-          <h3 className="product-name">{product.name}</h3>
+          <h3 className="product-name">
+            <a href={`/products/${product.id}`} onClick={(e) => {
+              e.preventDefault();
+              navigate(`/products/${product.id}`);
+            }}>
+              {product.name}
+            </a>
+          </h3>
           <StarRating rating={parseFloat(product.rating)} />
           <div className="product-price">
             <span className="current-price">{product.price} درهم</span>
