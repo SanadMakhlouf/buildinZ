@@ -359,12 +359,7 @@ const ProductDetailPage = () => {
                 )}
                 
                 <div className="secondary-actions">
-                  <button className="secondary-btn" onClick={handleAddToWishlist}>
-                    <FontAwesomeIcon icon={faHeart} /> إضافة للمفضلة
-                  </button>
-                  <button className="secondary-btn">
-                    <FontAwesomeIcon icon={faShare} /> مشاركة المنتج
-                  </button>
+                
                 </div>
               </div>
 

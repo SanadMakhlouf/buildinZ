@@ -18,6 +18,7 @@ import AdminPage from './pages/Admin/AdminPage';
 import FAQPage from './pages/FAQ/FAQPage';
 import PrivacyPage from './pages/Privacy/PrivacyPage';
 import CartPage from './pages/Cart/CartPage';
+import CheckoutPage from './pages/Checkout/CheckoutPage';
 import SearchPage from './pages/Search/SearchPage';
 
 // Components
@@ -52,6 +53,7 @@ function App() {
             <Route path="/faq" element={<FAQPage />} />
             <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/cart" element={<CartPage />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/search" element={<SearchPage />} />
           </Routes>
           <FloatingCart />

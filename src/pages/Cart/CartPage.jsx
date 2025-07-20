@@ -1,12 +1,13 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faTrash, 
   faPlus, 
   faMinus, 
   faShoppingCart, 
-  faArrowLeft 
+  faArrowLeft,
+  faShoppingBag
 } from '@fortawesome/free-solid-svg-icons';
 import { useCart } from '../../context/CartContext';
 import './CartPage.css';
@@ -19,6 +20,8 @@ const CartPage = () => {
     updateQuantity, 
     clearCart 
   } = useCart();
+  
+  const navigate = useNavigate();
 
   if (cart.length === 0) {
     return (
@@ -39,6 +42,10 @@ const CartPage = () => {
       </div>
     );
   }
+
+  const handleCheckout = () => {
+    navigate('/checkout');
+  };
 
   return (
     <div className="cart-page">
@@ -151,9 +158,10 @@ const CartPage = () => {
             </div>
             
             <div className="checkout-actions">
-              <Link to="/checkout" className="checkout-btn">
+              <button onClick={handleCheckout} className="checkout-btn">
+                <FontAwesomeIcon icon={faShoppingBag} />
                 المتابعة إلى الدفع
-              </Link>
+              </button>
             </div>
           </div>
         </div>

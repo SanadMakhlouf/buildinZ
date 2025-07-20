@@ -1,12 +1,13 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faShoppingCart, 
   faTimes, 
   faTrash, 
   faPlus, 
-  faMinus 
+  faMinus,
+  faShoppingBag
 } from '@fortawesome/free-solid-svg-icons';
 import { useCart } from '../context/CartContext';
 import './FloatingCart.css';
@@ -20,6 +21,13 @@ const FloatingCart = () => {
     removeFromCart, 
     updateQuantity 
   } = useCart();
+  
+  const navigate = useNavigate();
+  
+  const handleCheckout = () => {
+    toggleCart(); // Close the cart
+    navigate('/checkout');
+  };
 
   return (
     <div className={`floating-cart ${isCartOpen ? 'open' : ''}`}>
@@ -94,9 +102,10 @@ const FloatingCart = () => {
               <Link to="/cart" className="view-cart-btn" onClick={toggleCart}>
                 عرض السلة
               </Link>
-              <Link to="/checkout" className="checkout-btn" onClick={toggleCart}>
+              <button className="checkout-btn" onClick={handleCheckout}>
+                <FontAwesomeIcon icon={faShoppingBag} />
                 إتمام الشراء
-              </Link>
+              </button>
             </div>
           </div>
         )}

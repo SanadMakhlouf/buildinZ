@@ -58,7 +58,7 @@ const icons = {
   phone: faPhone
 };
 
-const AddressManager = () => {
+const AddressManager = ({ checkoutMode = false, onAddressSelect = null, selectedAddressId = null }) => {
   const [addresses, setAddresses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -87,6 +87,17 @@ const AddressManager = () => {
   useEffect(() => {
     fetchAddresses();
   }, []);
+  
+  // Select default address for checkout mode
+  useEffect(() => {
+    if (checkoutMode && addresses.length > 0 && !selectedAddressId) {
+      // Find default address or use the first one
+      const defaultAddress = addresses.find(addr => addr.is_default) || addresses[0];
+      if (defaultAddress && onAddressSelect) {
+        onAddressSelect(defaultAddress);
+      }
+    }
+  }, [addresses, checkoutMode, onAddressSelect, selectedAddressId]);
 
   // Fetch all addresses from the API
   const fetchAddresses = async () => {
@@ -206,17 +217,24 @@ const AddressManager = () => {
     setIsSaving(true);
     
     try {
+      let savedAddress;
+      
       if (editingAddressId) {
         // Update existing address
-        await addressService.updateAddress(editingAddressId, formData);
+        savedAddress = await addressService.updateAddress(editingAddressId, formData);
       } else {
         // Create new address
-        await addressService.createAddress(formData);
+        savedAddress = await addressService.createAddress(formData);
       }
       
       // Reset form and fetch updated addresses
       resetForm();
-      fetchAddresses();
+      await fetchAddresses();
+      
+      // If in checkout mode, select the newly created/updated address
+      if (checkoutMode && onAddressSelect && savedAddress) {
+        onAddressSelect(savedAddress);
+      }
     } catch (err) {
       // Handle API validation errors
       if (err.response?.data?.errors) {
@@ -250,21 +268,31 @@ const AddressManager = () => {
 
   // Handle address deletion
   const handleDeleteAddress = async (id) => {
-    setDeleteId(id);
     setIsDeleting(true);
-    setShowDeleteConfirm(false);
+    setDeleteId(id);
     
     try {
       await addressService.deleteAddress(id);
-      // Fetch updated addresses
-      fetchAddresses();
+      setAddresses(addresses.filter(address => address.id !== id));
+      setShowDeleteConfirm(false);
+      setAddressToDelete(null);
+      
+      // If deleted address was selected in checkout mode, select another address
+      if (checkoutMode && onAddressSelect && selectedAddressId === id) {
+        const remainingAddresses = addresses.filter(address => address.id !== id);
+        if (remainingAddresses.length > 0) {
+          const defaultAddress = remainingAddresses.find(addr => addr.is_default) || remainingAddresses[0];
+          onAddressSelect(defaultAddress);
+        } else {
+          onAddressSelect(null);
+        }
+      }
     } catch (err) {
       setError('حدث خطأ أثناء حذف العنوان. يرجى المحاولة مرة أخرى.');
       console.error(err);
     } finally {
       setIsDeleting(false);
       setDeleteId(null);
-      setAddressToDelete(null);
     }
   };
 
@@ -272,8 +300,10 @@ const AddressManager = () => {
   const handleSetDefault = async (id) => {
     try {
       await addressService.setDefaultAddress(id);
-      // Fetch updated addresses
-      fetchAddresses();
+      setAddresses(addresses.map(address => ({
+        ...address,
+        is_default: address.id === id
+      })));
     } catch (err) {
       setError('حدث خطأ أثناء تعيين العنوان الافتراضي. يرجى المحاولة مرة أخرى.');
       console.error(err);
@@ -295,15 +325,10 @@ const AddressManager = () => {
     setShowAddForm(true);
     setFormErrors({});
     setValidationStatus(null);
-    
-    // Scroll to form
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
+    setShowAutoDetector(false);
   };
 
-  // Reset form and state
+  // Reset form and form state
   const resetForm = () => {
     setFormData({
       name: '',
@@ -314,17 +339,18 @@ const AddressManager = () => {
       delivery_instructions: '',
       is_default: false
     });
-    setEditingAddressId(null);
-    setShowAddForm(false);
     setFormErrors({});
     setValidationStatus(null);
+    setShowAddForm(false);
+    setEditingAddressId(null);
+    setShowAutoDetector(true);
   };
 
-  // Get icon based on address type
+  // Get appropriate icon for address type
   const getAddressIcon = (name) => {
     const lowerName = name?.toLowerCase() || '';
     
-    if (lowerName.includes('home') || lowerName.includes('منزل')) {
+    if (lowerName.includes('home') || lowerName.includes('منزل') || lowerName.includes('بيت')) {
       return icons.home;
     } else if (lowerName.includes('work') || lowerName.includes('office') || lowerName.includes('عمل') || lowerName.includes('مكتب')) {
       return icons.work;
@@ -335,16 +361,17 @@ const AddressManager = () => {
     }
   };
 
-  // Handle when an address is created by the auto detector
+  // Handle address created from auto detector
   const handleAutoAddressCreated = (address) => {
-    // Hide the auto detector after an address is created or found
-    setShowAutoDetector(false);
-    
-    // Refresh the addresses list
     fetchAddresses();
+    
+    // If in checkout mode, select the newly created address
+    if (checkoutMode && onAddressSelect && address) {
+      onAddressSelect(address);
+    }
   };
 
-  // Handle getting current location for the form
+  // Handle using current location
   const handleUseCurrentLocation = async () => {
     setIsValidating(true);
     setValidationStatus(null);
@@ -457,12 +484,135 @@ const AddressManager = () => {
       setIsValidating(false);
     }
   };
+  
+  // Handle address selection in checkout mode
+  const handleAddressSelect = (address) => {
+    if (checkoutMode && onAddressSelect) {
+      onAddressSelect(address);
+    }
+  };
 
-  return (
-    <div className="address-manager">
-      <div className="address-manager-header">
-        <h2>إدارة العناوين</h2>
-        {!showAddForm && (
+  // Render address list
+  const renderAddressList = () => {
+    if (isLoading) {
+      return (
+        <div className="addresses-loading">
+          <FontAwesomeIcon icon={icons.loading} spin />
+          <span>جاري تحميل العناوين...</span>
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div className="addresses-error">
+          <FontAwesomeIcon icon={icons.error} />
+          <span>{error}</span>
+          <button onClick={fetchAddresses} className="retry-button">
+            إعادة المحاولة
+          </button>
+        </div>
+      );
+    }
+
+    if (addresses.length === 0) {
+      return (
+        <div className="no-addresses">
+          <FontAwesomeIcon icon={icons.location} />
+          <p>لا توجد عناوين محفوظة.</p>
+          <button 
+            className="add-address-btn"
+            onClick={() => setShowAddForm(true)}
+          >
+            <FontAwesomeIcon icon={icons.add} />
+            إضافة عنوان جديد
+          </button>
+        </div>
+      );
+    }
+
+    return (
+      <div className={`addresses-list ${checkoutMode ? 'checkout-mode' : ''}`}>
+        {addresses.map(address => (
+          <div 
+            key={address.id} 
+            className={`address-card ${address.is_default ? 'default' : ''} ${checkoutMode && selectedAddressId === address.id ? 'selected' : ''}`}
+            onClick={checkoutMode ? () => handleAddressSelect(address) : undefined}
+          >
+            <div className="address-icon">
+              <FontAwesomeIcon icon={getAddressIcon(address.name)} />
+            </div>
+            
+            <div className="address-details">
+              <div className="address-header">
+                <h3>{address.name}</h3>
+                {address.is_default && (
+                  <span className="default-badge">
+                    <FontAwesomeIcon icon={icons.default} />
+                    افتراضي
+                  </span>
+                )}
+              </div>
+              
+              <div className="address-content">
+                <p>{address.address_line1}</p>
+                {address.address_line2 && <p>{address.address_line2}</p>}
+                <p>{address.city}</p>
+                {address.phone && (
+                  <p className="address-phone">
+                    <FontAwesomeIcon icon={icons.phone} />
+                    {address.phone}
+                  </p>
+                )}
+                {address.delivery_instructions && (
+                  <p className="delivery-instructions">
+                    <strong>تعليمات التوصيل:</strong> {address.delivery_instructions}
+                  </p>
+                )}
+              </div>
+            </div>
+            
+            {!checkoutMode && (
+              <div className="address-actions">
+                <button 
+                  className="edit-btn"
+                  onClick={() => handleEditAddress(address)}
+                  title="تعديل العنوان"
+                >
+                  <FontAwesomeIcon icon={icons.edit} />
+                </button>
+                
+                <button 
+                  className="delete-btn"
+                  onClick={() => confirmDeleteAddress(address)}
+                  title="حذف العنوان"
+                >
+                  <FontAwesomeIcon icon={icons.delete} />
+                </button>
+                
+                {!address.is_default && (
+                  <button 
+                    className="set-default-btn"
+                    onClick={() => handleSetDefault(address.id)}
+                    title="تعيين كعنوان افتراضي"
+                  >
+                    <FontAwesomeIcon icon={icons.setDefault} />
+                  </button>
+                )}
+              </div>
+            )}
+            
+            {checkoutMode && (
+              <div className="checkout-select">
+                <div className={`select-indicator ${selectedAddressId === address.id ? 'selected' : ''}`}>
+                  <FontAwesomeIcon icon={selectedAddressId === address.id ? faCheckCircle : faCircle} />
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+        
+        {!checkoutMode && (
           <button 
             className="add-address-btn"
             onClick={() => setShowAddForm(true)}
@@ -472,226 +622,178 @@ const AddressManager = () => {
           </button>
         )}
       </div>
+    );
+  };
 
-      {error && (
-        <div className="address-error">
-          <FontAwesomeIcon icon={icons.error} />
-          <span>{error}</span>
-          <button onClick={() => setError(null)}>إغلاق</button>
-        </div>
-      )}
-      
-      {/* Delete Confirmation Dialog */}
-      <AnimatePresence>
-        {showDeleteConfirm && addressToDelete && (
-          <motion.div 
-            className="delete-confirm-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div 
-              className="delete-confirm-dialog"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-            >
-              <div className="delete-confirm-header">
-                <FontAwesomeIcon icon={icons.warning} />
-                <h3>تأكيد الحذف</h3>
-              </div>
-              <div className="delete-confirm-content">
-                <p>هل أنت متأكد من حذف هذا العنوان؟</p>
-                <div className="address-preview">
-                  <strong>{addressToDelete.name}</strong>
-                  <p>{addressToDelete.address_line1}</p>
-                  {addressToDelete.is_default && (
-                    <span className="default-tag">العنوان الافتراضي</span>
-                  )}
-                </div>
-                <p className="warning-text">لا يمكن التراجع عن هذا الإجراء.</p>
-              </div>
-              <div className="delete-confirm-actions">
-                <button 
-                  className="delete-confirm-btn"
-                  onClick={() => handleDeleteAddress(addressToDelete.id)}
-                  disabled={isDeleting}
-                >
-                  {isDeleting ? (
-                    <>
-                      <FontAwesomeIcon icon={icons.loading} spin />
-                      جاري الحذف...
-                    </>
-                  ) : (
-                    <>
-                      <FontAwesomeIcon icon={icons.delete} />
-                      نعم، احذف العنوان
-                    </>
-                  )}
-                </button>
-                <button 
-                  className="delete-cancel-btn"
-                  onClick={cancelDelete}
-                  disabled={isDeleting}
-                >
-                  <FontAwesomeIcon icon={icons.cancel} />
-                  إلغاء
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      
-      {/* Auto Location Detector */}
-      {showAutoDetector && (
-        <AutoLocationDetector onAddressCreated={handleAutoAddressCreated} />
-      )}
-
+  // Render address form
+  const renderAddressForm = () => {
+    return (
       <AnimatePresence>
         {showAddForm && (
-          <motion.div 
+          <motion.div
             className="address-form-container"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
           >
-            <form onSubmit={handleSubmit} className="address-form">
+            <div className="address-form-header">
               <h3>{editingAddressId ? 'تعديل العنوان' : 'إضافة عنوان جديد'}</h3>
-              
-              <div className="form-row">
-                <div className={`form-group ${formErrors.name ? 'has-error' : ''}`}>
-                  <label>اسم العنوان <span className="required">*</span></label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    placeholder="مثال: المنزل، العمل..."
-                    disabled={isSaving}
-                  />
-                  {formErrors.name && <div className="error-message">{formErrors.name}</div>}
-                </div>
-
-                <div className={`form-group ${formErrors.phone ? 'has-error' : ''}`}>
-                  <label>رقم الهاتف</label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    placeholder="رقم الهاتف (اختياري)"
-                    disabled={isSaving}
-                  />
-                  {formErrors.phone && <div className="error-message">{formErrors.phone}</div>}
-                </div>
+              <button 
+                className="close-form-btn"
+                onClick={resetForm}
+              >
+                <FontAwesomeIcon icon={icons.cancel} />
+              </button>
+            </div>
+            
+            <form onSubmit={handleSubmit} className="address-form">
+              <div className="form-group">
+                <label htmlFor="name">اسم العنوان*</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  placeholder="مثل: المنزل، العمل، الخ"
+                  className={formErrors.name ? 'error' : ''}
+                />
+                {formErrors.name && <span className="error-message">{formErrors.name}</span>}
               </div>
-
-              <div className={`form-group ${formErrors.address_line1 ? 'has-error' : ''}`}>
-                <label>العنوان <span className="required">*</span></label>
-                <div className="address-line1-container">
+              
+              <div className="form-group">
+                <label htmlFor="address_line1">العنوان*</label>
+                <div className="address-input-container">
                   <input
                     type="text"
+                    id="address_line1"
                     name="address_line1"
                     value={formData.address_line1}
                     onChange={handleInputChange}
-                    placeholder="أدخل العنوان"
-                    disabled={isSaving || isValidating}
+                    placeholder="اسم الشارع، رقم المبنى"
+                    className={formErrors.address_line1 ? 'error' : ''}
                   />
-                  <div className="address-buttons">
-                    <button 
-                      type="button" 
-                      className="current-location-btn"
-                      onClick={handleUseCurrentLocation}
-                      disabled={isSaving || isValidating}
-                      title="استخدام موقعي الحالي"
-                    >
-                      {isValidating ? (
-                        <FontAwesomeIcon icon={icons.loading} spin />
-                      ) : (
-                        <FontAwesomeIcon icon={icons.currentLocation} />
-                      )}
-                    </button>
-                    <button 
-                      type="button" 
-                      className="validate-btn"
-                      onClick={handleValidateAddress}
-                      disabled={isSaving || isValidating || !formData.address_line1}
-                    >
-                      {isValidating ? (
-                        <FontAwesomeIcon icon={icons.loading} spin />
-                      ) : (
-                        <FontAwesomeIcon icon={icons.search} />
-                      )}
-                      تحقق
-                    </button>
-                  </div>
+                  <button 
+                    type="button"
+                    className="current-location-btn"
+                    onClick={handleUseCurrentLocation}
+                    title="استخدام موقعي الحالي"
+                  >
+                    <FontAwesomeIcon icon={icons.currentLocation} />
+                  </button>
                 </div>
-                {formErrors.address_line1 && <div className="error-message">{formErrors.address_line1}</div>}
+                {formErrors.address_line1 && <span className="error-message">{formErrors.address_line1}</span>}
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="address_line2">تفاصيل إضافية</label>
+                <input
+                  type="text"
+                  id="address_line2"
+                  name="address_line2"
+                  value={formData.address_line2}
+                  onChange={handleInputChange}
+                  placeholder="الطابق، رقم الشقة، المنطقة"
+                  className={formErrors.address_line2 ? 'error' : ''}
+                />
+                {formErrors.address_line2 && <span className="error-message">{formErrors.address_line2}</span>}
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="city">المدينة*</label>
+                <select
+                  id="city"
+                  name="city"
+                  value={formData.city}
+                  onChange={handleInputChange}
+                  className={formErrors.city ? 'error' : ''}
+                >
+                  <option value="">اختر المدينة</option>
+                  {uaeEmirates.map(emirate => (
+                    <option key={emirate} value={emirate}>{emirate}</option>
+                  ))}
+                </select>
+                {formErrors.city && <span className="error-message">{formErrors.city}</span>}
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="phone">رقم الهاتف</label>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  placeholder="رقم الهاتف للتواصل عند التوصيل"
+                  className={formErrors.phone ? 'error' : ''}
+                />
+                {formErrors.phone && <span className="error-message">{formErrors.phone}</span>}
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="delivery_instructions">تعليمات التوصيل</label>
+                <textarea
+                  id="delivery_instructions"
+                  name="delivery_instructions"
+                  value={formData.delivery_instructions}
+                  onChange={handleInputChange}
+                  placeholder="أي تعليمات خاصة بالتوصيل"
+                  rows="3"
+                  className={formErrors.delivery_instructions ? 'error' : ''}
+                ></textarea>
+                {formErrors.delivery_instructions && <span className="error-message">{formErrors.delivery_instructions}</span>}
+              </div>
+              
+              <div className="form-group checkbox">
+                <input
+                  type="checkbox"
+                  id="is_default"
+                  name="is_default"
+                  checked={formData.is_default}
+                  onChange={handleInputChange}
+                />
+                <label htmlFor="is_default">تعيين كعنوان افتراضي</label>
+              </div>
+              
+              <div className="address-validation">
+                <button 
+                  type="button" 
+                  className="validate-btn"
+                  onClick={handleValidateAddress}
+                  disabled={isValidating || !formData.address_line1}
+                >
+                  {isValidating ? (
+                    <>
+                      <FontAwesomeIcon icon={icons.loading} spin />
+                      جاري التحقق...
+                    </>
+                  ) : (
+                    <>
+                      <FontAwesomeIcon icon={icons.search} />
+                      التحقق من العنوان
+                    </>
+                  )}
+                </button>
                 
                 {validationStatus && (
                   <div className={`validation-status ${validationStatus.success ? 'success' : 'warning'}`}>
-                    <FontAwesomeIcon icon={validationStatus.success ? icons.success : icons.error} />
+                    <FontAwesomeIcon icon={validationStatus.success ? icons.success : icons.warning} />
                     <span>{validationStatus.message}</span>
                   </div>
                 )}
               </div>
-
-              <div className="form-group">
-                <label>العنوان التفصيلي</label>
-                <input
-                  type="text"
-                  name="address_line2"
-                  value={formData.address_line2}
-                  onChange={handleInputChange}
-                  placeholder="شقة، طابق، مبنى... (اختياري)"
-                  disabled={isSaving}
-                />
-              </div>
-
-              <div className="form-group">
-                <label>الإمارة</label>
-                <select
-                  name="city"
-                  value={formData.city}
-                  onChange={handleInputChange}
-                  disabled={isSaving}
-                  className="city-select"
-                >
-                  <option value="">اختر الإمارة</option>
-                  {uaeEmirates.map((emirate, index) => (
-                    <option key={index} value={emirate}>{emirate}</option>
-                  ))}
-                </select>
-                {formErrors.city && <div className="error-message">{formErrors.city}</div>}
-              </div>
-
-              <div className="form-group">
-                <label>تعليمات التوصيل</label>
-                <textarea
-                  name="delivery_instructions"
-                  value={formData.delivery_instructions}
-                  onChange={handleInputChange}
-                  placeholder="تعليمات إضافية للتوصيل (اختياري)"
-                  disabled={isSaving}
-                />
-              </div>
-
-              <div className="form-group checkbox-group">
-                <label>
-                  <input
-                    type="checkbox"
-                    name="is_default"
-                    checked={formData.is_default}
-                    onChange={handleInputChange}
-                    disabled={isSaving}
-                  />
-                  تعيين كعنوان افتراضي
-                </label>
-              </div>
-
+              
               <div className="form-actions">
+                <button 
+                  type="button" 
+                  className="cancel-btn"
+                  onClick={resetForm}
+                >
+                  <FontAwesomeIcon icon={icons.cancel} />
+                  إلغاء
+                </button>
+                
                 <button 
                   type="submit" 
                   className="save-btn"
@@ -705,117 +807,86 @@ const AddressManager = () => {
                   ) : (
                     <>
                       <FontAwesomeIcon icon={icons.save} />
-                      {editingAddressId ? 'تحديث العنوان' : 'إضافة العنوان'}
+                      {editingAddressId ? 'تحديث العنوان' : 'حفظ العنوان'}
                     </>
                   )}
-                </button>
-                <button 
-                  type="button" 
-                  className="cancel-btn"
-                  onClick={resetForm}
-                  disabled={isSaving}
-                >
-                  <FontAwesomeIcon icon={icons.cancel} />
-                  إلغاء
                 </button>
               </div>
             </form>
           </motion.div>
         )}
       </AnimatePresence>
+    );
+  };
 
-      <div className="addresses-list">
-        {isLoading ? (
-          <div className="loading-container">
-            <FontAwesomeIcon icon={icons.loading} spin />
-            <p>جاري تحميل العناوين...</p>
+  // Render delete confirmation dialog
+  const renderDeleteConfirmation = () => {
+    if (!showDeleteConfirm || !addressToDelete) return null;
+    
+    return (
+      <div className="delete-confirm-overlay">
+        <div className="delete-confirm-dialog">
+          <h3>تأكيد الحذف</h3>
+          <p>هل أنت متأكد من حذف العنوان "{addressToDelete.name}"؟</p>
+          
+          <div className="confirm-actions">
+            <button 
+              className="cancel-btn"
+              onClick={cancelDelete}
+              disabled={isDeleting}
+            >
+              إلغاء
+            </button>
+            
+            <button 
+              className="delete-btn"
+              onClick={() => handleDeleteAddress(addressToDelete.id)}
+              disabled={isDeleting}
+            >
+              {isDeleting && deleteId === addressToDelete.id ? (
+                <>
+                  <FontAwesomeIcon icon={icons.loading} spin />
+                  جاري الحذف...
+                </>
+              ) : (
+                <>
+                  <FontAwesomeIcon icon={icons.delete} />
+                  تأكيد الحذف
+                </>
+              )}
+            </button>
           </div>
-        ) : addresses.length === 0 ? (
-          <div className="empty-addresses">
-            <FontAwesomeIcon icon={icons.location} />
-            <p>لا توجد عناوين محفوظة</p>
-            {!showAddForm && (
-              <button 
-                className="add-address-btn"
-                onClick={() => setShowAddForm(true)}
-              >
-                <FontAwesomeIcon icon={icons.add} />
-                إضافة عنوان جديد
-              </button>
-            )}
-          </div>
-        ) : (
-          <div className="address-cards">
-            {addresses.map(address => (
-              <motion.div 
-                key={address.id} 
-                className={`address-card ${address.is_default ? 'default' : ''}`}
-                whileHover={{ y: -5 }}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="address-card-header">
-                  <div className="address-name">
-                    <FontAwesomeIcon icon={getAddressIcon(address.name)} />
-                    <span>{address.name}</span>
-                    {address.is_default && (
-                      <span className="default-badge">افتراضي</span>
-                    )}
-                  </div>
-                  <div className="address-actions">
-                    <button 
-                      className="edit-btn" 
-                      onClick={() => handleEditAddress(address)}
-                      title="تعديل"
-                    >
-                      <FontAwesomeIcon icon={icons.edit} />
-                    </button>
-                    <button 
-                      className="delete-btn" 
-                      onClick={() => confirmDeleteAddress(address)}
-                      disabled={isDeleting && deleteId === address.id}
-                      title="حذف"
-                    >
-                      {isDeleting && deleteId === address.id ? (
-                        <FontAwesomeIcon icon={icons.loading} spin />
-                      ) : (
-                        <FontAwesomeIcon icon={icons.delete} />
-                      )}
-                    </button>
-                  </div>
-                </div>
-                
-                <div className="address-details">
-                  <p className="address-line">{address.address_line1}</p>
-                  {address.address_line2 && <p className="address-line">{address.address_line2}</p>}
-                  
-                  {address.city && <p className="address-line">{address.city}</p>}
-                  
-                  {address.phone && <p className="address-phone"><FontAwesomeIcon icon={icons.phone} /> {address.phone}</p>}
-                  
-                  {address.delivery_instructions && (
-                    <div className="delivery-instructions">
-                      <p className="instructions-label">تعليمات التوصيل:</p>
-                      <p>{address.delivery_instructions}</p>
-                    </div>
-                  )}
-                </div>
-                
-                {!address.is_default && (
-                  <button 
-                    className="set-default-btn"
-                    onClick={() => handleSetDefault(address.id)}
-                  >
-                    <FontAwesomeIcon icon={icons.setDefault} />
-                    تعيين كعنوان افتراضي
-                  </button>
-                )}
-              </motion.div>
-            ))}
-          </div>
-        )}
+        </div>
       </div>
+    );
+  };
+
+  return (
+    <div className="address-manager">
+      {/* Auto Location Detector */}
+      {showAutoDetector && !showAddForm && (
+        <AutoLocationDetector onAddressCreated={handleAutoAddressCreated} />
+      )}
+      
+      {/* Addresses List */}
+      {renderAddressList()}
+      
+      {/* Add/Edit Address Form */}
+      {renderAddressForm()}
+      
+      {/* Delete Confirmation Dialog */}
+      {renderDeleteConfirmation()}
+      
+      {/* Add Address Button (for checkout mode) */}
+      {checkoutMode && !showAddForm && (
+        <button 
+          className="add-address-btn checkout-add-btn"
+          onClick={() => setShowAddForm(true)}
+        >
+          <FontAwesomeIcon icon={icons.add} />
+          إضافة عنوان جديد
+        </button>
+      )}
     </div>
   );
 };
