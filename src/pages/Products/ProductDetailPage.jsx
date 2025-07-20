@@ -17,12 +17,14 @@ import {
   faWhatsapp,
   faTelegram
 } from '@fortawesome/free-brands-svg-icons';
+import { useCart } from '../../context/CartContext';
 import productService from '../../services/productService';
 import './ProductDetailPage.css';
 
 const ProductDetailPage = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
+  const { addToCart } = useCart();
   
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -73,7 +75,20 @@ const ProductDetailPage = () => {
   };
 
   const handleAddToCart = () => {
-    console.log('تمت إضافة المنتج للسلة:', product.id, 'الكمية:', quantity);
+    if (product) {
+      // Format product for cart
+      const cartProduct = {
+        id: product.id,
+        name: product.name,
+        price: parseFloat(product.price),
+        image: product.primary_image_url || 
+              (product.image_urls && product.image_urls.length > 0 ? product.image_urls[0] : null),
+        vendor: product.vendor_profile?.business_name || '',
+        stockQuantity: product.stock_quantity || 0
+      };
+      
+      addToCart(cartProduct, quantity);
+    }
   };
 
   const handleAddToWishlist = () => {

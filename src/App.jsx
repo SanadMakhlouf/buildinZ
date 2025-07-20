@@ -24,34 +24,39 @@ import SearchPage from './pages/Search/SearchPage';
 import Navbar from './components/Navbar';
 import LocationSelector from './components/LocationSelector';
 import SearchModal from './components/SearchModal';
+import CartProvider from './context/CartContext';
+import FloatingCart from './components/FloatingCart';
 
 function App() {
   return (
     <Router>
-      <div className="app">
-        <Navbar />
-        <LocationSelector />
-        <SearchModal />
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/services" element={<ServicesPage />} />
-          <Route path="/services2" element={<ServicesPage2 />} />
-          <Route path="/services2/:categoryId" element={<ServicesPage2 />} />
-          <Route path="/products" element={<ProductsPage />} />
-          <Route path="/products/:productId" element={<ProductDetailPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/admin" element={<AdminPage />} />
-          <Route path="/faq" element={<FAQPage />} />
-          <Route path="/privacy" element={<PrivacyPage />} />
-          <Route path="/cart" element={<CartPage />} />
-          <Route path="/search" element={<SearchPage />} />
-        </Routes>
-      </div>
+      <CartProvider>
+        <div className="app">
+          <Navbar />
+          <LocationSelector />
+          <SearchModal />
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/services" element={<ServicesPage />} />
+            <Route path="/services2" element={<ServicesPage2 />} />
+            <Route path="/services2/:categoryId" element={<ServicesPage2 />} />
+            <Route path="/products" element={<ProductsPage />} />
+            <Route path="/products/:productId" element={<ProductDetailPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/admin" element={<AdminPage />} />
+            <Route path="/faq" element={<FAQPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/search" element={<SearchPage />} />
+          </Routes>
+          <FloatingCart />
+        </div>
+      </CartProvider>
     </Router>
   );
 }

@@ -10,6 +10,7 @@ import {
   faTimes,
   faFilter
 } from '@fortawesome/free-solid-svg-icons';
+import { useCart } from '../../context/CartContext';
 import './ProductsPage.css';
 // Import FontAwesome CSS for category icons
 import 'font-awesome/css/font-awesome.min.css';
@@ -32,6 +33,7 @@ const ProductsPage = () => {
   const searchTimeoutRef = useRef(null);
 
   const navigate = useNavigate();
+  const { addToCart } = useCart();
 
   // Handle responsive grid
   useLayoutEffect(() => {
@@ -293,6 +295,11 @@ const ProductsPage = () => {
       navigate(`/products/${product.id}`);
     };
     
+    const handleAddToCart = (e) => {
+      e.stopPropagation(); // Prevent card click
+      addToCart(product, 1);
+    };
+    
     // Format dimensions for display
     const formatDimensions = (dimensions) => {
       if (!dimensions) return '';
@@ -330,7 +337,7 @@ const ProductsPage = () => {
           <div className="product-price-container">
             <div className="product-price">
               AED {product.price.toFixed(0)}
-              {product.dimensions && <span className="price-unit"></span>}
+              {product.dimensions && <span className="price-unit">/m²</span>}
             </div>
             {product.vendor && (
               <div className="vendor-name">Sold by {product.vendor}</div>
@@ -339,11 +346,7 @@ const ProductsPage = () => {
           
           <button 
             className="add-to-cart-btn"
-            onClick={(e) => {
-              e.stopPropagation();
-              // Add to cart logic here
-              console.log('Added to cart:', product.id);
-            }}
+            onClick={handleAddToCart}
           >
             <FontAwesomeIcon icon={faShoppingCart} />
             أضف للسلة
