@@ -7,22 +7,34 @@ export const CartContext = createContext();
 export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
-  const [cart, setCart] = useState([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [cartTotal, setCartTotal] = useState({ items: 0, price: 0 });
-  
-  // Load cart from localStorage on initial load
-  useEffect(() => {
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-      try {
-        setCart(JSON.parse(savedCart));
-      } catch (error) {
-        console.error('Failed to parse cart from localStorage:', error);
-        setCart([]);
-      }
+  // Initialize state from localStorage directly
+  const [cart, setCart] = useState(() => {
+    try {
+      const savedCart = localStorage.getItem('cart');
+      return savedCart ? JSON.parse(savedCart) : [];
+    } catch (error) {
+      console.error('Failed to parse cart from localStorage:', error);
+      return [];
     }
-  }, []);
+  });
+  
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [cartTotal, setCartTotal] = useState(() => {
+    try {
+      const savedCart = localStorage.getItem('cart');
+      if (savedCart) {
+        const parsedCart = JSON.parse(savedCart);
+        return {
+          items: parsedCart.reduce((total, item) => total + item.quantity, 0),
+          price: parsedCart.reduce((total, item) => total + (item.price * item.quantity), 0)
+        };
+      }
+      return { items: 0, price: 0 };
+    } catch (error) {
+      console.error('Failed to calculate cart totals from localStorage:', error);
+      return { items: 0, price: 0 };
+    }
+  });
   
   // Update localStorage whenever cart changes
   useEffect(() => {
@@ -89,6 +101,7 @@ export const CartProvider = ({ children }) => {
   // Clear cart
   const clearCart = () => {
     setCart([]);
+    localStorage.removeItem('cart');
   };
   
   // Toggle cart visibility
