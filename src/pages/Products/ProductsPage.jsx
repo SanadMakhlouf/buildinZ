@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faStar,
   faSpinner,
   faExclamationTriangle,
-  faShoppingCart
+  faShoppingCart,
+  faSearch,
+  faTimes
 } from '@fortawesome/free-solid-svg-icons';
 import './ProductsPage.css';
 
@@ -15,18 +17,70 @@ const ProductsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [visibleProducts, setVisibleProducts] = useState(12);
+  const [gridColumns, setGridColumns] = useState('repeat(5, 1fr)');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const searchInputRef = useRef(null);
+  const searchTimeoutRef = useRef(null);
 
   const navigate = useNavigate();
+
+  // Handle responsive grid
+  useLayoutEffect(() => {
+    function updateGridColumns() {
+      if (window.innerWidth <= 480) {
+        setGridColumns('1fr'); // 1 column on mobile
+      } else if (window.innerWidth <= 768) {
+        setGridColumns('repeat(2, 1fr)'); // 2 columns on tablet
+      } else {
+        setGridColumns('repeat(5, 1fr)'); // 5 columns on desktop
+      }
+    }
+
+    updateGridColumns();
+    window.addEventListener('resize', updateGridColumns);
+    return () => window.removeEventListener('resize', updateGridColumns);
+  }, []);
 
   // Fetch products from API
   useEffect(() => {
     fetchProducts();
   }, []);
 
-  const fetchProducts = async () => {
+  // Handle search with debounce
+  useEffect(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    if (searchTerm.trim() !== '') {
+      setIsSearching(true);
+      searchTimeoutRef.current = setTimeout(() => {
+        fetchProducts(searchTerm);
+      }, 500); // 500ms debounce
+    } else if (searchTerm === '' && products.length > 0) {
+      // Reset to all products when search is cleared
+      setFilteredProducts(products);
+      setIsSearching(false);
+    }
+
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [searchTerm]);
+
+  const fetchProducts = async (search = '') => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8000/api/products');
+      let url = 'http://localhost:8000/api/products';
+      if (search) {
+        url += `?search=${encodeURIComponent(search)}`;
+      }
+      
+      const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Failed to fetch products');
       }
@@ -56,19 +110,59 @@ const ProductsPage = () => {
         }));
         
         console.log('Formatted products:', formattedProducts.length);
-        setProducts(formattedProducts);
+        
+        // Store all products in state
+        if (!search) {
+          setProducts(formattedProducts);
+        }
+        
+        // Update filtered products
         setFilteredProducts(formattedProducts);
+        setVisibleProducts(12); // Reset pagination when searching
       } else {
-        setProducts([]);
+        if (!search) {
+          setProducts([]);
+        }
         setFilteredProducts([]);
       }
     } catch (err) {
       console.error('Error fetching products:', err);
       setError(err.message);
-      setProducts([]);
+      if (!search) {
+        setProducts([]);
+      }
       setFilteredProducts([]);
     } finally {
       setLoading(false);
+      setIsSearching(false);
+    }
+  };
+
+  // Handle search focus
+  const handleSearchFocus = () => {
+    setIsSearchFocused(true);
+  };
+
+  // Handle search blur
+  const handleSearchBlur = () => {
+    // Small delay to allow click events to process
+    setTimeout(() => {
+      setIsSearchFocused(false);
+    }, 200);
+  };
+
+  // Handle search clear
+  const handleClearSearch = () => {
+    setSearchTerm('');
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  };
+
+  // Handle search icon click
+  const handleSearchIconClick = () => {
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
     }
   };
 
@@ -148,7 +242,7 @@ const ProductsPage = () => {
     );
   };
 
-  if (loading) {
+  if (loading && !isSearching) {
     return (
       <div className="products-page">
         <div className="loading-container">
@@ -166,7 +260,7 @@ const ProductsPage = () => {
           <FontAwesomeIcon icon={faExclamationTriangle} size="3x" />
           <h2>Failed to load products</h2>
           <p>{error}</p>
-          <button className="retry-btn" onClick={fetchProducts}>
+          <button className="retry-btn" onClick={() => fetchProducts()}>
             Try Again
           </button>
         </div>
@@ -177,15 +271,53 @@ const ProductsPage = () => {
   return (
     <div className="products-page">
       <div className="container">
+        {/* Search Bar */}
+        <div className={`search-bar-container ${isSearchFocused ? 'focused' : ''}`}>
+          <div className="search-input-wrapper">
+            <div className="search-icon" onClick={handleSearchIconClick}>
+              {isSearching ? (
+                <FontAwesomeIcon icon={faSpinner} spin />
+              ) : (
+                <FontAwesomeIcon icon={faSearch} />
+              )}
+            </div>
+            <input
+              ref={searchInputRef}
+              type="text"
+              className="search-input"
+              placeholder="بحث عن المنتجات..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onFocus={handleSearchFocus}
+              onBlur={handleSearchBlur}
+            />
+            {searchTerm && (
+              <div className="search-clear" onClick={handleClearSearch}>
+                <FontAwesomeIcon icon={faTimes} />
+              </div>
+            )}
+          </div>
+          {isSearchFocused && searchTerm && (
+            <div className="search-status">
+              {isSearching ? 'جاري البحث...' : `تم العثور على ${filteredProducts.length} منتج`}
+            </div>
+          )}
+        </div>
+        
         <div className="products-content">
           {/* Products Grid */}
-          {filteredProducts.length > 0 ? (
+          {loading && isSearching ? (
+            <div className="loading-container">
+              <FontAwesomeIcon icon={faSpinner} spin size="3x" />
+              <p>Searching products...</p>
+            </div>
+          ) : filteredProducts.length > 0 ? (
             <>
               <div 
                 className="products-grid" 
                 style={{ 
                   display: 'grid', 
-                  gridTemplateColumns: 'repeat(5, 1fr)', 
+                  gridTemplateColumns: gridColumns, 
                   gap: '1rem' 
                 }}
               >
@@ -205,7 +337,7 @@ const ProductsPage = () => {
           ) : (
             <div className="no-products">
               <h3>No products found</h3>
-              <p>Try again later</p>
+              <p>{searchTerm ? `No results for "${searchTerm}"` : 'Try again later'}</p>
             </div>
           )}
         </div>

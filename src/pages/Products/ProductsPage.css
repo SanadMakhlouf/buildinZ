@@ -12,6 +12,103 @@
   padding: 2rem 1rem;
 }
 
+/* Search Bar */
+.search-bar-container {
+  margin-top: 50px;
+  margin-bottom: 2rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  transition: all 0.3s ease;
+  direction: rtl; /* RTL for Arabic text */
+}
+
+.search-bar-container.focused {
+  transform: translateY(-5px);
+}
+
+.search-input-wrapper {
+  display: flex;
+  position: relative;
+  align-items: center;
+  background-color:white;
+  border-radius: 50px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  padding: 0 15px;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  color: black;
+  text-color: black;
+}
+
+.search-bar-container.focused .search-input-wrapper {
+  border-color: var(--gradient-accent, #DAA520);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.25);
+}
+
+.search-icon {
+  color: #DAA520;
+  font-size: 1.1rem;
+  margin-left: 10px;
+  margin-right: 0;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.search-bar-container.focused .search-icon {
+  color: var(--gradient-accent, #DAA520);
+}
+
+.search-input {
+  flex: 1;
+  padding: 12px 0;
+  border: none;
+  font-size: 1rem;
+  background: transparent;
+  width: 100%;
+  color: black;
+}
+
+.search-input::placeholder {
+  color: black;
+  opacity: 1;
+}
+
+.search-input:focus {
+  outline: none;
+}
+
+.search-clear {
+  color: #DAA520;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 5px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.search-clear:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.search-status {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-top: 0.5rem;
+  padding: 0 10px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* Products Grid */
 .products-content {
   width: 100%;
@@ -237,6 +334,10 @@
   .products-page .products-grid {
     grid-template-columns: repeat(2, 1fr) !important;
   }
+  
+  .search-bar-container {
+    max-width: 100%;
+  }
 }
 
 @media (max-width: 480px) {
@@ -247,6 +348,14 @@
   .products-page .products-grid {
     grid-template-columns: 1fr !important;
     gap: 1rem;
+  }
+  
+  .search-input {
+    font-size: 0.9rem;
+  }
+  
+  .search-icon {
+    font-size: 1rem;
   }
 }
 

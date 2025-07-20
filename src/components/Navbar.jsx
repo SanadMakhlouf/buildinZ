@@ -104,15 +104,7 @@ const Navbar = () => {
               </button>
             </div>
 
-            {/* Cart */}
-            <div className="cart-wrapper">
-              <Link to="/cart" className="action-button">
-                <FontAwesomeIcon icon={faShoppingBag} />
-                {cartCount > 0 && (
-                  <span className="notification-badge">{cartCount}</span>
-                )}
-              </Link>
-            </div>
+           
 
             {/* User Profile */}
             <div className="profile-wrapper">
