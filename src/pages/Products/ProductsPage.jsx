@@ -14,12 +14,7 @@ const ProductsPage = () => {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [sortBy, setSortBy] = useState('popular');
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
-  const [categories, setCategories] = useState([]);
-  const [vendors, setVendors] = useState([]);
-  const [selectedVendors, setSelectedVendors] = useState([]);
+  const [visibleProducts, setVisibleProducts] = useState(12);
 
   const navigate = useNavigate();
 
@@ -39,6 +34,7 @@ const ProductsPage = () => {
       
       if (responseData.success && responseData.data && Array.isArray(responseData.data.products)) {
         const productsArray = responseData.data.products;
+        console.log('API returned products:', productsArray.length);
         
         // Transform products to match the component's expected format
         const formattedProducts = productsArray.map(product => ({
@@ -52,31 +48,16 @@ const ProductsPage = () => {
           description: product.description || '',
           image: product.primary_image_url || 
                  (product.image_urls && product.image_urls.length > 0 ? product.image_urls[0] : 
-                  'https://via.placeholder.com/300x300?text=No+Image'),
+                  null),
           stockQuantity: product.stock_quantity || 0,
           dimensions: product.dimensions || '',
           specifications: product.specifications || '',
           rating: 4.8 // Since API doesn't provide ratings, using a standard value
         }));
         
+        console.log('Formatted products:', formattedProducts.length);
         setProducts(formattedProducts);
         setFilteredProducts(formattedProducts);
-        
-        // Extract unique categories from API data
-        const uniqueCategories = [...new Set(productsArray
-          .filter(p => p.category && p.category.name)
-          .map(p => ({ id: p.category.id, name: p.category.name }))
-        )];
-        const categoriesWithAll = [{ id: '', name: 'All' }, ...uniqueCategories];
-        setCategories(categoriesWithAll);
-        
-        // Extract unique vendors from API data
-        const uniqueVendors = [...new Set(productsArray
-          .filter(p => p.vendor_profile && p.vendor_profile.business_name)
-          .map(p => ({ id: p.vendor_profile.id, name: p.vendor_profile.business_name }))
-        )];
-        setVendors(uniqueVendors);
-        
       } else {
         setProducts([]);
         setFilteredProducts([]);
@@ -91,72 +72,30 @@ const ProductsPage = () => {
     }
   };
 
-  // Filter products
-  useEffect(() => {
-    if (!Array.isArray(products) || products.length === 0) {
-      setFilteredProducts([]);
-      return;
-    }
-
-    let filtered = [...products];
-
-    // Category filter
-    if (selectedCategory && selectedCategory !== '') {
-      filtered = filtered.filter(product => product.categoryId === selectedCategory);
-    }
-
-    // Vendor filter
-    if (selectedVendors.length > 0) {
-      filtered = filtered.filter(product => selectedVendors.includes(product.vendorId));
-    }
-
-    // Price range filter
-    filtered = filtered.filter(product => 
-      product.price >= priceRange.min && product.price <= priceRange.max
-    );
-
-    // Sorting
-    switch (sortBy) {
-      case 'price-low':
-        filtered.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-high':
-        filtered.sort((a, b) => b.price - a.price);
-        break;
-      case 'name':
-        filtered.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      default: // popular
-        filtered.sort((a, b) => b.rating - a.rating);
-    }
-
-    setFilteredProducts(filtered);
-  }, [products, sortBy, selectedCategory, selectedVendors, priceRange]);
-
-  // Handle category change
-  const handleCategoryChange = (categoryId) => {
-    setSelectedCategory(categoryId);
-  };
-
-  // Handle vendor filter change
-  const handleVendorChange = (vendorId) => {
-    setSelectedVendors(prev => {
-      if (prev.includes(vendorId)) {
-        return prev.filter(id => id !== vendorId);
-      } else {
-        return [...prev, vendorId];
-      }
-    });
+  // Load more products
+  const loadMoreProducts = () => {
+    setVisibleProducts(prev => prev + 12);
   };
 
   // Product card component
   const ProductCard = ({ product }) => {
     const handleImageError = (e) => {
-      e.target.src = 'https://via.placeholder.com/300x300?text=No+Image';
+      // Remove image on error instead of showing placeholder
+      e.target.style.display = 'none';
     };
     
     const handleCardClick = () => {
       navigate(`/products/${product.id}`);
+    };
+    
+    // Format dimensions for display
+    const formatDimensions = (dimensions) => {
+      if (!dimensions) return '';
+      if (typeof dimensions === 'object') {
+        const { length, width, height } = dimensions;
+        return `${length || 0} × ${width || 0} × ${height || 0} cm`;
+      }
+      return dimensions;
     };
     
     return (
@@ -166,19 +105,21 @@ const ProductsPage = () => {
             <FontAwesomeIcon icon={faStar} className="rating-star" />
             {product.rating}
           </div>
-          <img 
-            src={product.image} 
-            alt={product.name} 
-            className="product-image" 
-            onError={handleImageError} 
-          />
+          {product.image && (
+            <img 
+              src={product.image} 
+              alt={product.name} 
+              className="product-image" 
+              onError={handleImageError} 
+            />
+          )}
         </div>
         
         <div className="product-info">
           <h3 className="product-title">{product.name}</h3>
           
           {product.dimensions && (
-            <div className="product-specs">{product.dimensions} • Natural finish</div>
+            <div className="product-specs">{formatDimensions(product.dimensions)}</div>
           )}
           
           <div className="product-price-container">
@@ -195,10 +136,12 @@ const ProductsPage = () => {
             className="add-to-cart-btn"
             onClick={(e) => {
               e.stopPropagation();
+              // Add to cart logic here
+              console.log('Added to cart:', product.id);
             }}
           >
             <FontAwesomeIcon icon={faShoppingCart} />
-            Add to Cart
+            أضف للسلة
           </button>
         </div>
       </div>
@@ -234,134 +177,37 @@ const ProductsPage = () => {
   return (
     <div className="products-page">
       <div className="container">
-        {/* Header */}
-        <div className="marketplace-header">
-          <h1>Shop Marketplace</h1>
-          <p>Premium materials and décor for your projects</p>
-        </div>
-
-        {/* Top Controls */}
-        <div className="top-controls">
-          <div className="sort-dropdown">
-            <select 
-              value={sortBy} 
-              onChange={(e) => setSortBy(e.target.value)}
-              className="sort-select"
-            >
-              <option value="popular">Sort by: Popular</option>
-              <option value="price-low">Price: Low to High</option>
-              <option value="price-high">Price: High to Low</option>
-              <option value="name">Name</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Category Tabs */}
-        <div className="category-tabs">
-          {categories.map(category => (
-            <button
-              key={category.id}
-              className={`category-tab ${selectedCategory === category.id ? 'active' : ''}`}
-              onClick={() => handleCategoryChange(category.id)}
-            >
-              {category.name}
-            </button>
-          ))}
-        </div>
-
-        <div className="main-layout">
-          {/* Sidebar */}
-          <div className="sidebar">
-            <h2>Filters</h2>
-            
-            {/* Categories */}
-            <div className="filter-group">
-              <h3>Categories</h3>
-              <div className="filter-options">
-                <div className="filter-option">
-                  <input type="checkbox" id="wood-timber" />
-                  <label htmlFor="wood-timber">Wood & Timber</label>
-                </div>
-                <div className="filter-option">
-                  <input type="checkbox" id="tiles-marble" />
-                  <label htmlFor="tiles-marble">Tiles & Marble</label>
-                </div>
-                <div className="filter-option">
-                  <input type="checkbox" id="paint-coatings" />
-                  <label htmlFor="paint-coatings">Paint & Coatings</label>
-                </div>
-                <div className="filter-option">
-                  <input type="checkbox" id="lighting" />
-                  <label htmlFor="lighting">Lighting</label>
-                </div>
-                <div className="filter-option">
-                  <input type="checkbox" id="decor-items" />
-                  <label htmlFor="decor-items">Décor Items</label>
-                </div>
-              </div>
-            </div>
-
-            {/* Price Range */}
-            <div className="filter-group">
-              <h3>Price Range</h3>
-              <div className="price-range-container">
-                <div className="price-slider">
-                  <div 
-                    className="price-track" 
-                    style={{
-                      left: `${(priceRange.min / 1000) * 100}%`,
-                      width: `${((priceRange.max - priceRange.min) / 1000) * 100}%`
-                    }}
-                  ></div>
-                </div>
-                <div className="price-inputs">
-                  <span className="price-label">AED {priceRange.min}</span>
-                  <span className="price-label">AED {priceRange.max}+</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Vendors */}
-            {vendors.length > 0 && (
-              <div className="filter-group">
-                <h3>Vendors</h3>
-                <div className="filter-options">
-                  {vendors.map(vendor => (
-                    <div className="filter-option" key={vendor.id}>
-                      <input
-                        type="checkbox"
-                        id={`vendor-${vendor.id}`}
-                        checked={selectedVendors.includes(vendor.id)}
-                        onChange={() => handleVendorChange(vendor.id)}
-                      />
-                      <label htmlFor={`vendor-${vendor.id}`}>{vendor.name}</label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <button className="apply-filters-btn">
-              Apply Filters
-            </button>
-          </div>
-          
-          {/* Products Content */}
-          <div className="products-content">
-            {/* Products Grid */}
-            {filteredProducts.length > 0 ? (
-              <div className="products-grid">
-                {filteredProducts.map(product => (
+        <div className="products-content">
+          {/* Products Grid */}
+          {filteredProducts.length > 0 ? (
+            <>
+              <div 
+                className="products-grid" 
+                style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: 'repeat(5, 1fr)', 
+                  gap: '1rem' 
+                }}
+              >
+                {filteredProducts.slice(0, visibleProducts).map(product => (
                   <ProductCard key={product.id} product={product} />
                 ))}
               </div>
-            ) : (
-              <div className="no-products">
-                <h3>No products found</h3>
-                <p>Try adjusting your filters or search terms</p>
-              </div>
-            )}
-          </div>
+              
+              {visibleProducts < filteredProducts.length && (
+                <div className="load-more-container">
+                  <button className="load-more-btn" onClick={loadMoreProducts}>
+                    Load More Products
+                  </button>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="no-products">
+              <h3>No products found</h3>
+              <p>Try again later</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -56,7 +56,8 @@ const ProductDetailPage = () => {
   }, [productId]);
 
   const handleImageError = (e) => {
-    e.target.src = 'https://via.placeholder.com/500x500?text=صورة+غير+متوفرة';
+    // Remove image on error instead of showing placeholder
+    e.target.style.display = 'none';
   };
 
   const increaseQuantity = () => {
@@ -114,6 +115,33 @@ const ProductDetailPage = () => {
     if (shareUrl) {
       window.open(shareUrl, '_blank', 'width=600,height=400');
     }
+  };
+
+  // Format dimensions for display
+  const formatDimensions = (dimensions) => {
+    if (!dimensions) return '';
+    if (typeof dimensions === 'object') {
+      const { length, width, height } = dimensions;
+      return `${length || 0} × ${width || 0} × ${height || 0} سم`;
+    }
+    return dimensions;
+  };
+
+  // Format specifications for display
+  const formatSpecifications = (specs) => {
+    if (!specs) return null;
+    if (typeof specs === 'object') {
+      return (
+        <ul className="specs-list">
+          {Object.entries(specs).map(([key, value]) => (
+            <li key={key}>
+              <strong>{key}:</strong> {value}
+            </li>
+          ))}
+        </ul>
+      );
+    }
+    return <p>{specs}</p>;
   };
 
   if (loading) {
@@ -185,11 +213,13 @@ const ProductDetailPage = () => {
                         className={`thumbnail ${selectedImage === index ? 'active' : ''}`}
                         onClick={() => setSelectedImage(index)}
                       >
-                        <img 
-                          src={url} 
-                          alt={`${product.name} - عرض ${index + 1}`} 
-                          onError={handleImageError} 
-                        />
+                        {url && (
+                          <img 
+                            src={url} 
+                            alt={`${product.name} - عرض ${index + 1}`} 
+                            onError={handleImageError} 
+                          />
+                        )}
                       </div>
                     ))}
                   </div>
@@ -197,13 +227,13 @@ const ProductDetailPage = () => {
                 
                 <div className="main-image-container">
                   <div className="main-image">
-                    <img 
-                      src={availableImages.length > 0 
-                        ? availableImages[selectedImage] 
-                        : 'https://via.placeholder.com/500x500?text=صورة+غير+متوفرة'} 
-                      alt={product.name} 
-                      onError={handleImageError}
-                    />
+                    {availableImages.length > 0 && availableImages[selectedImage] && (
+                      <img 
+                        src={availableImages[selectedImage]} 
+                        alt={product.name} 
+                        onError={handleImageError}
+                      />
+                    )}
                   </div>
                 </div>
               </div>
@@ -246,8 +276,19 @@ const ProductDetailPage = () => {
               <div className="product-options">
                 {product.specifications && (
                   <div className="option-group">
-                    <span className="option-label">اختر اللون</span>
-                    <div className="option-value">{product.specifications}</div>
+                    <span className="option-label">المواصفات</span>
+                    <div className="option-value">
+                      {formatSpecifications(product.specifications)}
+                    </div>
+                  </div>
+                )}
+                
+                {product.dimensions && (
+                  <div className="option-group">
+                    <span className="option-label">الأبعاد</span>
+                    <div className="option-value">
+                      {formatDimensions(product.dimensions)}
+                    </div>
                   </div>
                 )}
               </div>
