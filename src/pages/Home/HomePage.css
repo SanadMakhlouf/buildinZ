@@ -474,6 +474,7 @@ p, a, button, input, textarea, select {
 
 /* Location Section Styles */
 .hero-location {
+  margin-top: 50px;
   margin-bottom: 1.5rem;
   width: 100%;
 }
@@ -1872,7 +1873,6 @@ section:after {
     flex-direction: column;
     gap: 0.7rem;
     text-align: right;
-    align-items: flex-end;
     justify-content: flex-end;
   }
   

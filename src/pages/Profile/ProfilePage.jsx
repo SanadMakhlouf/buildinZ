@@ -1,6 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+  faUser, 
+  faShoppingCart, 
+  faTools, 
+  faBell, 
+  faCog, 
+  faSignOutAlt, 
+  faEdit, 
+  faSave, 
+  faTimes, 
+  faTrashAlt, 
+  faPhone, 
+  faEnvelope, 
+  faUserTag, 
+  faMapMarkerAlt, 
+  faMapMarkedAlt, 
+  faExclamationCircle,
+  faShoppingBasket,
+  faSpinner,
+  faBan,
+  faEye,
+  faCheck
+} from '@fortawesome/free-solid-svg-icons';
 import profileService from '../../services/profileService';
 import authService from '../../services/authService';
 import AddressManager from '../../components/Profile/AddressManager';
@@ -8,22 +32,27 @@ import './ProfilePage.css';
 
 // Icons for the sidebar and profile sections
 const icons = {
-  profile: "fas fa-user",
-  orders: "fas fa-shopping-cart",
-  services: "fas fa-tools",
-  notifications: "fas fa-bell",
-  settings: "fas fa-cog",
-  logout: "fas fa-sign-out-alt",
-  edit: "fas fa-edit",
-  save: "fas fa-save",
-  cancel: "fas fa-times",
-  delete: "fas fa-trash-alt",
-  phone: "fas fa-phone",
-  email: "fas fa-envelope",
-  role: "fas fa-user-tag",
-  address: "fas fa-map-marker-alt",
-  addresses: "fas fa-map-marked-alt",
-  error: "fas fa-exclamation-circle"
+  profile: faUser,
+  orders: faShoppingCart,
+  services: faTools,
+  notifications: faBell,
+  settings: faCog,
+  logout: faSignOutAlt,
+  edit: faEdit,
+  save: faSave,
+  cancel: faTimes,
+  delete: faTrashAlt,
+  phone: faPhone,
+  email: faEnvelope,
+  role: faUserTag,
+  address: faMapMarkerAlt,
+  addresses: faMapMarkedAlt,
+  error: faExclamationCircle,
+  basket: faShoppingBasket,
+  spinner: faSpinner,
+  ban: faBan,
+  eye: faEye,
+  check: faCheck
 };
 
 const ProfilePage = () => {
@@ -42,11 +71,20 @@ const ProfilePage = () => {
   const [error, setError] = useState(null);
   const [validationErrors, setValidationErrors] = useState({});
   const [formTouched, setFormTouched] = useState({});
+  const [cancellingOrderId, setCancellingOrderId] = useState(null);
+  const [showOrderDetails, setShowOrderDetails] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Check if user is authenticated
+    if (!authService.isAuthenticated()) {
+      // Redirect to login page with return URL
+      navigate('/login?redirect=/profile');
+      return;
+    }
+    
     fetchProfileData();
-  }, []);
+  }, [navigate]);
 
   const fetchProfileData = async () => {
     try {
@@ -74,6 +112,40 @@ const ProfilePage = () => {
       console.error(err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Handle order cancellation
+  const handleCancelOrder = async (orderId) => {
+    try {
+      setCancellingOrderId(orderId);
+      await profileService.cancelOrder(orderId);
+      
+      // Update orders list after cancellation
+      setOrders(prevOrders => 
+        prevOrders.map(order => 
+          order.id === orderId 
+            ? { ...order, status: 'cancelled', status_label: 'ملغي' } 
+            : order
+        )
+      );
+      
+      // Show success message
+      alert('تم إلغاء الطلب بنجاح');
+    } catch (err) {
+      setError('حدث خطأ أثناء إلغاء الطلب. يرجى المحاولة مرة أخرى.');
+      console.error(err);
+    } finally {
+      setCancellingOrderId(null);
+    }
+  };
+
+  // Toggle order details view
+  const toggleOrderDetails = (orderId) => {
+    if (showOrderDetails === orderId) {
+      setShowOrderDetails(null);
+    } else {
+      setShowOrderDetails(orderId);
     }
   };
 
@@ -385,7 +457,7 @@ const ProfilePage = () => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
         >
-          <i className="fas fa-shopping-basket" style={{ fontSize: '3rem', color: '#DAA520', marginBottom: '1rem' }}></i>
+          <FontAwesomeIcon icon={icons.basket} style={{ fontSize: '3rem', color: '#DAA520', marginBottom: '1rem' }} />
           <p>لا توجد طلبات حتى الآن</p>
           <button 
             className="edit-btn" 
@@ -409,18 +481,99 @@ const ProfilePage = () => {
               whileHover={{ y: -5 }}
             >
               <div className="order-header">
-                <span>رقم الطلب: #{order.id}</span>
+                <span>رقم الطلب: #{order.order_number || order.id}</span>
                 <span className={`order-status ${order.status.toLowerCase()}`}>
                   {order.status === 'pending' ? 'قيد الانتظار' : 
+                   order.status === 'processing' ? 'قيد المعالجة' :
+                   order.status === 'shipped' ? 'تم الشحن' :
+                   order.status === 'delivered' ? 'تم التوصيل' :
+                   order.status === 'confirmed' ? 'مكتمل' :
                    order.status === 'completed' ? 'مكتمل' : 'ملغي'}
+                   
                 </span>
               </div>
               <div className="order-details">
                 <p>التاريخ: {new Date(order.created_at).toLocaleDateString('ar-SA')}</p>
-                <p>المبلغ الإجمالي: {order.total_amount} ر.س</p>
-                <p>عدد المنتجات: {order.items_count || '1'}</p>
-                <p>طريقة الدفع: {order.payment_method || 'الدفع عند الاستلام'}</p>
+                <p>المبلغ الإجمالي: {order.total_amount} درهم</p>
+                <p>عدد المنتجات: {order.items_count || order.items?.length || '1'}</p>
+                <p>طريقة الدفع: {
+                  order.payment_method === 'cash_on_delivery' ? 'الدفع عند الاستلام' : 
+                  order.payment_method === 'credit_card' ? 'بطاقة ائتمان' : 
+                  order.payment_method === 'bank_transfer' ? 'تحويل بنكي' : 
+                  'الدفع عند الاستلام'
+                }</p>
               </div>
+              
+              <div className="order-actions">
+                <button 
+                  className="view-order-btn"
+                  onClick={() => toggleOrderDetails(order.id)}
+                >
+                  <FontAwesomeIcon icon={icons.eye} />
+                  {showOrderDetails === order.id ? 'إخفاء التفاصيل' : 'عرض التفاصيل'}
+                </button>
+                
+                {(order.status === 'pending' || order.status === 'processing') && (
+                  <button 
+                    className="cancel-order-btn"
+                    onClick={() => handleCancelOrder(order.id)}
+                    disabled={cancellingOrderId === order.id}
+                  >
+                    {cancellingOrderId === order.id ? (
+                      <>
+                        <FontAwesomeIcon icon={icons.spinner} spin />
+                        جاري الإلغاء...
+                      </>
+                    ) : (
+                      <>
+                        <FontAwesomeIcon icon={icons.ban} />
+                        إلغاء الطلب
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+              
+              {showOrderDetails === order.id && (
+                <motion.div 
+                  className="order-items-details"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <h4>تفاصيل المنتجات</h4>
+                  {order.items && order.items.length > 0 ? (
+                    <div className="order-items-list">
+                      {order.items.map((item, index) => (
+                        <div key={index} className="order-item-detail">
+                          <div className="item-name">{item.name || item.product_name}</div>
+                          <div className="item-quantity">الكمية: {item.quantity}</div>
+                          <div className="item-price">السعر: {item.price || item.unit_price} درهم</div>
+                          <div className="item-total">المجموع: {item.total_price || (item.price * item.quantity)} درهم</div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p>لا توجد تفاصيل متاحة للمنتجات</p>
+                  )}
+                  
+                  {order.shipping_address && (
+                    <div className="shipping-address">
+                      <h4>عنوان الشحن</h4>
+                      <p>{order.shipping_address.street}</p>
+                      <p>{order.shipping_address.city}, {order.shipping_address.state}</p>
+                      <p>{order.shipping_address.zip}, {order.shipping_address.country}</p>
+                    </div>
+                  )}
+                  
+                  {order.notes && (
+                    <div className="order-notes">
+                      <h4>ملاحظات</h4>
+                      <p>{order.notes}</p>
+                    </div>
+                  )}
+                </motion.div>
+              )}
             </motion.div>
           ))}
         </motion.div>

@@ -20,6 +20,8 @@ import PrivacyPage from './pages/Privacy/PrivacyPage';
 import CartPage from './pages/Cart/CartPage';
 import CheckoutPage from './pages/Checkout/CheckoutPage';
 import SearchPage from './pages/Search/SearchPage';
+import PaymentSuccessPage from './pages/Payment/PaymentSuccessPage';
+import PaymentFailurePage from './pages/Payment/PaymentFailurePage';
 
 // Components
 import Navbar from './components/Navbar';
@@ -54,6 +56,8 @@ function App() {
             <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/payment/success" element={<PaymentSuccessPage />} />
+            <Route path="/payment/failure" element={<PaymentFailurePage />} />
             <Route path="/search" element={<SearchPage />} />
           </Routes>
           <FloatingCart />

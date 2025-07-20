@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faSpinner, 
@@ -10,7 +10,9 @@ import {
   faMoneyBill,
   faUniversity,
   faShoppingBag,
-  faLock
+  faLock,
+  faExternalLinkAlt,
+  faTimes
 } from '@fortawesome/free-solid-svg-icons';
 import { useCart } from '../../context/CartContext';
 import AddressManager from '../../components/Profile/AddressManager';
@@ -19,6 +21,7 @@ import './CheckoutPage.css';
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { cart, cartTotal, clearCart } = useCart();
   
   const [selectedAddress, setSelectedAddress] = useState(null);
@@ -28,21 +31,114 @@ const CheckoutPage = () => {
   const [error, setError] = useState(null);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [orderData, setOrderData] = useState(null);
+  const [paymentLink, setPaymentLink] = useState(null);
+  const [redirectingToPayment, setRedirectingToPayment] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState(null); // 'success', 'failure', null
+  const [secondsToRedirect, setSecondsToRedirect] = useState(3);
+  const [existingOrderId, setExistingOrderId] = useState(null);
+  const [loadingExistingOrder, setLoadingExistingOrder] = useState(false);
+  
+  // Check for order_id parameter (for retrying payment)
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const orderId = searchParams.get('order_id');
+    
+    if (orderId) {
+      setExistingOrderId(orderId);
+      fetchExistingOrder(orderId);
+    }
+  }, [location]);
+  
+  // Fetch existing order details if order_id is provided
+  const fetchExistingOrder = async (orderId) => {
+    if (!authService.isAuthenticated()) {
+      navigate('/login?redirect=' + encodeURIComponent(window.location.pathname + window.location.search));
+      return;
+    }
+    
+    setLoadingExistingOrder(true);
+    
+    try {
+      const response = await fetch(`http://localhost:8000/api/orders/${orderId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        // Set order data
+        setOrderData(data.data.order);
+        
+        // Pre-fill form with order data
+        if (data.data.order.shipping_address) {
+          // Find matching address in address manager
+          // This will be handled by the AddressManager component
+        }
+        
+        if (data.data.order.payment_method) {
+          setPaymentMethod(data.data.order.payment_method);
+        }
+        
+        if (data.data.order.notes) {
+          setNotes(data.data.order.notes);
+        }
+      } else {
+        setError('لم نتمكن من العثور على الطلب المطلوب');
+      }
+    } catch (err) {
+      console.error('Error fetching order:', err);
+      setError('حدث خطأ أثناء جلب بيانات الطلب');
+    } finally {
+      setLoadingExistingOrder(false);
+    }
+  };
+  
+  // Check for payment success/failure from URL params
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const sessionId = searchParams.get('session_id');
+    
+    if (location.pathname === '/payment/success' && sessionId) {
+      setPaymentStatus('success');
+      // Fetch order details by session ID if needed
+      // For now, we'll just show a success message
+    } else if (location.pathname === '/payment/failure' && sessionId) {
+      setPaymentStatus('failure');
+    }
+  }, [location]);
   
   // Check authentication
   useEffect(() => {
-    if (!authService.isAuthenticated()) {
+    if (!authService.isAuthenticated() && !paymentStatus) {
       // Redirect to login page with return URL
       navigate('/login?redirect=/checkout');
     }
-  }, [navigate]);
+  }, [navigate, paymentStatus]);
   
   // Redirect to cart if cart is empty
   useEffect(() => {
-    if (cart.length === 0 && !orderSuccess) {
+    if (cart.length === 0 && !orderSuccess && !paymentStatus) {
       navigate('/cart');
     }
-  }, [cart, navigate, orderSuccess]);
+  }, [cart, navigate, orderSuccess, paymentStatus]);
+  
+  // Countdown timer for payment redirect
+  useEffect(() => {
+    let timer;
+    if (redirectingToPayment && secondsToRedirect > 0) {
+      timer = setTimeout(() => {
+        setSecondsToRedirect(seconds => seconds - 1);
+      }, 1000);
+    } else if (redirectingToPayment && secondsToRedirect === 0 && paymentLink) {
+      window.location.href = paymentLink;
+    }
+    
+    return () => clearTimeout(timer);
+  }, [redirectingToPayment, secondsToRedirect, paymentLink]);
   
   // Handle address selection from AddressManager
   const handleAddressSelect = (address) => {
@@ -100,6 +196,11 @@ const CheckoutPage = () => {
         notes: notes.trim() || undefined
       };
       
+      // If we have an existing order ID, add it to the payload
+      if (existingOrderId) {
+        orderPayload.order_id = existingOrderId;
+      }
+      
       console.log('Sending order with token:', localStorage.getItem('token'));
       console.log('Order payload:', orderPayload);
       
@@ -119,9 +220,28 @@ const CheckoutPage = () => {
         throw new Error(data.message || 'فشل في إنشاء الطلب');
       }
       
-      // Order created successfully
-      setOrderSuccess(true);
+      // Set order data first for both payment methods
       setOrderData(data.data.order);
+      setOrderSuccess(true);
+      
+      // Store order data in localStorage for the success page to access
+      localStorage.setItem('lastOrderData', JSON.stringify(data.data.order));
+      
+      // Check if payment link is returned (for credit card payments)
+      if (paymentMethod === 'credit_card' && (data.data.payment_link || data.data.order.payment_link)) {
+        const paymentUrl = data.data.payment_link || data.data.order.payment_link;
+        setPaymentLink(paymentUrl);
+        
+        // Show payment redirection message
+        setRedirectingToPayment(true);
+        
+        // Clear cart after successful order
+        clearCart();
+        
+        return;
+      }
+      
+      // For non-credit card payments, show success directly
       clearCart(); // Clear the cart after successful order
       
     } catch (err) {
@@ -139,6 +259,115 @@ const CheckoutPage = () => {
       setLoading(false);
     }
   };
+  
+  // Handle manual redirect to payment
+  const handleManualRedirect = () => {
+    if (paymentLink) {
+      window.location.href = paymentLink;
+    }
+  };
+  
+  // Payment Success Page
+  if (paymentStatus === 'success') {
+    return (
+      <div className="checkout-page">
+        <div className="container">
+          <div className="payment-result payment-success">
+            <div className="payment-icon success-icon">
+              <FontAwesomeIcon icon={faCheck} />
+            </div>
+            <h1>تم الدفع بنجاح!</h1>
+            <p>تم استلام الدفع الخاص بك وتأكيد طلبك.</p>
+            <p>سيتم إرسال تأكيد الطلب إلى بريدك الإلكتروني.</p>
+            
+            <div className="payment-actions">
+              <button 
+                className="view-orders-btn" 
+                onClick={() => navigate('/profile')}
+              >
+                عرض طلباتي
+              </button>
+              
+              <button 
+                className="continue-shopping" 
+                onClick={() => navigate('/products')}
+              >
+                <FontAwesomeIcon icon={faShoppingBag} />
+                مواصلة التسوق
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
+  // Payment Failure Page
+  if (paymentStatus === 'failure') {
+    return (
+      <div className="checkout-page">
+        <div className="container">
+          <div className="payment-result payment-failure">
+            <div className="payment-icon failure-icon">
+              <FontAwesomeIcon icon={faTimes} />
+            </div>
+            <h1>فشل عملية الدفع</h1>
+            <p>لم يتم استكمال عملية الدفع بنجاح.</p>
+            <p>يمكنك المحاولة مرة أخرى أو اختيار طريقة دفع أخرى.</p>
+            
+            <div className="payment-actions">
+              <button 
+                className="retry-payment-btn" 
+                onClick={() => navigate('/checkout')}
+              >
+                <FontAwesomeIcon icon={faCreditCard} />
+                إعادة المحاولة
+              </button>
+              
+              <button 
+                className="view-orders-btn" 
+                onClick={() => navigate('/profile')}
+              >
+                عرض طلباتي
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
+  // If redirecting to payment
+  if (redirectingToPayment && paymentLink) {
+    return (
+      <div className="checkout-page">
+        <div className="container">
+          <div className="payment-redirect">
+            <div className="payment-icon">
+              <FontAwesomeIcon icon={faCreditCard} />
+            </div>
+            <h1>تم إنشاء الطلب بنجاح!</h1>
+            <p>رقم الطلب: <strong>{orderData.order_number}</strong></p>
+            <p>سيتم تحويلك إلى صفحة الدفع خلال <strong>{secondsToRedirect}</strong> ثواني...</p>
+            
+            <div className="redirect-spinner">
+              <FontAwesomeIcon icon={faSpinner} spin />
+            </div>
+            
+            <div className="manual-redirect">
+              <button 
+                className="payment-link-btn" 
+                onClick={handleManualRedirect}
+              >
+                <FontAwesomeIcon icon={faExternalLinkAlt} />
+                الدفع الآن
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
   
   // If order was successful, show success page
   if (orderSuccess && orderData) {
@@ -166,7 +395,10 @@ const CheckoutPage = () => {
                 </div>
                 <div className="detail-row">
                   <span>طريقة الدفع:</span>
-                  <span>{paymentMethod === 'cash_on_delivery' ? 'الدفع عند الاستلام' : paymentMethod}</span>
+                  <span>{paymentMethod === 'cash_on_delivery' ? 'الدفع عند الاستلام' : 
+                         paymentMethod === 'credit_card' ? 'بطاقة ائتمان' : 
+                         paymentMethod === 'bank_transfer' ? 'تحويل بنكي' : 
+                         'الدفع عند الاستلام'}</span>
                 </div>
                 <div className="detail-row">
                   <span>حالة الدفع:</span>
@@ -279,6 +511,9 @@ const CheckoutPage = () => {
                   <label htmlFor="credit_card">
                     <FontAwesomeIcon icon={faCreditCard} />
                     بطاقة ائتمان
+                    <span className="payment-note">
+                      (سيتم تحويلك إلى صفحة الدفع الآمنة)
+                    </span>
                   </label>
                 </div>
                 

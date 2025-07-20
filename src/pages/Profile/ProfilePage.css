@@ -551,3 +551,140 @@
   font-size: 1.8rem;
   font-weight: 600;
 } 
+
+/* Order Actions */
+.order-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed #eee;
+}
+
+.view-order-btn, .cancel-order-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.view-order-btn {
+  background-color: #f0f7ff;
+  color: #1e88e5;
+}
+
+.view-order-btn:hover {
+  background-color: #e3f2fd;
+}
+
+.cancel-order-btn {
+  background-color: #ffebee;
+  color: #e53935;
+}
+
+.cancel-order-btn:hover:not(:disabled) {
+  background-color: #ffcdd2;
+}
+
+.cancel-order-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Order Items Details */
+.order-items-details {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.order-items-details h4 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
+}
+
+.order-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.order-item-detail {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.item-name {
+  font-weight: 500;
+}
+
+.shipping-address, .order-notes {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed #eee;
+}
+
+/* Order Status Colors */
+.order-status.pending {
+  background-color: #fff8e1;
+  color: #f57f17;
+}
+
+.order-status.processing {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.order-status.shipped {
+  background-color: #e8f5e9;
+  color: #388e3c;
+}
+
+.order-status.delivered {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.order-status.completed {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.order-status.cancelled {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+/* Responsive Styles for Order Details */
+@media (max-width: 768px) {
+  .order-item-detail {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+  
+  .order-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .view-order-btn, .cancel-order-btn {
+    width: 100%;
+    justify-content: center;
+  }
+} 

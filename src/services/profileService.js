@@ -71,6 +71,16 @@ export const profileService = {
       return [];
     }
   },
+  
+  async cancelOrder(orderId) {
+    try {
+      const response = await axiosInstance.post(`/orders/${orderId}/cancel`);
+      return response.data;
+    } catch (error) {
+      console.error('Cancel order error:', error.response?.data || error.message);
+      throw error;
+    }
+  },
 
   async getServiceRequests() {
     try {

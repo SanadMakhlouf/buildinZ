@@ -22,11 +22,17 @@ const LoginPage = () => {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const redirectMessage = params.get('message');
+    const redirectPath = params.get('redirect');
     
     if (redirectMessage) {
       setApiError(redirectMessage);
     }
-  }, [location]);
+
+    // If user is already logged in, redirect to the requested page or home
+    if (authService.isAuthenticated()) {
+      navigate(redirectPath || '/');
+    }
+  }, [location, navigate]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -84,9 +90,13 @@ const LoginPage = () => {
         // Show success animation
         setLoginSuccess(true);
         
+        // Get the redirect path from URL parameters or use default
+        const params = new URLSearchParams(location.search);
+        const redirectPath = params.get('redirect') || '/services';
+        
         // Redirect after a short delay
         setTimeout(() => {
-          navigate('/services');
+          navigate(redirectPath);
         }, 1000);
       } catch (error) {
         // Handle login errors
@@ -97,11 +107,6 @@ const LoginPage = () => {
         setIsLoading(false);
       }
     }
-  };
-
-  const handleGoogleLogin = () => {
-    // TODO: Implement Google OAuth login
-    console.log('Google login clicked');
   };
 
   return (
@@ -174,16 +179,6 @@ const LoginPage = () => {
                   )}
                 </AnimatePresence>
 
-                {/* Social Login */}
-                <button className="social-btn" onClick={handleGoogleLogin}>
-                  <i className="fab fa-google"></i>
-                  <span>متابعة مع Google</span>
-                </button>
-
-                <div className="divider">
-                  <span>أو</span>
-                </div>
-
                 {/* Form */}
                 <form className="auth-form" onSubmit={handleSubmit}>
                   <div className="input-group">
@@ -252,35 +247,30 @@ const LoginPage = () => {
                         checked={formData.rememberMe}
                         onChange={handleChange}
                       />
-                      <span>تذكرني</span>
+                      <span className="checkmark"></span>
+                      تذكرني
                     </label>
                     <Link to="/forgot-password" className="forgot-link">
                       نسيت كلمة المرور؟
                     </Link>
                   </div>
 
-                  <motion.button 
+                  <button 
                     type="submit" 
                     className="submit-btn"
                     disabled={isLoading}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
                   >
                     {isLoading ? (
                       <>
                         <i className="fas fa-spinner fa-spin"></i>
                         جاري تسجيل الدخول...
                       </>
-                    ) : (
-                      'تسجيل الدخول'
-                    )}
-                  </motion.button>
+                    ) : 'تسجيل الدخول'}
+                  </button>
                 </form>
 
-                {/* Footer */}
                 <div className="auth-footer">
-                  <span>ليس لديك حساب؟</span>
-                  <Link to="/signup" className="switch-link">إنشاء حساب جديد</Link>
+                  <p>ليس لديك حساب؟ <Link to="/signup">إنشاء حساب</Link></p>
                 </div>
               </motion.div>
             )}
