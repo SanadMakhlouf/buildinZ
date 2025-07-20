@@ -7,9 +7,12 @@ import {
   faExclamationTriangle,
   faShoppingCart,
   faSearch,
-  faTimes
+  faTimes,
+  faFilter
 } from '@fortawesome/free-solid-svg-icons';
 import './ProductsPage.css';
+// Import FontAwesome CSS for category icons
+import 'font-awesome/css/font-awesome.min.css';
 
 const ProductsPage = () => {
   const [products, setProducts] = useState([]);
@@ -21,6 +24,10 @@ const ProductsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [loadingCategories, setLoadingCategories] = useState(false);
+  
   const searchInputRef = useRef(null);
   const searchTimeoutRef = useRef(null);
 
@@ -46,6 +53,7 @@ const ProductsPage = () => {
   // Fetch products from API
   useEffect(() => {
     fetchProducts();
+    fetchCategories();
   }, []);
 
   // Handle search with debounce
@@ -57,11 +65,15 @@ const ProductsPage = () => {
     if (searchTerm.trim() !== '') {
       setIsSearching(true);
       searchTimeoutRef.current = setTimeout(() => {
-        fetchProducts(searchTerm);
+        fetchProducts(searchTerm, selectedCategory);
       }, 500); // 500ms debounce
     } else if (searchTerm === '' && products.length > 0) {
-      // Reset to all products when search is cleared
-      setFilteredProducts(products);
+      // Apply only category filter when search is cleared
+      if (selectedCategory) {
+        filterProductsByCategory(products, selectedCategory);
+      } else {
+        setFilteredProducts(products);
+      }
       setIsSearching(false);
     }
 
@@ -72,12 +84,97 @@ const ProductsPage = () => {
     };
   }, [searchTerm]);
 
-  const fetchProducts = async (search = '') => {
+  // Handle category selection
+  useEffect(() => {
+    if (selectedCategory) {
+      if (searchTerm) {
+        // If there's a search term, fetch with both filters
+        fetchProducts(searchTerm, selectedCategory);
+      } else {
+        // If no search term, just filter the existing products
+        filterProductsByCategory(products, selectedCategory);
+      }
+    } else if (searchTerm) {
+      // If category is cleared but search term exists
+      fetchProducts(searchTerm);
+    } else {
+      // If both filters are cleared
+      setFilteredProducts(products);
+    }
+  }, [selectedCategory]);
+
+  // Filter products by category
+  const filterProductsByCategory = (productsList, categoryId) => {
+    if (!categoryId) {
+      setFilteredProducts(productsList);
+      return;
+    }
+
+    // Simple direct filtering by category ID
+    const filtered = productsList.filter(product => product.categoryId === categoryId);
+    setFilteredProducts(filtered);
+    setVisibleProducts(12); // Reset pagination when filtering
+  };
+
+  // Fetch categories from API
+  const fetchCategories = async () => {
+    setLoadingCategories(true);
+    try {
+      const response = await fetch('http://localhost:8000/api/categories');
+      if (!response.ok) {
+        throw new Error('Failed to fetch categories');
+      }
+      
+      const responseData = await response.json();
+      
+      if (responseData.success && responseData.data) {
+        // Get all categories (both parents and children) as a flat list
+        const categoriesData = responseData.data;
+        
+        // Sort by sort_order
+        categoriesData.sort((a, b) => a.sort_order - b.sort_order);
+        
+        setCategories(categoriesData);
+      } else {
+        // Fallback: Extract categories from products if API fails
+        console.log('Falling back to extracting categories from products');
+        extractCategoriesFromProducts();
+      }
+    } catch (err) {
+      console.error('Error fetching categories:', err);
+      // Fallback: Extract categories from products if API fails
+      extractCategoriesFromProducts();
+    } finally {
+      setLoadingCategories(false);
+    }
+  };
+
+  // Extract categories from products as fallback
+  const extractCategoriesFromProducts = () => {
+    if (products.length === 0) return;
+    
+    const uniqueCategories = [...new Map(
+      products
+        .filter(p => p.category && p.categoryId)
+        .map(p => [p.categoryId, { id: p.categoryId, name: p.category }])
+    ).values()];
+    
+    setCategories(uniqueCategories);
+  };
+
+  const fetchProducts = async (search = '', category = '') => {
     try {
       setLoading(true);
       let url = 'http://localhost:8000/api/products';
-      if (search) {
-        url += `?search=${encodeURIComponent(search)}`;
+      
+      // Add query parameters
+      const params = new URLSearchParams();
+      if (search) params.append('search', search);
+      if (category) params.append('category', category);
+      
+      // Append parameters to URL if any exist
+      if (params.toString()) {
+        url += `?${params.toString()}`;
       }
       
       const response = await fetch(url);
@@ -112,15 +209,20 @@ const ProductsPage = () => {
         console.log('Formatted products:', formattedProducts.length);
         
         // Store all products in state
-        if (!search) {
+        if (!search && !category) {
           setProducts(formattedProducts);
         }
         
         // Update filtered products
         setFilteredProducts(formattedProducts);
         setVisibleProducts(12); // Reset pagination when searching
+        
+        // Extract categories from products if we haven't loaded them yet
+        if (categories.length === 0) {
+          extractCategoriesFromProducts();
+        }
       } else {
-        if (!search) {
+        if (!search && !category) {
           setProducts([]);
         }
         setFilteredProducts([]);
@@ -128,7 +230,7 @@ const ProductsPage = () => {
     } catch (err) {
       console.error('Error fetching products:', err);
       setError(err.message);
-      if (!search) {
+      if (!search && !category) {
         setProducts([]);
       }
       setFilteredProducts([]);
@@ -163,6 +265,15 @@ const ProductsPage = () => {
   const handleSearchIconClick = () => {
     if (searchInputRef.current) {
       searchInputRef.current.focus();
+    }
+  };
+
+  // Handle category selection
+  const handleCategorySelect = (categoryId) => {
+    if (selectedCategory === categoryId) {
+      setSelectedCategory(''); // Deselect if already selected
+    } else {
+      setSelectedCategory(categoryId);
     }
   };
 
@@ -219,7 +330,7 @@ const ProductsPage = () => {
           <div className="product-price-container">
             <div className="product-price">
               AED {product.price.toFixed(0)}
-              {product.dimensions && <span className="price-unit">/m²</span>}
+              {product.dimensions && <span className="price-unit"></span>}
             </div>
             {product.vendor && (
               <div className="vendor-name">Sold by {product.vendor}</div>
@@ -302,6 +413,43 @@ const ProductsPage = () => {
               {isSearching ? 'جاري البحث...' : `تم العثور على ${filteredProducts.length} منتج`}
             </div>
           )}
+        </div>
+        
+        {/* Categories Filter */}
+        <div className="categories-filter">
+          <div className="categories-header">
+            <FontAwesomeIcon icon={faFilter} />
+            <span>تصفية حسب الفئة</span>
+          </div>
+          <div className="categories-list">
+            {loadingCategories ? (
+              <div className="categories-loading">
+                <FontAwesomeIcon icon={faSpinner} spin />
+                <span>جاري تحميل الفئات...</span>
+              </div>
+            ) : categories.length > 0 ? (
+              <>
+                <button 
+                  className={`category-btn ${selectedCategory === '' ? 'active' : ''}`}
+                  onClick={() => handleCategorySelect('')}
+                >
+                  الكل
+                </button>
+                {categories.map(category => (
+                  <button 
+                    key={category.id} 
+                    className={`category-btn ${selectedCategory === category.id ? 'active' : ''} ${category.parent_id ? 'subcategory-btn' : 'parent-category'}`}
+                    onClick={() => handleCategorySelect(category.id)}
+                  >
+                    {category.icon && <i className={category.icon}></i>}
+                    {category.name}
+                  </button>
+                ))}
+              </>
+            ) : (
+              <div className="no-categories">لا توجد فئات متاحة</div>
+            )}
+          </div>
         </div>
         
         <div className="products-content">
