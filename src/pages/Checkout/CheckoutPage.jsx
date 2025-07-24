@@ -184,7 +184,9 @@ const CheckoutPage = () => {
         city: selectedAddress.city,
         state: selectedAddress.state,
         zip: selectedAddress.zip_code || selectedAddress.zip,
-        country: selectedAddress.country || 'AE'
+        country: selectedAddress.country || 'AE',
+        phone: selectedAddress.phone || undefined,
+        name: selectedAddress.name
       };
       
       // Create order payload

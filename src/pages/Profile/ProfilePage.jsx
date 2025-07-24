@@ -23,7 +23,8 @@ import {
   faSpinner,
   faBan,
   faEye,
-  faCheck
+  faCheck,
+  faLock
 } from '@fortawesome/free-solid-svg-icons';
 import profileService from '../../services/profileService';
 import authService from '../../services/authService';
@@ -52,7 +53,8 @@ const icons = {
   spinner: faSpinner,
   ban: faBan,
   eye: faEye,
-  check: faCheck
+  check: faCheck,
+  lock: faLock
 };
 
 const ProfilePage = () => {
@@ -79,12 +81,33 @@ const ProfilePage = () => {
     // Check if user is authenticated
     if (!authService.isAuthenticated()) {
       // Redirect to login page with return URL
-      navigate('/login?redirect=/profile');
+      navigate('/login?redirect=/profile', { replace: true });
       return;
     }
     
     fetchProfileData();
   }, [navigate]);
+
+  // Add a second authentication check outside of useEffect for immediate protection
+  if (!authService.isAuthenticated()) {
+    // This will render immediately before the useEffect runs
+    // and prevent any unauthorized rendering of profile content
+    return (
+      <div className="auth-required-container">
+        <div className="auth-required">
+          <FontAwesomeIcon icon={icons.lock} style={{ fontSize: '3rem', color: '#DAA520', marginBottom: '1rem' }} />
+          <h2>تسجيل الدخول مطلوب</h2>
+          <p>يجب تسجيل الدخول لعرض الملف الشخصي</p>
+          <button 
+            className="login-btn" 
+            onClick={() => navigate('/login?redirect=/profile')}
+          >
+            تسجيل الدخول
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const fetchProfileData = async () => {
     try {

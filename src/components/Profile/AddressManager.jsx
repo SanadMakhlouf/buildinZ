@@ -572,35 +572,46 @@ const AddressManager = ({ checkoutMode = false, onAddressSelect = null, selected
               </div>
             </div>
             
-            {!checkoutMode && (
-              <div className="address-actions">
-                <button 
-                  className="edit-btn"
-                  onClick={() => handleEditAddress(address)}
-                  title="تعديل العنوان"
-                >
-                  <FontAwesomeIcon icon={icons.edit} />
-                </button>
-                
-                <button 
-                  className="delete-btn"
-                  onClick={() => confirmDeleteAddress(address)}
-                  title="حذف العنوان"
-                >
-                  <FontAwesomeIcon icon={icons.delete} />
-                </button>
-                
-                {!address.is_default && (
+            <div className="address-actions">
+              <button 
+                className="edit-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleEditAddress(address);
+                }}
+                title="تعديل العنوان"
+              >
+                <FontAwesomeIcon icon={icons.edit} />
+              </button>
+              
+              {!checkoutMode && (
+                <>
                   <button 
-                    className="set-default-btn"
-                    onClick={() => handleSetDefault(address.id)}
-                    title="تعيين كعنوان افتراضي"
+                    className="delete-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      confirmDeleteAddress(address);
+                    }}
+                    title="حذف العنوان"
                   >
-                    <FontAwesomeIcon icon={icons.setDefault} />
+                    <FontAwesomeIcon icon={icons.delete} />
                   </button>
-                )}
-              </div>
-            )}
+                  
+                  {!address.is_default && (
+                    <button 
+                      className="set-default-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSetDefault(address.id);
+                      }}
+                      title="تعيين كعنوان افتراضي"
+                    >
+                      <FontAwesomeIcon icon={icons.setDefault} />
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
             
             {checkoutMode && (
               <div className="checkout-select">
@@ -612,9 +623,9 @@ const AddressManager = ({ checkoutMode = false, onAddressSelect = null, selected
           </div>
         ))}
         
-        {!checkoutMode && (
+        {!showAddForm && (
           <button 
-            className="add-address-btn"
+            className={`add-address-btn ${checkoutMode ? 'checkout-add-btn' : ''}`}
             onClick={() => setShowAddForm(true)}
           >
             <FontAwesomeIcon icon={icons.add} />
