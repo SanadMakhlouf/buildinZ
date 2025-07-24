@@ -1,9 +1,10 @@
 .category-page {
-  padding-top: 80px;
+  padding-top: 0;
   padding-bottom: 50px;
   min-height: 100vh;
-  background-color: #f8f9fa;
+  background-color: #f9fafb;
   direction: rtl;
+  font-family: 'Tajawal', 'Cairo', sans-serif;
 }
 
 .container {
@@ -12,120 +13,176 @@
   padding: 0 20px;
 }
 
-.category-header {
+/* Hero Section */
+.hero-section {
+  background: linear-gradient(rgba(10, 50, 89, 0.85), rgba(10, 50, 89, 0.9)), url('../../assets/images/hero-bg.png');
+  background-size: cover;
+  background-position: center;
+  color: white;
+  padding: 120px 20px 80px;
   text-align: center;
   margin-bottom: 40px;
-  padding: 30px 0;
+  position: relative;
 }
 
-.category-header h1 {
-  font-size: 2.5rem;
-  color: #0A3259;
-  margin-bottom: 15px;
+.hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
 }
 
-.category-header p {
-  font-size: 1.1rem;
-  color: #666;
-  margin-bottom: 25px;
+.hero-content h1 {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  font-weight: 700;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.hero-content p {
+  font-size: 1.2rem;
+  margin-bottom: 0;
+  opacity: 0.9;
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50px;
+  font-size: 0.95rem;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  backdrop-filter: blur(5px);
+  position: absolute;
+  top: -60px;
+  right: 0;
+}
+
+.back-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateX(5px);
 }
 
 .categories-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 25px;
+  gap: 30px;
+  margin-bottom: 50px;
 }
 
 .category-card {
-  background-color: white;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-  cursor: pointer;
   position: relative;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s ease;
+  cursor: pointer;
+  height: 300px;
 }
 
 .category-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
 .category-image {
-  height: 180px;
-  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  position: relative;
 }
 
 .category-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.5s ease;
+  transition: transform 0.6s ease;
 }
 
 .category-card:hover .category-image img {
-  transform: scale(1.05);
+  transform: scale(1.08);
 }
 
-.category-content {
-  padding: 20px;
+.category-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.1) 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 25px;
+  color: white;
+  transition: all 0.3s ease;
 }
 
-.category-content h3 {
-  font-size: 1.3rem;
-  color: #0A3259;
-  margin-bottom: 15px;
+.category-card:hover .category-overlay {
+  background: linear-gradient(to top, rgba(10, 50, 89, 0.9) 0%, rgba(10, 50, 89, 0.6) 50%, rgba(10, 50, 89, 0.2) 100%);
+}
+
+.category-overlay h3 {
+  font-size: 1.6rem;
+  margin: 0 0 15px;
+  font-weight: 700;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 .subcategories-list {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 10px;
+  margin-bottom: 20px;
 }
 
 .subcategory-tag {
-  background-color: #f0f0f0;
-  color: #555;
-  padding: 5px 12px;
-  border-radius: 15px;
-  font-size: 0.85rem;
-  transition: all 0.2s;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .subcategory-tag:hover {
-  background-color: #DAA520;
-  color: white;
+  background-color: rgba(218, 165, 32, 0.8);
+  transform: translateY(-3px);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 
 .more-tag {
-  background-color: #e0e0e0;
-  color: #666;
-  padding: 5px 12px;
-  border-radius: 15px;
-  font-size: 0.85rem;
-}
-
-.category-arrow {
-  position: absolute;
-  top: 50%;
-  left: 20px;
-  transform: translateY(-50%);
-  width: 30px;
-  height: 30px;
-  background-color: rgba(255, 255, 255, 0.8);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #0A3259;
-  transition: all 0.2s;
-}
-
-.category-card:hover .category-arrow {
-  background-color: #DAA520;
+  background-color: rgba(255, 255, 255, 0.15);
   color: white;
-  transform: translateY(-50%) translateX(-5px);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  backdrop-filter: blur(5px);
+}
+
+.category-action {
+  background-color: rgba(218, 165, 32, 0.9);
+  color: white;
+  padding: 10px 0;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: 600;
+  width: 100%;
+  text-align: center;
+  transform: translateY(20px);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.category-card:hover .category-action {
+  transform: translateY(0);
+  opacity: 1;
 }
 
 .loading-container,
@@ -135,43 +192,77 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 50px 20px;
+  padding: 60px 20px;
   text-align: center;
   min-height: 300px;
+  background-color: white;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  margin: 50px auto;
+  max-width: 600px;
 }
 
 .loading-container svg,
 .error-container svg {
   color: #DAA520;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
+  font-size: 3rem;
 }
 
 .loading-container p,
 .error-container p,
 .no-categories p {
-  font-size: 1.1rem;
-  color: #666;
-  margin-bottom: 20px;
+  font-size: 1.2rem;
+  color: #555;
+  margin-bottom: 25px;
+  max-width: 500px;
 }
 
 .retry-button {
   background-color: #DAA520;
   color: white;
   border: none;
-  border-radius: 5px;
-  padding: 10px 20px;
+  border-radius: 50px;
+  padding: 12px 30px;
   font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(218, 165, 32, 0.2);
 }
 
 .retry-button:hover {
   background-color: #c99100;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(218, 165, 32, 0.3);
+}
+
+.retry-button:active {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(218, 165, 32, 0.2);
 }
 
 /* Responsive styles */
+@media (max-width: 992px) {
+  .hero-section {
+    padding: 100px 20px 60px;
+  }
+  
+  .hero-content h1 {
+    font-size: 2.5rem;
+  }
+  
+  .categories-grid {
+    gap: 25px;
+  }
+  
+  .category-card {
+    height: 280px;
+  }
+}
+
 @media (max-width: 768px) {
-  .category-header h1 {
+  .hero-content h1 {
     font-size: 2rem;
   }
   
@@ -179,19 +270,73 @@
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 20px;
   }
+  
+  .category-card {
+    height: 250px;
+  }
+  
+  .category-overlay h3 {
+    font-size: 1.4rem;
+    margin-bottom: 12px;
+  }
+  
+  .back-button {
+    padding: 8px 15px;
+    font-size: 0.9rem;
+    top: -50px;
+  }
 }
 
 @media (max-width: 576px) {
-  .category-header h1 {
+  .hero-section {
+    padding: 90px 20px 50px;
+  }
+  
+  .hero-content h1 {
     font-size: 1.8rem;
+  }
+  
+  .hero-content p {
+    font-size: 1rem;
   }
   
   .categories-grid {
     grid-template-columns: 1fr;
-    gap: 15px;
+    gap: 20px;
   }
   
-  .category-image {
-    height: 160px;
+  .category-card {
+    height: 220px;
+  }
+  
+  .category-overlay {
+    padding: 20px;
+  }
+  
+  .category-overlay h3 {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+  }
+  
+  .subcategory-tag,
+  .more-tag {
+    padding: 5px 12px;
+    font-size: 0.85rem;
+  }
+  
+  .subcategories-list {
+    margin-bottom: 15px;
+  }
+  
+  .category-action {
+    padding: 8px 0;
+    font-size: 0.9rem;
+  }
+  
+  .back-button {
+    position: relative;
+    top: 0;
+    margin-bottom: 20px;
+    align-self: flex-start;
   }
 } 

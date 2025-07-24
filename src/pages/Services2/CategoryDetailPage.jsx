@@ -5,8 +5,9 @@ import {
   faSpinner, 
   faExclamationTriangle, 
   faArrowRight, 
-  faChevronLeft,
-  faLayerGroup
+  faLayerGroup,
+  faList,
+  faThLarge
 } from '@fortawesome/free-solid-svg-icons';
 import serviceBuilderService from '../../services/serviceBuilderService';
 import './CategoryDetailPage.css';
@@ -19,6 +20,7 @@ const CategoryDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('subcategories'); // 'subcategories' or 'services'
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
 
   useEffect(() => {
     fetchCategoryDetails();
@@ -63,14 +65,16 @@ const CategoryDetailPage = () => {
     navigate('/services2/categories');
   };
 
+  const toggleViewMode = () => {
+    setViewMode(viewMode === 'grid' ? 'list' : 'grid');
+  };
+
   if (loading) {
     return (
       <div className="category-detail-page">
-        <div className="container">
-          <div className="loading-container">
-            <FontAwesomeIcon icon={faSpinner} spin size="3x" />
-            <p>جاري تحميل تفاصيل الفئة...</p>
-          </div>
+        <div className="loading-container">
+          <FontAwesomeIcon icon={faSpinner} spin size="3x" />
+          <p>جاري تحميل تفاصيل الفئة...</p>
         </div>
       </div>
     );
@@ -79,18 +83,16 @@ const CategoryDetailPage = () => {
   if (error) {
     return (
       <div className="category-detail-page">
-        <div className="container">
-          <div className="error-container">
-            <FontAwesomeIcon icon={faExclamationTriangle} size="3x" />
-            <p>{error}</p>
-            <button onClick={fetchCategoryDetails} className="retry-button">
-              إعادة المحاولة
-            </button>
-            <button onClick={handleBackClick} className="back-button">
-              <FontAwesomeIcon icon={faArrowRight} />
-              العودة إلى الفئات
-            </button>
-          </div>
+        <div className="error-container">
+          <FontAwesomeIcon icon={faExclamationTriangle} size="3x" />
+          <p>{error}</p>
+          <button onClick={fetchCategoryDetails} className="retry-button">
+            إعادة المحاولة
+          </button>
+          <button onClick={handleBackClick} className="back-button secondary">
+            <FontAwesomeIcon icon={faArrowRight} />
+            العودة إلى الفئات
+          </button>
         </div>
       </div>
     );
@@ -99,15 +101,13 @@ const CategoryDetailPage = () => {
   if (!category) {
     return (
       <div className="category-detail-page">
-        <div className="container">
-          <div className="error-container">
-            <FontAwesomeIcon icon={faExclamationTriangle} size="3x" />
-            <p>لم يتم العثور على الفئة</p>
-            <button onClick={handleBackClick} className="back-button">
-              <FontAwesomeIcon icon={faArrowRight} />
-              العودة إلى الفئات
-            </button>
-          </div>
+        <div className="error-container">
+          <FontAwesomeIcon icon={faExclamationTriangle} size="3x" />
+          <p>لم يتم العثور على الفئة</p>
+          <button onClick={handleBackClick} className="back-button secondary">
+            <FontAwesomeIcon icon={faArrowRight} />
+            العودة إلى الفئات
+          </button>
         </div>
       </div>
     );
@@ -118,58 +118,67 @@ const CategoryDetailPage = () => {
 
   return (
     <div className="category-detail-page">
-      <div className="container">
-        <div className="category-header">
+      <div className="hero-banner" style={{
+        backgroundImage: `linear-gradient(rgba(10, 50, 89, 0.7), rgba(10, 50, 89, 0.85)), url(${serviceBuilderService.getImageUrl(category.image_path)})`
+      }}>
+        <div className="container">
           <button onClick={handleBackClick} className="back-button">
             <FontAwesomeIcon icon={faArrowRight} />
             العودة إلى الفئات
           </button>
           
-          <div className="category-info">
-            <div className="category-image">
-              <img 
-                src={serviceBuilderService.getImageUrl(category.image_path)} 
-                alt={category.name}
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = '/assets/images/placeholder.jpg';
-                }}
-              />
-            </div>
-            <div className="category-text">
-              <h1>{category.name}</h1>
-              {category.description && <p className="category-description">{category.description}</p>}
-            </div>
-          </div>
+          <h1>{category.name}</h1>
+          {category.description && <p className="category-description">{category.description}</p>}
         </div>
+      </div>
 
+      <div className="container content-container">
         {(hasSubcategories || hasServices) && (
           <div className="category-content">
             {/* Tabs - Only show if both subcategories and services exist */}
-            {hasSubcategories && hasServices && (
-              <div className="category-tabs">
+            <div className="category-header">
+              {hasSubcategories && hasServices && (
+                <div className="category-tabs">
+                  <button 
+                    className={`tab-button ${activeTab === 'subcategories' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('subcategories')}
+                  >
+                    الفئات الفرعية
+                  </button>
+                  <button 
+                    className={`tab-button ${activeTab === 'services' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('services')}
+                  >
+                    الخدمات
+                  </button>
+                </div>
+              )}
+              
+              <div className="view-toggle">
                 <button 
-                  className={`tab-button ${activeTab === 'subcategories' ? 'active' : ''}`}
-                  onClick={() => setActiveTab('subcategories')}
+                  className={`view-button ${viewMode === 'grid' ? 'active' : ''}`}
+                  onClick={() => setViewMode('grid')}
+                  title="عرض شبكي"
                 >
-                  الفئات الفرعية
+                  <FontAwesomeIcon icon={faThLarge} />
                 </button>
                 <button 
-                  className={`tab-button ${activeTab === 'services' ? 'active' : ''}`}
-                  onClick={() => setActiveTab('services')}
+                  className={`view-button ${viewMode === 'list' ? 'active' : ''}`}
+                  onClick={() => setViewMode('list')}
+                  title="عرض قائمة"
                 >
-                  الخدمات
+                  <FontAwesomeIcon icon={faList} />
                 </button>
               </div>
-            )}
+            </div>
 
             {/* Subcategories Tab */}
             {activeTab === 'subcategories' && hasSubcategories && (
-              <div className="subcategories-grid">
+              <div className={`subcategories-${viewMode}`}>
                 {category.children.map(subcategory => (
                   <div 
                     key={subcategory.id} 
-                    className="subcategory-card"
+                    className={`subcategory-item ${viewMode === 'grid' ? 'card' : 'row'}`}
                     onClick={() => handleSubcategoryClick(subcategory)}
                   >
                     <div className="subcategory-image">
@@ -181,13 +190,32 @@ const CategoryDetailPage = () => {
                           e.target.src = '/assets/images/placeholder.jpg';
                         }}
                       />
+                      {viewMode === 'grid' && (
+                        <div className="subcategory-overlay">
+                          <h3>{subcategory.name}</h3>
+                          <div className="subcategory-action">عرض الفئة</div>
+                        </div>
+                      )}
                     </div>
-                    <div className="subcategory-content">
-                      <h3>{subcategory.name}</h3>
-                    </div>
-                    <div className="subcategory-arrow">
-                      <FontAwesomeIcon icon={faChevronLeft} />
-                    </div>
+                    
+                    {viewMode === 'list' && (
+                      <div className="subcategory-details">
+                        <h3>{subcategory.name}</h3>
+                        {subcategory.description && <p>{subcategory.description}</p>}
+                        <div className="subcategory-meta">
+                          {subcategory.children && subcategory.children.length > 0 && (
+                            <span className="subcategory-count">
+                              {subcategory.children.length} فئة فرعية
+                            </span>
+                          )}
+                          {subcategory.services && subcategory.services.length > 0 && (
+                            <span className="service-count">
+                              {subcategory.services.length} خدمة
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -195,11 +223,11 @@ const CategoryDetailPage = () => {
 
             {/* Services Tab */}
             {activeTab === 'services' && hasServices && (
-              <div className="services-grid">
+              <div className={`services-${viewMode}`}>
                 {category.services.map(service => (
                   <div 
                     key={service.id} 
-                    className="service-card"
+                    className={`service-item ${viewMode === 'grid' ? 'card' : 'row'}`}
                     onClick={() => handleServiceClick(service)}
                   >
                     <div className="service-image">
@@ -217,14 +245,27 @@ const CategoryDetailPage = () => {
                           <FontAwesomeIcon icon={faLayerGroup} />
                         </div>
                       )}
+                      {viewMode === 'grid' && (
+                        <div className="service-overlay">
+                          <h3>{service.name}</h3>
+                          {service.description && <p>{service.description}</p>}
+                          <div className="service-action">عرض الخدمة</div>
+                        </div>
+                      )}
                     </div>
-                    <div className="service-content">
-                      <h3>{service.name}</h3>
-                      {service.description && <p>{service.description}</p>}
-                    </div>
-                    <div className="service-arrow">
-                      <FontAwesomeIcon icon={faChevronLeft} />
-                    </div>
+                    
+                    {viewMode === 'list' && (
+                      <div className="service-details">
+                        <h3>{service.name}</h3>
+                        {service.description && <p>{service.description}</p>}
+                        <div className="service-meta">
+                          <span className="service-price">
+                            {service.base_price ? `${service.base_price} ر.س` : 'السعر عند الطلب'}
+                          </span>
+                          <button className="view-service-btn">عرض الخدمة</button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -266,7 +307,7 @@ const CategoryDetailPage = () => {
         {!hasSubcategories && !hasServices && (
           <div className="no-content">
             <p>لا توجد فئات فرعية أو خدمات متاحة في هذه الفئة</p>
-            <button onClick={handleBackClick} className="back-button">
+            <button onClick={handleBackClick} className="back-button secondary">
               <FontAwesomeIcon icon={faArrowRight} />
               العودة إلى الفئات
             </button>

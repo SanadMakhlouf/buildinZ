@@ -1,27 +1,53 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faSpinner, 
-  faExclamationTriangle, 
-  faSearch, 
-  faLayerGroup, 
-  faChevronLeft 
-} from '@fortawesome/free-solid-svg-icons';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+import "./ServicesPage2.css";
 import serviceBuilderService from '../../services/serviceBuilderService';
-import './ServicesPage2.css';
 
 const ServicesPage2 = () => {
-  const [services, setServices] = useState([]);
+  const navigate = useNavigate();
+  const location = useLocation();
   const [categories, setCategories] = useState([]);
+  const [services, setServices] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedSubcategory, setSelectedSubcategory] = useState(null);
+  const [selectedService, setSelectedService] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const navigate = useNavigate();
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    // Parse URL to set the selected items
+    const pathParts = location.pathname.split('/').filter(Boolean);
+    
+    if (pathParts.includes('services2') && categories.length > 0) {
+      const categoryId = pathParts[pathParts.indexOf('services2') + 1];
+      const subcategoryId = pathParts[pathParts.indexOf('services2') + 2];
+      const serviceId = pathParts[pathParts.indexOf('services2') + 3];
+      
+      if (categoryId && !isNaN(parseInt(categoryId))) {
+        const category = categories.find(cat => cat.id.toString() === categoryId);
+        setSelectedCategory(category || null);
+        
+        if (subcategoryId && category && category.children) {
+          const subcategory = category.children.find(sub => sub.id.toString() === subcategoryId);
+          setSelectedSubcategory(subcategory || null);
+          
+          if (serviceId && subcategory && subcategory.services) {
+            const service = subcategory.services.find(srv => srv.id.toString() === serviceId);
+            setSelectedService(service || null);
+          } else if (serviceId && services.length > 0) {
+            const service = services.find(srv => srv.id.toString() === serviceId);
+            setSelectedService(service || null);
+          }
+        }
+      }
+    }
+  }, [location.pathname, categories, services]);
 
   const fetchData = async () => {
     try {
@@ -53,27 +79,40 @@ const ServicesPage2 = () => {
     }
   };
 
-  const handleServiceClick = (service) => {
+  const handleCategorySelect = (category) => {
+    setSelectedCategory(category);
+    navigate(`/services2/categories/${category.id}`);
+  };
+
+  const handleSubcategorySelect = (subcategory) => {
+    setSelectedSubcategory(subcategory);
+    navigate(`/services2/categories/${selectedCategory.id}/${subcategory.id}`);
+  };
+
+  const handleServiceSelect = (service) => {
+    setSelectedService(service);
     navigate(`/services2/${service.id}`);
   };
 
-  const handleCategoriesClick = () => {
+  const handleBackToCategories = () => {
+    setSelectedCategory(null);
+    setSelectedSubcategory(null);
+    setSelectedService(null);
     navigate('/services2/categories');
   };
 
-  const filteredServices = services.filter(service => 
-    service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (service.description && service.description.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const handleBackToSubcategories = () => {
+    setSelectedSubcategory(null);
+    setSelectedService(null);
+    navigate(`/services2/categories/${selectedCategory.id}`);
+  };
 
   if (loading) {
     return (
       <div className="services-page2">
-        <div className="container">
-          <div className="loading-container">
-            <FontAwesomeIcon icon={faSpinner} spin size="3x" />
-            <p>جاري تحميل الخدمات...</p>
-          </div>
+        <div className="loading-container">
+          <FontAwesomeIcon icon={faSpinner} spin size="3x" />
+          <p>جاري تحميل الخدمات...</p>
         </div>
       </div>
     );
@@ -82,14 +121,11 @@ const ServicesPage2 = () => {
   if (error) {
     return (
       <div className="services-page2">
-        <div className="container">
-          <div className="error-container">
-            <FontAwesomeIcon icon={faExclamationTriangle} size="3x" />
-            <p>{error}</p>
-            <button onClick={fetchData} className="retry-button">
-              إعادة المحاولة
-            </button>
-          </div>
+        <div className="error-container">
+          <p>{error}</p>
+          <button onClick={fetchData} className="retry-button">
+            إعادة المحاولة
+          </button>
         </div>
       </div>
     );
@@ -97,97 +133,59 @@ const ServicesPage2 = () => {
 
   return (
     <div className="services-page2">
-      <div className="container">
-        <div className="services-header">
+      <div className="hero-section">
+        <div className="hero-content">
           <h1>الخدمات</h1>
           <p>اختر من مجموعة متنوعة من الخدمات المتميزة</p>
-          
-          <div className="search-container">
-            <FontAwesomeIcon icon={faSearch} className="search-icon" />
-            <input
-              type="text"
-              placeholder="ابحث عن خدمة..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
-            />
-          </div>
         </div>
+      </div>
 
-        {/* Categories Section */}
-        {categories.length > 0 && (
-          <div className="categories-section">
-            <div className="section-header">
-              <h2>الفئات</h2>
-              <button 
-                className="view-all-button"
-                onClick={handleCategoriesClick}
+      <div className="container">
+        <div className="services-content">
+          {/* Categories Grid */}
+          <div className="categories-grid">
+            {categories.map(category => (
+              <div 
+                key={category.id} 
+                className="category-card"
+                onClick={() => handleCategorySelect(category)}
               >
-                عرض الكل
-                <FontAwesomeIcon icon={faChevronLeft} />
-              </button>
-            </div>
-            
-            <div className="categories-row">
-              {categories.slice(0, 4).map(category => (
-                <div 
-                  key={category.id} 
-                  className="category-item"
-                  onClick={() => navigate(`/services2/categories/${category.id}`)}
-                >
-                  <div className="category-icon">
-                    {category.image_path ? (
-                      <img 
-                        src={serviceBuilderService.getImageUrl(category.image_path)} 
-                        alt={category.name}
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = '/assets/images/placeholder.jpg';
-                        }}
-                      />
-                    ) : (
-                      <FontAwesomeIcon icon={faLayerGroup} />
+                <div className="category-image">
+                  <img 
+                    src={serviceBuilderService.getImageUrl(category.image_path)} 
+                    alt={category.name}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = '/assets/images/placeholder.jpg';
+                    }}
+                  />
+                  <div className="category-overlay">
+                    <h3>{category.name}</h3>
+                    
+                    {category.children && category.children.length > 0 && (
+                      <div className="subcategories-preview">
+                        <span className="subcategory-count">
+                          {category.children.length} فئة فرعية
+                        </span>
+                      </div>
                     )}
+                    
+                    <div className="category-action">عرض الخدمات</div>
                   </div>
-                  <h3>{category.name}</h3>
-                  {category.children && category.children.length > 0 && (
-                    <span className="subcategory-count">
-                      {category.children.length} فئة فرعية
-                    </span>
-                  )}
                 </div>
-              ))}
-              
-              {categories.length > 4 && (
-                <div 
-                  className="category-item more-categories"
-                  onClick={handleCategoriesClick}
-                >
-                  <div className="more-icon">
-                    <span>+{categories.length - 4}</span>
-                  </div>
-                  <h3>المزيد من الفئات</h3>
-                </div>
-              )}
-            </div>
+              </div>
+            ))}
           </div>
-        )}
 
-        {/* Services Section */}
-        <div className="services-section">
-          <h2>جميع الخدمات</h2>
-          
-          {filteredServices.length === 0 ? (
-            <div className="no-services">
-              <p>لا توجد خدمات متطابقة مع بحثك</p>
-            </div>
-          ) : (
+          {/* Featured Services */}
+          <div className="featured-services">
+            <h2>الخدمات المميزة</h2>
             <div className="services-grid">
-              {filteredServices.map(service => (
+              {services.slice(0, 6).map(service => (
                 <div 
                   key={service.id} 
                   className="service-card"
-                  onClick={() => handleServiceClick(service)}
+                  onClick={() => handleServiceSelect(service)}
                 >
                   <div className="service-image">
                     <img 
@@ -198,15 +196,15 @@ const ServicesPage2 = () => {
                         e.target.src = '/assets/images/placeholder.jpg';
                       }}
                     />
-                  </div>
-                  <div className="service-content">
-                    <h3>{service.name}</h3>
-                    {service.description && <p>{service.description}</p>}
+                    <div className="service-overlay">
+                      <h3>{service.name}</h3>
+                      <div className="service-action">عرض التفاصيل</div>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
-          )}
+          </div>
         </div>
       </div>
     </div>

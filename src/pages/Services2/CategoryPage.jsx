@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSpinner, faExclamationTriangle, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import { 
+  faSpinner, 
+  faExclamationTriangle, 
+  faChevronLeft, 
+  faArrowRight 
+} from '@fortawesome/free-solid-svg-icons';
 import serviceBuilderService from '../../services/serviceBuilderService';
 import './CategoryPage.css';
 
@@ -10,6 +15,7 @@ const CategoryPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const { id } = useParams();
 
   useEffect(() => {
     fetchCategories();
@@ -43,14 +49,16 @@ const CategoryPage = () => {
     navigate(`/services2/categories/${subcategory.id}`);
   };
 
+  const handleBackClick = () => {
+    navigate('/services2');
+  };
+
   if (loading) {
     return (
       <div className="category-page">
-        <div className="container">
-          <div className="loading-container">
-            <FontAwesomeIcon icon={faSpinner} spin size="3x" />
-            <p>جاري تحميل الفئات...</p>
-          </div>
+        <div className="loading-container">
+          <FontAwesomeIcon icon={faSpinner} spin size="3x" />
+          <p>جاري تحميل الفئات...</p>
         </div>
       </div>
     );
@@ -59,14 +67,12 @@ const CategoryPage = () => {
   if (error) {
     return (
       <div className="category-page">
-        <div className="container">
-          <div className="error-container">
-            <FontAwesomeIcon icon={faExclamationTriangle} size="3x" />
-            <p>{error}</p>
-            <button onClick={fetchCategories} className="retry-button">
-              إعادة المحاولة
-            </button>
-          </div>
+        <div className="error-container">
+          <FontAwesomeIcon icon={faExclamationTriangle} size="3x" />
+          <p>{error}</p>
+          <button onClick={fetchCategories} className="retry-button">
+            إعادة المحاولة
+          </button>
         </div>
       </div>
     );
@@ -74,12 +80,18 @@ const CategoryPage = () => {
 
   return (
     <div className="category-page">
-      <div className="container">
-        <div className="category-header">
+      <div className="hero-section">
+        <div className="hero-content">
+          <button onClick={handleBackClick} className="back-button">
+            <FontAwesomeIcon icon={faArrowRight} />
+            العودة إلى الخدمات
+          </button>
           <h1>الفئات</h1>
           <p>اختر من مجموعة متنوعة من الفئات والخدمات المتميزة</p>
         </div>
+      </div>
 
+      <div className="container">
         {categories.length === 0 ? (
           <div className="no-categories">
             <p>لا توجد فئات متاحة</p>
@@ -101,29 +113,28 @@ const CategoryPage = () => {
                       e.target.src = '/assets/images/placeholder.jpg';
                     }}
                   />
-                </div>
-                <div className="category-content">
-                  <h3>{category.name}</h3>
-                  
-                  {category.children && category.children.length > 0 && (
-                    <div className="subcategories-list">
-                      {category.children.slice(0, 3).map(subcategory => (
-                        <span 
-                          key={subcategory.id} 
-                          className="subcategory-tag"
-                          onClick={(e) => handleSubcategoryClick(subcategory, e)}
-                        >
-                          {subcategory.name}
-                        </span>
-                      ))}
-                      {category.children.length > 3 && (
-                        <span className="more-tag">+{category.children.length - 3}</span>
-                      )}
-                    </div>
-                  )}
-                </div>
-                <div className="category-arrow">
-                  <FontAwesomeIcon icon={faChevronLeft} />
+                  <div className="category-overlay">
+                    <h3>{category.name}</h3>
+                    
+                    {category.children && category.children.length > 0 && (
+                      <div className="subcategories-list">
+                        {category.children.slice(0, 3).map(subcategory => (
+                          <span 
+                            key={subcategory.id} 
+                            className="subcategory-tag"
+                            onClick={(e) => handleSubcategoryClick(subcategory, e)}
+                          >
+                            {subcategory.name}
+                          </span>
+                        ))}
+                        {category.children.length > 3 && (
+                          <span className="more-tag">+{category.children.length - 3}</span>
+                        )}
+                      </div>
+                    )}
+                    
+                    <div className="category-action">عرض الفئة</div>
+                  </div>
                 </div>
               </div>
             ))}
