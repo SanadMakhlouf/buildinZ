@@ -7,6 +7,9 @@ import HomePage from './pages/Home/HomePage';
 import AboutPage from './pages/About/AboutPage';
 import ServicesPage from './pages/Services/ServicesPage';
 import ServicesPage2 from './pages/Services2/ServicesPage2';
+import CategoryPage from './pages/Services2/CategoryPage';
+import CategoryDetailPage from './pages/Services2/CategoryDetailPage';
+import ServiceDetailPage from './pages/Services2/ServiceDetailPage';
 import ProductsPage from './pages/Products/ProductsPage';
 import ProductDetailPage from './pages/Products/ProductDetailPage';
 import ProfilePage from './pages/Profile/ProfilePage';
@@ -43,7 +46,9 @@ function App() {
             <Route path="/about" element={<AboutPage />} />
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/services2" element={<ServicesPage2 />} />
-            <Route path="/services2/:categoryId" element={<ServicesPage2 />} />
+            <Route path="/services2/categories" element={<CategoryPage />} />
+            <Route path="/services2/categories/:id" element={<CategoryDetailPage />} />
+            <Route path="/services2/:id" element={<ServiceDetailPage />} />
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/products/:productId" element={<ProductDetailPage />} />
             <Route path="/profile" element={<ProfilePage />} />
