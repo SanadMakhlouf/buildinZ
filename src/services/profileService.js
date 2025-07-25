@@ -71,7 +71,7 @@ export const profileService = {
       return [];
     }
   },
-  
+
   async cancelOrder(orderId) {
     try {
       const response = await axiosInstance.post(`/orders/${orderId}/cancel`);

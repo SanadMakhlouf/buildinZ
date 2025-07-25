@@ -108,10 +108,7 @@ const CategoryPage = () => {
                   <img 
                     src={serviceBuilderService.getImageUrl(category.image_path)} 
                     alt={category.name}
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = '/assets/images/placeholder.jpg';
-                    }}
+                   
                   />
                   <div className="category-overlay">
                     <h3>{category.name}</h3>

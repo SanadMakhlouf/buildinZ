@@ -34,6 +34,7 @@ const ServiceDetailPage = () => {
   });
   const [submitting, setSubmitting] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
+  const [showBookingModal, setShowBookingModal] = useState(false);
 
   useEffect(() => {
     fetchServiceDetails();
@@ -132,6 +133,7 @@ const ServiceDetailPage = () => {
 
       if (response.success) {
         setCalculation(response.calculation); // Changed from response.data to response.calculation
+        setShowBookingModal(true); // Show the booking modal after successful calculation
       } else {
         setCalculationError(response.message || 'فشل في حساب السعر');
       }
@@ -318,144 +320,147 @@ const ServiceDetailPage = () => {
             </div>
           </div>
 
-          {/* Fields Section */}
-          {service?.fields && service.fields.length > 0 && (
-            <div className="fields-section">
-              <h2>اختر الخيارات المناسبة</h2>
-              <div className="fields-container">
-                {service.fields.map(field => (
-                  <div key={field.id} className="field-item">
-                    <h3>
-                      {field.required && <span className="required">*</span>}
-                      {field.label}
-                    </h3>
-                    {field.description && (
-                      <p className="field-description">{field.description}</p>
-                    )}
-                    
-                    {field.type === 'number' ? (
-                      <div className="number-input-container">
-                        <input
-                          type="number"
-                          className="number-input"
-                          placeholder={`أدخل ${field.label}`}
-                          min={field.min_value}
-                          max={field.max_value}
-                          step={field.step}
-                          value={fieldValues[field.id]?.value || ''}
-                          onChange={(e) => handleFieldValueChange(field.id, e.target.value)}
-                        />
-                        {field.unit && <span className="unit-label">{field.unit}</span>}
-                      </div>
-                    ) : field.options && field.options.length > 0 ? (
-                      <div className="field-options">
-                        {field.options.map(option => (
-                          <div
-                            key={option.id}
-                            className={`option-card ${fieldValues[field.id]?.option_id === option.id ? 'selected' : ''}`}
-                            onClick={() => handleOptionSelect(field.id, option.id)}
-                          >
-                            {option.image_path ? (
-                              <div className="option-image">
+          {/* Horizontal Layout for Fields and Products */}
+          <div className="main-content-wrapper">
+            {/* Fields Section */}
+            {service?.fields && service.fields.length > 0 && (
+              <div className="fields-section">
+                <h2>اختر الخيارات المناسبة</h2>
+                <div className="fields-container">
+                  {service.fields.map(field => (
+                    <div key={field.id} className="field-item">
+                      <h3>
+                        {field.required && <span className="required">*</span>}
+                        {field.label}
+                      </h3>
+                      {field.description && (
+                        <p className="field-description">{field.description}</p>
+                      )}
+                      
+                      {field.type === 'number' ? (
+                        <div className="number-input-container">
+                          <input
+                            type="number"
+                            className="number-input"
+                            placeholder={`أدخل ${field.label}`}
+                            min={field.min_value}
+                            max={field.max_value}
+                            step={field.step}
+                            value={fieldValues[field.id]?.value || ''}
+                            onChange={(e) => handleFieldValueChange(field.id, e.target.value)}
+                          />
+                          {field.unit && <span className="unit-label">{field.unit}</span>}
+                        </div>
+                      ) : field.options && field.options.length > 0 ? (
+                        <div className="field-options">
+                          {field.options.map(option => (
+                            <div
+                              key={option.id}
+                              className={`option-card ${fieldValues[field.id]?.option_id === option.id ? 'selected' : ''}`}
+                              onClick={() => handleOptionSelect(field.id, option.id)}
+                            >
+                              {option.image_path ? (
+                                <div className="option-image">
+                                  <img 
+                                    src={serviceBuilderService.getImageUrl(option.image_path)} 
+                                    alt={option.label}
+                                    onError={(e) => e.target.style.display = 'none'}
+                                  />
+                                </div>
+                              ) : (
+                                <div className="option-placeholder">
+                                  <FontAwesomeIcon icon={faImage} />
+                                </div>
+                              )}
+                              <div className="option-content">
+                                <h4>{option.label}</h4>
+                                {option.price_modifier && (
+                                  <span className="price-adjustment">
+                                    {option.price_modifier > 0 ? '+' : ''}{option.price_modifier} د.ك
+                                  </span>
+                                )}
+                              </div>
+                              {fieldValues[field.id]?.option_id === option.id && (
+                                <div className="selected-indicator">
+                                  <FontAwesomeIcon icon={faPlus} />
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="no-options">
+                          لا توجد خيارات متاحة لهذا الحقل
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Products Section */}
+            {service && (service.productsByTag || service.productsWithoutTags) && (
+              <div className="products-section">
+                <h2>اختر المنتجات</h2>
+                {Object.entries(productsByCategory).map(([category, products]) => (
+                  <div key={category} className="products-by-category">
+                    <h3 className="category-title">{category}</h3>
+                    <div className="products-grid">
+                      {products.map(product => {
+                        const selectedProduct = getSelectedProduct(product.id);
+                        return (
+                          <div key={product.id} className="product-card">
+                            {product.image_path ? (
+                              <div className="product-image">
                                 <img 
-                                  src={serviceBuilderService.getImageUrl(option.image_path)} 
-                                  alt={option.label}
+                                  src={serviceBuilderService.getImageUrl(product.image_path)} 
+                                  alt={product.name}
                                   onError={(e) => e.target.style.display = 'none'}
                                 />
                               </div>
                             ) : (
-                              <div className="option-placeholder">
+                              <div className="product-placeholder">
                                 <FontAwesomeIcon icon={faImage} />
                               </div>
                             )}
-                            <div className="option-content">
-                              <h4>{option.label}</h4>
-                              {option.price_modifier && (
-                                <span className="price-adjustment">
-                                  {option.price_modifier > 0 ? '+' : ''}{option.price_modifier} د.ك
-                                </span>
+                            <div className="product-content">
+                              <h4>{product.name}</h4>
+                              <div className="product-price">{product.unit_price} د.ك</div>
+                              {product.description && (
+                                <p className="product-description">{product.description}</p>
                               )}
                             </div>
-                            {fieldValues[field.id]?.option_id === option.id && (
-                              <div className="selected-indicator">
-                                <FontAwesomeIcon icon={faPlus} />
-                              </div>
-                            )}
+                            <div className="product-actions">
+                              {selectedProduct ? (
+                                <div className="quantity-selector">
+                                  <label>الكمية:</label>
+                                  <input
+                                    type="number"
+                                    min="1"
+                                    value={selectedProduct.quantity}
+                                    onChange={(e) => handleProductQuantityChange(product.id, parseInt(e.target.value))}
+                                  />
+                                </div>
+                              ) : (
+                                <button 
+                                  className="add-product-btn"
+                                  onClick={() => handleProductSelect(product.id, 1)}
+                                >
+                                  <FontAwesomeIcon icon={faPlus} />
+                                  إضافة
+                                </button>
+                              )}
+                            </div>
                           </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="no-options">
-                        لا توجد خيارات متاحة لهذا الحقل
-                      </div>
-                    )}
+                        );
+                      })}
+                    </div>
                   </div>
                 ))}
               </div>
-            </div>
-          )}
-
-          {/* Products Section */}
-          {service && (service.productsByTag || service.productsWithoutTags) && (
-            <div className="products-section">
-              <h2>اختر المنتجات</h2>
-              {Object.entries(productsByCategory).map(([category, products]) => (
-                <div key={category} className="products-by-category">
-                  <h3 className="category-title">{category}</h3>
-                  <div className="products-grid">
-                    {products.map(product => {
-                      const selectedProduct = getSelectedProduct(product.id);
-                      return (
-                        <div key={product.id} className="product-card">
-                          {product.image_path ? (
-                            <div className="product-image">
-                              <img 
-                                src={serviceBuilderService.getImageUrl(product.image_path)} 
-                                alt={product.name}
-                                onError={(e) => e.target.style.display = 'none'}
-                              />
-                            </div>
-                          ) : (
-                            <div className="product-placeholder">
-                              <FontAwesomeIcon icon={faImage} />
-                            </div>
-                          )}
-                          <div className="product-content">
-                            <h4>{product.name}</h4>
-                            <div className="product-price">{product.unit_price} د.ك</div>
-                            {product.description && (
-                              <p className="product-description">{product.description}</p>
-                            )}
-                          </div>
-                          <div className="product-actions">
-                            {selectedProduct ? (
-                              <div className="quantity-selector">
-                                <label>الكمية:</label>
-                                <input
-                                  type="number"
-                                  min="1"
-                                  value={selectedProduct.quantity}
-                                  onChange={(e) => handleProductQuantityChange(product.id, parseInt(e.target.value))}
-                                />
-                              </div>
-                            ) : (
-                              <button 
-                                className="add-product-btn"
-                                onClick={() => handleProductSelect(product.id, 1)}
-                              >
-                                <FontAwesomeIcon icon={faPlus} />
-                                إضافة
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+            )}
+          </div>
 
           {/* Calculate Button */}
           <div className="calculate-section">
@@ -490,41 +495,6 @@ const ServiceDetailPage = () => {
                 <FontAwesomeIcon icon={faLayerGroup} />
               </div>
             )}
-          </div>
-
-          {/* Booking Summary */}
-          <div className="booking-summary">
-            <h3>تفاصيل الحجز</h3>
-            <div className="summary-item">
-              <span className="summary-label">الخدمة:</span>
-              <span className="summary-value">{service?.name}</span>
-            </div>
-            <div className="summary-item">
-              <span className="summary-label">المنتجات المختارة:</span>
-              <span className="summary-value">{getSelectedProductsCount()}</span>
-            </div>
-            {calculation && (
-              <div className="summary-item">
-                <span className="summary-label">السعر الإجمالي:</span>
-                <span className="summary-value price">{getTotalPrice()} د.ك</span>
-              </div>
-            )}
-          </div>
-
-          {/* Payment Summary */}
-          <div className="payment-summary">
-            <h3>ملخص الدفع</h3>
-            <div className="price-total">
-              <span>المجموع:</span>
-              <span>{getTotalPrice()} د.ك</span>
-            </div>
-            <button 
-              className="order-button"
-              onClick={() => setShowOrderForm(true)}
-              disabled={!calculation}
-            >
-              إرسال الطلب
-            </button>
           </div>
         </div>
       </div>
@@ -594,6 +564,77 @@ const ServiceDetailPage = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Booking Details Modal */}
+      {showBookingModal && (
+        <div className="booking-modal-overlay">
+          <div className="booking-modal-container">
+            <div className="booking-modal-header">
+              <h2>تفاصيل الحجز</h2>
+              <button 
+                className="close-button"
+                onClick={() => setShowBookingModal(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="booking-modal-content">
+              {/* Service Preview */}
+              <div className="modal-service-preview">
+                {service?.preview_image ? (
+                  <img 
+                    src={serviceBuilderService.getImageUrl(service.preview_image)} 
+                    alt={service.name}
+                    onError={(e) => e.target.style.display = 'none'}
+                  />
+                ) : (
+                  <div className="modal-service-placeholder">
+                    <FontAwesomeIcon icon={faLayerGroup} />
+                  </div>
+                )}
+              </div>
+
+              {/* Booking Summary */}
+              <div className="modal-booking-summary">
+                <h3>تفاصيل الحجز</h3>
+                <div className="summary-item">
+                  <span className="summary-label">الخدمة:</span>
+                  <span className="summary-value">{service?.name}</span>
+                </div>
+                <div className="summary-item">
+                  <span className="summary-label">المنتجات المختارة:</span>
+                  <span className="summary-value">{getSelectedProductsCount()}</span>
+                </div>
+                {calculation && (
+                  <div className="summary-item">
+                    <span className="summary-label">السعر الإجمالي:</span>
+                    <span className="summary-value price">{getTotalPrice()} د.ك</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Payment Summary */}
+              <div className="modal-payment-summary">
+                <h3>ملخص الدفع</h3>
+                <div className="price-total">
+                  <span>المجموع:</span>
+                  <span>{getTotalPrice()} د.ك</span>
+                </div>
+                <button 
+                  className="order-button"
+                  onClick={() => {
+                    setShowBookingModal(false);
+                    setShowOrderForm(true);
+                  }}
+                  disabled={!calculation}
+                >
+                  إرسال الطلب
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

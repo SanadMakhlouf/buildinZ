@@ -232,10 +232,7 @@ const CategoryDetailPage = () => {
                         <img 
                           src={serviceBuilderService.getImageUrl(service.preview_image)} 
                           alt={service.name}
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = '/assets/images/placeholder.jpg';
-                          }}
+                         
                         />
                       ) : (
                         <div className="service-placeholder">

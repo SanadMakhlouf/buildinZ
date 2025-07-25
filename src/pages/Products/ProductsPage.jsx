@@ -212,7 +212,7 @@ const ProductsPage = () => {
         
         // Store all products in state
         if (!search && !category) {
-          setProducts(formattedProducts);
+        setProducts(formattedProducts);
         }
         
         // Update filtered products
@@ -225,7 +225,7 @@ const ProductsPage = () => {
         }
       } else {
         if (!search && !category) {
-          setProducts([]);
+        setProducts([]);
         }
         setFilteredProducts([]);
       }
@@ -233,7 +233,7 @@ const ProductsPage = () => {
       console.error('Error fetching products:', err);
       setError(err.message);
       if (!search && !category) {
-        setProducts([]);
+      setProducts([]);
       }
       setFilteredProducts([]);
     } finally {
@@ -318,12 +318,12 @@ const ProductsPage = () => {
             {product.rating}
           </div>
           {product.image && (
-            <img 
-              src={product.image} 
-              alt={product.name} 
-              className="product-image" 
-              onError={handleImageError} 
-            />
+          <img 
+            src={product.image} 
+            alt={product.name} 
+            className="product-image" 
+            onError={handleImageError} 
+          />
           )}
         </div>
         
@@ -335,7 +335,7 @@ const ProductsPage = () => {
           )}
           
           <div className="product-price-container">
-            <div className="product-price">
+          <div className="product-price">
               AED {product.price.toFixed(0)}
               {product.dimensions && <span className="price-unit">/m²</span>}
             </div>
@@ -417,13 +417,13 @@ const ProductsPage = () => {
             </div>
           )}
         </div>
-        
+
         {/* Categories Filter */}
         <div className="categories-filter">
           <div className="categories-header">
             <FontAwesomeIcon icon={faFilter} />
             <span>تصفية حسب الفئة</span>
-          </div>
+            </div>
           <div className="categories-list">
             {loadingCategories ? (
               <div className="categories-loading">
@@ -452,16 +452,16 @@ const ProductsPage = () => {
             ) : (
               <div className="no-categories">لا توجد فئات متاحة</div>
             )}
-          </div>
-        </div>
-        
+                </div>
+              </div>
+
         <div className="products-content">
           {/* Products Grid */}
           {loading && isSearching ? (
             <div className="loading-container">
               <FontAwesomeIcon icon={faSpinner} spin size="3x" />
               <p>Searching products...</p>
-            </div>
+                </div>
           ) : filteredProducts.length > 0 ? (
             <>
               <div 
@@ -481,15 +481,15 @@ const ProductsPage = () => {
                 <div className="load-more-container">
                   <button className="load-more-btn" onClick={loadMoreProducts}>
                     Load More Products
-                  </button>
-                </div>
-              )}
+                </button>
+              </div>
+            )}
             </>
           ) : (
             <div className="no-products">
               <h3>No products found</h3>
               <p>{searchTerm ? `No results for "${searchTerm}"` : 'Try again later'}</p>
-            </div>
+          </div>
           )}
         </div>
       </div>

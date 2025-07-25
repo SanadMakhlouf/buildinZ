@@ -484,7 +484,7 @@ const AddressManager = ({ checkoutMode = false, onAddressSelect = null, selected
       setIsValidating(false);
     }
   };
-  
+
   // Handle address selection in checkout mode
   const handleAddressSelect = (address) => {
     if (checkoutMode && onAddressSelect) {
@@ -495,7 +495,7 @@ const AddressManager = ({ checkoutMode = false, onAddressSelect = null, selected
   // Render address list
   const renderAddressList = () => {
     if (isLoading) {
-      return (
+  return (
         <div className="addresses-loading">
           <FontAwesomeIcon icon={icons.loading} spin />
           <span>جاري تحميل العناوين...</span>
@@ -527,7 +527,7 @@ const AddressManager = ({ checkoutMode = false, onAddressSelect = null, selected
             <FontAwesomeIcon icon={icons.add} />
             إضافة عنوان جديد
           </button>
-        </div>
+      </div>
       );
     }
 
@@ -541,7 +541,7 @@ const AddressManager = ({ checkoutMode = false, onAddressSelect = null, selected
           >
             <div className="address-icon">
               <FontAwesomeIcon icon={getAddressIcon(address.name)} />
-            </div>
+        </div>
             
             <div className="address-details">
               <div className="address-header">
@@ -568,12 +568,12 @@ const AddressManager = ({ checkoutMode = false, onAddressSelect = null, selected
                   <p className="delivery-instructions">
                     <strong>تعليمات التوصيل:</strong> {address.delivery_instructions}
                   </p>
-                )}
+                  )}
+                </div>
               </div>
-            </div>
             
             <div className="address-actions">
-              <button 
+                <button 
                 className="edit-btn"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -594,24 +594,24 @@ const AddressManager = ({ checkoutMode = false, onAddressSelect = null, selected
                     }}
                     title="حذف العنوان"
                   >
-                    <FontAwesomeIcon icon={icons.delete} />
-                  </button>
+                      <FontAwesomeIcon icon={icons.delete} />
+                </button>
                   
                   {!address.is_default && (
-                    <button 
+                <button 
                       className="set-default-btn"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleSetDefault(address.id);
                       }}
                       title="تعيين كعنوان افتراضي"
-                    >
+                >
                       <FontAwesomeIcon icon={icons.setDefault} />
-                    </button>
+                </button>
                   )}
                 </>
               )}
-            </div>
+              </div>
             
             {checkoutMode && (
               <div className="checkout-select">
@@ -641,7 +641,7 @@ const AddressManager = ({ checkoutMode = false, onAddressSelect = null, selected
     return (
       <AnimatePresence>
         {showAddForm && (
-          <motion.div
+          <motion.div 
             className="address-form-container"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -661,18 +661,18 @@ const AddressManager = ({ checkoutMode = false, onAddressSelect = null, selected
             <form onSubmit={handleSubmit} className="address-form">
               <div className="form-group">
                 <label htmlFor="name">اسم العنوان*</label>
-                <input
-                  type="text"
+                  <input
+                    type="text"
                   id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
                   placeholder="مثل: المنزل، العمل، الخ"
                   className={formErrors.name ? 'error' : ''}
-                />
+                  />
                 {formErrors.name && <span className="error-message">{formErrors.name}</span>}
-              </div>
-              
+                </div>
+
               <div className="form-group">
                 <label htmlFor="address_line1">العنوان*</label>
                 <div className="address-input-container">
@@ -685,18 +685,18 @@ const AddressManager = ({ checkoutMode = false, onAddressSelect = null, selected
                     placeholder="اسم الشارع، رقم المبنى"
                     className={formErrors.address_line1 ? 'error' : ''}
                   />
-                  <button 
-                    type="button"
-                    className="current-location-btn"
-                    onClick={handleUseCurrentLocation}
-                    title="استخدام موقعي الحالي"
-                  >
-                    <FontAwesomeIcon icon={icons.currentLocation} />
-                  </button>
-                </div>
+                    <button 
+                      type="button" 
+                      className="current-location-btn"
+                      onClick={handleUseCurrentLocation}
+                      title="استخدام موقعي الحالي"
+                    >
+                        <FontAwesomeIcon icon={icons.currentLocation} />
+                    </button>
+                  </div>
                 {formErrors.address_line1 && <span className="error-message">{formErrors.address_line1}</span>}
               </div>
-              
+
               <div className="form-group">
                 <label htmlFor="address_line2">تفاصيل إضافية</label>
                 <input
@@ -710,7 +710,7 @@ const AddressManager = ({ checkoutMode = false, onAddressSelect = null, selected
                 />
                 {formErrors.address_line2 && <span className="error-message">{formErrors.address_line2}</span>}
               </div>
-              
+
               <div className="form-group">
                 <label htmlFor="city">المدينة*</label>
                 <select
@@ -727,7 +727,7 @@ const AddressManager = ({ checkoutMode = false, onAddressSelect = null, selected
                 </select>
                 {formErrors.city && <span className="error-message">{formErrors.city}</span>}
               </div>
-              
+
               <div className="form-group">
                 <label htmlFor="phone">رقم الهاتف</label>
                 <input
@@ -755,18 +755,18 @@ const AddressManager = ({ checkoutMode = false, onAddressSelect = null, selected
                 ></textarea>
                 {formErrors.delivery_instructions && <span className="error-message">{formErrors.delivery_instructions}</span>}
               </div>
-              
+
               <div className="form-group checkbox">
-                <input
-                  type="checkbox"
+                  <input
+                    type="checkbox"
                   id="is_default"
-                  name="is_default"
-                  checked={formData.is_default}
-                  onChange={handleInputChange}
-                />
+                    name="is_default"
+                    checked={formData.is_default}
+                    onChange={handleInputChange}
+                  />
                 <label htmlFor="is_default">تعيين كعنوان افتراضي</label>
               </div>
-              
+
               <div className="address-validation">
                 <button 
                   type="button" 
@@ -841,33 +841,33 @@ const AddressManager = ({ checkoutMode = false, onAddressSelect = null, selected
           <p>هل أنت متأكد من حذف العنوان "{addressToDelete.name}"؟</p>
           
           <div className="confirm-actions">
-            <button 
+              <button 
               className="cancel-btn"
               onClick={cancelDelete}
               disabled={isDeleting}
-            >
+              >
               إلغاء
-            </button>
+              </button>
             
-            <button 
-              className="delete-btn"
+                    <button 
+                      className="delete-btn" 
               onClick={() => handleDeleteAddress(addressToDelete.id)}
               disabled={isDeleting}
-            >
+                    >
               {isDeleting && deleteId === addressToDelete.id ? (
                 <>
-                  <FontAwesomeIcon icon={icons.loading} spin />
+                        <FontAwesomeIcon icon={icons.loading} spin />
                   جاري الحذف...
                 </>
-              ) : (
+                      ) : (
                 <>
-                  <FontAwesomeIcon icon={icons.delete} />
+                        <FontAwesomeIcon icon={icons.delete} />
                   تأكيد الحذف
                 </>
-              )}
-            </button>
-          </div>
-        </div>
+                      )}
+                    </button>
+                  </div>
+                </div>
       </div>
     );
   };
@@ -878,26 +878,26 @@ const AddressManager = ({ checkoutMode = false, onAddressSelect = null, selected
       {showAutoDetector && !showAddForm && (
         <AutoLocationDetector onAddressCreated={handleAutoAddressCreated} />
       )}
-      
+                  
       {/* Addresses List */}
       {renderAddressList()}
-      
+                  
       {/* Add/Edit Address Form */}
       {renderAddressForm()}
-      
+                  
       {/* Delete Confirmation Dialog */}
       {renderDeleteConfirmation()}
       
       {/* Add Address Button (for checkout mode) */}
       {checkoutMode && !showAddForm && (
-        <button 
+                  <button 
           className="add-address-btn checkout-add-btn"
           onClick={() => setShowAddForm(true)}
-        >
+                  >
           <FontAwesomeIcon icon={icons.add} />
           إضافة عنوان جديد
-        </button>
-      )}
+                  </button>
+                )}
     </div>
   );
 };
