@@ -376,7 +376,7 @@ const ServiceDetailPage = () => {
                                 <h4>{option.label}</h4>
                                 {option.price_modifier && (
                                   <span className="price-adjustment">
-                                    {option.price_modifier > 0 ? '+' : ''}{option.price_modifier} د.ك
+                                    {option.price_modifier > 0 ? '+' : ''}{option.price_modifier}درهم
                                   </span>
                                 )}
                               </div>
@@ -410,7 +410,7 @@ const ServiceDetailPage = () => {
                       {products.map(product => {
                         const selectedProduct = getSelectedProduct(product.id);
                         return (
-                          <div key={product.id} className="product-card">
+                          <div key={product.id} className={`product-card ${selectedProduct ? 'selected' : ''}`}>
                             {product.image_path ? (
                               <div className="product-image">
                                 <img 
@@ -426,7 +426,7 @@ const ServiceDetailPage = () => {
                             )}
                             <div className="product-content">
                               <h4>{product.name}</h4>
-                              <div className="product-price">{product.unit_price} د.ك</div>
+                              <div className="product-price">{product.unit_price} درهم</div>
                               {product.description && (
                                 <p className="product-description">{product.description}</p>
                               )}
@@ -611,7 +611,7 @@ const ServiceDetailPage = () => {
                 {calculation && (
                   <div className="summary-item">
                     <span className="summary-label">السعر الإجمالي:</span>
-                    <span className="summary-value price">{getTotalPrice()} د.ك</span>
+                    <span className="summary-value price">{getTotalPrice()} ددرهم.ك</span>
                   </div>
                 )}
               </div>
@@ -621,7 +621,7 @@ const ServiceDetailPage = () => {
                 <h3>ملخص الدفع</h3>
                 <div className="price-total">
                   <span>المجموع:</span>
-                  <span>{getTotalPrice()} د.ك</span>
+                  <span>{getTotalPrice()} درهم</span>
                 </div>
                 <button 
                   className="order-button"
