@@ -278,7 +278,7 @@ const ServiceDetailPage = () => {
       <div className="service-header">
         <div className="header-content">
           <div className="header-left">
-            <button className="back-button" onClick={() => navigate(-1)}>
+            <button className="back-button" onClick={() => navigate('/services2')}>
               <FontAwesomeIcon icon={faArrowLeft} />
               رجوع
             </button>

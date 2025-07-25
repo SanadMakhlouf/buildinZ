@@ -62,7 +62,7 @@ const CategoryDetailPage = () => {
   };
 
   const handleBackClick = () => {
-    navigate('/services2/categories');
+    navigate('/services2');
   };
 
   const toggleViewMode = () => {
@@ -235,8 +235,11 @@ const CategoryDetailPage = () => {
                          
                         />
                       ) : (
-                        <div className="service-placeholder">
-                          <FontAwesomeIcon icon={faLayerGroup} />
+                        <div className="service-gradient-bg">
+                          <div className="service-icon-container">
+                            <FontAwesomeIcon icon={faLayerGroup} />
+                          </div>
+                          <div className="service-bg-pattern"></div>
                         </div>
                       )}
                       {viewMode === 'grid' && (
