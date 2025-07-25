@@ -1,9 +1,10 @@
 /* About Page Styles */
 .about-page {
-  font-family: 'Cairo', sans-serif;
+  font-family: 'Tajawal', 'Cairo', sans-serif;
   color: #333;
   overflow-x: hidden;
   direction: rtl;
+  padding-top: 70px;
 }
 
 /* Container */
@@ -17,7 +18,6 @@
 .about-hero {
   position: relative;
   min-height: 500px;
-  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
   background-size: cover;
   background-position: center;
   color: #fff;
@@ -76,7 +76,7 @@
 
 /* Section Styles */
 .about-section {
-  padding: 6rem 0;
+  padding: 5rem 0;
   opacity: 0;
   transform: translateY(30px);
   transition: opacity 0.8s ease, transform 0.8s ease;
@@ -89,10 +89,11 @@
 
 .about-section-title {
   text-align: center;
-  font-size: 2.5rem;
+  font-size: 2.2rem;
   margin-bottom: 3rem;
   position: relative;
   padding-bottom: 1rem;
+  color: #0A3259;
 }
 
 .about-section-title::after {
@@ -103,7 +104,7 @@
   transform: translateX(-50%);
   width: 80px;
   height: 4px;
-  background: linear-gradient(to right, #DAA520, #0A3259);
+  background: #DAA520;
   border-radius: 2px;
 }
 
@@ -117,7 +118,7 @@
 
 /* Mission & Vision Section */
 .about-mission {
-  background-color: #f9f9f9;
+  background-color: #f9fafb;
 }
 
 .about-mission-grid {
@@ -146,8 +147,8 @@
   margin-bottom: 1.5rem;
 }
 
-.about-mission-item h2 {
-  font-size: 1.8rem;
+.about-mission-item h3 {
+  font-size: 1.6rem;
   margin-bottom: 1rem;
   color: #0A3259;
 }
@@ -170,7 +171,7 @@
 }
 
 .about-value-card {
-  background-color: #f9f9f9;
+  background-color: #f9fafb;
   border-radius: 10px;
   padding: 2rem;
   text-align: center;
@@ -209,7 +210,7 @@
 
 /* Team Section */
 .about-team {
-  background-color: #f9f9f9;
+  background-color: #f9fafb;
 }
 
 .about-team-grid {
@@ -274,7 +275,7 @@
 .about-stats {
   background: linear-gradient(to right, #0A3259, #1a5a9e);
   color: #fff;
-  padding: 5rem 0;
+  padding: 4rem 0;
 }
 
 .about-stats-grid {
@@ -327,7 +328,7 @@
   bottom: 0;
   right: 20px;
   width: 4px;
-  background: linear-gradient(to bottom, #DAA520, #0A3259);
+  background: #DAA520;
   border-radius: 2px;
 }
 
@@ -356,7 +357,7 @@
 }
 
 .about-timeline-content {
-  background-color: #f9f9f9;
+  background-color: #f9fafb;
   border-radius: 10px;
   padding: 1.5rem;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
@@ -392,7 +393,7 @@
 
 /* CTA Section */
 .about-cta {
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  background: linear-gradient(rgba(10, 50, 89, 0.85), rgba(10, 50, 89, 0.9));
   background-size: cover;
   background-position: center;
   color: #fff;
@@ -421,7 +422,7 @@
 .about-btn {
   display: inline-block;
   padding: 1rem 2rem;
-  border-radius: 30px;
+  border-radius: 8px;
   font-size: 1.1rem;
   font-weight: 600;
   text-decoration: none;
@@ -512,7 +513,7 @@
   }
   
   .about-section-title {
-    font-size: 2.2rem;
+    font-size: 2rem;
   }
 }
 
@@ -538,7 +539,7 @@
   }
   
   .about-section-title {
-    font-size: 2rem;
+    font-size: 1.8rem;
   }
   
   .about-cta h2 {
@@ -580,7 +581,7 @@
   }
   
   .about-section-title {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     margin-bottom: 2rem;
   }
   

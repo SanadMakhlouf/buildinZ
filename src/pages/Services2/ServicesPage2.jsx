@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { faSpinner, faLayerGroup } from '@fortawesome/free-solid-svg-icons';
 import "./ServicesPage2.css";
 import serviceBuilderService from '../../services/serviceBuilderService';
+import placeholderImage from '../../assets/images/placeholder.png';
 
 const ServicesPage2 = () => {
   const navigate = useNavigate();
@@ -131,18 +132,26 @@ const ServicesPage2 = () => {
     );
   }
 
-  return (
-    <div className="services-page2">
-      <div className="hero-section">
-        <div className="hero-content">
-          <h1>الخدمات</h1>
-          <p>اختر من مجموعة متنوعة من الخدمات المتميزة</p>
+  if (!categories || categories.length === 0) {
+    return (
+      <div className="services-page2">
+        <div className="empty-state">
+          <FontAwesomeIcon icon={faLayerGroup} size="3x" />
+          <h2>اختر الخيارات المناسبة</h2>
+          <p>لم يتم العثور على أي فئات. يرجى المحاولة مرة أخرى لاحقاً.</p>
+          <button onClick={fetchData} className="retry-button">
+            إعادة المحاولة
+          </button>
         </div>
       </div>
+    );
+  }
 
+  return (
+    <div className="services-page2">
       <div className="container">
-        <div className="services-content">
-          {/* Categories Grid */}
+        <div className="categories-section">
+          <h2>اختر الخيارات المناسبة</h2>
           <div className="categories-grid">
             {categories.map(category => (
               <div 
@@ -151,14 +160,20 @@ const ServicesPage2 = () => {
                 onClick={() => handleCategorySelect(category)}
               >
                 <div className="category-image">
-                  <img 
-                    src={serviceBuilderService.getImageUrl(category.image_path)} 
-                    alt={category.name}
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = '/assets/images/placeholder.jpg';
-                    }}
-                  />
+                  {category.image_path ? (
+                    <img 
+                      src={serviceBuilderService.getImageUrl(category.image_path)} 
+                      alt={category.name}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = placeholderImage;
+                      }}
+                    />
+                  ) : (
+                    <div className="category-placeholder">
+                      <FontAwesomeIcon icon={faLayerGroup} />
+                    </div>
+                  )}
                   <div className="category-overlay">
                     <h3>{category.name}</h3>
                     
@@ -175,35 +190,6 @@ const ServicesPage2 = () => {
                 </div>
               </div>
             ))}
-          </div>
-
-          {/* Featured Services */}
-          <div className="featured-services">
-            <h2>الخدمات المميزة</h2>
-            <div className="services-grid">
-              {services.slice(0, 6).map(service => (
-                <div 
-                  key={service.id} 
-                  className="service-card"
-                  onClick={() => handleServiceSelect(service)}
-                >
-                  <div className="service-image">
-                    <img 
-                      src={serviceBuilderService.getImageUrl(service.preview_image)} 
-                      alt={service.name}
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = '/assets/images/placeholder.jpg';
-                      }}
-                    />
-                    <div className="service-overlay">
-                      <h3>{service.name}</h3>
-                      <div className="service-action">عرض التفاصيل</div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </div>

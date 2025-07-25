@@ -95,8 +95,8 @@ const AboutPage = () => {
       <section className={`about-hero ${animateSection.hero ? 'animate' : ''}`}>
         <div className="about-hero-overlay"></div>
         <div className="about-container">
-          <h1>قصتنا</h1>
-          <p className="about-hero-subtitle">نحن نبني مستقبلاً أفضل للخدمات المنزلية</p>
+          <h1>عن Buildinz</h1>
+          <p className="about-hero-subtitle">نبني مستقبلاً أفضل للخدمات المنزلية</p>
           <div className="about-hero-content">
             <p>
               منذ تأسيسها في عام 2018، تسعى Buildinz لتغيير طريقة حصول الناس على خدمات الصيانة والإصلاح المنزلية في دولة الإمارات العربية المتحدة.
@@ -109,12 +109,13 @@ const AboutPage = () => {
       {/* Mission & Vision Section */}
       <section id="mission" className={`about-section about-mission ${animateSection.mission ? 'animate' : ''}`}>
         <div className="about-container">
+          <h2 className="about-section-title">رؤيتنا ومهمتنا</h2>
           <div className="about-mission-grid">
             <div className="about-mission-item">
               <div className="about-section-icon">
                 <FontAwesomeIcon icon={faLightbulb} />
               </div>
-              <h2>رؤيتنا</h2>
+              <h3>رؤيتنا</h3>
               <p>
                 أن نصبح المنصة الرائدة في مجال الخدمات المنزلية في الشرق الأوسط، مع توفير تجربة سلسة وموثوقة لكل من العملاء ومقدمي الخدمات.
               </p>
@@ -123,7 +124,7 @@ const AboutPage = () => {
               <div className="about-section-icon">
                 <FontAwesomeIcon icon={faBuilding} />
               </div>
-              <h2>مهمتنا</h2>
+              <h3>مهمتنا</h3>
               <p>
                 تمكين الناس من العيش في منازل آمنة ومريحة من خلال توفير وصول سهل وموثوق به إلى أفضل المهنيين في مجال الخدمات المنزلية.
               </p>
@@ -150,28 +151,6 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Team Section */}
-      <section id="team" className={`about-section about-team ${animateSection.team ? 'animate' : ''}`}>
-        <div className="about-container">
-          <h2 className="about-section-title">فريقنا</h2>
-          <p className="about-section-subtitle">
-            يتكون فريقنا من خبراء متحمسين ملتزمين بتحويل قطاع الخدمات المنزلية
-          </p>
-          <div className="about-team-grid">
-            {teamMembers.map((member, index) => (
-              <div className="about-team-card" key={index} style={{ animationDelay: `${index * 0.15}s` }}>
-                <div className="about-team-image">
-                  <img src={member.image} alt={member.name} />
-                </div>
-                <h3>{member.name}</h3>
-                <h4>{member.position}</h4>
-                <p>{member.bio}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Stats Section */}
       <section id="stats" className={`about-section about-stats ${animateSection.stats ? 'animate' : ''}`}>
         <div className="about-container">
@@ -192,6 +171,28 @@ const AboutPage = () => {
               <div className="about-stat-number">7</div>
               <div className="about-stat-label">إمارات مغطاة</div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Team Section */}
+      <section id="team" className={`about-section about-team ${animateSection.team ? 'animate' : ''}`}>
+        <div className="about-container">
+          <h2 className="about-section-title">فريقنا</h2>
+          <p className="about-section-subtitle">
+            يتكون فريقنا من خبراء متحمسين ملتزمين بتحويل قطاع الخدمات المنزلية
+          </p>
+          <div className="about-team-grid">
+            {teamMembers.map((member, index) => (
+              <div className="about-team-card" key={index} style={{ animationDelay: `${index * 0.15}s` }}>
+                <div className="about-team-image">
+                  <img src={member.image} alt={member.name} />
+                </div>
+                <h3>{member.name}</h3>
+                <h4>{member.position}</h4>
+                <p>{member.bio}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -223,8 +224,8 @@ const AboutPage = () => {
             سواء كنت تبحث عن خدمة منزلية موثوقة أو كنت محترفًا يبحث عن فرص جديدة، Buildinz هي المكان المناسب لك.
           </p>
           <div className="about-cta-buttons">
-            <a href="/services" className="about-btn about-btn-primary">استكشف خدماتنا</a>
-            <a href="/contact" className="about-btn about-btn-secondary">تواصل معنا</a>
+            <a href="/services2" className="about-btn about-btn-primary">استكشف خدماتنا</a>
+            <a href="/services2/categories" className="about-btn about-btn-secondary">تصفح الفئات</a>
           </div>
         </div>
       </section>

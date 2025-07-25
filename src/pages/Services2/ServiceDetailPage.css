@@ -136,7 +136,7 @@
 .field-item h3 {
   font-size: 1.2rem;
   color: #0A3259;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
   display: flex;
   align-items: center;
 }
@@ -150,6 +150,44 @@
   font-size: 0.9rem;
   color: #666;
   margin-bottom: 15px;
+}
+
+/* Number Input Styles */
+.number-input-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.number-input {
+  flex: 1;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+  direction: ltr;
+  text-align: left;
+}
+
+.number-input:focus {
+  outline: none;
+  border-color: #DAA520;
+  box-shadow: 0 0 0 2px rgba(218, 165, 32, 0.1);
+}
+
+.number-input::placeholder {
+  color: #999;
+  direction: rtl;
+  text-align: right;
+}
+
+.unit-label {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+  min-width: 40px;
+  text-align: center;
 }
 
 .field-options {
@@ -166,6 +204,8 @@
   cursor: pointer;
   transition: all 0.2s;
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .option-card:hover {
@@ -178,6 +218,38 @@
   border-color: #DAA520;
   background-color: #fffbf0;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.option-image {
+  height: 120px;
+  width: 100%;
+  margin-bottom: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.option-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.option-placeholder {
+  height: 120px;
+  width: 100%;
+  margin-bottom: 12px;
+  border-radius: 6px;
+  background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ccc;
+  font-size: 2rem;
+}
+
+.option-card:hover .option-image img {
+  transform: scale(1.05);
 }
 
 .option-content {
@@ -201,15 +273,16 @@
   position: absolute;
   top: 10px;
   left: 10px;
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   background-color: #DAA520;
   color: white;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.7rem;
+  font-size: 0.8rem;
+  z-index: 2;
 }
 
 .fields-actions,
@@ -271,6 +344,50 @@
   transform: translateY(-3px);
 }
 
+/* Empty States */
+.empty-options,
+.empty-products {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 50px 20px;
+  text-align: center;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  margin: 20px 0;
+}
+
+.empty-options svg,
+.empty-products svg {
+  color: #DAA520;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+.empty-options h3,
+.empty-products h3 {
+  font-size: 1.5rem;
+  color: #0A3259;
+  margin-bottom: 10px;
+}
+
+.empty-options p,
+.empty-products p {
+  font-size: 1.1rem;
+  color: #666;
+  max-width: 500px;
+}
+
+.no-options {
+  text-align: center;
+  padding: 15px;
+  color: #666;
+  background-color: #f0f0f0;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
 /* Service Products */
 .products-by-tag,
 .products-without-tags {
@@ -316,6 +433,7 @@
 .product-image {
   height: 150px;
   overflow: hidden;
+  position: relative;
 }
 
 .product-image img {
@@ -323,6 +441,17 @@
   height: 100%;
   object-fit: cover;
   transition: transform 0.3s ease;
+}
+
+.product-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f0f0;
+  color: #ccc;
+  font-size: 3rem;
 }
 
 .product-card:hover .product-image img {
@@ -464,12 +593,25 @@
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  height: 250px;
 }
 
 .service-preview img {
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
   display: block;
+}
+
+.service-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f0f0;
+  color: #ccc;
+  font-size: 4rem;
 }
 
 .price-summary {
@@ -736,14 +878,6 @@
   background-color: #c99100;
 }
 
-.no-fields,
-.no-products {
-  text-align: center;
-  padding: 30px;
-  color: #666;
-  font-size: 1.1rem;
-}
-
 .calculation-error {
   margin-top: 20px;
   padding: 15px;
@@ -767,7 +901,7 @@
   }
   
   .service-preview {
-    display: none;
+    height: 200px;
   }
 }
 
@@ -795,6 +929,21 @@
     width: 100%;
     justify-content: center;
   }
+  
+  .option-image,
+  .option-placeholder {
+    height: 100px;
+  }
+  
+  .number-input-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .unit-label {
+    text-align: center;
+    margin-top: 5px;
+  }
 }
 
 @media (max-width: 576px) {
@@ -821,5 +970,10 @@
   .cancel-button,
   .submit-button {
     width: 100%;
+  }
+  
+  .option-image,
+  .option-placeholder {
+    height: 120px;
   }
 } 

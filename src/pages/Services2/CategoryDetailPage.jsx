@@ -185,10 +185,7 @@ const CategoryDetailPage = () => {
                       <img 
                         src={serviceBuilderService.getImageUrl(subcategory.image_path)} 
                         alt={subcategory.name}
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = '/assets/images/placeholder.jpg';
-                        }}
+                       
                       />
                       {viewMode === 'grid' && (
                         <div className="subcategory-overlay">

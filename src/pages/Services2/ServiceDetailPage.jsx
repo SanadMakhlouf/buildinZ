@@ -8,10 +8,13 @@ import {
   faCheck, 
   faShoppingCart,
   faCalculator,
-  faTimes
+  faTimes,
+  faLayerGroup,
+  faImage
 } from '@fortawesome/free-solid-svg-icons';
 import serviceBuilderService from '../../services/serviceBuilderService';
 import './ServiceDetailPage.css';
+import placeholderImage from '../../assets/images/placeholder.png';
 
 const ServiceDetailPage = () => {
   const { id } = useParams();
@@ -53,8 +56,8 @@ const ServiceDetailPage = () => {
         if (response.service.fields) {
           const initialFieldValues = response.service.fields.map(field => ({
             field_id: field.id,
-            option_id: null,
-            value: null
+            value: null,
+            type: field.type
           }));
           setFieldValues(initialFieldValues);
         }
@@ -67,6 +70,22 @@ const ServiceDetailPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleFieldValueChange = (fieldId, value) => {
+    setFieldValues(prevValues => {
+      const newValues = [...prevValues];
+      const fieldIndex = newValues.findIndex(field => field.field_id === fieldId);
+      
+      if (fieldIndex !== -1) {
+        newValues[fieldIndex] = {
+          ...newValues[fieldIndex],
+          value: value
+        };
+      }
+      
+      return newValues;
+    });
   };
 
   const handleFieldOptionSelect = (fieldId, optionId, value) => {
@@ -131,10 +150,10 @@ const ServiceDetailPage = () => {
 
   const handleCalculatePrice = async () => {
     // Validate required fields
-    const requiredFields = service.fields.filter(field => field.is_required);
+    const requiredFields = service.fields.filter(field => field.required);
     const missingFields = requiredFields.filter(field => {
       const fieldValue = fieldValues.find(fv => fv.field_id === field.id);
-      return !fieldValue || !fieldValue.option_id;
+      return !fieldValue || fieldValue.value === null || fieldValue.value === '';
     });
     
     if (missingFields.length > 0) {
@@ -148,7 +167,7 @@ const ServiceDetailPage = () => {
       
       const calculationData = {
         service_id: service.id,
-        field_values: fieldValues.filter(field => field.option_id),
+        field_values: fieldValues.filter(field => field.value !== null && field.value !== ''),
         products: selectedProducts
       };
       
@@ -185,7 +204,7 @@ const ServiceDetailPage = () => {
       const orderData = {
         service_id: service.id,
         ...orderFormData,
-        field_values: fieldValues.filter(field => field.option_id),
+        field_values: fieldValues.filter(field => field.value !== null && field.value !== ''),
         products: selectedProducts
       };
       
@@ -278,6 +297,11 @@ const ServiceDetailPage = () => {
     );
   }
 
+  // Check if service has fields and products
+  const hasFields = service.fields && service.fields.length > 0;
+  const hasProducts = (service.productsByTag && service.productsByTag.length > 0) || 
+                     (service.productsWithoutTags && service.productsWithoutTags.length > 0);
+
   return (
     <div className="service-detail-page">
       <div className="container">
@@ -319,48 +343,89 @@ const ServiceDetailPage = () => {
               <div className="service-fields">
                 <h2>اختر الخيارات المناسبة</h2>
                 
-                {service.fields && service.fields.length > 0 ? (
+                {hasFields ? (
                   <div className="fields-container">
-                    {service.fields.map(field => (
-                      <div key={field.id} className="field-item">
-                        <h3>
-                          {field.name}
-                          {field.is_required && <span className="required">*</span>}
-                        </h3>
-                        {field.description && <p className="field-description">{field.description}</p>}
-                        
-                        <div className="field-options">
-                          {field.options.map(option => {
-                            const isSelected = fieldValues.some(
-                              fv => fv.field_id === field.id && fv.option_id === option.id
-                            );
-                            
-                            return (
-                              <div 
-                                key={option.id}
-                                className={`option-card ${isSelected ? 'selected' : ''}`}
-                                onClick={() => handleFieldOptionSelect(field.id, option.id, option.name)}
-                              >
-                                <div className="option-content">
-                                  <h4>{option.name}</h4>
-                                  {option.price_adjustment > 0 && (
-                                    <span className="price-adjustment">+{option.price_adjustment}</span>
-                                  )}
-                                </div>
-                                {isSelected && (
-                                  <div className="selected-indicator">
-                                    <FontAwesomeIcon icon={faCheck} />
+                    {service.fields.map(field => {
+                      const fieldValue = fieldValues.find(fv => fv.field_id === field.id);
+                      
+                      return (
+                        <div key={field.id} className="field-item">
+                          <h3>
+                            {field.label}
+                            {field.required && <span className="required">*</span>}
+                          </h3>
+                          
+                          {field.type === 'number' ? (
+                            <div className="number-input-container">
+                              <input
+                                type="number"
+                                value={fieldValue?.value || ''}
+                                onChange={(e) => handleFieldValueChange(field.id, e.target.value)}
+                                min={field.min_value}
+                                max={field.max_value}
+                                step={field.step}
+                                placeholder={`أدخل ${field.label}`}
+                                className="number-input"
+                              />
+                              {field.unit && <span className="unit-label">{field.unit}</span>}
+                            </div>
+                          ) : field.options && field.options.length > 0 ? (
+                            <div className="field-options">
+                              {field.options.map(option => {
+                                const isSelected = fieldValues.some(
+                                  fv => fv.field_id === field.id && fv.option_id === option.id
+                                );
+                                
+                                return (
+                                  <div 
+                                    key={option.id}
+                                    className={`option-card ${isSelected ? 'selected' : ''}`}
+                                    onClick={() => handleFieldOptionSelect(field.id, option.id, option.name)}
+                                  >
+                                    {option.image_path ? (
+                                      <div className="option-image">
+                                        <img 
+                                          src={serviceBuilderService.getImageUrl(option.image_path)} 
+                                          alt={option.name}
+                                          onError={(e) => {
+                                            e.target.onerror = null;
+                                            e.target.src = placeholderImage;
+                                          }}
+                                        />
+                                      </div>
+                                    ) : (
+                                      <div className="option-placeholder">
+                                        <FontAwesomeIcon icon={faImage} />
+                                      </div>
+                                    )}
+                                    <div className="option-content">
+                                      <h4>{option.name}</h4>
+                                      {option.price_adjustment > 0 && (
+                                        <span className="price-adjustment">+{option.price_adjustment}</span>
+                                      )}
+                                    </div>
+                                    {isSelected && (
+                                      <div className="selected-indicator">
+                                        <FontAwesomeIcon icon={faCheck} />
+                                      </div>
+                                    )}
                                   </div>
-                                )}
-                              </div>
-                            );
-                          })}
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            <p className="no-options">لا توجد خيارات متاحة لهذا الحقل</p>
+                          )}
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 ) : (
-                  <p className="no-fields">لا توجد خيارات متاحة لهذه الخدمة</p>
+                  <div className="empty-options">
+                    <FontAwesomeIcon icon={faLayerGroup} size="3x" />
+                    <h3>لا توجد خيارات متاحة</h3>
+                    <p>هذه الخدمة لا تحتوي على خيارات للاختيار منها</p>
+                  </div>
                 )}
 
                 <div className="fields-actions">
@@ -378,17 +443,89 @@ const ServiceDetailPage = () => {
               <div className="service-products">
                 <h2>اختر المنتجات</h2>
                 
-                {/* Products with tags */}
-                {service.productsByTag && service.productsByTag.length > 0 && (
-                  <div className="products-by-tag">
-                    {service.productsByTag.map(tagGroup => (
-                      <div key={tagGroup.tag.id} className="tag-group">
-                        <h3 className="tag-title" style={{ color: tagGroup.tag.color }}>
-                          {tagGroup.tag.name}
-                        </h3>
+                {hasProducts ? (
+                  <>
+                    {/* Products with tags */}
+                    {service.productsByTag && service.productsByTag.length > 0 && (
+                      <div className="products-by-tag">
+                        {service.productsByTag.map(tagGroup => (
+                          <div key={tagGroup.tag.id} className="tag-group">
+                            <h3 className="tag-title" style={{ color: tagGroup.tag.color }}>
+                              {tagGroup.tag.name}
+                            </h3>
+                            
+                            <div className="products-grid">
+                              {tagGroup.products.map(product => {
+                                const isSelected = isProductSelected(product.id);
+                                const quantity = getSelectedProductQuantity(product.id);
+                                
+                                return (
+                                  <div 
+                                    key={product.id}
+                                    className={`product-card ${isSelected ? 'selected' : ''}`}
+                                    onClick={() => handleProductSelect(product)}
+                                  >
+                                    <div className="product-image">
+                                      {product.image_path ? (
+                                        <img 
+                                          src={serviceBuilderService.getImageUrl(product.image_path)} 
+                                          alt={product.name}
+                                          onError={(e) => {
+                                            e.target.onerror = null;
+                                            e.target.src = placeholderImage;
+                                          }}
+                                        />
+                                      ) : (
+                                        <div className="product-placeholder">
+                                          <FontAwesomeIcon icon={faImage} />
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className="product-content">
+                                      <h4>{product.name}</h4>
+                                      <p className="product-price">{product.unit_price} درهم</p>
+                                      {product.description && (
+                                        <p className="product-description">{product.description}</p>
+                                      )}
+                                    </div>
+                                    
+                                    {isSelected && (
+                                      <div className="selected-indicator">
+                                        <FontAwesomeIcon icon={faCheck} />
+                                      </div>
+                                    )}
+                                    
+                                    {isSelected && product.quantity_toggle && (
+                                      <div 
+                                        className="quantity-selector"
+                                        onClick={(e) => e.stopPropagation()}
+                                      >
+                                        <label>الكمية:</label>
+                                        <input 
+                                          type="number" 
+                                          value={quantity}
+                                          min={product.min_quantity || 1}
+                                          max={product.max_quantity || 100}
+                                          onChange={(e) => handleProductQuantityChange(product.id, e.target.value)}
+                                        />
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {/* Products without tags */}
+                    {service.productsWithoutTags && service.productsWithoutTags.length > 0 && (
+                      <div className="products-without-tags">
+                        <h3>منتجات إضافية</h3>
                         
                         <div className="products-grid">
-                          {tagGroup.products.map(product => {
+                          {service.productsWithoutTags.map(product => {
                             const isSelected = isProductSelected(product.id);
                             const quantity = getSelectedProductQuantity(product.id);
                             
@@ -399,14 +536,20 @@ const ServiceDetailPage = () => {
                                 onClick={() => handleProductSelect(product)}
                               >
                                 <div className="product-image">
-                                  <img 
-                                    src={serviceBuilderService.getImageUrl(product.image_path)} 
-                                    alt={product.name}
-                                    onError={(e) => {
-                                      e.target.onerror = null;
-                                      e.target.src = '/assets/images/placeholder.jpg';
-                                    }}
-                                  />
+                                  {product.image_path ? (
+                                    <img 
+                                      src={serviceBuilderService.getImageUrl(product.image_path)} 
+                                      alt={product.name}
+                                      onError={(e) => {
+                                        e.target.onerror = null;
+                                        e.target.src = placeholderImage;
+                                      }}
+                                    />
+                                  ) : (
+                                    <div className="product-placeholder">
+                                      <FontAwesomeIcon icon={faImage} />
+                                    </div>
+                                  )}
                                 </div>
                                 <div className="product-content">
                                   <h4>{product.name}</h4>
@@ -442,75 +585,14 @@ const ServiceDetailPage = () => {
                           })}
                         </div>
                       </div>
-                    ))}
+                    )}
+                  </>
+                ) : (
+                  <div className="empty-products">
+                    <FontAwesomeIcon icon={faLayerGroup} size="3x" />
+                    <h3>لا توجد منتجات متاحة</h3>
+                    <p>هذه الخدمة لا تحتوي على منتجات للاختيار منها</p>
                   </div>
-                )}
-                
-                {/* Products without tags */}
-                {service.productsWithoutTags && service.productsWithoutTags.length > 0 && (
-                  <div className="products-without-tags">
-                    <h3>منتجات إضافية</h3>
-                    
-                    <div className="products-grid">
-                      {service.productsWithoutTags.map(product => {
-                        const isSelected = isProductSelected(product.id);
-                        const quantity = getSelectedProductQuantity(product.id);
-                        
-                        return (
-                          <div 
-                            key={product.id}
-                            className={`product-card ${isSelected ? 'selected' : ''}`}
-                            onClick={() => handleProductSelect(product)}
-                          >
-                            <div className="product-image">
-                              <img 
-                                src={serviceBuilderService.getImageUrl(product.image_path)} 
-                                alt={product.name}
-                                onError={(e) => {
-                                  e.target.onerror = null;
-                                  e.target.src = '/assets/images/placeholder.jpg';
-                                }}
-                              />
-                            </div>
-                            <div className="product-content">
-                              <h4>{product.name}</h4>
-                              <p className="product-price">{product.unit_price} درهم</p>
-                              {product.description && (
-                                <p className="product-description">{product.description}</p>
-                              )}
-                            </div>
-                            
-                            {isSelected && (
-                              <div className="selected-indicator">
-                                <FontAwesomeIcon icon={faCheck} />
-                              </div>
-                            )}
-                            
-                            {isSelected && product.quantity_toggle && (
-                              <div 
-                                className="quantity-selector"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <label>الكمية:</label>
-                                <input 
-                                  type="number" 
-                                  value={quantity}
-                                  min={product.min_quantity || 1}
-                                  max={product.max_quantity || 100}
-                                  onChange={(e) => handleProductQuantityChange(product.id, e.target.value)}
-                                />
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-                
-                {(!service.productsByTag || service.productsByTag.length === 0) && 
-                 (!service.productsWithoutTags || service.productsWithoutTags.length === 0) && (
-                  <p className="no-products">لا توجد منتجات متاحة لهذه الخدمة</p>
                 )}
 
                 <div className="products-actions">
@@ -634,14 +716,20 @@ const ServiceDetailPage = () => {
 
           <div className="service-sidebar">
             <div className="service-preview">
-              <img 
-                src={serviceBuilderService.getImageUrl(service.preview_image)} 
-                alt={service.name}
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = '/assets/images/placeholder.jpg';
-                }}
-              />
+              {service.preview_image ? (
+                <img 
+                  src={serviceBuilderService.getImageUrl(service.preview_image)} 
+                  alt={service.name}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = placeholderImage;
+                  }}
+                />
+              ) : (
+                <div className="service-placeholder">
+                  <FontAwesomeIcon icon={faImage} />
+                </div>
+              )}
             </div>
             
             {calculation && (
