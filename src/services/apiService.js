@@ -2,7 +2,7 @@ import axios from 'axios';
 import authService from './authService';
 
 // Get the API base URL from environment variables or use default
-const API_BASE_URL = process.env.REACT_APP_BACKEND_API || 'http://localhost:8000/api';
+const API_BASE_URL = process.env.REACT_APP_BACKEND_API || 'http://127.0.0.1:8000/api';
 
 console.log('Using API base URL:', API_BASE_URL);
 

@@ -50,7 +50,7 @@ const CategoryPage = () => {
   };
 
   const handleBackClick = () => {
-    navigate('/services2');
+    navigate('/services');
   };
 
   if (loading) {

@@ -62,7 +62,7 @@ const CategoryDetailPage = () => {
   };
 
   const handleBackClick = () => {
-    navigate('/services2');
+    navigate('/services');
   };
 
   const toggleViewMode = () => {

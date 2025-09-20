@@ -25,10 +25,11 @@ const ServicesPage2 = () => {
     // Parse URL to set the selected items
     const pathParts = location.pathname.split('/').filter(Boolean);
     
-    if (pathParts.includes('services2') && categories.length > 0) {
-      const categoryId = pathParts[pathParts.indexOf('services2') + 1];
-      const subcategoryId = pathParts[pathParts.indexOf('services2') + 2];
-      const serviceId = pathParts[pathParts.indexOf('services2') + 3];
+    if ((pathParts.includes('services') || pathParts.includes('services2')) && categories.length > 0) {
+      const servicesIndex = pathParts.includes('services2') ? pathParts.indexOf('services2') : pathParts.indexOf('services');
+      const categoryId = pathParts[servicesIndex + 1];
+      const subcategoryId = pathParts[servicesIndex + 2];
+      const serviceId = pathParts[servicesIndex + 3];
       
       if (categoryId && !isNaN(parseInt(categoryId))) {
         const category = categories.find(cat => cat.id.toString() === categoryId);

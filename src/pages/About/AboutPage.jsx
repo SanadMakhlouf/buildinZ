@@ -224,7 +224,7 @@ const AboutPage = () => {
             سواء كنت تبحث عن خدمة منزلية موثوقة أو كنت محترفًا يبحث عن فرص جديدة، Buildinz هي المكان المناسب لك.
           </p>
           <div className="about-cta-buttons">
-            <a href="/services2" className="about-btn about-btn-primary">استكشف خدماتنا</a>
+            <a href="/services" className="about-btn about-btn-primary">استكشف خدماتنا</a>
             <a href="/services2/categories" className="about-btn about-btn-secondary">تصفح الفئات</a>
           </div>
         </div>

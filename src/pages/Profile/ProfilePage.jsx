@@ -69,12 +69,15 @@ const ProfilePage = () => {
   const [editMode, setEditMode] = useState(false);
   const [orders, setOrders] = useState([]);
   const [serviceRequests, setServiceRequests] = useState([]);
+  const [serviceBuilderOrders, setServiceBuilderOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [validationErrors, setValidationErrors] = useState({});
   const [formTouched, setFormTouched] = useState({});
   const [cancellingOrderId, setCancellingOrderId] = useState(null);
   const [showOrderDetails, setShowOrderDetails] = useState(null);
+  const [showServiceBuilderOrderDetails, setShowServiceBuilderOrderDetails] = useState(null);
+  const [selectedServiceBuilderOrder, setSelectedServiceBuilderOrder] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -130,7 +133,22 @@ const ProfilePage = () => {
 
       const userServiceRequests = await profileService.getServiceRequests();
       setServiceRequests(userServiceRequests);
+      
+      const userServiceBuilderOrders = await profileService.getServiceBuilderOrders();
+      setServiceBuilderOrders(userServiceBuilderOrders);
     } catch (err) {
+      // Handle authentication errors
+      if (err.code === 'UNAUTHENTICATED' || err.error === 'Authentication required') {
+        // Clear any remaining auth data
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('rememberMe');
+        
+        // Redirect to login with message
+        navigate('/login?redirect=/profile&message=تم تسجيل الخروج تلقائياً. يرجى تسجيل الدخول مرة أخرى.', { replace: true });
+        return;
+      }
+      
       setError('حدث خطأ أثناء جلب البيانات. يرجى المحاولة مرة أخرى.');
       console.error(err);
     } finally {
@@ -156,6 +174,18 @@ const ProfilePage = () => {
       // Show success message
       alert('تم إلغاء الطلب بنجاح');
     } catch (err) {
+      // Handle authentication errors
+      if (err.code === 'UNAUTHENTICATED' || err.error === 'Authentication required') {
+        // Clear any remaining auth data
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('rememberMe');
+        
+        // Redirect to login with message
+        navigate('/login?redirect=/profile&message=تم تسجيل الخروج تلقائياً. يرجى تسجيل الدخول مرة أخرى.', { replace: true });
+        return;
+      }
+      
       setError('حدث خطأ أثناء إلغاء الطلب. يرجى المحاولة مرة أخرى.');
       console.error(err);
     } finally {
@@ -169,6 +199,38 @@ const ProfilePage = () => {
       setShowOrderDetails(null);
     } else {
       setShowOrderDetails(orderId);
+    }
+  };
+  
+  // Toggle service builder order details view
+  const toggleServiceBuilderOrderDetails = async (orderId) => {
+    try {
+      if (showServiceBuilderOrderDetails === orderId) {
+        setShowServiceBuilderOrderDetails(null);
+        setSelectedServiceBuilderOrder(null);
+      } else {
+        setShowServiceBuilderOrderDetails(orderId);
+        setIsLoading(true);
+        const orderDetails = await profileService.getServiceBuilderOrderDetails(orderId);
+        setSelectedServiceBuilderOrder(orderDetails);
+        setIsLoading(false);
+      }
+    } catch (err) {
+      // Handle authentication errors
+      if (err.code === 'UNAUTHENTICATED' || err.error === 'Authentication required') {
+        // Clear any remaining auth data
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('rememberMe');
+        
+        // Redirect to login with message
+        navigate('/login?redirect=/profile&message=تم تسجيل الخروج تلقائياً. يرجى تسجيل الدخول مرة أخرى.', { replace: true });
+        return;
+      }
+      
+      setError('حدث خطأ أثناء جلب تفاصيل الطلب. يرجى المحاولة مرة أخرى.');
+      console.error(err);
+      setIsLoading(false);
     }
   };
 
@@ -293,6 +355,18 @@ const ProfilePage = () => {
       // Reset form touched state
       setFormTouched({});
     } catch (err) {
+      // Handle authentication errors
+      if (err.code === 'UNAUTHENTICATED' || err.error === 'Authentication required') {
+        // Clear any remaining auth data
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('rememberMe');
+        
+        // Redirect to login with message
+        navigate('/login?redirect=/profile&message=تم تسجيل الخروج تلقائياً. يرجى تسجيل الدخول مرة أخرى.', { replace: true });
+        return;
+      }
+      
       // Handle API validation errors
       if (err.response?.data?.errors) {
         const apiErrors = {};
@@ -606,6 +680,7 @@ const ProfilePage = () => {
 
   const renderServiceRequestsTab = () => (
     <div className="service-requests-section">
+      {/* Regular Service Requests */}
       <h2>طلبات الخدمة</h2>
       {serviceRequests.length === 0 ? (
         <motion.div 
@@ -650,6 +725,241 @@ const ProfilePage = () => {
                 <p>المبلغ: {request.amount} ر.س</p>
                 <p>الحالة: {request.status}</p>
               </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      )}
+      
+      {/* Service Builder Orders */}
+      <h2 className="section-divider">طلبات الخدم</h2>
+      {serviceBuilderOrders.length === 0 ? (
+        <motion.div 
+          className="empty-state"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+        >
+          <i className="fas fa-hammer" style={{ fontSize: '3rem', color: '#DAA520', marginBottom: '1rem' }}></i>
+          <p>لا توجد طلبات خدم حتى الآن</p>
+          <button 
+            className="edit-btn" 
+            onClick={() => navigate('/services')}
+            style={{ marginTop: '1rem' }}
+          >
+            تصفح خدمات البناء
+          </button>
+        </motion.div>
+      ) : (
+        <motion.div 
+          className="service-builder-orders-list"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+        >
+          {serviceBuilderOrders.map(order => (
+            <motion.div 
+              key={order.id} 
+              className="service-builder-order-item"
+              whileHover={{ y: -5 }}
+            >
+              <div className="order-header">
+                <span>رقم الطلب: {order.order_number}</span>
+                <span className={`order-status ${order.status.toLowerCase()}`}>
+                  {order.status === 'pending' ? 'قيد الانتظار' : 
+                   order.status === 'confirmed' ? 'مؤكد' : 
+                   order.status === 'completed' ? 'مكتمل' : 'ملغي'}
+                </span>
+              </div>
+              <div className="order-details">
+                <p>التاريخ: {new Date(order.created_at).toLocaleDateString('ar-SA')}</p>
+                <p>الخدمة: {order.service_name}</p>
+                <p>المبلغ: {order.total_amount} {order.currency}</p>
+                <p>حالة الدفع: {order.payment_status === 'paid' ? 'مدفوع' : 'غير مدفوع'}</p>
+                {order.estimated_delivery && (
+                  <p>تاريخ التسليم المتوقع: {new Date(order.estimated_delivery).toLocaleDateString('ar-SA')}</p>
+                )}
+              </div>
+              <div className="order-actions">
+                <button 
+                  className="details-btn"
+                  onClick={() => toggleServiceBuilderOrderDetails(order.id)}
+                >
+                  {showServiceBuilderOrderDetails === order.id ? 'إخفاء التفاصيل' : 'عرض التفاصيل'}
+                </button>
+                {order.has_payment_link && order.payment_status !== 'paid' && (
+                  <a 
+                    href="#" 
+                    className="payment-btn"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      window.open(order.payment_link, '_blank');
+                    }}
+                  >
+                    الدفع الآن
+                  </a>
+                )}
+                {order.has_invoice && (
+                  <a 
+                    href="#" 
+                    className="invoice-btn"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      // Add invoice download logic here
+                    }}
+                  >
+                    تحميل الفاتورة
+                  </a>
+                )}
+              </div>
+              
+              {/* Order Details Expansion */}
+              {showServiceBuilderOrderDetails === order.id && selectedServiceBuilderOrder && (
+                <motion.div 
+                  className="service-builder-order-details-expanded"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {isLoading ? (
+                    <div className="loading-spinner">جاري التحميل...</div>
+                  ) : (
+                    <>
+                      <h4>تفاصيل الطلب</h4>
+                      <div className="order-details-grid">
+                        <div className="order-details-section">
+                          <h5>معلومات الطلب</h5>
+                          <p><strong>رقم الطلب:</strong> {selectedServiceBuilderOrder.order_number}</p>
+                          <p><strong>الخدمة:</strong> {selectedServiceBuilderOrder.service?.name}</p>
+                          <p><strong>تاريخ الطلب:</strong> {new Date(selectedServiceBuilderOrder.created_at).toLocaleDateString('ar-SA')}</p>
+                          <p><strong>حالة الطلب:</strong> {
+                            selectedServiceBuilderOrder.status === 'pending' ? 'قيد الانتظار' : 
+                            selectedServiceBuilderOrder.status === 'confirmed' ? 'مؤكد' : 
+                            selectedServiceBuilderOrder.status === 'completed' ? 'مكتمل' : 'ملغي'
+                          }</p>
+                          <p><strong>حالة الدفع:</strong> {
+                            selectedServiceBuilderOrder.payment_status === 'paid' ? 'مدفوع' : 
+                            selectedServiceBuilderOrder.payment_status === 'pending' ? 'قيد الانتظار' : 'غير مدفوع'
+                          }</p>
+                          <p><strong>طريقة الدفع:</strong> {
+                            selectedServiceBuilderOrder.payment_method === 'cash_on_delivery' ? 'الدفع عند الاستلام' : 
+                            selectedServiceBuilderOrder.payment_method === 'credit_card' ? 'بطاقة ائتمان' : 
+                            selectedServiceBuilderOrder.payment_method === 'bank_transfer' ? 'تحويل بنكي' : 'غير محدد'
+                          }</p>
+                          {selectedServiceBuilderOrder.estimated_delivery && (
+                            <p><strong>تاريخ التسليم المتوقع:</strong> {new Date(selectedServiceBuilderOrder.estimated_delivery).toLocaleDateString('ar-SA')}</p>
+                          )}
+                          {selectedServiceBuilderOrder.invoice_number && (
+                            <p><strong>رقم الفاتورة:</strong> {selectedServiceBuilderOrder.invoice_number}</p>
+                          )}
+                        </div>
+                        
+                        <div className="order-details-section">
+                          <h5>معلومات التوصيل</h5>
+                          {selectedServiceBuilderOrder.shipping_address && (
+                            <>
+                              <p><strong>الاسم:</strong> {selectedServiceBuilderOrder.shipping_address.name}</p>
+                              <p><strong>العنوان:</strong> {selectedServiceBuilderOrder.shipping_address.street}</p>
+                              <p><strong>المدينة:</strong> {selectedServiceBuilderOrder.shipping_address.city}</p>
+                              <p><strong>الدولة:</strong> {selectedServiceBuilderOrder.shipping_address.country}</p>
+                              <p><strong>رقم الهاتف:</strong> {selectedServiceBuilderOrder.shipping_address.phone}</p>
+                            </>
+                          )}
+                          {selectedServiceBuilderOrder.notes && (
+                            <p><strong>ملاحظات:</strong> {selectedServiceBuilderOrder.notes}</p>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* Field Values */}
+                      {selectedServiceBuilderOrder.field_values && selectedServiceBuilderOrder.field_values.length > 0 && (
+                        <div className="order-details-section">
+                          <h5>خيارات الخدمة</h5>
+                          <div className="field-values-table">
+                            <table>
+                              <thead>
+                                <tr>
+                                  <th>الخيار</th>
+                                  <th>القيمة</th>
+                                  <th>السعر الإضافي</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {selectedServiceBuilderOrder.field_values.map((field, index) => (
+                                  <tr key={index}>
+                                    <td>{field.name}</td>
+                                    <td>{field.value}</td>
+                                    <td>{field.price_adjustment > 0 ? `+${field.price_adjustment} ${selectedServiceBuilderOrder.currency}` : '-'}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Product Items */}
+                      {selectedServiceBuilderOrder.product_items && selectedServiceBuilderOrder.product_items.length > 0 && (
+                        <div className="order-details-section">
+                          <h5>المنتجات</h5>
+                          <div className="product-items-table">
+                            <table>
+                              <thead>
+                                <tr>
+                                  <th>المنتج</th>
+                                  <th>السعر</th>
+                                  <th>الكمية</th>
+                                  <th>المجموع</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {selectedServiceBuilderOrder.product_items.map((item, index) => (
+                                  <tr key={index}>
+                                    <td>{item.name}</td>
+                                    <td>{item.unit_price} {selectedServiceBuilderOrder.currency}</td>
+                                    <td>{item.quantity}</td>
+                                    <td>{item.total} {selectedServiceBuilderOrder.currency}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Order Summary */}
+                      <div className="order-summary">
+                        <h5>ملخص الطلب</h5>
+                        <div className="summary-row">
+                          <span>المجموع الفرعي:</span>
+                          <span>{selectedServiceBuilderOrder.subtotal} {selectedServiceBuilderOrder.currency}</span>
+                        </div>
+                        {selectedServiceBuilderOrder.shipping_cost > 0 && (
+                          <div className="summary-row">
+                            <span>تكلفة التوصيل:</span>
+                            <span>{selectedServiceBuilderOrder.shipping_cost} {selectedServiceBuilderOrder.currency}</span>
+                          </div>
+                        )}
+                        {selectedServiceBuilderOrder.tax_amount > 0 && (
+                          <div className="summary-row">
+                            <span>الضريبة:</span>
+                            <span>{selectedServiceBuilderOrder.tax_amount} {selectedServiceBuilderOrder.currency}</span>
+                          </div>
+                        )}
+                        {selectedServiceBuilderOrder.discount_amount > 0 && (
+                          <div className="summary-row discount">
+                            <span>الخصم:</span>
+                            <span>-{selectedServiceBuilderOrder.discount_amount} {selectedServiceBuilderOrder.currency}</span>
+                          </div>
+                        )}
+                        <div className="summary-row total">
+                          <span>المجموع:</span>
+                          <span>{selectedServiceBuilderOrder.total_amount} {selectedServiceBuilderOrder.currency}</span>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </motion.div>
+              )}
             </motion.div>
           ))}
         </motion.div>

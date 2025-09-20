@@ -350,7 +350,7 @@ const ServiceDetailPage = () => {
           <div className="success-actions">
             <button 
               className="primary-button" 
-              onClick={() => navigate('/services2')}
+              onClick={() => navigate('/services')}
             >
               العودة للخدمات
             </button>

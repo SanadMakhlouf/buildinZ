@@ -5,7 +5,6 @@ import './App.css';
 // Pages
 import HomePage from './pages/Home/HomePage';
 import AboutPage from './pages/About/AboutPage';
-import ServicesPage from './pages/Services/ServicesPage';
 import ServicesPage2 from './pages/Services2/ServicesPage2';
 import CategoryPage from './pages/Services2/CategoryPage';
 import CategoryDetailPage from './pages/Services2/CategoryDetailPage';
@@ -44,7 +43,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/about" element={<AboutPage />} />
-            <Route path="/services" element={<ServicesPage />} />
+            <Route path="/services" element={<ServicesPage2 />} />
             <Route path="/services2" element={<ServicesPage2 />} />
             <Route path="/services2/categories" element={<CategoryPage />} />
             <Route path="/services2/categories/:id" element={<CategoryDetailPage />} />

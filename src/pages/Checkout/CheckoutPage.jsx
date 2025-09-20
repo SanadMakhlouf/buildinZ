@@ -59,7 +59,7 @@ const CheckoutPage = () => {
     setLoadingExistingOrder(true);
     
     try {
-      const response = await fetch(`http://localhost:8000/api/orders/${orderId}`, {
+      const response = await fetch(`http://127.0.0.1:8000/api/orders/${orderId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -207,7 +207,7 @@ const CheckoutPage = () => {
       console.log('Order payload:', orderPayload);
       
       // Send order to API
-      const response = await fetch('http://localhost:8000/api/orders', {
+      const response = await fetch('http://127.0.0.1:8000/api/orders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

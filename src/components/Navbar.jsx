@@ -62,7 +62,7 @@ const Navbar = () => {
           {/* Logo */}
           <div className="navbar-logo">
             <Link to="/" className="logo-link">
-              <img src="/logo.png" alt="BuildingZ Logo" className="logo-image" style={{ height: '60px', width: 'auto' }} />
+              <img src="/logo.png" alt="BuildingZ Logo" className="logo-image" style={{ height: '180px', width: 'auto' }} />
             </Link>
           </div>
 
@@ -71,11 +71,8 @@ const Navbar = () => {
             <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>
               <span className="nav-text">الرئيسية</span>
             </Link>
-            <Link to="/services" className={`nav-link ${location.pathname === '/services' ? 'active' : ''}`}>
+            <Link to="/services" className={`nav-link ${location.pathname === '/services' || location.pathname.includes('/services2') ? 'active' : ''}`}>
               <span className="nav-text">الخدمات</span>
-            </Link>
-            <Link to="/services2" className={`nav-link ${location.pathname.includes('/services2') ? 'active' : ''}`}>
-              <span className="nav-text">الخدمات الجديدة</span>
             </Link>
             <Link to="/products" className={`nav-link ${location.pathname.includes('/products') ? 'active' : ''}`}>
               <span className="nav-text">المتجر</span>
@@ -158,10 +155,6 @@ const Navbar = () => {
               <Link to="/services" className="mobile-nav-link">
                 <FontAwesomeIcon icon={faTools} />
                 <span>الخدمات</span>
-              </Link>
-              <Link to="/services2" className="mobile-nav-link">
-                <FontAwesomeIcon icon={faTools} />
-                <span>الخدمات الجديدة</span>
               </Link>
               <Link to="/products" className="mobile-nav-link">
                 <FontAwesomeIcon icon={faStore} />

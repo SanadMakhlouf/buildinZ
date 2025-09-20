@@ -122,7 +122,7 @@ const ProductsPage = () => {
   const fetchCategories = async () => {
     setLoadingCategories(true);
     try {
-      const response = await fetch('http://localhost:8000/api/categories');
+      const response = await fetch('http://127.0.0.1:8000/api/categories');
       if (!response.ok) {
         throw new Error('Failed to fetch categories');
       }
@@ -167,7 +167,7 @@ const ProductsPage = () => {
   const fetchProducts = async (search = '', category = '') => {
     try {
       setLoading(true);
-      let url = 'http://localhost:8000/api/products';
+      let url = 'http://127.0.0.1:8000/api/products';
       
       // Add query parameters
       const params = new URLSearchParams();
