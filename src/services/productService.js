@@ -100,7 +100,7 @@ const productService = {
 
   async searchProducts(query) {
     try {
-      const response = await axiosInstance.get(`/products/search?q=${encodeURIComponent(query)}`);
+      const response = await axiosInstance.get(`/search/products?q=${encodeURIComponent(query)}`);
       return response.data;
     } catch (error) {
       throw error;

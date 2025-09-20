@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import './SearchPage.css';
-import productService from '../../services/productService';
-import { searchServices } from '../../services/serviceService';
+import searchService from '../../services/searchService';
 
 // Define a base64 encoded placeholder image to avoid external requests
 const PLACEHOLDER_IMAGE_SMALL = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZWVlZWVlIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMThweCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgYWxpZ25tZW50LWJhc2VsaW5lPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmaWxsPSIjOTk5OTk5Ij5ObyBJbWFnZTwvdGV4dD48L3N2Zz4=';
@@ -18,27 +17,28 @@ const SearchPage = () => {
     const fetchSearchResults = async () => {
       setIsLoading(true);
       try {
-        // Search for products and services in parallel
-        const [productsResponse, servicesData] = await Promise.all([
-          productService.searchProducts(query),
-          searchServices(query)
-        ]);
+        // Use unified search for better performance
+        const searchResponse = await searchService.unifiedSearch(query, 'all', { limit: 50 });
         
-        // Extract products from the response based on the API structure
-        let productsData = [];
-        if (productsResponse && productsResponse.data) {
-          // Handle different response structures
-          if (Array.isArray(productsResponse.data)) {
-            productsData = productsResponse.data;
-          } else if (productsResponse.data.products) {
-            productsData = productsResponse.data.products;
-          }
+        if (searchResponse && searchResponse.success) {
+          const { results: searchResults } = searchResponse;
+          
+          // Extract products
+          const productsData = searchResults.products || [];
+          
+          // Extract services
+          const servicesData = searchResults.services || [];
+          
+          setProducts(productsData);
+          setServices(servicesData);
+        } else {
+          setProducts([]);
+          setServices([]);
         }
-        
-        setProducts(productsData);
-        setServices(servicesData);
       } catch (error) {
         console.error('Error fetching search results:', error);
+        setProducts([]);
+        setServices([]);
       } finally {
         setIsLoading(false);
       }
@@ -104,7 +104,7 @@ const SearchPage = () => {
                     <h2 className="section-title">الخدمات</h2>
                     <div className="services-grid">
                       {services.map(service => (
-                        <Link to={`/services/${service.categoryId}/${service.id}`} key={service.id} className="service-card">
+                        <Link to={`/services2/${service.id}`} key={service.id} className="service-card">
                           <div className="service-image">
                             <img src={service.image} alt={service.name} />
                           </div>

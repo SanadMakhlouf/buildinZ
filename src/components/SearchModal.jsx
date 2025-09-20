@@ -12,6 +12,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import '../styles/SearchModal.css';
 import { Link } from 'react-router-dom';
+import searchService from '../services/searchService';
 
 const PLACEHOLDER_ICON = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2VlZWVlZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjEwcHgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGFsaWdubWVudC1iYXNlbGluZT0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZmlsbD0iIzk5OTk5OSI+SWNvbjwvdGV4dD48L3N2Zz4=';
 
@@ -71,7 +72,7 @@ const SearchModal = ({ isOpen, onClose }) => {
   }, [isOpen, onClose]);
 
   // Handle search
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
     
     if (!searchQuery.trim()) return;
@@ -79,59 +80,60 @@ const SearchModal = ({ isOpen, onClose }) => {
     // Save to recent searches
     saveRecentSearch(searchQuery);
     
-    // Simulate search API call
     setIsLoading(true);
-    setTimeout(() => {
-      // Mock results based on the active tab
+    
+    try {
       let results = [];
       
-      if (activeTab === 'all' || activeTab === 'products') {
-        results = [
-          ...results,
-          {
-            id: 'p1',
-            type: 'product',
-            name: 'أدوات كهربائية',
-            image: PLACEHOLDER_ICON,
-            price: '١٥٠ درهم',
-            category: 'أدوات'
-          },
-          {
-            id: 'p2',
-            type: 'product',
-            name: 'معدات بناء',
-            image: PLACEHOLDER_ICON,
-            price: '٣٠٠ درهم',
-            category: 'معدات'
-          }
-        ];
-      }
+      // Use unified search for better performance
+      const searchType = activeTab === 'all' ? 'all' : activeTab;
+      const searchResponse = await searchService.unifiedSearch(searchQuery, searchType, { limit: 10 });
       
-      if (activeTab === 'all' || activeTab === 'services') {
-        results = [
-          ...results,
-          {
-            id: 's1',
+      if (searchResponse && searchResponse.success) {
+        const { results: searchResults } = searchResponse;
+        
+        // Process products
+        if (searchResults.products && searchResults.products.length > 0) {
+          const productResults = searchResults.products.map(product => ({
+            id: product.id,
+            type: 'product',
+            name: product.name,
+            image: product.primary_image_url || 
+                   (product.images && product.images.length > 0 ? product.images[0] : PLACEHOLDER_ICON),
+            price: product.price ? `SAR ${product.price}` : 'السعر غير متوفر',
+            category: product.category?.name || product.category || 'عام',
+            rating: product.rating || 0,
+            discountPercentage: product.discountPercentage || 0
+          }));
+          
+          results = [...results, ...productResults];
+        }
+        
+        // Process services
+        if (searchResults.services && searchResults.services.length > 0) {
+          const serviceResults = searchResults.services.map(service => ({
+            id: service.id,
             type: 'service',
-            name: 'خدمات صيانة',
-            image: PLACEHOLDER_ICON,
-            rating: 4.5,
-            category: 'صيانة'
-          },
-          {
-            id: 's2',
-            type: 'service',
-            name: 'خدمات تنظيف',
-            image: PLACEHOLDER_ICON,
-            rating: 4.2,
-            category: 'تنظيف'
-          }
-        ];
+            name: service.name,
+            image: service.image || service.preview_image || PLACEHOLDER_ICON,
+            category: service.categoryName || service.category || 'عام',
+            subcategory: service.subcategoryName || service.subcategory,
+            rating: service.rating || 4.0,
+            price: service.price ? `${service.price} درهم` : 'السعر حسب الطلب',
+            description: service.description
+          }));
+          
+          results = [...results, ...serviceResults];
+        }
       }
       
       setSearchResults(results);
+    } catch (error) {
+      console.error('Search error:', error);
+      setSearchResults([]);
+    } finally {
       setIsLoading(false);
-    }, 500);
+    }
   };
 
   // Save search query to recent searches
@@ -186,125 +188,182 @@ const SearchModal = ({ isOpen, onClose }) => {
   };
 
   // Use a recent search
-  const handleRecentSearch = (query) => {
+  const handleRecentSearch = async (query) => {
     setSearchQuery(query);
     // Move this search to the top
     saveRecentSearch(query);
     
-    // Trigger search
+    // Trigger search using unified search
     setIsLoading(true);
-    setTimeout(() => {
-      // Similar mock results as handleSearch
-      setSearchResults([
-        {
-          id: 'p1',
-          type: 'product',
-          name: 'أدوات كهربائية',
-          image: PLACEHOLDER_ICON,
-          price: '١٥٠ درهم',
-          category: 'أدوات'
-        },
-        {
-          id: 's1',
-          type: 'service',
-          name: 'خدمات صيانة',
-          image: PLACEHOLDER_ICON,
-          rating: 4.5,
-          category: 'صيانة'
+    
+    try {
+      const searchResponse = await searchService.unifiedSearch(query, 'all', { limit: 10 });
+      let results = [];
+      
+      if (searchResponse && searchResponse.success) {
+        const { results: searchResults } = searchResponse;
+        
+        // Process products
+        if (searchResults.products && searchResults.products.length > 0) {
+          const productResults = searchResults.products.map(product => ({
+            id: product.id,
+            type: 'product',
+            name: product.name,
+            image: product.primary_image_url || 
+                   (product.images && product.images.length > 0 ? product.images[0] : PLACEHOLDER_ICON),
+            price: product.price ? `SAR ${product.price}` : 'السعر غير متوفر',
+            category: product.category?.name || product.category || 'عام',
+            rating: product.rating || 0,
+            discountPercentage: product.discountPercentage || 0
+          }));
+          
+          results = [...results, ...productResults];
         }
-      ]);
+        
+        // Process services
+        if (searchResults.services && searchResults.services.length > 0) {
+          const serviceResults = searchResults.services.map(service => ({
+            id: service.id,
+            type: 'service',
+            name: service.name,
+            image: service.image || service.preview_image || PLACEHOLDER_ICON,
+            category: service.categoryName || service.category || 'عام',
+            subcategory: service.subcategoryName || service.subcategory,
+            rating: service.rating || 4.0,
+            price: service.price ? `${service.price} درهم` : 'السعر حسب الطلب',
+            description: service.description
+          }));
+          
+          results = [...results, ...serviceResults];
+        }
+      }
+      
+      setSearchResults(results);
+    } catch (error) {
+      console.error('Search error:', error);
+      setSearchResults([]);
+    } finally {
       setIsLoading(false);
-    }, 500);
+    }
   };
 
   // Handle trending search
-  const handleTrendingSearch = (query) => {
+  const handleTrendingSearch = async (query) => {
     setSearchQuery(query);
     saveRecentSearch(query);
     
-    // Trigger search
+    // Trigger search using unified search
     setIsLoading(true);
-    setTimeout(() => {
-      setSearchResults([
-        {
-          id: 'p1',
-          type: 'product',
-          name: 'أدوات كهربائية',
-          image: PLACEHOLDER_ICON,
-          price: '١٥٠ درهم',
-          category: 'أدوات'
-        },
-        {
-          id: 's1',
-          type: 'service',
-          name: 'خدمات صيانة',
-          image: PLACEHOLDER_ICON,
-          rating: 4.5,
-          category: 'صيانة'
+    
+    try {
+      const searchResponse = await searchService.unifiedSearch(query, 'all', { limit: 10 });
+      let results = [];
+      
+      if (searchResponse && searchResponse.success) {
+        const { results: searchResults } = searchResponse;
+        
+        // Process products
+        if (searchResults.products && searchResults.products.length > 0) {
+          const productResults = searchResults.products.map(product => ({
+            id: product.id,
+            type: 'product',
+            name: product.name,
+            image: product.primary_image_url || 
+                   (product.images && product.images.length > 0 ? product.images[0] : PLACEHOLDER_ICON),
+            price: product.price ? `SAR ${product.price}` : 'السعر غير متوفر',
+            category: product.category?.name || product.category || 'عام',
+            rating: product.rating || 0,
+            discountPercentage: product.discountPercentage || 0
+          }));
+          
+          results = [...results, ...productResults];
         }
-      ]);
+        
+        // Process services
+        if (searchResults.services && searchResults.services.length > 0) {
+          const serviceResults = searchResults.services.map(service => ({
+            id: service.id,
+            type: 'service',
+            name: service.name,
+            image: service.image || service.preview_image || PLACEHOLDER_ICON,
+            category: service.categoryName || service.category || 'عام',
+            subcategory: service.subcategoryName || service.subcategory,
+            rating: service.rating || 4.0,
+            price: service.price ? `${service.price} درهم` : 'السعر حسب الطلب',
+            description: service.description
+          }));
+          
+          results = [...results, ...serviceResults];
+        }
+      }
+      
+      setSearchResults(results);
+    } catch (error) {
+      console.error('Search error:', error);
+      setSearchResults([]);
+    } finally {
       setIsLoading(false);
-    }, 500);
+    }
   };
 
   // Handle tab change
-  const handleTabChange = (tab) => {
+  const handleTabChange = async (tab) => {
     setActiveTab(tab);
     
     if (searchQuery.trim()) {
-      // Re-run search with new tab filter
+      // Re-run search with new tab filter using unified search
       setIsLoading(true);
-      setTimeout(() => {
-        // Filter results based on the selected tab
+      
+      try {
+        const searchType = tab === 'all' ? 'all' : tab;
+        const searchResponse = await searchService.unifiedSearch(searchQuery, searchType, { limit: 10 });
         let results = [];
         
-        if (tab === 'all' || tab === 'products') {
-          results = [
-            ...results,
-            {
-              id: 'p1',
+        if (searchResponse && searchResponse.success) {
+          const { results: searchResults } = searchResponse;
+          
+          // Process products
+          if (searchResults.products && searchResults.products.length > 0) {
+            const productResults = searchResults.products.map(product => ({
+              id: product.id,
               type: 'product',
-              name: 'أدوات كهربائية',
-              image: PLACEHOLDER_ICON,
-              price: '١٥٠ درهم',
-              category: 'أدوات'
-            },
-            {
-              id: 'p2',
-              type: 'product',
-              name: 'معدات بناء',
-              image: PLACEHOLDER_ICON,
-              price: '٣٠٠ درهم',
-              category: 'معدات'
-            }
-          ];
-        }
-        
-        if (tab === 'all' || tab === 'services') {
-          results = [
-            ...results,
-            {
-              id: 's1',
+              name: product.name,
+              image: product.primary_image_url || 
+                     (product.images && product.images.length > 0 ? product.images[0] : PLACEHOLDER_ICON),
+              price: product.price ? `SAR ${product.price}` : 'السعر غير متوفر',
+              category: product.category?.name || product.category || 'عام',
+              rating: product.rating || 0,
+              discountPercentage: product.discountPercentage || 0
+            }));
+            
+            results = [...results, ...productResults];
+          }
+          
+          // Process services
+          if (searchResults.services && searchResults.services.length > 0) {
+            const serviceResults = searchResults.services.map(service => ({
+              id: service.id,
               type: 'service',
-              name: 'خدمات صيانة',
-              image: PLACEHOLDER_ICON,
-              rating: 4.5,
-              category: 'صيانة'
-            },
-            {
-              id: 's2',
-              type: 'service',
-              name: 'خدمات تنظيف',
-              image: PLACEHOLDER_ICON,
-              rating: 4.2,
-              category: 'تنظيف'
-            }
-          ];
+              name: service.name,
+              image: service.image || service.preview_image || PLACEHOLDER_ICON,
+              category: service.categoryName || service.category || 'عام',
+              subcategory: service.subcategoryName || service.subcategory,
+              rating: service.rating || 4.0,
+              price: service.price ? `${service.price} درهم` : 'السعر حسب الطلب',
+              description: service.description
+            }));
+            
+            results = [...results, ...serviceResults];
+          }
         }
         
         setSearchResults(results);
+      } catch (error) {
+        console.error('Search error:', error);
+        setSearchResults([]);
+      } finally {
         setIsLoading(false);
-      }, 500);
+      }
     }
   };
 
@@ -389,33 +448,69 @@ const SearchModal = ({ isOpen, onClose }) => {
             <div className="search-results">
               <h3 className="results-title">نتائج البحث</h3>
               
-              {searchResults.map((result) => (
-                <Link
-                  to={`/${result.type === 'product' ? 'products' : 'services'}?id=${result.id}`}
-                  className="search-result-item"
-                  key={`${result.type}-${result.id}`}
-                >
+              {searchResults.map((result) => {
+                // Determine the correct URL based on result type
+                let resultUrl = '';
+                if (result.type === 'product') {
+                  resultUrl = `/products/${result.id}`;
+                } else if (result.type === 'service') {
+                  // For services, use the services2 route structure
+                  resultUrl = `/services2/${result.id}`;
+                }
+                
+                return (
+                  <Link
+                    to={resultUrl}
+                    className="search-result-item"
+                    key={`${result.type}-${result.id}`}
+                    onClick={() => onClose()} // Close modal when clicking a result
+                  >
                   <div className="search-result-image">
-                    <img src={result.image} alt={result.name} />
+                    <img 
+                      src={result.image} 
+                      alt={result.name}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = PLACEHOLDER_ICON;
+                      }}
+                    />
+                    {result.discountPercentage > 0 && (
+                      <div className="discount-badge">{result.discountPercentage}% خصم</div>
+                    )}
                   </div>
                   <div className="search-result-info">
                     <h4>{result.name}</h4>
                     <div className="search-result-category">{result.category}</div>
+                    {result.subcategory && (
+                      <div className="search-result-subcategory">{result.subcategory}</div>
+                    )}
                     {result.type === 'product' && (
                       <div className="search-result-price">{result.price}</div>
                     )}
                     {result.type === 'service' && (
-                      <div className="search-result-rating">
-                        <span className="rating-value">{result.rating}</span>
-                        <div className="rating-stars">
-                          {'★'.repeat(Math.floor(result.rating))}
-                          {'☆'.repeat(5 - Math.floor(result.rating))}
+                      <div className="search-result-service-info">
+                        <div className="search-result-price">{result.price}</div>
+                        <div className="search-result-rating">
+                          <span className="rating-value">{result.rating}</span>
+                          <div className="rating-stars">
+                            {'★'.repeat(Math.floor(result.rating))}
+                            {'☆'.repeat(5 - Math.floor(result.rating))}
+                          </div>
                         </div>
                       </div>
                     )}
+                    {result.description && (
+                      <div className="search-result-description">
+                        {result.description.length > 100 
+                          ? `${result.description.substring(0, 100)}...` 
+                          : result.description
+                        }
+                      </div>
+                    )}
                   </div>
-                </Link>
-              ))}
+                  </Link>
+                );
+              })}
               
               <Link to={`/search?q=${encodeURIComponent(searchQuery)}`} className="view-all-results">
                 عرض جميع النتائج
