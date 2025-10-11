@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faArrowLeft, 
-  faHeart,
+  faHeart, 
   faCheck,
   faPlus,
   faMinus,
@@ -151,10 +151,10 @@ const ServiceDetailPage = () => {
         ...prev,
         [fieldId]: file
       }));
-      setFieldValues(prev => ({
-        ...prev,
+    setFieldValues(prev => ({
+      ...prev,
         [fieldId]: file.name
-      }));
+    }));
     }
   };
 
@@ -175,8 +175,8 @@ const ServiceDetailPage = () => {
     if (qty < 1) {
       setSelectedProducts(prev => prev.filter(p => p.product_id !== productId));
     } else {
-      setSelectedProducts(prev =>
-        prev.map(p =>
+      setSelectedProducts(prev => 
+        prev.map(p => 
           p.product_id === productId ? { ...p, quantity: qty } : p
         )
       );
@@ -200,8 +200,15 @@ const ServiceDetailPage = () => {
     }
   };
 
-  // Calculate price
+  // Calculate price or proceed directly to booking
   const handleCalculatePrice = async () => {
+    // If service doesn't require pricing, skip calculation and go to booking
+    if (service?.requires_pricing === false) {
+      setShowBookingModal(true);
+      setBookingStep('details'); // Skip summary, go directly to details
+      return;
+    }
+
     try {
       setCalculating(true);
       setCalculationError(null);
@@ -216,7 +223,7 @@ const ServiceDetailPage = () => {
             case 'select':
             case 'radio':
               return value ? {
-                field_id: parseInt(fieldId),
+          field_id: parseInt(fieldId),
                 option_id: value,
                 type: 'option'
               } : null;
@@ -272,13 +279,8 @@ const ServiceDetailPage = () => {
 
   // Submit order
   const handleSubmitOrder = async () => {
-    if (!selectedAddress) {
-      setBookingError('يرجى اختيار عنوان للخدمة');
-      return;
-    }
-
-    if (!customerInfo.name || !customerInfo.phone) {
-      setBookingError('يرجى ملء جميع الحقول المطلوبة');
+    if (!customerInfo.name || !customerInfo.phone || !customerInfo.email) {
+      setBookingError('يرجى ملء جميع الحقول المطلوبة (الاسم، الهاتف، البريد الإلكتروني)');
       return;
     }
 
@@ -295,13 +297,24 @@ const ServiceDetailPage = () => {
           switch (field.type) {
             case 'select':
             case 'radio':
-              return { field_id: parseInt(fieldId), option_id: value };
+              return { 
+                field_id: parseInt(fieldId), 
+                option_id: value,
+                value: field.options?.find(opt => opt.id === value)?.value || value.toString()
+              };
             case 'checkbox':
               return Array.isArray(value) && value.length > 0
-                ? { field_id: parseInt(fieldId), option_ids: value }
+                ? { 
+                    field_id: parseInt(fieldId), 
+                    option_id: value[0], // Send first selected option id for compatibility
+                    value: value.map(v => field.options?.find(opt => opt.id === v)?.value || v).join(', ')
+                  }
                 : null;
             default:
-              return { field_id: parseInt(fieldId), value };
+              return { 
+                field_id: parseInt(fieldId), 
+                value: value.toString() 
+              };
           }
         })
         .filter(v => v !== null);
@@ -313,22 +326,28 @@ const ServiceDetailPage = () => {
         customer_phone: customerInfo.phone,
         field_values: formattedFieldValues,
         products: selectedProducts,
-        shipping_address: {
+        notes: customerInfo.notes || undefined,
+        payment_method: paymentMethod
+      };
+
+      // Only include shipping_address if an address is selected
+      if (selectedAddress) {
+        orderData.shipping_address = {
+          name: selectedAddress.name || customerInfo.name,
           street: selectedAddress.street || selectedAddress.address_line1,
           city: selectedAddress.city,
-          state: selectedAddress.state,
-          zip: selectedAddress.zip_code || selectedAddress.zip,
-          country: selectedAddress.country || 'AE',
-          phone: selectedAddress.phone || customerInfo.phone,
-          name: selectedAddress.name || customerInfo.name
-        },
-        payment_method: paymentMethod,
-        notes: customerInfo.notes
-      };
+          state: selectedAddress.state || selectedAddress.city,
+          country: selectedAddress.country || 'UAE',
+          phone: selectedAddress.phone || customerInfo.phone
+        };
+      }
+
+      console.log('Submitting order:', orderData);
 
       const response = await serviceBuilderService.submitOrder(orderData);
 
       if (response.success) {
+        setOrderData(response);
         setOrderSuccess(true);
         setShowBookingModal(false);
       } else {
@@ -336,7 +355,7 @@ const ServiceDetailPage = () => {
       }
     } catch (err) {
       console.error('Order submission error:', err);
-      setBookingError('حدث خطأ أثناء إرسال الطلب');
+      setBookingError(err.response?.data?.message || 'حدث خطأ أثناء إرسال الطلب');
     } finally {
       setSubmitting(false);
     }
@@ -621,8 +640,8 @@ const ServiceDetailPage = () => {
           <h2>{error}</h2>
           <div className="error-actions">
             <button className="btn btn-primary" onClick={fetchServiceDetails}>
-              إعادة المحاولة
-            </button>
+            إعادة المحاولة
+          </button>
             <button className="btn btn-secondary" onClick={() => navigate('/services')}>
               العودة للخدمات
             </button>
@@ -641,6 +660,14 @@ const ServiceDetailPage = () => {
           </div>
           <h2>تم إرسال طلبك بنجاح!</h2>
           <p>سنقوم بالتواصل معك قريباً لتأكيد الطلب</p>
+          {orderData?.order_id && (
+            <div className="order-info">
+              <p className="order-number">رقم الطلب: <strong>{orderData.order_id}</strong></p>
+              {orderData.order_details?.total_amount && (
+                <p className="order-total">المبلغ الإجمالي: <strong>{orderData.order_details.total_amount} درهم</strong></p>
+              )}
+            </div>
+          )}
           <div className="success-actions">
             <button className="btn btn-primary" onClick={() => navigate('/services')}>
               العودة للخدمات
@@ -660,32 +687,34 @@ const ServiceDetailPage = () => {
       <header className="service-header">
         <div className="container">
           <button className="btn-back" onClick={() => navigate(-1)}>
-            <FontAwesomeIcon icon={faArrowLeft} />
+              <FontAwesomeIcon icon={faArrowLeft} />
             <span>رجوع</span>
-          </button>
+            </button>
           
           <div className="service-header-content">
             <div className="service-title-section">
-              <h1>{service?.name}</h1>
+            <h1>{service?.name}</h1>
               {service?.description && <p className="service-description">{service.description}</p>}
               {service?.category && (
                 <div className="service-category-badge">
                   {service.category.name}
-                </div>
+          </div>
               )}
-            </div>
+          </div>
             
-            <div className="service-price-section">
-              <div className="base-price">
-                <span className="label">السعر الأساسي</span>
-                <span className="price">{service?.base_price} <small>درهم</small></span>
-              </div>
-            </div>
+            {service?.requires_pricing !== false && (
+              <div className="service-price-section">
+                <div className="base-price">
+                  <span className="label">السعر الأساسي</span>
+                  <span className="price">{service?.base_price} <small>درهم</small></span>
+        </div>
+      </div>
+            )}
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
+        {/* Main Content */}
       <div className="container">
         <div className="service-layout">
           {/* Left Column - Image Gallery */}
@@ -702,7 +731,7 @@ const ServiceDetailPage = () => {
                     <>
                       <button className="gallery-nav gallery-prev" onClick={prevImage}>
                         <FontAwesomeIcon icon={faChevronRight} />
-                      </button>
+              </button>
                       <button className="gallery-nav gallery-next" onClick={nextImage}>
                         <FontAwesomeIcon icon={faChevronLeft} />
                       </button>
@@ -716,17 +745,17 @@ const ServiceDetailPage = () => {
                 {service.images.length > 1 && (
                   <div className="gallery-thumbnails">
                     {service.images.map((image, index) => (
-                      <button
+                <button 
                         key={image.id}
                         className={`thumbnail ${index === currentImageIndex ? 'active' : ''}`}
                         onClick={() => setCurrentImageIndex(index)}
                       >
                         <img src={image.url} alt={`${service.name} ${index + 1}`} />
-                      </button>
-                    ))}
-                  </div>
+                </button>
+              ))}
+            </div>
                 )}
-              </div>
+          </div>
             ) : (
               <div className="image-placeholder">
                 <FontAwesomeIcon icon={faImage} />
@@ -749,9 +778,9 @@ const ServiceDetailPage = () => {
                         {field.required && <span className="required">*</span>}
                       </label>
                       {renderField(field)}
-                    </div>
-                  ))}
-                </div>
+                            </div>
+                          ))}
+                        </div>
               </section>
             )}
 
@@ -759,29 +788,29 @@ const ServiceDetailPage = () => {
             {service?.enable_products && service?.products && service.products.length > 0 && (
               <section className="form-section">
                 <h2 className="section-title">منتجات إضافية</h2>
-                <div className="products-grid">
+                    <div className="products-grid">
                   {service.products.map(product => {
                     const selectedProduct = selectedProducts.find(p => p.product_id === product.id);
                     const isSelected = !!selectedProduct;
                     
-                    return (
+                        return (
                       <div 
                         key={product.id} 
                         className={`product-card ${isSelected ? 'selected' : ''}`}
                       >
                         {product.image_url && (
-                          <div className="product-image">
+                              <div className="product-image">
                             <img src={product.image_url} alt={product.name} />
-                          </div>
-                        )}
+                              </div>
+                            )}
                         
                         <div className="product-info">
-                          <h4>{product.name}</h4>
+                              <h4>{product.name}</h4>
                           {product.description && <p>{product.description}</p>}
                           <div className="product-price">{product.price} درهم</div>
-                        </div>
+                            </div>
                         
-                        <div className="product-actions">
+                            <div className="product-actions">
                           {isSelected ? (
                             <div className="quantity-control">
                               <button 
@@ -790,10 +819,10 @@ const ServiceDetailPage = () => {
                               >
                                 <FontAwesomeIcon icon={faMinus} />
                               </button>
-                              <input
-                                type="number"
+                                  <input
+                                    type="number"
                                 className="qty-input"
-                                value={selectedProduct.quantity}
+                                    value={selectedProduct.quantity}
                                 onChange={(e) => handleProductQuantityChange(product.id, e.target.value)}
                                 min="1"
                               />
@@ -803,34 +832,34 @@ const ServiceDetailPage = () => {
                               >
                                 <FontAwesomeIcon icon={faPlus} />
                               </button>
-                            </div>
-                          ) : (
-                            <button 
+                                </div>
+                              ) : (
+                                <button 
                               className="btn btn-outline btn-sm"
                               onClick={() => handleProductToggle(product.id)}
-                            >
-                              <FontAwesomeIcon icon={faPlus} />
-                              إضافة
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                                >
+                                  <FontAwesomeIcon icon={faPlus} />
+                                  إضافة
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
               </section>
             )}
 
-            {/* Calculate Button */}
+          {/* Calculate Button */}
             <div className="form-actions">
-              {calculationError && (
+            {calculationError && (
                 <div className="alert alert-error">
                   <FontAwesomeIcon icon={faExclamationTriangle} />
                   <span>{calculationError}</span>
-                </div>
-              )}
+              </div>
+            )}
               
-              <button
+              <button 
                 className="btn btn-primary btn-lg btn-calculate"
                 onClick={handleCalculatePrice}
                 disabled={calculating || !isFormValid()}
@@ -839,6 +868,11 @@ const ServiceDetailPage = () => {
                   <>
                     <FontAwesomeIcon icon={faSpinner} spin />
                     جاري الحساب...
+                  </>
+                ) : service?.requires_pricing === false ? (
+                  <>
+                    احجز الآن
+                    <FontAwesomeIcon icon={faArrowLeft} />
                   </>
                 ) : (
                   <>
@@ -849,8 +883,8 @@ const ServiceDetailPage = () => {
               </button>
             </div>
           </main>
-        </div>
-      </div>
+              </div>
+              </div>
 
       {/* Booking Modal */}
       {showBookingModal && (
@@ -858,33 +892,33 @@ const ServiceDetailPage = () => {
           <div className="modal-container modal-booking">
             <button className="modal-close" onClick={() => setShowBookingModal(false)}>
               <FontAwesomeIcon icon={faTimes} />
-            </button>
-
+              </button>
+            
             {/* Steps Progress */}
-            <div className="booking-steps">
+              <div className="booking-steps">
               <div className={`step ${bookingStep === 'summary' ? 'active' : bookingStep !== 'summary' ? 'completed' : ''}`}>
                 <div className="step-circle">1</div>
-                <span>ملخص الطلب</span>
-              </div>
-              <div className={`step ${bookingStep === 'details' ? 'active' : bookingStep === 'payment' ? 'completed' : ''}`}>
+                  <span>ملخص الطلب</span>
+                </div>
+                <div className={`step ${bookingStep === 'details' ? 'active' : bookingStep === 'payment' ? 'completed' : ''}`}>
                 <div className="step-circle">2</div>
                 <span>بياناتك</span>
-              </div>
-              <div className={`step ${bookingStep === 'payment' ? 'active' : ''}`}>
+                </div>
+                <div className={`step ${bookingStep === 'payment' ? 'active' : ''}`}>
                 <div className="step-circle">3</div>
-                <span>الدفع</span>
+                  <span>الدفع</span>
+                </div>
               </div>
-            </div>
 
-            {bookingError && (
+              {bookingError && (
               <div className="alert alert-error">
-                <FontAwesomeIcon icon={faExclamationTriangle} />
-                <span>{bookingError}</span>
-              </div>
-            )}
+                  <FontAwesomeIcon icon={faExclamationTriangle} />
+                  <span>{bookingError}</span>
+                </div>
+              )}
 
             {/* Step 1: Summary */}
-            {bookingStep === 'summary' && calculation && (
+              {bookingStep === 'summary' && (
               <div className="modal-content">
                 <h2>ملخص الطلب</h2>
                 
@@ -895,13 +929,15 @@ const ServiceDetailPage = () => {
                       <span>الخدمة:</span>
                       <strong>{service?.name}</strong>
                     </div>
-                    <div className="summary-row">
-                      <span>السعر الأساسي:</span>
-                      <strong>{calculation.base_price || service?.base_price} درهم</strong>
-                    </div>
+                    {calculation && (
+                      <div className="summary-row">
+                        <span>السعر الأساسي:</span>
+                        <strong>{calculation.base_price || service?.base_price} درهم</strong>
+                      </div>
+                    )}
                   </div>
 
-                  {calculation.field_adjustments > 0 && (
+                  {calculation?.field_adjustments > 0 && (
                     <div className="summary-section">
                       <h3>التعديلات</h3>
                       <div className="summary-row">
@@ -920,68 +956,71 @@ const ServiceDetailPage = () => {
                           <div key={sp.product_id} className="summary-row">
                             <span>{product.name} × {sp.quantity}</span>
                             <strong>{product.price * sp.quantity} درهم</strong>
-                          </div>
+                            </div>
                         ) : null;
-                      })}
+                        })}
                     </div>
                   )}
 
-                  <div className="summary-total">
-                    <span>المجموع الإجمالي:</span>
-                    <strong>{calculation.total || calculation.total_price || 0} درهم</strong>
-                  </div>
+                  {calculation && (
+                    <div className="summary-total">
+                          <span>المجموع الإجمالي:</span>
+                      <strong>{calculation.total || calculation.total_price || 0} درهم</strong>
+                    </div>
+                  )}
                 </div>
 
                 <button className="btn btn-primary btn-lg" onClick={() => setBookingStep('details')}>
                   متابعة
                   <FontAwesomeIcon icon={faArrowLeft} />
-                </button>
-              </div>
-            )}
+                  </button>
+                </div>
+              )}
 
-            {/* Step 2: Customer Details */}
-            {bookingStep === 'details' && (
+              {/* Step 2: Customer Details */}
+              {bookingStep === 'details' && (
               <div className="modal-content">
                 <h2>معلومات التواصل</h2>
-                
+                    
                 <div className="form-grid">
-                  <div className="form-group">
+                    <div className="form-group">
                     <label>الاسم الكامل <span className="required">*</span></label>
-                    <input
-                      type="text"
+                      <input
+                        type="text"
                       className="form-input"
                       value={customerInfo.name}
                       onChange={(e) => setCustomerInfo(prev => ({ ...prev, name: e.target.value }))}
-                      placeholder="أدخل اسمك الكامل"
+                        placeholder="أدخل اسمك الكامل"
                       required
-                    />
-                  </div>
-
-                  <div className="form-group">
+                      />
+                    </div>
+                    
+                    <div className="form-group">
                     <label>رقم الهاتف <span className="required">*</span></label>
-                    <input
-                      type="tel"
+                      <input
+                        type="tel"
                       className="form-input"
                       value={customerInfo.phone}
                       onChange={(e) => setCustomerInfo(prev => ({ ...prev, phone: e.target.value }))}
                       placeholder="05xxxxxxxx"
+                        required
+                      />
+                    </div>
+                    
+                  <div className="form-group full-width">
+                    <label>البريد الإلكتروني <span className="required">*</span></label>
+                      <input
+                        type="email"
+                      className="form-input"
+                      value={customerInfo.email}
+                      onChange={(e) => setCustomerInfo(prev => ({ ...prev, email: e.target.value }))}
+                      placeholder="email@example.com"
                       required
                     />
                   </div>
 
                   <div className="form-group full-width">
-                    <label>البريد الإلكتروني</label>
-                    <input
-                      type="email"
-                      className="form-input"
-                      value={customerInfo.email}
-                      onChange={(e) => setCustomerInfo(prev => ({ ...prev, email: e.target.value }))}
-                      placeholder="email@example.com"
-                    />
-                  </div>
-
-                  <div className="form-group full-width">
-                    <label>عنوان الخدمة <span className="required">*</span></label>
+                    <label>عنوان الخدمة <span className="optional">(اختياري)</span></label>
                     <AddressManager
                       checkoutMode={true}
                       onAddressSelect={setSelectedAddress}
@@ -999,113 +1038,129 @@ const ServiceDetailPage = () => {
                       rows={3}
                     />
                   </div>
-                </div>
+                  </div>
 
                 <div className="modal-actions">
-                  <button className="btn btn-secondary" onClick={() => setBookingStep('summary')}>
-                    السابق
-                  </button>
+                  {service?.requires_pricing !== false && (
+                    <button className="btn btn-secondary" onClick={() => setBookingStep('summary')}>
+                      السابق
+                    </button>
+                  )}
                   <button 
                     className="btn btn-primary"
                     onClick={() => setBookingStep('payment')}
-                    disabled={!customerInfo.name || !customerInfo.phone || !selectedAddress}
+                    disabled={!customerInfo.name || !customerInfo.phone || !customerInfo.email}
                   >
                     متابعة
                     <FontAwesomeIcon icon={faArrowLeft} />
                   </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Step 3: Payment */}
-            {bookingStep === 'payment' && (
+              {/* Step 3: Payment */}
+              {bookingStep === 'payment' && (
               <div className="modal-content">
                 <h2>طريقة الدفع</h2>
-                
-                <div className="payment-methods">
-                  <div
-                    className={`payment-method ${paymentMethod === 'cash_on_delivery' ? 'selected' : ''}`}
+                    
+                    <div className="payment-methods">
+                      <div 
+                        className={`payment-method ${paymentMethod === 'cash_on_delivery' ? 'selected' : ''}`}
                     onClick={() => setPaymentMethod('cash_on_delivery')}
-                  >
+                      >
                     <FontAwesomeIcon icon={faMoneyBill} className="payment-icon" />
                     <div className="payment-info">
-                      <h4>الدفع عند الاستلام</h4>
+                          <h4>الدفع عند الاستلام</h4>
                       <p>ادفع نقداً عند وصول فريق العمل</p>
-                    </div>
+                        </div>
                     {paymentMethod === 'cash_on_delivery' && (
                       <FontAwesomeIcon icon={faCheck} className="payment-check" />
                     )}
-                  </div>
-
-                  <div
-                    className={`payment-method ${paymentMethod === 'credit_card' ? 'selected' : ''}`}
+                      </div>
+                      
+                      <div 
+                        className={`payment-method ${paymentMethod === 'credit_card' ? 'selected' : ''}`}
                     onClick={() => setPaymentMethod('credit_card')}
-                  >
+                      >
                     <FontAwesomeIcon icon={faCreditCard} className="payment-icon" />
                     <div className="payment-info">
-                      <h4>بطاقة ائتمان</h4>
+                          <h4>بطاقة ائتمان</h4>
                       <p>ادفع الآن عبر البطاقة بشكل آمن</p>
-                    </div>
+                        </div>
                     {paymentMethod === 'credit_card' && (
                       <FontAwesomeIcon icon={faCheck} className="payment-check" />
                     )}
-                  </div>
-
-                  <div
-                    className={`payment-method ${paymentMethod === 'bank_transfer' ? 'selected' : ''}`}
+                      </div>
+                      
+                      <div 
+                        className={`payment-method ${paymentMethod === 'bank_transfer' ? 'selected' : ''}`}
                     onClick={() => setPaymentMethod('bank_transfer')}
-                  >
+                      >
                     <FontAwesomeIcon icon={faUniversity} className="payment-icon" />
                     <div className="payment-info">
-                      <h4>تحويل بنكي</h4>
+                          <h4>تحويل بنكي</h4>
                       <p>قم بتحويل المبلغ للحساب البنكي</p>
-                    </div>
+                        </div>
                     {paymentMethod === 'bank_transfer' && (
                       <FontAwesomeIcon icon={faCheck} className="payment-check" />
                     )}
+                    </div>
                   </div>
-                </div>
 
-                <div className="final-summary">
+                  <div className="final-summary">
                   <h3>تأكيد نهائي</h3>
-                  <div className="summary-row">
-                    <span>المبلغ الإجمالي:</span>
-                    <strong className="text-xl">{calculation?.total || 0} درهم</strong>
+                  <div className="summary-details">
+                    <div className="summary-row">
+                      <span>الخدمة:</span>
+                      <span>{service?.name}</span>
+                    </div>
+                    {selectedAddress && (
+                      <div className="summary-row">
+                        <span>العنوان:</span>
+                        <span>{selectedAddress.address_line1 || selectedAddress.street}, {selectedAddress.city}</span>
+                      </div>
+                    )}
+                    <div className="summary-row">
+                      <span>طريقة الدفع:</span>
+                      <span>
+                        {paymentMethod === 'cash_on_delivery' ? 'الدفع عند الاستلام' : 
+                         paymentMethod === 'credit_card' ? 'بطاقة ائتمان' : 
+                         paymentMethod === 'bank_transfer' ? 'تحويل بنكي' : 'الدفع عند الاستلام'}
+                      </span>
+                    </div>
+                    {calculation && (
+                      <div className="summary-row total">
+                        <span>المجموع الإجمالي:</span>
+                        <span>{calculation.total || 0} درهم</span>
+                      </div>
+                    )}
                   </div>
-                  <div className="summary-row">
-                    <span>طريقة الدفع:</span>
-                    <strong>
-                      {paymentMethod === 'cash_on_delivery' && 'الدفع عند الاستلام'}
-                      {paymentMethod === 'credit_card' && 'بطاقة ائتمان'}
-                      {paymentMethod === 'bank_transfer' && 'تحويل بنكي'}
-                    </strong>
                   </div>
-                </div>
 
                 <div className="modal-actions">
                   <button className="btn btn-secondary" onClick={() => setBookingStep('details')}>
-                    السابق
-                  </button>
-                  <button
+                      السابق
+                    </button>
+                    <button 
                     className="btn btn-primary btn-lg"
                     onClick={handleSubmitOrder}
-                    disabled={submitting}
-                  >
-                    {submitting ? (
-                      <>
-                        <FontAwesomeIcon icon={faSpinner} spin />
+                      disabled={submitting}
+                    >
+                      {submitting ? (
+                        <>
+                          <FontAwesomeIcon icon={faSpinner} spin />
                         جاري الإرسال...
-                      </>
-                    ) : (
+                        </>
+                      ) : (
                       <>
                         <FontAwesomeIcon icon={faCheck} />
                         تأكيد الطلب
                       </>
-                    )}
-                  </button>
+                      )}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </div>
         </div>
       )}
@@ -1113,4 +1168,4 @@ const ServiceDetailPage = () => {
   );
 };
 
-export default ServiceDetailPage;
+export default ServiceDetailPage; 

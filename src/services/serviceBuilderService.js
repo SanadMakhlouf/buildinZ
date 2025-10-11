@@ -140,7 +140,7 @@ const serviceBuilderService = {
    */
   submitOrder: async (orderData) => {
     try {
-      const response = await axiosInstance.post('/submit-order', orderData);
+      const response = await axiosInstance.post('/orders', orderData);
       return response.data;
     } catch (error) {
       console.error('Error submitting order:', error);
