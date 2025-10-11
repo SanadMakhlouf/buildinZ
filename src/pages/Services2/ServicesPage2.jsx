@@ -69,7 +69,13 @@ const ServicesPage2 = () => {
       }
       
       if (categoriesResponse.success) {
-        setCategories(categoriesResponse.categories || []);
+        const categories = categoriesResponse.categories || [];
+        console.log('Categories API Response:', categoriesResponse);
+        console.log('Categories Data:', categories);
+        if (categories.length > 0) {
+          console.log('First Category Sample:', categories[0]);
+        }
+        setCategories(categories);
       } else {
         console.error('Failed to fetch categories:', categoriesResponse.message);
       }
@@ -161,15 +167,33 @@ const ServicesPage2 = () => {
                 onClick={() => handleCategorySelect(category)}
               >
                 <div className="category-image">
-                  {category.image_path ? (
-                    <img 
-                      src={serviceBuilderService.getImageUrl(category.image_path)} 
-                      alt={category.name}
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = placeholderImage;
-                      }}
-                    />
+                  {(category.preview_image_url || category.image_path) ? (
+                    (() => {
+                      const imagePath = category.preview_image_url || category.image_path;
+                      const fullImageUrl = serviceBuilderService.getImageUrl(imagePath);
+                      console.log('Category Image Debug:', {
+                        categoryName: category.name,
+                        categoryId: category.id,
+                        preview_image_url: category.preview_image_url,
+                        image_path: category.image_path,
+                        selectedPath: imagePath,
+                        fullImageUrl: fullImageUrl
+                      });
+                      return (
+                        <img 
+                          src={fullImageUrl} 
+                          alt={category.name}
+                          onError={(e) => {
+                            console.log('Image failed to load:', fullImageUrl);
+                            e.target.onerror = null;
+                            e.target.src = placeholderImage;
+                          }}
+                          onLoad={() => {
+                            console.log('Image loaded successfully:', fullImageUrl);
+                          }}
+                        />
+                      );
+                    })()
                   ) : (
                     <div className="category-placeholder">
                       <FontAwesomeIcon icon={faLayerGroup} />

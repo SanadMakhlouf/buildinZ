@@ -1,10 +1,9 @@
 import axios from 'axios';
-
-const API_BASE_URL = process.env.REACT_APP_BACKEND_API || 'http://127.0.0.1:8000/api';
+import config from '../config/apiConfig';
 
 // Create axios instance with authentication
 const axiosInstance = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: config.API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -35,10 +34,13 @@ axiosInstance.interceptors.response.use(
       });
       
       // Handle 401 Unauthorized
-      if (error.response.status === 401) {
-        localStorage.removeItem('token');
-        window.location.href = '/login';
-      }
+        if (error.response.status === 401) {
+          localStorage.removeItem('token');
+          // Only redirect if not already on login page to prevent infinite loops
+          if (!window.location.pathname.includes('/login')) {
+            window.location.href = '/login';
+          }
+        }
     } else if (error.request) {
       // Request made but no response
       console.error('[API No Response]', error.request);

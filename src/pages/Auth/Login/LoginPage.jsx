@@ -14,18 +14,29 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
   const [loginSuccess, setLoginSuccess] = useState(false);
 
-  // Check for redirect parameters
+  // Check for redirect parameters and location state
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const redirectMessage = params.get('message');
     const redirectPath = params.get('redirect');
     
+    // Handle URL parameters
     if (redirectMessage) {
       setApiError(redirectMessage);
+    }
+
+    // Handle location state (from signup page)
+    if (location.state?.message) {
+      if (location.state.type === 'success' || location.state.type === 'info') {
+        setSuccessMessage(location.state.message);
+      } else {
+        setApiError(location.state.message);
+      }
     }
 
     // If user is already logged in, redirect to the requested page or home
@@ -48,9 +59,12 @@ const LoginPage = () => {
         [name]: ''
       });
     }
-    // Clear API error
+    // Clear API error and success message
     if (apiError) {
       setApiError(null);
+    }
+    if (successMessage) {
+      setSuccessMessage(null);
     }
   };
 
@@ -175,6 +189,20 @@ const LoginPage = () => {
                       exit={{ opacity: 0, y: -10 }}
                     >
                       {apiError}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Success Message */}
+                <AnimatePresence>
+                  {successMessage && (
+                    <motion.div 
+                      className="api-success-message"
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                    >
+                      {successMessage}
                     </motion.div>
                   )}
                 </AnimatePresence>

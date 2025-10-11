@@ -8,6 +8,7 @@ import {
   faArrowRight 
 } from '@fortawesome/free-solid-svg-icons';
 import serviceBuilderService from '../../services/serviceBuilderService';
+import placeholderImage from '../../assets/images/placeholder.png';
 import './CategoryPage.css';
 
 const CategoryPage = () => {
@@ -106,9 +107,12 @@ const CategoryPage = () => {
               >
                 <div className="category-image">
                   <img 
-                    src={serviceBuilderService.getImageUrl(category.image_path)} 
+                    src={serviceBuilderService.getImageUrl(category.preview_image_url || category.image_path)} 
                     alt={category.name}
-                   
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = placeholderImage;
+                    }}
                   />
                   <div className="category-overlay">
                     <h3>{category.name}</h3>

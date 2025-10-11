@@ -1,9 +1,8 @@
 import axios from 'axios';
-
-const API_BASE_URL = process.env.REACT_APP_BACKEND_API || '/api';
+import config from '../config/apiConfig';
 
 const axiosInstance = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: config.API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   }
@@ -45,7 +44,7 @@ export const authService = {
     }
   },
 
-  async signup(userData) {
+  async signup(userData, autoLogin = true) {
     try {
       const response = await axiosInstance.post('/register', {
         name: userData.fullName,
@@ -54,6 +53,26 @@ export const authService = {
         password_confirmation: userData.confirmPassword,
         role: 'customer'
       });
+
+      // Auto-login after successful signup
+      if (autoLogin && response.data.success) {
+        try {
+          const loginResponse = await this.login(userData.email, userData.password);
+          return {
+            ...response.data,
+            autoLogin: true,
+            loginData: loginResponse
+          };
+        } catch (loginError) {
+          console.warn('Auto-login failed after signup:', loginError);
+          // Return signup response even if auto-login fails
+          return {
+            ...response.data,
+            autoLogin: false,
+            loginError: loginError.message
+          };
+        }
+      }
 
       return response.data;
     } catch (error) {
@@ -96,6 +115,9 @@ export const authService = {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('rememberMe');
+    
+    // Clear any pending requests by updating the axios instance
+    delete axiosInstance.defaults.headers.common['Authorization'];
   },
 
   getCurrentUser() {

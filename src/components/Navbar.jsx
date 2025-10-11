@@ -16,13 +16,13 @@ import {
   faHeart
 } from '@fortawesome/free-solid-svg-icons';
 import SearchModal from './SearchModal';
+import NotificationBell from './NotificationBell';
 
 const Navbar = () => {
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const [searchActive, setSearchActive] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [notificationCount] = useState(3);
   const [cartCount] = useState(2);
   const [searchModalOpen, setSearchModalOpen] = useState(false);
 
@@ -91,15 +91,10 @@ const Navbar = () => {
               </button>
             </div>
 
-            {/* Notifications */}
-            <div className="notification-wrapper">
-              <button className="action-button">
-                <FontAwesomeIcon icon={faBell} />
-                {notificationCount > 0 && (
-                  <span className="notification-badge">{notificationCount}</span>
-                )}
-              </button>
-            </div>
+            {/* Notifications - Temporarily disabled to test redirect issue */}
+            {/* <div className="notification-wrapper">
+              <NotificationBell />
+            </div> */}
 
            
 

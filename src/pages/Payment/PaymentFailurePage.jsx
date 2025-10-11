@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import config from '../../config/apiConfig';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faTimes, 
@@ -44,7 +45,7 @@ const PaymentFailurePage = () => {
     setIsLoading(true);
     
     // Call API to verify payment
-    fetch('http://127.0.0.1:8000/api/payments/verify', {
+    fetch(`${config.BACKEND_URL}/api/payments/verify`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

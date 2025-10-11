@@ -9,7 +9,7 @@ The BuildingZ Flutter app communicates with the same RESTful API used by the web
 ```dart
 // lib/constants/api_constants.dart
 class ApiConstants {
-  static const String baseUrl = 'http://127.0.0.1:8000/api';
+  static const String baseUrl = 'https://buildingz.digistuff.live/admin/public/api';
 }
 ```
 

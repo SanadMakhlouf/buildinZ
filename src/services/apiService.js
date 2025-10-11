@@ -1,14 +1,12 @@
 import axios from 'axios';
 import authService from './authService';
+import config from '../config/apiConfig';
 
-// Get the API base URL from environment variables or use default
-const API_BASE_URL = process.env.REACT_APP_BACKEND_API || 'http://127.0.0.1:8000/api';
-
-console.log('Using API base URL:', API_BASE_URL);
+console.log('Using API base URL:', config.API_BASE_URL);
 
 // Create axios instance with base URL
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: config.API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import config from '../../config/apiConfig';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faSpinner, 
@@ -59,7 +60,7 @@ const CheckoutPage = () => {
     setLoadingExistingOrder(true);
     
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/orders/${orderId}`, {
+      const response = await fetch(`${config.BACKEND_URL}/api/orders/${orderId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -207,7 +208,7 @@ const CheckoutPage = () => {
       console.log('Order payload:', orderPayload);
       
       // Send order to API
-      const response = await fetch('http://127.0.0.1:8000/api/orders', {
+      const response = await fetch(`${config.BACKEND_URL}/api/orders`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

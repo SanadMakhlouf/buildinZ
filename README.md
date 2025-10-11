@@ -1011,6 +1011,37 @@ test: adding tests
 
 *This documentation is a living document and will be updated as the project evolves. For the most current information, please refer to the latest version in the repository.* 
 
+## API Configuration
+
+### Environment Variables
+The application uses centralized API configuration through environment variables:
+
+```bash
+# Backend API URL (for authenticated API calls)
+REACT_APP_BACKEND_API=https://buildingz.digistuff.live/admin/public/api
+
+# Backend URL (for general API calls and file storage)
+REACT_APP_BACKEND_URL=http://localhost:8000
+```
+
+### Configuration File
+All API endpoints are centralized in `/src/config/apiConfig.js`:
+- `API_BASE_URL`: Used for authenticated API calls (login, profile, orders, etc.)
+- `BACKEND_URL`: Used for general API calls (products, categories, payments) and file storage
+- `endpoints`: Centralized endpoint definitions
+- `utils`: Helper functions for URL generation
+
+### Usage
+```javascript
+import config from '../config/apiConfig';
+
+// Use predefined endpoints
+const response = await fetch(config.utils.getApiUrl(config.endpoints.categories));
+
+// Use backend URL for general calls
+const response = await fetch(`${config.BACKEND_URL}/api/products`);
+```
+
 ## Authentication
 
 ### Features

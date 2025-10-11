@@ -10,6 +10,7 @@ import {
   faThLarge
 } from '@fortawesome/free-solid-svg-icons';
 import serviceBuilderService from '../../services/serviceBuilderService';
+import placeholderImage from '../../assets/images/placeholder.png';
 import './CategoryDetailPage.css';
 
 const CategoryDetailPage = () => {
@@ -119,7 +120,7 @@ const CategoryDetailPage = () => {
   return (
     <div className="category-detail-page">
       <div className="hero-banner" style={{
-        backgroundImage: `linear-gradient(rgba(10, 50, 89, 0.7), rgba(10, 50, 89, 0.85)), url(${serviceBuilderService.getImageUrl(category.image_path)})`
+        backgroundImage: `linear-gradient(rgba(10, 50, 89, 0.7), rgba(10, 50, 89, 0.85)), url(${serviceBuilderService.getImageUrl(category.preview_image_url || category.image_path)})`
       }}>
         <div className="container">
           <button onClick={handleBackClick} className="back-button">
@@ -183,8 +184,12 @@ const CategoryDetailPage = () => {
                   >
                     <div className="subcategory-image">
                       <img 
-                        src={serviceBuilderService.getImageUrl(subcategory.image_path)} 
+                        src={serviceBuilderService.getImageUrl(subcategory.preview_image_url || subcategory.image_path)} 
                         alt={subcategory.name}
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = placeholderImage;
+                        }}
                        
                       />
                       {viewMode === 'grid' && (
@@ -228,11 +233,14 @@ const CategoryDetailPage = () => {
                     onClick={() => handleServiceClick(service)}
                   >
                     <div className="service-image">
-                      {service.preview_image ? (
+                      {service.main_image?.url ? (
                         <img 
-                          src={serviceBuilderService.getImageUrl(service.preview_image)} 
+                          src={service.main_image.url} 
                           alt={service.name}
-                         
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = placeholderImage;
+                          }}
                         />
                       ) : (
                         <div className="service-gradient-bg">

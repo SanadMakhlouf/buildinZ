@@ -1,10 +1,9 @@
 import axios from 'axios';
-
-const API_BASE_URL = process.env.REACT_APP_BACKEND_API || 'http://127.0.0.1:8000/api';
+import config from '../config/apiConfig';
 
 // Create axios instance with authentication
 const axiosInstance = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: config.API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   }

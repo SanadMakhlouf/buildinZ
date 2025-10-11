@@ -561,9 +561,9 @@ const ServicesPage3 = () => {
                   whileTap={{ scale: 0.98 }}
                 >
                   <div className="category-icon-container">
-                    {category.image_path ? (
+                    {(category.preview_image_url || category.image_path) ? (
                       <img 
-                        src={serviceBuilderService.getImageUrl(category.image_path)} 
+                        src={serviceBuilderService.getImageUrl(category.preview_image_url || category.image_path)} 
                         alt={category.name}
                         className="category-icon-image"
                         onError={(e) => {
@@ -865,9 +865,9 @@ const ServicesPage3 = () => {
                                       onClick={() => handleProductSelect(product.id, 1)}
                                     >
                                       <div className="product-image">
-                                        {product.image_path ? (
+                                        {product.image_url ? (
                                           <img 
-                                            src={serviceBuilderService.getImageUrl(product.image_path)} 
+                                            src={product.image_url} 
                                             alt={product.name}
                                             onError={(e) => e.target.style.display = 'none'}
                                           />

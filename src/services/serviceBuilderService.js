@@ -1,7 +1,7 @@
 import axios from 'axios';
+import config from '../config/apiConfig';
 
-const API_BASE_URL = process.env.REACT_APP_BACKEND_API || 'http://127.0.0.1:8000/api';
-const SERVICE_BUILDER_URL = `${API_BASE_URL}/service-builder`;
+const SERVICE_BUILDER_URL = `${config.API_BASE_URL}/service-builder`;
 
 // Create axios instance
 const axiosInstance = axios.create({
@@ -154,11 +154,13 @@ const serviceBuilderService = {
    * @returns {string} Full image URL
    */
   getImageUrl: (imagePath) => {
-    if (!imagePath) return '';
-    if (imagePath.startsWith('http')) return imagePath;
-    
-    const baseUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
-    return `${baseUrl}/storage/${imagePath}`;
+    const result = config.utils.getImageUrl(imagePath);
+    console.log('serviceBuilderService.getImageUrl:', {
+      input: imagePath,
+      output: result,
+      backendUrl: config.BACKEND_URL
+    });
+    return result;
   }
 };
 

@@ -400,7 +400,8 @@ const ProfilePage = () => {
 
   const handleLogout = () => {
     authService.logout();
-    navigate('/login');
+    // Use window.location.href to ensure clean redirect and prevent infinite loops
+    window.location.href = '/login';
   };
 
   const renderProfileTab = () => (

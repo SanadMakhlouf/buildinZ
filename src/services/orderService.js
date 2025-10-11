@@ -1,11 +1,10 @@
 import axios from 'axios';
 import authService from './authService';
-
-const API_BASE_URL = process.env.REACT_APP_BACKEND_API || '/api';
+import config from '../config/apiConfig';
 
 // Create axios instance with authentication
 const axiosInstance = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: config.API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   }

@@ -9,6 +9,7 @@
       name="description"
       content="BuildingZ - Your one-stop solution for construction and maintenance services"
     />
+    
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <!--
       manifest.json provides metadata used when your web app is installed on a
@@ -46,5 +47,16 @@
       To begin the development process, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
+
+    <!-- Usersnap Feedback Widget -->
+    <script>
+      window.onUsersnapLoad = function(api) {
+        api.init();
+      };
+      var script = document.createElement('script');
+      script.defer = 1;
+      script.src = 'https://widget.usersnap.com/global/load/64f71176-fb3f-47ea-a622-726c89ddfa94?onload=onUsersnapLoad';
+      document.getElementsByTagName('head')[0].appendChild(script);
+    </script>
   </body>
 </html>

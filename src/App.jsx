@@ -24,6 +24,7 @@ import CheckoutPage from './pages/Checkout/CheckoutPage';
 import SearchPage from './pages/Search/SearchPage';
 import PaymentSuccessPage from './pages/Payment/PaymentSuccessPage';
 import PaymentFailurePage from './pages/Payment/PaymentFailurePage';
+import NotificationsPage from './pages/Notifications/NotificationsPage';
 
 // Components
 import Navbar from './components/Navbar';
@@ -63,6 +64,7 @@ function App() {
             <Route path="/payment/success" element={<PaymentSuccessPage />} />
             <Route path="/payment/failure" element={<PaymentFailurePage />} />
             <Route path="/search" element={<SearchPage />} />
+            <Route path="/notifications" element={<NotificationsPage />} />
           </Routes>
           <FloatingCart />
         </div>

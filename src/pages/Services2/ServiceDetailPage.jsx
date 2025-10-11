@@ -1,322 +1,612 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faArrowLeft, 
-  faHeart, 
-  faSearch, 
-  faPlus,
-  faLayerGroup,
-  faImage,
-  faMapMarkerAlt,
-  faCreditCard,
-  faMoneyBill,
-  faUniversity,
+  faHeart,
   faCheck,
+  faPlus,
+  faMinus,
   faSpinner,
-  faExclamationTriangle
+  faExclamationTriangle,
+  faMoneyBill,
+  faCreditCard,
+  faUniversity,
+  faImage,
+  faChevronLeft,
+  faChevronRight,
+  faCalendar,
+  faClock,
+  faUpload,
+  faTrash,
+  faTimes
 } from '@fortawesome/free-solid-svg-icons';
 import serviceBuilderService from '../../services/serviceBuilderService';
 import AddressManager from '../../components/Profile/AddressManager';
-import placeholderImage from '../../assets/images/hero-bg.png';
 import './ServiceDetailPage.css';
 
 const ServiceDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  
+  // Service State
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedProducts, setSelectedProducts] = useState([]);
+  
+  // Image Gallery State
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  
+  // Form State
   const [fieldValues, setFieldValues] = useState({});
+  const [selectedProducts, setSelectedProducts] = useState([]);
+  const [uploadedFiles, setUploadedFiles] = useState({});
+  
+  // Calculation State
   const [calculation, setCalculation] = useState(null);
   const [calculating, setCalculating] = useState(false);
   const [calculationError, setCalculationError] = useState(null);
-  const [showOrderForm, setShowOrderForm] = useState(false);
-  const [orderFormData, setOrderFormData] = useState({
+  
+  // Booking State
+  const [showBookingModal, setShowBookingModal] = useState(false);
+  const [bookingStep, setBookingStep] = useState('summary');
+  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [paymentMethod, setPaymentMethod] = useState('cash_on_delivery');
+  const [customerInfo, setCustomerInfo] = useState({
     name: '',
     phone: '',
     email: '',
     notes: ''
   });
   const [submitting, setSubmitting] = useState(false);
-  const [orderSuccess, setOrderSuccess] = useState(false);
-  const [showBookingModal, setShowBookingModal] = useState(false);
-  
-  // Enhanced booking states
-  const [selectedAddress, setSelectedAddress] = useState(null);
-  const [paymentMethod, setPaymentMethod] = useState('cash_on_delivery');
-  const [bookingStep, setBookingStep] = useState('summary'); // 'summary', 'details', 'payment'
   const [bookingError, setBookingError] = useState(null);
-  const [orderData, setOrderData] = useState(null);
+  const [orderSuccess, setOrderSuccess] = useState(false);
 
-  useEffect(() => {
-    fetchServiceDetails();
-  }, [id]);
-
-  const fetchServiceDetails = async () => {
+  // Fetch service details
+  const fetchServiceDetails = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null);
       const response = await serviceBuilderService.getServiceById(id);
+      
       if (response.success) {
-        setService(response.service); // Changed from response.data to response.service
-        // Initialize field values
-        const initialValues = {};
-        if (response.service.fields) {
-          response.service.fields.forEach(field => {
-            if (field.type === 'number') {
-              initialValues[field.id] = { value: '', type: field.type };
-            } else if (field.options && field.options.length > 0) {
-              initialValues[field.id] = { option_id: null, type: field.type };
-            }
-          });
-        }
-        setFieldValues(initialValues);
+        setService(response.service);
+        initializeFieldValues(response.service.fields);
       } else {
-        setError(response.message || 'فشل في تحميل تفاصيل الخدمة');
+        setError(response.message || 'Failed to load service details');
       }
     } catch (err) {
+      console.error('Error fetching service:', err);
       setError('حدث خطأ أثناء تحميل تفاصيل الخدمة');
     } finally {
       setLoading(false);
     }
+  }, [id]);
+
+  useEffect(() => {
+    fetchServiceDetails();
+  }, [fetchServiceDetails]);
+
+  // Initialize field values based on field types
+  const initializeFieldValues = (fields) => {
+    if (!fields) return;
+    
+    const initialValues = {};
+    fields.forEach(field => {
+      switch (field.type) {
+        case 'text':
+        case 'textarea':
+        case 'date':
+        case 'time':
+          initialValues[field.id] = '';
+          break;
+        case 'number':
+          initialValues[field.id] = field.min_value || '';
+          break;
+        case 'select':
+        case 'radio':
+          const defaultOption = field.options?.find(opt => opt.is_default);
+          initialValues[field.id] = defaultOption?.id || null;
+          break;
+        case 'checkbox':
+          initialValues[field.id] = [];
+          break;
+        case 'file':
+          initialValues[field.id] = null;
+          break;
+        default:
+          initialValues[field.id] = null;
+      }
+    });
+    setFieldValues(initialValues);
   };
 
-  const handleFieldValueChange = (fieldId, value) => {
+  // Handle field changes
+  const handleFieldChange = (fieldId, value, fieldType) => {
     setFieldValues(prev => ({
       ...prev,
-      [fieldId]: { value, type: 'number' }
+      [fieldId]: value
     }));
   };
 
-  const handleOptionSelect = (fieldId, optionId) => {
-    setFieldValues(prev => ({
-      ...prev,
-      [fieldId]: { option_id: optionId, type: 'option' }
-    }));
+  // Handle checkbox toggle
+  const handleCheckboxToggle = (fieldId, optionId) => {
+    setFieldValues(prev => {
+      const currentValues = prev[fieldId] || [];
+      const isSelected = currentValues.includes(optionId);
+      
+      return {
+        ...prev,
+        [fieldId]: isSelected
+          ? currentValues.filter(id => id !== optionId)
+          : [...currentValues, optionId]
+      };
+    });
   };
 
-  const handleProductSelect = (productId, quantity = 1) => {
+  // Handle file upload
+  const handleFileUpload = (fieldId, file) => {
+    if (file) {
+      setUploadedFiles(prev => ({
+        ...prev,
+        [fieldId]: file
+      }));
+      setFieldValues(prev => ({
+        ...prev,
+        [fieldId]: file.name
+      }));
+    }
+  };
+
+  // Handle product selection
+  const handleProductToggle = (productId) => {
     setSelectedProducts(prev => {
       const existing = prev.find(p => p.product_id === productId);
       if (existing) {
-        return prev.map(p => 
-          p.product_id === productId 
-            ? { ...p, quantity: p.quantity + quantity }
-            : p
-        );
+        return prev.filter(p => p.product_id !== productId);
       } else {
-        return [...prev, { product_id: productId, quantity }];
+        return [...prev, { product_id: productId, quantity: 1 }];
       }
     });
   };
 
   const handleProductQuantityChange = (productId, quantity) => {
-    if (quantity <= 0) {
+    const qty = parseInt(quantity) || 1;
+    if (qty < 1) {
       setSelectedProducts(prev => prev.filter(p => p.product_id !== productId));
     } else {
-      setSelectedProducts(prev => 
-        prev.map(p => 
-          p.product_id === productId 
-            ? { ...p, quantity }
-            : p
+      setSelectedProducts(prev =>
+        prev.map(p =>
+          p.product_id === productId ? { ...p, quantity: qty } : p
         )
       );
     }
   };
 
+  // Image gallery navigation
+  const nextImage = () => {
+    if (service?.images) {
+      setCurrentImageIndex((prev) => 
+        prev === service.images.length - 1 ? 0 : prev + 1
+      );
+    }
+  };
+
+  const prevImage = () => {
+    if (service?.images) {
+      setCurrentImageIndex((prev) => 
+        prev === 0 ? service.images.length - 1 : prev - 1
+      );
+    }
+  };
+
+  // Calculate price
   const handleCalculatePrice = async () => {
     try {
       setCalculating(true);
       setCalculationError(null);
 
-      const field_values = Object.entries(fieldValues)
-        .filter(([_, value]) => value.value !== null && value.value !== '')
-        .map(([fieldId, value]) => ({
-          field_id: parseInt(fieldId),
-          ...value
-        }));
+      // Prepare field values for API
+      const formattedFieldValues = Object.entries(fieldValues)
+        .map(([fieldId, value]) => {
+          const field = service.fields.find(f => f.id === parseInt(fieldId));
+          if (!field) return null;
+
+          switch (field.type) {
+            case 'select':
+            case 'radio':
+              return value ? {
+                field_id: parseInt(fieldId),
+                option_id: value,
+                type: 'option'
+              } : null;
+            case 'checkbox':
+              return Array.isArray(value) && value.length > 0 ? {
+                field_id: parseInt(fieldId),
+                option_ids: value,
+                type: 'checkbox'
+              } : null;
+            case 'number':
+              return value ? {
+                field_id: parseInt(fieldId),
+                value: parseFloat(value),
+                type: 'number'
+              } : null;
+            case 'text':
+            case 'textarea':
+            case 'date':
+            case 'time':
+              return value ? {
+                field_id: parseInt(fieldId),
+                value: value,
+                type: field.type
+              } : null;
+            default:
+              return null;
+          }
+        })
+        .filter(v => v !== null);
 
       const calculationData = {
         service_id: parseInt(id),
-        field_values,
+        field_values: formattedFieldValues,
         products: selectedProducts
       };
 
       const response = await serviceBuilderService.calculatePrice(calculationData);
 
       if (response.success) {
-        setCalculation(response.calculation); // Changed from response.data to response.calculation
-        setShowBookingModal(true); // Show the booking modal after successful calculation
+        setCalculation(response.calculation);
+        setShowBookingModal(true);
+        setBookingStep('summary');
       } else {
         setCalculationError(response.message || 'فشل في حساب السعر');
       }
     } catch (err) {
+      console.error('Calculation error:', err);
       setCalculationError('حدث خطأ أثناء حساب السعر');
     } finally {
       setCalculating(false);
     }
   };
 
+  // Submit order
   const handleSubmitOrder = async () => {
+    if (!selectedAddress) {
+      setBookingError('يرجى اختيار عنوان للخدمة');
+      return;
+    }
+
+    if (!customerInfo.name || !customerInfo.phone) {
+      setBookingError('يرجى ملء جميع الحقول المطلوبة');
+      return;
+    }
+
     try {
       setSubmitting(true);
+      setBookingError(null);
 
-      const field_values = Object.entries(fieldValues)
-        .filter(([_, value]) => value.value !== null && value.value !== '')
-        .map(([fieldId, value]) => ({
-          field_id: parseInt(fieldId),
-          ...value
-        }));
+      // Format field values for submission
+      const formattedFieldValues = Object.entries(fieldValues)
+        .map(([fieldId, value]) => {
+          const field = service.fields.find(f => f.id === parseInt(fieldId));
+          if (!field || !value) return null;
+
+          switch (field.type) {
+            case 'select':
+            case 'radio':
+              return { field_id: parseInt(fieldId), option_id: value };
+            case 'checkbox':
+              return Array.isArray(value) && value.length > 0
+                ? { field_id: parseInt(fieldId), option_ids: value }
+                : null;
+            default:
+              return { field_id: parseInt(fieldId), value };
+          }
+        })
+        .filter(v => v !== null);
 
       const orderData = {
         service_id: parseInt(id),
-        customer_name: orderFormData.name,
-        customer_email: orderFormData.email,
-        customer_phone: orderFormData.phone,
-        field_values,
+        customer_name: customerInfo.name,
+        customer_email: customerInfo.email,
+        customer_phone: customerInfo.phone,
+        field_values: formattedFieldValues,
         products: selectedProducts,
-        notes: orderFormData.notes
+        shipping_address: {
+          street: selectedAddress.street || selectedAddress.address_line1,
+          city: selectedAddress.city,
+          state: selectedAddress.state,
+          zip: selectedAddress.zip_code || selectedAddress.zip,
+          country: selectedAddress.country || 'AE',
+          phone: selectedAddress.phone || customerInfo.phone,
+          name: selectedAddress.name || customerInfo.name
+        },
+        payment_method: paymentMethod,
+        notes: customerInfo.notes
       };
 
       const response = await serviceBuilderService.submitOrder(orderData);
 
       if (response.success) {
         setOrderSuccess(true);
-        setShowOrderForm(false);
-      } else {
-        setCalculationError(response.message || 'فشل في إرسال الطلب');
-      }
-    } catch (err) {
-      setCalculationError('حدث خطأ أثناء إرسال الطلب');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const getProductsByCategory = () => {
-    if (!service) return {};
-    
-    const grouped = {};
-    
-    // Handle products with tags
-    if (service.productsByTag) {
-      service.productsByTag.forEach(tagGroup => {
-        const category = tagGroup.tag.name;
-        if (!grouped[category]) {
-          grouped[category] = [];
-        }
-        grouped[category].push(...tagGroup.products);
-      });
-    }
-    
-    // Handle products without tags
-    if (service.productsWithoutTags && service.productsWithoutTags.length > 0) {
-      const category = 'منتجات إضافية';
-      if (!grouped[category]) {
-        grouped[category] = [];
-      }
-      grouped[category].push(...service.productsWithoutTags);
-    }
-    
-    return grouped;
-  };
-
-  const getSelectedProduct = (productId) => {
-    return selectedProducts.find(p => p.product_id === productId);
-  };
-
-  const getTotalPrice = () => {
-    if (!calculation) return 0;
-    return calculation.total || 0; // Changed from calculation.total_price to calculation.total
-  };
-
-  const getSelectedProductsCount = () => {
-    return selectedProducts.reduce((total, product) => total + product.quantity, 0);
-  };
-
-  // Handle address selection
-  const handleAddressSelect = (address) => {
-    setSelectedAddress(address);
-  };
-
-  // Handle payment method change
-  const handlePaymentMethodChange = (method) => {
-    setPaymentMethod(method);
-  };
-
-  // Handle booking step navigation
-  const handleBookingStepChange = (step) => {
-    setBookingStep(step);
-    setBookingError(null);
-  };
-
-  // Enhanced order submission
-  const handleEnhancedSubmitOrder = async () => {
-    if (!selectedAddress) {
-      setBookingError('يرجى اختيار عنوان للخدمة');
-      return;
-    }
-
-    setSubmitting(true);
-    setBookingError(null);
-
-    try {
-      // Format field values
-      const field_values = Object.entries(fieldValues)
-        .filter(([_, value]) => value.value !== null && value.value !== '')
-        .map(([fieldId, value]) => ({
-          field_id: parseInt(fieldId),
-          ...value
-        }));
-
-      // Format shipping address
-      const shippingAddress = {
-        street: selectedAddress.street || selectedAddress.address_line1,
-        city: selectedAddress.city,
-        state: selectedAddress.state,
-        zip: selectedAddress.zip_code || selectedAddress.zip,
-        country: selectedAddress.country || 'AE',
-        phone: selectedAddress.phone || orderFormData.phone,
-        name: selectedAddress.name || orderFormData.name
-      };
-
-      // Create order payload
-      const orderPayload = {
-        service_id: parseInt(id),
-        customer_name: orderFormData.name,
-        customer_email: orderFormData.email,
-        customer_phone: orderFormData.phone,
-        field_values,
-        products: selectedProducts,
-        shipping_address: shippingAddress,
-        payment_method: paymentMethod,
-        notes: orderFormData.notes.trim() || undefined
-      };
-
-      const response = await serviceBuilderService.submitOrder(orderPayload);
-
-      if (response.success) {
-        setOrderData(response);
-        setOrderSuccess(true);
         setShowBookingModal(false);
       } else {
         setBookingError(response.message || 'فشل في إرسال الطلب');
       }
     } catch (err) {
-      console.error('Error submitting order:', err);
+      console.error('Order submission error:', err);
       setBookingError('حدث خطأ أثناء إرسال الطلب');
     } finally {
       setSubmitting(false);
     }
   };
 
+  // Validation
+  const isFormValid = () => {
+    if (!service?.fields) return true;
+    
+    return service.fields.every(field => {
+      if (!field.required) return true;
+      
+      const value = fieldValues[field.id];
+      
+      switch (field.type) {
+        case 'checkbox':
+          return Array.isArray(value) && value.length > 0;
+        case 'text':
+        case 'textarea':
+        case 'date':
+        case 'time':
+        case 'number':
+          return value !== '' && value !== null && value !== undefined;
+        case 'select':
+        case 'radio':
+          return value !== null && value !== undefined;
+        default:
+          return true;
+      }
+    });
+  };
+
+  // Render field based on type
+  const renderField = (field) => {
+    const value = fieldValues[field.id];
+
+    switch (field.type) {
+      case 'text':
+        return (
+          <div className="field-input-wrapper">
+            <input
+              type="text"
+              className="field-input"
+              placeholder={`أدخل ${field.label}`}
+              value={value || ''}
+              onChange={(e) => handleFieldChange(field.id, e.target.value, 'text')}
+              required={field.required}
+            />
+          </div>
+        );
+
+      case 'textarea':
+        return (
+          <div className="field-input-wrapper">
+            <textarea
+              className="field-textarea"
+              placeholder={`أدخل ${field.label}`}
+              value={value || ''}
+              onChange={(e) => handleFieldChange(field.id, e.target.value, 'textarea')}
+              required={field.required}
+              rows={4}
+            />
+          </div>
+        );
+
+      case 'number':
+        return (
+          <div className="field-input-wrapper field-number-wrapper">
+            <input
+              type="number"
+              className="field-input field-number"
+              placeholder={`أدخل ${field.label}`}
+              value={value || ''}
+              onChange={(e) => handleFieldChange(field.id, e.target.value, 'number')}
+              min={field.min_value}
+              max={field.max_value}
+              step={field.step || 1}
+              required={field.required}
+            />
+            {field.unit && <span className="field-unit">{field.unit}</span>}
+          </div>
+        );
+
+      case 'date':
+        return (
+          <div className="field-input-wrapper field-date-wrapper">
+            <FontAwesomeIcon icon={faCalendar} className="field-icon" />
+            <input
+              type="date"
+              className="field-input field-date"
+              value={value || ''}
+              onChange={(e) => handleFieldChange(field.id, e.target.value, 'date')}
+              required={field.required}
+            />
+          </div>
+        );
+
+      case 'time':
+        return (
+          <div className="field-input-wrapper field-time-wrapper">
+            <FontAwesomeIcon icon={faClock} className="field-icon" />
+            <input
+              type="time"
+              className="field-input field-time"
+              value={value || ''}
+              onChange={(e) => handleFieldChange(field.id, e.target.value, 'time')}
+              required={field.required}
+            />
+          </div>
+        );
+
+      case 'file':
+        return (
+          <div className="field-file-wrapper">
+            <label className="field-file-label">
+              <FontAwesomeIcon icon={faUpload} />
+              <span>{value || `اختر ${field.label}`}</span>
+              <input
+                type="file"
+                className="field-file-input"
+                onChange={(e) => handleFileUpload(field.id, e.target.files[0])}
+                required={field.required}
+              />
+            </label>
+            {value && (
+              <button
+                className="field-file-remove"
+                onClick={() => {
+                  setFieldValues(prev => ({ ...prev, [field.id]: null }));
+                  setUploadedFiles(prev => {
+                    const newFiles = { ...prev };
+                    delete newFiles[field.id];
+                    return newFiles;
+                  });
+                }}
+              >
+                <FontAwesomeIcon icon={faTrash} />
+              </button>
+            )}
+          </div>
+        );
+
+      case 'select':
+        // If options have images, render as cards (smart detection)
+        const hasImages = field.options?.some(opt => opt.image_url);
+        
+        if (hasImages) {
+          return (
+            <div className="field-options-grid">
+              {field.options?.map(option => (
+                <div
+                  key={option.id}
+                  className={`option-card ${value === option.id ? 'selected' : ''}`}
+                  onClick={() => handleFieldChange(field.id, option.id, 'select')}
+                >
+                  {option.image_url && (
+                    <div className="option-image-container">
+                      <img src={option.image_url} alt={option.label} />
+                    </div>
+                  )}
+                  <div className="option-content">
+                    <h4 className="option-label">{option.label}</h4>
+                    {option.price_modifier !== 0 && (
+                      <span className="option-price">
+                        {option.price_modifier > 0 ? '+' : ''}{option.price_modifier} درهم
+                      </span>
+                    )}
+                  </div>
+                  <div className="option-check">
+                    {value === option.id && <FontAwesomeIcon icon={faCheck} />}
+                  </div>
+                </div>
+              ))}
+            </div>
+          );
+        }
+        
+        // Otherwise, render as dropdown
+        return (
+          <div className="field-select-wrapper">
+            <select
+              className="field-select"
+              value={value || ''}
+              onChange={(e) => handleFieldChange(field.id, parseInt(e.target.value), 'select')}
+              required={field.required}
+            >
+              <option value="">اختر {field.label}</option>
+              {field.options?.map(option => (
+                <option key={option.id} value={option.id}>
+                  {option.label}
+                  {option.price_modifier !== 0 && ` (${option.price_modifier > 0 ? '+' : ''}${option.price_modifier} درهم)`}
+                </option>
+              ))}
+            </select>
+          </div>
+        );
+
+      case 'radio':
+        return (
+          <div className="field-options-grid">
+            {field.options?.map(option => (
+              <div
+                key={option.id}
+                className={`option-card ${value === option.id ? 'selected' : ''} ${!option.image_url ? 'option-card-compact' : ''}`}
+                onClick={() => handleFieldChange(field.id, option.id, 'radio')}
+              >
+                {option.image_url && (
+                  <div className="option-image-container">
+                    <img src={option.image_url} alt={option.label} />
+                  </div>
+                )}
+                <div className="option-content">
+                  <h4 className="option-label">{option.label}</h4>
+                  {option.price_modifier !== 0 && (
+                    <span className="option-price">
+                      {option.price_modifier > 0 ? '+' : ''}{option.price_modifier} درهم
+                    </span>
+                  )}
+                </div>
+                <div className="option-check">
+                  {value === option.id && <FontAwesomeIcon icon={faCheck} />}
+                </div>
+              </div>
+            ))}
+          </div>
+        );
+
+      case 'checkbox':
+        return (
+          <div className="field-options-grid">
+            {field.options?.map(option => {
+              const isSelected = Array.isArray(value) && value.includes(option.id);
+              return (
+                <div
+                  key={option.id}
+                  className={`option-card ${isSelected ? 'selected' : ''} ${!option.image_url ? 'option-card-compact' : ''}`}
+                  onClick={() => handleCheckboxToggle(field.id, option.id)}
+                >
+                  {option.image_url && (
+                    <div className="option-image-container">
+                      <img src={option.image_url} alt={option.label} />
+                    </div>
+                  )}
+                  <div className="option-content">
+                    <h4 className="option-label">{option.label}</h4>
+                    {option.price_modifier !== 0 && (
+                      <span className="option-price">
+                        {option.price_modifier > 0 ? '+' : ''}{option.price_modifier} درهم
+                      </span>
+                    )}
+                  </div>
+                  <div className="option-check">
+                    {isSelected && <FontAwesomeIcon icon={faCheck} />}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        );
+
+      default:
+        return <p className="field-unsupported">نوع الحقل غير مدعوم: {field.type}</p>;
+    }
+  };
+
   if (loading) {
     return (
-      <div className="service-detail-page">
-        <div className="loading-container">
-          <FontAwesomeIcon icon={faLayerGroup} spin />
+      <div className="service-detail-page loading-state">
+        <div className="loading-spinner">
+          <FontAwesomeIcon icon={faSpinner} spin size="3x" />
           <p>جاري تحميل تفاصيل الخدمة...</p>
         </div>
       </div>
@@ -325,33 +615,15 @@ const ServiceDetailPage = () => {
 
   if (error) {
     return (
-      <div className="service-detail-page">
+      <div className="service-detail-page error-state">
         <div className="error-container">
-          <FontAwesomeIcon icon={faLayerGroup} />
-          <p>{error}</p>
-          <button className="retry-button" onClick={fetchServiceDetails}>
-            إعادة المحاولة
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (orderSuccess) {
-    return (
-      <div className="service-detail-page">
-        <div className="order-success">
-          <div className="success-icon">
-            <FontAwesomeIcon icon={faHeart} />
-          </div>
-          <h2>تم إرسال طلبك بنجاح!</h2>
-          <p>سنقوم بالتواصل معك قريباً لتأكيد الطلب</p>
-          <p>رقم الطلب: {Date.now()}</p>
-          <div className="success-actions">
-            <button 
-              className="primary-button" 
-              onClick={() => navigate('/services')}
-            >
+          <FontAwesomeIcon icon={faExclamationTriangle} size="3x" />
+          <h2>{error}</h2>
+          <div className="error-actions">
+            <button className="btn btn-primary" onClick={fetchServiceDetails}>
+              إعادة المحاولة
+            </button>
+            <button className="btn btn-secondary" onClick={() => navigate('/services')}>
               العودة للخدمات
             </button>
           </div>
@@ -360,629 +632,480 @@ const ServiceDetailPage = () => {
     );
   }
 
-  const productsByCategory = getProductsByCategory();
-  const categories = Object.keys(productsByCategory);
+  if (orderSuccess) {
+    return (
+      <div className="service-detail-page success-state">
+        <div className="success-container">
+          <div className="success-icon">
+            <FontAwesomeIcon icon={faCheck} />
+          </div>
+          <h2>تم إرسال طلبك بنجاح!</h2>
+          <p>سنقوم بالتواصل معك قريباً لتأكيد الطلب</p>
+          <div className="success-actions">
+            <button className="btn btn-primary" onClick={() => navigate('/services')}>
+              العودة للخدمات
+            </button>
+            <button className="btn btn-secondary" onClick={() => navigate('/profile')}>
+              عرض طلباتي
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="service-detail-page">
       {/* Header */}
-      <div className="service-header">
-        <div className="header-content">
-          <div className="header-left">
-            <button className="back-button" onClick={() => navigate(-1)}>
-              <FontAwesomeIcon icon={faArrowLeft} />
-              رجوع
-            </button>
-            <div className="step-indicator">
-              <span className="step-text">الخطوة 1 من 3</span>
+      <header className="service-header">
+        <div className="container">
+          <button className="btn-back" onClick={() => navigate(-1)}>
+            <FontAwesomeIcon icon={faArrowLeft} />
+            <span>رجوع</span>
+          </button>
+          
+          <div className="service-header-content">
+            <div className="service-title-section">
+              <h1>{service?.name}</h1>
+              {service?.description && <p className="service-description">{service.description}</p>}
+              {service?.category && (
+                <div className="service-category-badge">
+                  {service.category.name}
+                </div>
+              )}
             </div>
-            <h1>{service?.name}</h1>
-            <p className="service-description">{service?.description}</p>
-          </div>
-          <div className="header-right">
-            <button className="favorite-button">
-              <FontAwesomeIcon icon={faHeart} />
-            </button>
+            
+            <div className="service-price-section">
+              <div className="base-price">
+                <span className="label">السعر الأساسي</span>
+                <span className="price">{service?.base_price} <small>درهم</small></span>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="service-content">
-        {/* Main Content */}
-        <div className="service-main">
-          {/* Category Filters */}
-          <div className="category-filters">
-            <div className="filter-buttons">
-              <button 
-                className={`filter-btn ${selectedCategory === 'all' ? 'active' : ''}`}
-                onClick={() => setSelectedCategory('all')}
-              >
-                جميع الخيارات
-              </button>
-              {categories.map(category => (
-                <button 
-                  key={category}
-                  className={`filter-btn ${selectedCategory === category ? 'active' : ''}`}
-                  onClick={() => setSelectedCategory(category)}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
-          </div>
+      {/* Main Content */}
+      <div className="container">
+        <div className="service-layout">
+          {/* Left Column - Image Gallery */}
+          <aside className="service-gallery-section">
+            {service?.images && service.images.length > 0 ? (
+              <div className="image-gallery">
+                <div className="gallery-main">
+                  <img 
+                    src={service.images[currentImageIndex]?.url} 
+                    alt={service.name}
+                    className="main-image"
+                  />
+                  {service.images.length > 1 && (
+                    <>
+                      <button className="gallery-nav gallery-prev" onClick={prevImage}>
+                        <FontAwesomeIcon icon={faChevronRight} />
+                      </button>
+                      <button className="gallery-nav gallery-next" onClick={nextImage}>
+                        <FontAwesomeIcon icon={faChevronLeft} />
+                      </button>
+                      <div className="gallery-indicator">
+                        {currentImageIndex + 1} / {service.images.length}
+                      </div>
+                    </>
+                  )}
+                </div>
+                
+                {service.images.length > 1 && (
+                  <div className="gallery-thumbnails">
+                    {service.images.map((image, index) => (
+                      <button
+                        key={image.id}
+                        className={`thumbnail ${index === currentImageIndex ? 'active' : ''}`}
+                        onClick={() => setCurrentImageIndex(index)}
+                      >
+                        <img src={image.url} alt={`${service.name} ${index + 1}`} />
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="image-placeholder">
+                <FontAwesomeIcon icon={faImage} />
+                <p>لا توجد صور متاحة</p>
+              </div>
+            )}
+          </aside>
 
-          {/* Horizontal Layout for Fields and Products */}
-          <div className="main-content-wrapper">
-            {/* Fields Section */}
+          {/* Right Column - Form */}
+          <main className="service-form-section">
+            {/* Dynamic Fields */}
             {service?.fields && service.fields.length > 0 && (
-              <div className="fields-section">
-                <h2>اختر الخيارات المناسبة</h2>
+              <section className="form-section">
+                <h2 className="section-title">تخصيص الخدمة</h2>
                 <div className="fields-container">
                   {service.fields.map(field => (
-                    <div key={field.id} className="field-item">
-                      <h3>
-                        {field.required && <span className="required">*</span>}
+                    <div key={field.id} className={`field-group field-type-${field.type}`}>
+                      <label className="field-label">
                         {field.label}
-                      </h3>
-                      {field.description && (
-                        <p className="field-description">{field.description}</p>
-                      )}
-                      
-                      {field.type === 'number' ? (
-                        <div className="number-input-container">
-                          <input
-                            type="number"
-                            className="number-input"
-                            placeholder={`أدخل ${field.label}`}
-                            min={field.min_value}
-                            max={field.max_value}
-                            step={field.step}
-                            value={fieldValues[field.id]?.value || ''}
-                            onChange={(e) => handleFieldValueChange(field.id, e.target.value)}
-                          />
-                          {field.unit && <span className="unit-label">{field.unit}</span>}
-                        </div>
-                      ) : field.options && field.options.length > 0 ? (
-                        <div className="field-options">
-                          {field.options.map(option => (
-                            <div
-                              key={option.id}
-                              className={`option-card ${fieldValues[field.id]?.option_id === option.id ? 'selected' : ''}`}
-                              onClick={() => handleOptionSelect(field.id, option.id)}
-                            >
-                              {option.image_path ? (
-                                <div className="option-image">
-                                  <img 
-                                    src={serviceBuilderService.getImageUrl(option.image_path)} 
-                                    alt={option.label}
-                                    onError={(e) => e.target.style.display = 'none'}
-                                  />
-                                </div>
-                              ) : (
-                                <div className="option-placeholder">
-                                  <FontAwesomeIcon icon={faImage} />
-                                </div>
-                              )}
-                              <div className="option-content">
-                                <h4>{option.label}</h4>
-                                {option.price_modifier && (
-                                  <span className="price-adjustment">
-                                    {option.price_modifier > 0 ? '+' : ''}{option.price_modifier}درهم
-                                  </span>
-                                )}
-                              </div>
-                              {fieldValues[field.id]?.option_id === option.id && (
-                                <div className="selected-indicator">
-                                  <FontAwesomeIcon icon={faPlus} />
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="no-options">
-                          لا توجد خيارات متاحة لهذا الحقل
-                        </div>
-                      )}
+                        {field.required && <span className="required">*</span>}
+                      </label>
+                      {renderField(field)}
                     </div>
                   ))}
                 </div>
-              </div>
+              </section>
             )}
 
-            {/* Products Section */}
-            {service && (service.productsByTag || service.productsWithoutTags) && (
-              <div className="products-section">
-                <h2>اختر المنتجات</h2>
-                {Object.entries(productsByCategory).map(([category, products]) => (
-                  <div key={category} className="products-by-category">
-                    <h3 className="category-title">{category}</h3>
-                    <div className="products-grid">
-                      {products.map(product => {
-                        const selectedProduct = getSelectedProduct(product.id);
-                        return (
-                          <div key={product.id} className={`product-card ${selectedProduct ? 'selected' : ''}`}>
-                            {product.image_path ? (
-                              <div className="product-image">
-                                <img 
-                                  src={serviceBuilderService.getImageUrl(product.image_path)} 
-                                  alt={product.name}
-                                  onError={(e) => e.target.style.display = 'none'}
-                                />
-                              </div>
-                            ) : (
-                              <div className="product-placeholder">
-                                <FontAwesomeIcon icon={faImage} />
-                              </div>
-                            )}
-                            <div className="product-content">
-                              <h4>{product.name}</h4>
-                              <div className="product-price">{product.unit_price} درهم</div>
-                              {product.description && (
-                                <p className="product-description">{product.description}</p>
-                              )}
-                            </div>
-                            <div className="product-actions">
-                              {selectedProduct ? (
-                                <div className="quantity-selector">
-                                  <label>الكمية:</label>
-                                  <input
-                                    type="number"
-                                    min="1"
-                                    value={selectedProduct.quantity}
-                                    onChange={(e) => handleProductQuantityChange(product.id, parseInt(e.target.value))}
-                                  />
-                                </div>
-                              ) : (
-                                <button 
-                                  className="add-product-btn"
-                                  onClick={() => handleProductSelect(product.id, 1)}
-                                >
-                                  <FontAwesomeIcon icon={faPlus} />
-                                  إضافة
-                                </button>
-                              )}
-                            </div>
+            {/* Products */}
+            {service?.enable_products && service?.products && service.products.length > 0 && (
+              <section className="form-section">
+                <h2 className="section-title">منتجات إضافية</h2>
+                <div className="products-grid">
+                  {service.products.map(product => {
+                    const selectedProduct = selectedProducts.find(p => p.product_id === product.id);
+                    const isSelected = !!selectedProduct;
+                    
+                    return (
+                      <div 
+                        key={product.id} 
+                        className={`product-card ${isSelected ? 'selected' : ''}`}
+                      >
+                        {product.image_url && (
+                          <div className="product-image">
+                            <img src={product.image_url} alt={product.name} />
                           </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))}
-              </div>
+                        )}
+                        
+                        <div className="product-info">
+                          <h4>{product.name}</h4>
+                          {product.description && <p>{product.description}</p>}
+                          <div className="product-price">{product.price} درهم</div>
+                        </div>
+                        
+                        <div className="product-actions">
+                          {isSelected ? (
+                            <div className="quantity-control">
+                              <button 
+                                className="qty-btn"
+                                onClick={() => handleProductQuantityChange(product.id, selectedProduct.quantity - 1)}
+                              >
+                                <FontAwesomeIcon icon={faMinus} />
+                              </button>
+                              <input
+                                type="number"
+                                className="qty-input"
+                                value={selectedProduct.quantity}
+                                onChange={(e) => handleProductQuantityChange(product.id, e.target.value)}
+                                min="1"
+                              />
+                              <button 
+                                className="qty-btn"
+                                onClick={() => handleProductQuantityChange(product.id, selectedProduct.quantity + 1)}
+                              >
+                                <FontAwesomeIcon icon={faPlus} />
+                              </button>
+                            </div>
+                          ) : (
+                            <button 
+                              className="btn btn-outline btn-sm"
+                              onClick={() => handleProductToggle(product.id)}
+                            >
+                              <FontAwesomeIcon icon={faPlus} />
+                              إضافة
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
             )}
-          </div>
 
-          {/* Calculate Button */}
-          <div className="calculate-section">
-            <button 
-              className="calculate-button"
-              onClick={handleCalculatePrice}
-              disabled={calculating}
-            >
-              {calculating ? 'جاري الحساب...' : 'احسب السعر'}
-            </button>
-            {calculationError && (
-              <div className="calculation-error">
-                <FontAwesomeIcon icon={faLayerGroup} />
-                {calculationError}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Sidebar */}
-        <div className="service-sidebar">
-          {/* Service Preview */}
-          <div className="service-preview">
-            {service?.preview_image ? (
-              <img 
-                src={serviceBuilderService.getImageUrl(service.preview_image)} 
-                alt={service.name}
-                onError={(e) => e.target.style.display = 'none'}
-              />
-            ) : (
-              <div className="service-placeholder">
-                <FontAwesomeIcon icon={faLayerGroup} />
-              </div>
-            )}
-          </div>
+            {/* Calculate Button */}
+            <div className="form-actions">
+              {calculationError && (
+                <div className="alert alert-error">
+                  <FontAwesomeIcon icon={faExclamationTriangle} />
+                  <span>{calculationError}</span>
+                </div>
+              )}
+              
+              <button
+                className="btn btn-primary btn-lg btn-calculate"
+                onClick={handleCalculatePrice}
+                disabled={calculating || !isFormValid()}
+              >
+                {calculating ? (
+                  <>
+                    <FontAwesomeIcon icon={faSpinner} spin />
+                    جاري الحساب...
+                  </>
+                ) : (
+                  <>
+                    احسب السعر واحجز
+                    <FontAwesomeIcon icon={faArrowLeft} />
+                  </>
+                )}
+              </button>
+            </div>
+          </main>
         </div>
       </div>
 
-      {/* Order Form Modal */}
-      {showOrderForm && (
-        <div className="order-form-overlay">
-          <div className="order-form-container">
-            <div className="order-form-header">
-              <h2>إرسال الطلب</h2>
-              <button 
-                className="close-button"
-                onClick={() => setShowOrderForm(false)}
-              >
-                ×
-              </button>
-            </div>
-            <form className="order-form" onSubmit={(e) => { e.preventDefault(); handleSubmitOrder(); }}>
-              <div className="form-group">
-                <label>الاسم الكامل *</label>
-                <input
-                  type="text"
-                  required
-                  value={orderFormData.name}
-                  onChange={(e) => setOrderFormData(prev => ({ ...prev, name: e.target.value }))}
-                />
-              </div>
-              <div className="form-group">
-                <label>رقم الهاتف *</label>
-                <input
-                  type="tel"
-                  required
-                  value={orderFormData.phone}
-                  onChange={(e) => setOrderFormData(prev => ({ ...prev, phone: e.target.value }))}
-                />
-              </div>
-              <div className="form-group">
-                <label>البريد الإلكتروني</label>
-                <input
-                  type="email"
-                  value={orderFormData.email}
-                  onChange={(e) => setOrderFormData(prev => ({ ...prev, email: e.target.value }))}
-                />
-              </div>
-              <div className="form-group">
-                <label>ملاحظات إضافية</label>
-                <textarea
-                  value={orderFormData.notes}
-                  onChange={(e) => setOrderFormData(prev => ({ ...prev, notes: e.target.value }))}
-                  rows="3"
-                />
-              </div>
-              <div className="form-actions">
-                <button 
-                  type="button" 
-                  className="cancel-button"
-                  onClick={() => setShowOrderForm(false)}
-                >
-                  إلغاء
-                </button>
-                <button 
-                  type="submit" 
-                  className="submit-button"
-                  disabled={submitting}
-                >
-                  {submitting ? 'جاري الإرسال...' : 'إرسال الطلب'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Enhanced Booking Modal */}
+      {/* Booking Modal */}
       {showBookingModal && (
-        <div className="booking-modal-overlay">
-          <div className="booking-modal-container">
-            <div className="booking-modal-header">
-              <h2>تفاصيل الحجز</h2>
-              <button 
-                className="close-button"
-                onClick={() => {
-                  setShowBookingModal(false);
-                  setBookingStep('summary');
-                  setBookingError(null);
-                }}
-              >
-                ×
-              </button>
-            </div>
-            
-            <div className="booking-modal-content">
-              {/* Booking Steps Navigation */}
-              <div className="booking-steps">
-                <div className={`step ${bookingStep === 'summary' ? 'active' : bookingStep === 'details' || bookingStep === 'payment' ? 'completed' : ''}`}>
-                  <div className="step-number">1</div>
-                  <span>ملخص الطلب</span>
-                </div>
-                <div className={`step ${bookingStep === 'details' ? 'active' : bookingStep === 'payment' ? 'completed' : ''}`}>
-                  <div className="step-number">2</div>
-                  <span>تفاصيل العميل</span>
-                </div>
-                <div className={`step ${bookingStep === 'payment' ? 'active' : ''}`}>
-                  <div className="step-number">3</div>
-                  <span>الدفع</span>
-                </div>
+        <div className="modal-overlay">
+          <div className="modal-container modal-booking">
+            <button className="modal-close" onClick={() => setShowBookingModal(false)}>
+              <FontAwesomeIcon icon={faTimes} />
+            </button>
+
+            {/* Steps Progress */}
+            <div className="booking-steps">
+              <div className={`step ${bookingStep === 'summary' ? 'active' : bookingStep !== 'summary' ? 'completed' : ''}`}>
+                <div className="step-circle">1</div>
+                <span>ملخص الطلب</span>
               </div>
+              <div className={`step ${bookingStep === 'details' ? 'active' : bookingStep === 'payment' ? 'completed' : ''}`}>
+                <div className="step-circle">2</div>
+                <span>بياناتك</span>
+              </div>
+              <div className={`step ${bookingStep === 'payment' ? 'active' : ''}`}>
+                <div className="step-circle">3</div>
+                <span>الدفع</span>
+              </div>
+            </div>
 
-              {/* Error Display */}
-              {bookingError && (
-                <div className="booking-error">
-                  <FontAwesomeIcon icon={faExclamationTriangle} />
-                  <span>{bookingError}</span>
-                </div>
-              )}
+            {bookingError && (
+              <div className="alert alert-error">
+                <FontAwesomeIcon icon={faExclamationTriangle} />
+                <span>{bookingError}</span>
+              </div>
+            )}
 
-              {/* Step 1: Booking Summary */}
-              {bookingStep === 'summary' && (
-                <div className="booking-step-content">
-                  {/* Service Preview */}
-                  <div className="modal-service-preview">
-                    {service?.preview_image ? (
-                      <img 
-                        src={serviceBuilderService.getImageUrl(service.preview_image)} 
-                        alt={service.name}
-                        onError={(e) => e.target.style.display = 'none'}
-                      />
-                    ) : (
-                      <div className="modal-service-placeholder">
-                        <FontAwesomeIcon icon={faLayerGroup} />
+            {/* Step 1: Summary */}
+            {bookingStep === 'summary' && calculation && (
+              <div className="modal-content">
+                <h2>ملخص الطلب</h2>
+                
+                <div className="order-summary">
+                  <div className="summary-section">
+                    <h3>تفاصيل الخدمة</h3>
+                    <div className="summary-row">
+                      <span>الخدمة:</span>
+                      <strong>{service?.name}</strong>
+                    </div>
+                    <div className="summary-row">
+                      <span>السعر الأساسي:</span>
+                      <strong>{calculation.base_price || service?.base_price} درهم</strong>
+                    </div>
+                  </div>
+
+                  {calculation.field_adjustments > 0 && (
+                    <div className="summary-section">
+                      <h3>التعديلات</h3>
+                      <div className="summary-row">
+                        <span>تعديلات الخيارات:</span>
+                        <strong className="text-primary">+{calculation.field_adjustments} درهم</strong>
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
 
-                  {/* Service Details */}
-                  <div className="service-details-summary">
-                    <h3>{service?.name}</h3>
-                    <p>{service?.description}</p>
-                  </div>
-
-                  {/* Selected Products */}
                   {selectedProducts.length > 0 && (
-                    <div className="selected-products-summary">
-                      <h4>المنتجات المختارة</h4>
-                      <div className="products-list">
-                        {selectedProducts.map((product, index) => {
-                          const productDetails = getSelectedProduct(product.product_id);
-                          return (
-                            <div key={index} className="product-item">
-                              <span className="product-name">{productDetails?.name || `منتج ${product.product_id}`}</span>
-                              <span className="product-quantity">الكمية: {product.quantity}</span>
-                              <span className="product-price">
-                                {productDetails?.unit_price ? `${productDetails.unit_price * product.quantity} درهم` : 'غير محدد'}
-                              </span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Field Values Summary */}
-                  {Object.keys(fieldValues).length > 0 && (
-                    <div className="field-values-summary">
-                      <h4>الخيارات المختارة</h4>
-                      <div className="field-values-list">
-                        {Object.entries(fieldValues).map(([fieldId, value]) => {
-                          const field = service?.fields?.find(f => f.id === parseInt(fieldId));
-                          if (!field || !value.value) return null;
-                          
-                          let displayValue = value.value;
-                          if (field.type === 'select' && field.options) {
-                            const option = field.options.find(o => o.id === value.option_id);
-                            displayValue = option?.name || value.value;
-                          }
-                          
-                          return (
-                            <div key={fieldId} className="field-value-item">
-                              <span className="field-name">{field.name}:</span>
-                              <span className="field-value">{displayValue}</span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Price Summary */}
-                  {calculation && (
-                    <div className="price-summary">
-                      <div className="price-breakdown">
-                        <div className="price-item">
-                          <span>سعر الخدمة:</span>
-                          <span>{calculation.subtotal || 0} درهم</span>
-                        </div>
-                        {calculation.field_adjustments > 0 && (
-                          <div className="price-item">
-                            <span>تعديلات الخيارات:</span>
-                            <span>{calculation.field_adjustments} درهم</span>
+                    <div className="summary-section">
+                      <h3>المنتجات المضافة</h3>
+                      {selectedProducts.map(sp => {
+                        const product = service?.products?.find(p => p.id === sp.product_id);
+                        return product ? (
+                          <div key={sp.product_id} className="summary-row">
+                            <span>{product.name} × {sp.quantity}</span>
+                            <strong>{product.price * sp.quantity} درهم</strong>
                           </div>
-                        )}
-                        <div className="price-total">
-                          <span>المجموع الإجمالي:</span>
-                          <span>{getTotalPrice()} درهم</span>
-                        </div>
-                      </div>
+                        ) : null;
+                      })}
                     </div>
                   )}
 
-                  <button 
-                    className="next-step-button"
-                    onClick={() => handleBookingStepChange('details')}
-                    disabled={!calculation}
-                  >
-                    التالي: تفاصيل العميل
-                  </button>
+                  <div className="summary-total">
+                    <span>المجموع الإجمالي:</span>
+                    <strong>{calculation.total || calculation.total_price || 0} درهم</strong>
+                  </div>
                 </div>
-              )}
 
-              {/* Step 2: Customer Details */}
-              {bookingStep === 'details' && (
-                <div className="booking-step-content">
-                  <div className="customer-details-section">
-                    <h3>معلومات العميل</h3>
-                    
-                    <div className="form-group">
-                      <label className="required">الاسم الكامل</label>
-                      <input
-                        type="text"
-                        required
-                        value={orderFormData.name}
-                        onChange={(e) => setOrderFormData(prev => ({ ...prev, name: e.target.value }))}
-                        placeholder="أدخل اسمك الكامل"
-                      />
-                    </div>
-                    
-                    <div className="form-group">
-                      <label className="required">رقم الهاتف</label>
-                      <input
-                        type="tel"
-                        required
-                        value={orderFormData.phone}
-                        onChange={(e) => setOrderFormData(prev => ({ ...prev, phone: e.target.value }))}
-                        placeholder="أدخل رقم الهاتف"
-                      />
-                    </div>
-                    
-                    <div className="form-group">
-                      <label>البريد الإلكتروني</label>
-                      <input
-                        type="email"
-                        value={orderFormData.email}
-                        onChange={(e) => setOrderFormData(prev => ({ ...prev, email: e.target.value }))}
-                        placeholder="أدخل البريد الإلكتروني (اختياري)"
-                      />
-                    </div>
+                <button className="btn btn-primary btn-lg" onClick={() => setBookingStep('details')}>
+                  متابعة
+                  <FontAwesomeIcon icon={faArrowLeft} />
+                </button>
+              </div>
+            )}
+
+            {/* Step 2: Customer Details */}
+            {bookingStep === 'details' && (
+              <div className="modal-content">
+                <h2>معلومات التواصل</h2>
+                
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label>الاسم الكامل <span className="required">*</span></label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={customerInfo.name}
+                      onChange={(e) => setCustomerInfo(prev => ({ ...prev, name: e.target.value }))}
+                      placeholder="أدخل اسمك الكامل"
+                      required
+                    />
                   </div>
 
-                  <div className="address-section">
-                    <h3>عنوان الخدمة</h3>
-                    <AddressManager 
+                  <div className="form-group">
+                    <label>رقم الهاتف <span className="required">*</span></label>
+                    <input
+                      type="tel"
+                      className="form-input"
+                      value={customerInfo.phone}
+                      onChange={(e) => setCustomerInfo(prev => ({ ...prev, phone: e.target.value }))}
+                      placeholder="05xxxxxxxx"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group full-width">
+                    <label>البريد الإلكتروني</label>
+                    <input
+                      type="email"
+                      className="form-input"
+                      value={customerInfo.email}
+                      onChange={(e) => setCustomerInfo(prev => ({ ...prev, email: e.target.value }))}
+                      placeholder="email@example.com"
+                    />
+                  </div>
+
+                  <div className="form-group full-width">
+                    <label>عنوان الخدمة <span className="required">*</span></label>
+                    <AddressManager
                       checkoutMode={true}
-                      onAddressSelect={handleAddressSelect}
+                      onAddressSelect={setSelectedAddress}
                       selectedAddressId={selectedAddress?.id}
                     />
                   </div>
 
-                  <div className="notes-section">
-                    <h3>ملاحظات إضافية</h3>
+                  <div className="form-group full-width">
+                    <label>ملاحظات إضافية</label>
                     <textarea
-                      value={orderFormData.notes}
-                      onChange={(e) => setOrderFormData(prev => ({ ...prev, notes: e.target.value }))}
-                      placeholder="أي ملاحظات أو متطلبات خاصة..."
-                      rows="3"
+                      className="form-textarea"
+                      value={customerInfo.notes}
+                      onChange={(e) => setCustomerInfo(prev => ({ ...prev, notes: e.target.value }))}
+                      placeholder="أي تفاصيل أو متطلبات خاصة..."
+                      rows={3}
                     />
                   </div>
+                </div>
 
-                  <div className="step-navigation">
-                    <button 
-                      className="prev-step-button"
-                      onClick={() => handleBookingStepChange('summary')}
-                    >
-                      السابق
-                    </button>
-                    <button 
-                      className="next-step-button"
-                      onClick={() => handleBookingStepChange('payment')}
-                      disabled={!orderFormData.name || !orderFormData.phone || !selectedAddress}
-                    >
-                      التالي: الدفع
-                    </button>
+                <div className="modal-actions">
+                  <button className="btn btn-secondary" onClick={() => setBookingStep('summary')}>
+                    السابق
+                  </button>
+                  <button 
+                    className="btn btn-primary"
+                    onClick={() => setBookingStep('payment')}
+                    disabled={!customerInfo.name || !customerInfo.phone || !selectedAddress}
+                  >
+                    متابعة
+                    <FontAwesomeIcon icon={faArrowLeft} />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: Payment */}
+            {bookingStep === 'payment' && (
+              <div className="modal-content">
+                <h2>طريقة الدفع</h2>
+                
+                <div className="payment-methods">
+                  <div
+                    className={`payment-method ${paymentMethod === 'cash_on_delivery' ? 'selected' : ''}`}
+                    onClick={() => setPaymentMethod('cash_on_delivery')}
+                  >
+                    <FontAwesomeIcon icon={faMoneyBill} className="payment-icon" />
+                    <div className="payment-info">
+                      <h4>الدفع عند الاستلام</h4>
+                      <p>ادفع نقداً عند وصول فريق العمل</p>
+                    </div>
+                    {paymentMethod === 'cash_on_delivery' && (
+                      <FontAwesomeIcon icon={faCheck} className="payment-check" />
+                    )}
+                  </div>
+
+                  <div
+                    className={`payment-method ${paymentMethod === 'credit_card' ? 'selected' : ''}`}
+                    onClick={() => setPaymentMethod('credit_card')}
+                  >
+                    <FontAwesomeIcon icon={faCreditCard} className="payment-icon" />
+                    <div className="payment-info">
+                      <h4>بطاقة ائتمان</h4>
+                      <p>ادفع الآن عبر البطاقة بشكل آمن</p>
+                    </div>
+                    {paymentMethod === 'credit_card' && (
+                      <FontAwesomeIcon icon={faCheck} className="payment-check" />
+                    )}
+                  </div>
+
+                  <div
+                    className={`payment-method ${paymentMethod === 'bank_transfer' ? 'selected' : ''}`}
+                    onClick={() => setPaymentMethod('bank_transfer')}
+                  >
+                    <FontAwesomeIcon icon={faUniversity} className="payment-icon" />
+                    <div className="payment-info">
+                      <h4>تحويل بنكي</h4>
+                      <p>قم بتحويل المبلغ للحساب البنكي</p>
+                    </div>
+                    {paymentMethod === 'bank_transfer' && (
+                      <FontAwesomeIcon icon={faCheck} className="payment-check" />
+                    )}
                   </div>
                 </div>
-              )}
 
-              {/* Step 3: Payment */}
-              {bookingStep === 'payment' && (
-                <div className="booking-step-content">
-                  <div className="payment-methods-section">
-                    <h3>طريقة الدفع</h3>
-                    
-                    <div className="payment-methods">
-                      <div 
-                        className={`payment-method ${paymentMethod === 'cash_on_delivery' ? 'selected' : ''}`}
-                        onClick={() => handlePaymentMethodChange('cash_on_delivery')}
-                      >
-                        <FontAwesomeIcon icon={faMoneyBill} />
-                        <div className="payment-method-info">
-                          <h4>الدفع عند الاستلام</h4>
-                          <p>ادفع عند وصول فريق العمل</p>
-                        </div>
-                        <div className="payment-method-check">
-                          {paymentMethod === 'cash_on_delivery' && <FontAwesomeIcon icon={faCheck} />}
-                        </div>
-                      </div>
-                      
-                      <div 
-                        className={`payment-method ${paymentMethod === 'credit_card' ? 'selected' : ''}`}
-                        onClick={() => handlePaymentMethodChange('credit_card')}
-                      >
-                        <FontAwesomeIcon icon={faCreditCard} />
-                        <div className="payment-method-info">
-                          <h4>بطاقة ائتمان</h4>
-                          <p>ادفع الآن عبر البطاقة</p>
-                        </div>
-                        <div className="payment-method-check">
-                          {paymentMethod === 'credit_card' && <FontAwesomeIcon icon={faCheck} />}
-                        </div>
-                      </div>
-                      
-                      <div 
-                        className={`payment-method ${paymentMethod === 'bank_transfer' ? 'selected' : ''}`}
-                        onClick={() => handlePaymentMethodChange('bank_transfer')}
-                      >
-                        <FontAwesomeIcon icon={faUniversity} />
-                        <div className="payment-method-info">
-                          <h4>تحويل بنكي</h4>
-                          <p>تحويل مباشر للبنك</p>
-                        </div>
-                        <div className="payment-method-check">
-                          {paymentMethod === 'bank_transfer' && <FontAwesomeIcon icon={faCheck} />}
-                        </div>
-                      </div>
-                    </div>
+                <div className="final-summary">
+                  <h3>تأكيد نهائي</h3>
+                  <div className="summary-row">
+                    <span>المبلغ الإجمالي:</span>
+                    <strong className="text-xl">{calculation?.total || 0} درهم</strong>
                   </div>
-
-                  <div className="final-summary">
-                    <h3>ملخص الطلب النهائي</h3>
-                    <div className="summary-details">
-                      <div className="summary-row">
-                        <span>الخدمة:</span>
-                        <span>{service?.name}</span>
-                      </div>
-                      <div className="summary-row">
-                        <span>العنوان:</span>
-                        <span>{selectedAddress?.address_line1}, {selectedAddress?.city}</span>
-                      </div>
-                      <div className="summary-row">
-                        <span>طريقة الدفع:</span>
-                        <span>
-                          {paymentMethod === 'cash_on_delivery' ? 'الدفع عند الاستلام' : 
-                           paymentMethod === 'credit_card' ? 'بطاقة ائتمان' : 
-                           paymentMethod === 'bank_transfer' ? 'تحويل بنكي' : 'الدفع عند الاستلام'}
-                        </span>
-                      </div>
-                      <div className="summary-row total">
-                        <span>المجموع الإجمالي:</span>
-                        <span>{getTotalPrice()} درهم</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="step-navigation">
-                    <button 
-                      className="prev-step-button"
-                      onClick={() => handleBookingStepChange('details')}
-                    >
-                      السابق
-                    </button>
-                    <button 
-                      className="submit-order-button"
-                      onClick={handleEnhancedSubmitOrder}
-                      disabled={submitting}
-                    >
-                      {submitting ? (
-                        <>
-                          <FontAwesomeIcon icon={faSpinner} spin />
-                          جاري إرسال الطلب...
-                        </>
-                      ) : (
-                        'تأكيد الطلب'
-                      )}
-                    </button>
+                  <div className="summary-row">
+                    <span>طريقة الدفع:</span>
+                    <strong>
+                      {paymentMethod === 'cash_on_delivery' && 'الدفع عند الاستلام'}
+                      {paymentMethod === 'credit_card' && 'بطاقة ائتمان'}
+                      {paymentMethod === 'bank_transfer' && 'تحويل بنكي'}
+                    </strong>
                   </div>
                 </div>
-              )}
-            </div>
+
+                <div className="modal-actions">
+                  <button className="btn btn-secondary" onClick={() => setBookingStep('details')}>
+                    السابق
+                  </button>
+                  <button
+                    className="btn btn-primary btn-lg"
+                    onClick={handleSubmitOrder}
+                    disabled={submitting}
+                  >
+                    {submitting ? (
+                      <>
+                        <FontAwesomeIcon icon={faSpinner} spin />
+                        جاري الإرسال...
+                      </>
+                    ) : (
+                      <>
+                        <FontAwesomeIcon icon={faCheck} />
+                        تأكيد الطلب
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -990,4 +1113,4 @@ const ServiceDetailPage = () => {
   );
 };
 
-export default ServiceDetailPage; 
+export default ServiceDetailPage;

@@ -98,17 +98,33 @@ const SignupPage = () => {
       setApiError(null);
       
       try {
-        const response = await authService.signup(formData);
+        const response = await authService.signup(formData, true);
         
         // Show success animation
         setSignupSuccess(true);
         
-        // Redirect after a short delay
-        setTimeout(() => {
-          navigate('/login', { 
-            state: { message: 'تم إنشاء الحساب بنجاح. يمكنك الآن تسجيل الدخول.' } 
-          });
-        }, 2000);
+        // Handle auto-login result
+        if (response.autoLogin) {
+          // User is now logged in automatically
+          setTimeout(() => {
+            navigate('/', { 
+              state: { 
+                message: 'تم إنشاء الحساب وتسجيل الدخول بنجاح!',
+                type: 'success'
+              } 
+            });
+          }, 2000);
+        } else {
+          // Auto-login failed, redirect to login page
+          setTimeout(() => {
+            navigate('/login', { 
+              state: { 
+                message: 'تم إنشاء الحساب بنجاح. يرجى تسجيل الدخول.',
+                type: 'info'
+              } 
+            });
+          }, 2000);
+        }
       } catch (error) {
         // Handle signup errors
         const errorMessage = error.response?.data?.message || 
@@ -120,10 +136,6 @@ const SignupPage = () => {
     }
   };
 
-  const handleGoogleSignup = () => {
-    // TODO: Implement Google OAuth signup
-    console.log('Google signup clicked');
-  };
 
   const getPasswordStrengthText = () => {
     switch (passwordStrength) {
@@ -198,7 +210,7 @@ const SignupPage = () => {
                   <i className="fas fa-check-circle"></i>
                 </div>
                 <h2>تم إنشاء الحساب بنجاح</h2>
-                <p>جاري تحويلك لصفحة تسجيل الدخول...</p>
+                <p>جاري تسجيل الدخول تلقائياً...</p>
               </motion.div>
             ) : (
               <motion.div
@@ -226,16 +238,6 @@ const SignupPage = () => {
                     </motion.div>
                   )}
                 </AnimatePresence>
-
-                {/* Social Signup */}
-                <button className="social-btn" onClick={handleGoogleSignup}>
-                  <i className="fab fa-google"></i>
-                  <span>إنشاء حساب مع Google</span>
-                </button>
-
-                <div className="divider">
-                  <span>أو</span>
-                </div>
 
                 {/* Form */}
                 <form className="auth-form" onSubmit={handleSubmit}>
