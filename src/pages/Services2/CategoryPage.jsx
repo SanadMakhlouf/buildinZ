@@ -107,7 +107,7 @@ const CategoryPage = () => {
               >
                 <div className="category-image">
                   <img 
-                    src={serviceBuilderService.getImageUrl(category.preview_image_url || category.image_path)} 
+                    src={serviceBuilderService.getImageUrl(category.preview_image_path || category.preview_image_url || category.image_path)} 
                     alt={category.name}
                     onError={(e) => {
                       e.target.onerror = null;

@@ -167,13 +167,14 @@ const ServicesPage2 = () => {
                 onClick={() => handleCategorySelect(category)}
               >
                 <div className="category-image">
-                  {(category.preview_image_url || category.image_path) ? (
+                  {(category.preview_image_path || category.preview_image_url || category.image_path) ? (
                     (() => {
-                      const imagePath = category.preview_image_url || category.image_path;
+                      const imagePath = category.preview_image_path || category.preview_image_url || category.image_path;
                       const fullImageUrl = serviceBuilderService.getImageUrl(imagePath);
                       console.log('Category Image Debug:', {
                         categoryName: category.name,
                         categoryId: category.id,
+                        preview_image_path: category.preview_image_path,
                         preview_image_url: category.preview_image_url,
                         image_path: category.image_path,
                         selectedPath: imagePath,

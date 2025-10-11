@@ -1624,6 +1624,95 @@
   font-size: 1.2rem;
 }
 
+/* WhatsApp Contact Section */
+.whatsapp-contact {
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  border-radius: var(--border-radius-lg);
+  padding: 24px;
+  margin: 24px 0;
+  text-align: center;
+}
+
+.whatsapp-contact h3 {
+  color: white;
+  font-size: 1.3rem;
+  margin: 0 0 16px 0;
+  font-weight: 600;
+}
+
+.whatsapp-numbers {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.whatsapp-button {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: white;
+  color: #128C7E;
+  padding: 16px 20px;
+  border-radius: var(--border-radius);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.whatsapp-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  background: #f0f0f0;
+}
+
+.whatsapp-button svg {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  color: #25D366;
+}
+
+.whatsapp-button span {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: right;
+  flex: 1;
+}
+
+.whatsapp-button strong {
+  font-size: 1.1rem;
+  color: #128C7E;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.whatsapp-button small {
+  font-size: 0.9rem;
+  color: #666;
+  direction: ltr;
+}
+
+/* Simple Quick Summary */
+.quick-summary-simple {
+  background: var(--primary-lighter);
+  border: 1px solid var(--primary-light);
+  border-radius: var(--border-radius);
+  padding: 16px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.quick-summary-simple p {
+  margin: 0;
+  color: var(--gray-800);
+}
+
+.quick-summary-simple strong {
+  font-size: 1.15rem;
+  color: var(--primary);
+}
+
 /* ============================================
    Responsive Design
    ============================================ */
@@ -1739,6 +1828,32 @@
   
   .modal-actions {
     flex-direction: column;
+  }
+
+  .whatsapp-contact {
+    padding: 20px;
+  }
+
+  .whatsapp-contact h3 {
+    font-size: 1.1rem;
+  }
+
+  .whatsapp-button {
+    padding: 12px 16px;
+    gap: 12px;
+  }
+
+  .whatsapp-button svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .whatsapp-button strong {
+    font-size: 1rem;
+  }
+
+  .whatsapp-button small {
+    font-size: 0.85rem;
   }
 }
 

@@ -561,9 +561,9 @@ const ServicesPage3 = () => {
                   whileTap={{ scale: 0.98 }}
                 >
                   <div className="category-icon-container">
-                    {(category.preview_image_url || category.image_path) ? (
+                    {(category.preview_image_path || category.preview_image_url || category.image_path) ? (
                       <img 
-                        src={serviceBuilderService.getImageUrl(category.preview_image_url || category.image_path)} 
+                        src={serviceBuilderService.getImageUrl(category.preview_image_path || category.preview_image_url || category.image_path)} 
                         alt={category.name}
                         className="category-icon-image"
                         onError={(e) => {
@@ -802,10 +802,10 @@ const ServicesPage3 = () => {
                                       className={`option-card ${fieldValues[field.id]?.option_id === option.id ? 'selected' : ''}`}
                                       onClick={() => handleOptionSelect(field.id, option.id)}
                                     >
-                                      {option.image_path ? (
+                                      {option.image_url ? (
                                         <div className="option-image">
                                           <img 
-                                            src={serviceBuilderService.getImageUrl(option.image_path)} 
+                                            src={serviceBuilderService.getImageUrl(option.image_url)} 
                                             alt={option.label}
                                             onError={(e) => e.target.style.display = 'none'}
                                           />
