@@ -22,7 +22,6 @@ import {
   faTimes
 } from '@fortawesome/free-solid-svg-icons';
 import serviceBuilderService from '../../services/serviceBuilderService';
-import AddressManager from '../../components/Profile/AddressManager';
 import './ServiceDetailPage.css';
 
 const ServiceDetailPage = () => {
@@ -36,6 +35,7 @@ const ServiceDetailPage = () => {
   
   // Image Gallery State
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isZoomOpen, setIsZoomOpen] = useState(false);
   
   // Form State
   const [fieldValues, setFieldValues] = useState({});
@@ -56,11 +56,13 @@ const ServiceDetailPage = () => {
     name: '',
     phone: '',
     email: '',
+    emirate: '',
     notes: ''
   });
   const [submitting, setSubmitting] = useState(false);
   const [bookingError, setBookingError] = useState(null);
   const [orderSuccess, setOrderSuccess] = useState(false);
+  const [orderData, setOrderData] = useState(null);
 
   // Fetch service details
   const fetchServiceDetails = useCallback(async () => {
@@ -200,6 +202,27 @@ const ServiceDetailPage = () => {
     }
   };
 
+  // Image zoom handlers
+  const openZoom = () => {
+    setIsZoomOpen(true);
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+  };
+
+  const closeZoom = () => {
+    setIsZoomOpen(false);
+    document.body.style.overflow = 'unset';
+  };
+
+  const nextZoomImage = (e) => {
+    e.stopPropagation();
+    nextImage();
+  };
+
+  const prevZoomImage = (e) => {
+    e.stopPropagation();
+    prevImage();
+  };
+
   // Calculate price or proceed directly to booking
   const handleCalculatePrice = async () => {
     // If service doesn't require pricing, skip calculation and go to booking
@@ -279,8 +302,8 @@ const ServiceDetailPage = () => {
 
   // Submit order
   const handleSubmitOrder = async () => {
-    if (!customerInfo.name || !customerInfo.phone || !customerInfo.email) {
-      setBookingError('يرجى ملء جميع الحقول المطلوبة (الاسم، الهاتف، البريد الإلكتروني)');
+    if (!customerInfo.name || !customerInfo.phone) {
+      setBookingError('يرجى ملء جميع الحقول المطلوبة (الاسم، الهاتف)');
       return;
     }
 
@@ -322,7 +345,7 @@ const ServiceDetailPage = () => {
       const orderData = {
         service_id: parseInt(id),
         customer_name: customerInfo.name,
-        customer_email: customerInfo.email,
+        customer_email: customerInfo.email || 'optional+email+notselected@buildingz.ae',
         customer_phone: customerInfo.phone,
         field_values: formattedFieldValues,
         products: selectedProducts,
@@ -330,15 +353,21 @@ const ServiceDetailPage = () => {
         payment_method: paymentMethod
       };
 
-      // Only include shipping_address if an address is selected
-      if (selectedAddress) {
-        orderData.shipping_address = {
+      // Include emirate in shipping address if provided
+      if (customerInfo.emirate || selectedAddress) {
+        orderData.shipping_address = selectedAddress ? {
           name: selectedAddress.name || customerInfo.name,
           street: selectedAddress.street || selectedAddress.address_line1,
           city: selectedAddress.city,
-          state: selectedAddress.state || selectedAddress.city,
+          state: customerInfo.emirate || selectedAddress.state || selectedAddress.city,
           country: selectedAddress.country || 'UAE',
           phone: selectedAddress.phone || customerInfo.phone
+        } : {
+          name: customerInfo.name,
+          city: customerInfo.emirate,
+          state: customerInfo.emirate,
+          country: 'UAE',
+          phone: customerInfo.phone
         };
       }
 
@@ -721,7 +750,7 @@ const ServiceDetailPage = () => {
           <aside className="service-gallery-section">
             {service?.images && service.images.length > 0 ? (
               <div className="image-gallery">
-                <div className="gallery-main">
+                <div className="gallery-main" onClick={openZoom}>
                   <img 
                     src={service.images[currentImageIndex]?.url} 
                     alt={service.name}
@@ -729,10 +758,10 @@ const ServiceDetailPage = () => {
                   />
                   {service.images.length > 1 && (
                     <>
-                      <button className="gallery-nav gallery-prev" onClick={prevImage}>
+                      <button className="gallery-nav gallery-prev" onClick={(e) => { e.stopPropagation(); prevImage(); }}>
                         <FontAwesomeIcon icon={faChevronRight} />
               </button>
-                      <button className="gallery-nav gallery-next" onClick={nextImage}>
+                      <button className="gallery-nav gallery-next" onClick={(e) => { e.stopPropagation(); nextImage(); }}>
                         <FontAwesomeIcon icon={faChevronLeft} />
                       </button>
                       <div className="gallery-indicator">
@@ -922,56 +951,53 @@ const ServiceDetailPage = () => {
               <div className="modal-content">
                 <h2>ملخص الطلب</h2>
                 
-                <div className="order-summary">
-                  <div className="summary-section">
-                    <h3>تفاصيل الخدمة</h3>
-                    <div className="summary-row">
-                      <span>الخدمة:</span>
-                      <strong>{service?.name}</strong>
-                    </div>
-                    {calculation && (
-                      <div className="summary-row">
-                        <span>السعر الأساسي:</span>
-                        <strong>{calculation.base_price || service?.base_price} درهم</strong>
-                      </div>
-                    )}
+                <div className="order-summary-simple">
+                  <div className="summary-item">
+                    <span className="summary-label">الخدمة:</span>
+                    <strong className="summary-value">{service?.name}</strong>
                   </div>
 
-                  {calculation?.field_adjustments > 0 && (
-                    <div className="summary-section">
-                      <h3>التعديلات</h3>
-                      <div className="summary-row">
-                        <span>تعديلات الخيارات:</span>
-                        <strong className="text-primary">+{calculation.field_adjustments} درهم</strong>
+                  {calculation && (
+                    <>
+                      <div className="summary-item">
+                        <span className="summary-label">السعر الأساسي:</span>
+                        <strong className="summary-value">{calculation.base_price || service?.base_price} درهم</strong>
                       </div>
-                    </div>
+
+                      {calculation.field_adjustments > 0 && (
+                        <div className="summary-item">
+                          <span className="summary-label">إضافات الخيارات:</span>
+                          <strong className="summary-value text-primary">+{calculation.field_adjustments} درهم</strong>
+                        </div>
+                      )}
+                    </>
                   )}
 
                   {selectedProducts.length > 0 && (
-                    <div className="summary-section">
-                      <h3>المنتجات المضافة</h3>
+                    <div className="summary-products">
+                      <span className="summary-label">المنتجات:</span>
                       {selectedProducts.map(sp => {
                         const product = service?.products?.find(p => p.id === sp.product_id);
                         return product ? (
-                          <div key={sp.product_id} className="summary-row">
+                          <div key={sp.product_id} className="summary-product-item">
                             <span>{product.name} × {sp.quantity}</span>
                             <strong>{product.price * sp.quantity} درهم</strong>
-                            </div>
+                          </div>
                         ) : null;
-                        })}
+                      })}
                     </div>
                   )}
 
                   {calculation && (
-                    <div className="summary-total">
-                          <span>المجموع الإجمالي:</span>
+                    <div className="summary-total-simple">
+                      <span>الإجمالي</span>
                       <strong>{calculation.total || calculation.total_price || 0} درهم</strong>
                     </div>
                   )}
                 </div>
 
                 <button className="btn btn-primary btn-lg" onClick={() => setBookingStep('details')}>
-                  متابعة
+                  متابعة للحجز
                   <FontAwesomeIcon icon={faArrowLeft} />
                   </button>
                 </div>
@@ -981,6 +1007,20 @@ const ServiceDetailPage = () => {
               {bookingStep === 'details' && (
               <div className="modal-content">
                 <h2>معلومات التواصل</h2>
+                
+                {/* Quick Summary */}
+                <div className="quick-summary">
+                  <div className="quick-summary-row">
+                    <span>الخدمة:</span>
+                    <strong>{service?.name}</strong>
+                  </div>
+                  {calculation && (
+                    <div className="quick-summary-row total">
+                      <span>الإجمالي:</span>
+                      <strong>{calculation.total || calculation.total_price || 0} درهم</strong>
+                    </div>
+                  )}
+                </div>
                     
                 <div className="form-grid">
                     <div className="form-group">
@@ -1008,28 +1048,36 @@ const ServiceDetailPage = () => {
                     </div>
                     
                   <div className="form-group full-width">
-                    <label>البريد الإلكتروني <span className="required">*</span></label>
+                    <label>البريد الإلكتروني <span className="optional">(اختياري)</span></label>
                       <input
                         type="email"
                       className="form-input"
                       value={customerInfo.email}
                       onChange={(e) => setCustomerInfo(prev => ({ ...prev, email: e.target.value }))}
                       placeholder="email@example.com"
-                      required
                     />
                   </div>
 
                   <div className="form-group full-width">
-                    <label>عنوان الخدمة <span className="optional">(اختياري)</span></label>
-                    <AddressManager
-                      checkoutMode={true}
-                      onAddressSelect={setSelectedAddress}
-                      selectedAddressId={selectedAddress?.id}
-                    />
+                    <label>الإمارة <span className="optional">(اختياري)</span></label>
+                    <select
+                      className="form-input"
+                      value={customerInfo.emirate}
+                      onChange={(e) => setCustomerInfo(prev => ({ ...prev, emirate: e.target.value }))}
+                    >
+                      <option value="">اختر الإمارة</option>
+                      <option value="أبوظبي">أبوظبي</option>
+                      <option value="دبي">دبي</option>
+                      <option value="الشارقة">الشارقة</option>
+                      <option value="عجمان">عجمان</option>
+                      <option value="أم القيوين">أم القيوين</option>
+                      <option value="رأس الخيمة">رأس الخيمة</option>
+                      <option value="الفجيرة">الفجيرة</option>
+                    </select>
                   </div>
 
                   <div className="form-group full-width">
-                    <label>ملاحظات إضافية</label>
+                    <label>ملاحظات إضافية <span className="optional">(اختياري)</span></label>
                     <textarea
                       className="form-textarea"
                       value={customerInfo.notes}
@@ -1047,12 +1095,21 @@ const ServiceDetailPage = () => {
                     </button>
                   )}
                   <button 
-                    className="btn btn-primary"
-                    onClick={() => setBookingStep('payment')}
-                    disabled={!customerInfo.name || !customerInfo.phone || !customerInfo.email}
+                    className="btn btn-primary btn-lg"
+                    onClick={handleSubmitOrder}
+                    disabled={!customerInfo.name || !customerInfo.phone || submitting}
                   >
-                    متابعة
-                    <FontAwesomeIcon icon={faArrowLeft} />
+                    {submitting ? (
+                      <>
+                        <FontAwesomeIcon icon={faSpinner} spin />
+                        جاري الإرسال...
+                      </>
+                    ) : (
+                      <>
+                        <FontAwesomeIcon icon={faCheck} />
+                        تأكيد الحجز
+                      </>
+                    )}
                   </button>
                   </div>
                 </div>
@@ -1161,6 +1218,37 @@ const ServiceDetailPage = () => {
                   </div>
                 </div>
               )}
+          </div>
+        </div>
+      )}
+
+      {/* Image Zoom Modal */}
+      {isZoomOpen && (
+        <div className="zoom-modal" onClick={closeZoom}>
+          <button className="zoom-close" onClick={closeZoom}>
+            <FontAwesomeIcon icon={faTimes} />
+          </button>
+          
+          <div className="zoom-content" onClick={(e) => e.stopPropagation()}>
+            <img 
+              src={service?.images[currentImageIndex]?.url} 
+              alt={service?.name}
+              className="zoom-image"
+            />
+            
+            {service?.images && service.images.length > 1 && (
+              <>
+                <button className="zoom-nav zoom-prev" onClick={prevZoomImage}>
+                  <FontAwesomeIcon icon={faChevronRight} />
+                </button>
+                <button className="zoom-nav zoom-next" onClick={nextZoomImage}>
+                  <FontAwesomeIcon icon={faChevronLeft} />
+                </button>
+                <div className="zoom-indicator">
+                  {currentImageIndex + 1} / {service.images.length}
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}

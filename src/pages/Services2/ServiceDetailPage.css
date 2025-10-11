@@ -436,6 +436,123 @@
   margin-right: 6px;
 }
 
+/* Quick Summary */
+.quick-summary {
+  background: linear-gradient(135deg, var(--primary-lighter) 0%, var(--primary-light) 100%);
+  border: 2px solid var(--primary);
+  border-radius: var(--border-radius);
+  padding: 16px 20px;
+  margin-bottom: 24px;
+}
+
+.quick-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  color: var(--gray-800);
+}
+
+.quick-summary-row span {
+  font-size: 0.95rem;
+  color: var(--gray-700);
+}
+
+.quick-summary-row strong {
+  font-size: 1.05rem;
+  color: var(--gray-900);
+}
+
+.quick-summary-row.total {
+  border-top: 2px solid var(--primary);
+  margin-top: 8px;
+  padding-top: 12px;
+}
+
+.quick-summary-row.total strong {
+  font-size: 1.3rem;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* Simplified Order Summary */
+.order-summary-simple {
+  background: var(--bg-light);
+  border-radius: var(--border-radius);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.summary-item:last-child {
+  border-bottom: none;
+}
+
+.summary-label {
+  font-size: 1rem;
+  color: var(--gray-600);
+  font-weight: 500;
+}
+
+.summary-value {
+  font-size: 1.1rem;
+  color: var(--gray-900);
+  font-weight: 600;
+}
+
+.summary-products {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.summary-products .summary-label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.summary-product-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: white;
+  border-radius: var(--border-radius-sm);
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+.summary-product-item:last-child {
+  margin-bottom: 0;
+}
+
+.summary-total-simple {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  margin-top: 8px;
+  border-top: 2px solid var(--primary);
+}
+
+.summary-total-simple span {
+  font-size: 1.2rem;
+  color: var(--gray-700);
+  font-weight: 600;
+}
+
+.summary-total-simple strong {
+  font-size: 1.5rem;
+  color: var(--primary);
+  font-weight: 700;
+}
+
 /* Text & Textarea Inputs */
 .field-input-wrapper {
   position: relative;
@@ -1657,5 +1774,222 @@
   
   .gallery-thumbnails {
     grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  }
+}
+
+/* =============================================
+   IMAGE ZOOM MODAL
+   ============================================= */
+
+.zoom-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.zoom-close {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 10002;
+  backdrop-filter: blur(10px);
+}
+
+.zoom-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: rotate(90deg) scale(1.1);
+}
+
+.zoom-content {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: zoomIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes zoomIn {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.zoom-image {
+  max-width: 100%;
+  max-height: 90vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 25px 100px rgba(0, 0, 0, 0.5);
+  animation: imageReveal 0.5s ease 0.2s both;
+}
+
+@keyframes imageReveal {
+  from {
+    opacity: 0;
+    filter: blur(20px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+.zoom-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 10001;
+  backdrop-filter: blur(10px);
+}
+
+.zoom-nav:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.6);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.zoom-nav:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.zoom-prev {
+  right: calc(100% + 20px);
+}
+
+.zoom-next {
+  left: calc(100% + 20px);
+}
+
+.zoom-indicator {
+  position: absolute;
+  bottom: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 10px 24px;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  white-space: nowrap;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Mobile zoom modal adjustments */
+@media (max-width: 768px) {
+  .zoom-modal {
+    padding: 10px;
+  }
+
+  .zoom-close {
+    top: 10px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+
+  .zoom-content {
+    max-width: 95vw;
+    max-height: 85vh;
+  }
+
+  .zoom-image {
+    max-height: 85vh;
+    border-radius: var(--border-radius);
+  }
+
+  .zoom-nav {
+    width: 45px;
+    height: 45px;
+    font-size: 1.2rem;
+  }
+
+  .zoom-prev {
+    right: auto;
+    left: 10px;
+  }
+
+  .zoom-next {
+    left: auto;
+    right: 10px;
+  }
+
+  .zoom-indicator {
+    bottom: 10px;
+    padding: 8px 20px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Landscape mobile adjustments */
+@media (max-width: 768px) and (orientation: landscape) {
+  .zoom-image {
+    max-height: 80vh;
+  }
+
+  .zoom-content {
+    max-height: 80vh;
+  }
+
+  .zoom-indicator {
+    bottom: 5px;
+    padding: 6px 16px;
+    font-size: 0.85rem;
   }
 }
