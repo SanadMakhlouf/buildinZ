@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faArrowLeft, 
@@ -25,8 +26,11 @@ import serviceBuilderService from '../../services/serviceBuilderService';
 import './ServiceDetailPage.css';
 
 const ServiceDetailPage = () => {
-  const { id } = useParams();
+  const { id: urlParam } = useParams();
   const navigate = useNavigate();
+  
+  // Extract ID from URL param (handle both "18" and "18-slug-name" formats)
+  const id = urlParam?.split('-')[0];
   
   // Service State
   const [service, setService] = useState(null);
@@ -729,8 +733,77 @@ const ServiceDetailPage = () => {
     );
   }
 
+  // Prepare SEO data
+  const serviceSlug = service?.slug || (service?.name ? service.name.toLowerCase().replace(/\s+/g, '-') : 'service');
+  const pageTitle = `${service?.name || 'خدمة'} - ${service?.category?.name || 'خدمات'} - BuildingZ`;
+  const pageDescription = service?.description || `احجز خدمة ${service?.name || ''} على منصة BuildingZ`;
+  const pageUrl = `${window.location.origin}/services2/${service?.id || 'service'}-${serviceSlug}`;
+  const serviceImage = service?.main_image?.url || service?.images?.[0]?.url || `${window.location.origin}/logo.png`;
+  const whatsappContacts = service?.whatsapp_numbers || [];
+
   return (
     <div className="service-detail-page">
+      <Helmet>
+        {/* Basic Meta Tags */}
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDescription} />
+        <meta name="keywords" content={`${service?.name}, ${service?.category?.name}, خدمات, BuildingZ, حجز خدمات`} />
+        <link rel="canonical" href={pageUrl} />
+        
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="product" />
+        <meta property="og:url" content={pageUrl} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDescription} />
+        <meta property="og:image" content={serviceImage} />
+        <meta property="og:site_name" content="BuildingZ" />
+        <meta property="og:locale" content="ar_AE" />
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content={pageUrl} />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={pageDescription} />
+        <meta name="twitter:image" content={serviceImage} />
+        
+        {/* Additional SEO */}
+        <meta name="robots" content="index, follow" />
+        <meta name="language" content="Arabic" />
+        
+        {/* Structured Data for Service */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Service",
+            "name": service?.name,
+            "description": pageDescription,
+            "url": pageUrl,
+            "image": serviceImage,
+            "provider": {
+              "@type": "Organization",
+              "name": "BuildingZ",
+              "url": window.location.origin,
+              ...(whatsappContacts.length > 0 && {
+                "contactPoint": whatsappContacts.map(contact => ({
+                  "@type": "ContactPoint",
+                  "telephone": contact.whatsapp_number,
+                  "contactType": "customer service",
+                  "availableLanguage": ["ar", "en"]
+                }))
+              })
+            },
+            "category": service?.category?.name,
+            ...(service?.base_price && service.base_price > 0 && {
+              "offers": {
+                "@type": "Offer",
+                "price": service.base_price,
+                "priceCurrency": "AED"
+              }
+            })
+          })}
+        </script>
+      </Helmet>
+
       {/* Header */}
       <header className="service-header">
         <div className="container">
@@ -749,15 +822,6 @@ const ServiceDetailPage = () => {
           </div>
               )}
           </div>
-            
-            {service?.requires_pricing !== false && (
-              <div className="service-price-section">
-                <div className="base-price">
-                  <span className="label">السعر الأساسي</span>
-                  <span className="price">{service?.base_price} <small>درهم</small></span>
-        </div>
-      </div>
-            )}
           </div>
         </div>
       </header>
@@ -774,6 +838,8 @@ const ServiceDetailPage = () => {
                     src={service.images[currentImageIndex]?.url} 
                     alt={service.name}
                     className="main-image"
+                    loading="eager"
+                    decoding="async"
                   />
                   {service.images.length > 1 && (
                     <>
@@ -798,7 +864,12 @@ const ServiceDetailPage = () => {
                         className={`thumbnail ${index === currentImageIndex ? 'active' : ''}`}
                         onClick={() => setCurrentImageIndex(index)}
                       >
-                        <img src={image.url} alt={`${service.name} ${index + 1}`} />
+                        <img 
+                          src={image.url} 
+                          alt={`${service.name} ${index + 1}`} 
+                          loading={index < 3 ? "eager" : "lazy"}
+                          decoding="async"
+                        />
                 </button>
               ))}
             </div>
@@ -976,20 +1047,11 @@ const ServiceDetailPage = () => {
                     <strong className="summary-value">{service?.name}</strong>
                   </div>
 
-                  {calculation && (
-                    <>
-                      <div className="summary-item">
-                        <span className="summary-label">السعر الأساسي:</span>
-                        <strong className="summary-value">{calculation.base_price || service?.base_price} درهم</strong>
-                      </div>
-
-                      {calculation.field_adjustments > 0 && (
-                        <div className="summary-item">
-                          <span className="summary-label">إضافات الخيارات:</span>
-                          <strong className="summary-value text-primary">+{calculation.field_adjustments} درهم</strong>
-                        </div>
-                      )}
-                    </>
+                  {calculation?.field_adjustments > 0 && (
+                    <div className="summary-item">
+                      <span className="summary-label">إضافات الخيارات:</span>
+                      <strong className="summary-value text-primary">+{calculation.field_adjustments} درهم</strong>
+                    </div>
                   )}
 
                   {selectedProducts.length > 0 && (

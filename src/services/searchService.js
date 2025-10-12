@@ -54,51 +54,54 @@ axiosInstance.interceptors.response.use(
 
 const searchService = {
   /**
-   * Search products using the new search endpoint
-   * @param {string} query - Search query
-   * @param {Object} options - Additional search options
+   * Global search across services, categories, and products
+   * @param {string} query - Search query (supports Arabic and English)
+   * @param {Object} options - Search options
+   * @param {string} options.type - Type of results: 'all', 'services', 'categories', 'products' (default: 'all')
+   * @param {number} options.limit - Maximum results per type (1-100, default: 10)
    * @returns {Promise} Promise with search results
    */
-  async searchProducts(query, options = {}) {
+  async search(query, options = {}) {
     try {
+      if (!query || query.trim() === '') {
+        throw new Error('Search query is required');
+      }
+
       const params = new URLSearchParams();
       params.append('q', query);
       
-      // Add optional parameters
-      if (options.page) params.append('page', options.page);
-      if (options.limit) params.append('limit', options.limit);
-      if (options.category) params.append('category', options.category);
-      if (options.minPrice) params.append('min_price', options.minPrice);
-      if (options.maxPrice) params.append('max_price', options.maxPrice);
+      // Add type parameter (all, services, categories, products)
+      const type = options.type || 'all';
+      params.append('type', type);
       
-      const response = await axiosInstance.get(`/search/products?${params.toString()}`);
+      // Add limit parameter (1-100)
+      const limit = options.limit || 10;
+      if (limit >= 1 && limit <= 100) {
+        params.append('limit', limit);
+      }
+      
+      const response = await axiosInstance.get(`/search?${params.toString()}`);
       return response.data;
     } catch (error) {
-      console.error('Error searching products:', error);
+      console.error('Error performing search:', error);
       throw error;
     }
   },
 
   /**
-   * Search services using the new search endpoint
+   * Search only services
    * @param {string} query - Search query
-   * @param {Object} options - Additional search options
-   * @returns {Promise} Promise with search results
+   * @param {number} limit - Maximum number of results (default: 10)
+   * @returns {Promise} Promise with service results
    */
-  async searchServices(query, options = {}) {
+  async searchServices(query, limit = 10) {
     try {
-      const params = new URLSearchParams();
-      params.append('q', query);
-      
-      // Add optional parameters
-      if (options.page) params.append('page', options.page);
-      if (options.limit) params.append('limit', options.limit);
-      if (options.categoryId) params.append('category_id', options.categoryId);
-      if (options.subcategoryId) params.append('subcategory_id', options.subcategoryId);
-      if (options.tags) params.append('tags', options.tags);
-      
-      const response = await axiosInstance.get(`/search/services?${params.toString()}`);
-      return response.data;
+      const response = await this.search(query, { type: 'services', limit });
+      return {
+        success: response.success,
+        services: response.results?.services || [],
+        total: response.results?.services?.length || 0
+      };
     } catch (error) {
       console.error('Error searching services:', error);
       throw error;
@@ -106,42 +109,69 @@ const searchService = {
   },
 
   /**
-   * Unified search across products and services
+   * Search only categories
    * @param {string} query - Search query
-   * @param {string} type - Search type: 'all', 'products', 'services'
-   * @param {Object} options - Additional search options
-   * @returns {Promise} Promise with search results
+   * @param {number} limit - Maximum number of results (default: 10)
+   * @returns {Promise} Promise with category results
    */
-  async unifiedSearch(query, type = 'all', options = {}) {
+  async searchCategories(query, limit = 10) {
     try {
-      const params = new URLSearchParams();
-      params.append('q', query);
-      params.append('type', type);
-      
-      // Add optional parameters
-      if (options.page) params.append('page', options.page);
-      if (options.limit) params.append('limit', options.limit);
-      
-      const response = await axiosInstance.get(`/search?${params.toString()}`);
-      return response.data;
+      const response = await this.search(query, { type: 'categories', limit });
+      return {
+        success: response.success,
+        categories: response.results?.categories || [],
+        total: response.results?.categories?.length || 0
+      };
     } catch (error) {
-      console.error('Error performing unified search:', error);
+      console.error('Error searching categories:', error);
       throw error;
     }
   },
 
   /**
-   * Get search suggestions/autocomplete
-   * @param {string} query - Partial search query
+   * Search only products
+   * @param {string} query - Search query
+   * @param {number} limit - Maximum number of results (default: 10)
+   * @returns {Promise} Promise with product results
+   */
+  async searchProducts(query, limit = 10) {
+    try {
+      const response = await this.search(query, { type: 'products', limit });
+      return {
+        success: response.success,
+        products: response.results?.products || [],
+        total: response.results?.products?.length || 0
+      };
+    } catch (error) {
+      console.error('Error searching products:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get search suggestions for autocomplete (with debouncing recommended)
+   * @param {string} query - Partial search query (minimum 2 characters recommended)
+   * @param {number} limit - Maximum suggestions per type (default: 5)
    * @returns {Promise} Promise with suggestions
    */
-  async getSuggestions(query) {
+  async getSuggestions(query, limit = 5) {
     try {
-      const response = await axiosInstance.get(`/search/suggestions?q=${encodeURIComponent(query)}`);
-      return response.data;
+      if (!query || query.length < 2) {
+        return {
+          success: true,
+          results: { services: [], categories: [], products: [] },
+          total_results: 0
+        };
+      }
+      
+      return await this.search(query, { type: 'all', limit });
     } catch (error) {
       console.error('Error getting search suggestions:', error);
-      throw error;
+      return {
+        success: false,
+        results: { services: [], categories: [], products: [] },
+        total_results: 0
+      };
     }
   }
 };

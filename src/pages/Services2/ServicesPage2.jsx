@@ -89,17 +89,23 @@ const ServicesPage2 = () => {
 
   const handleCategorySelect = (category) => {
     setSelectedCategory(category);
-    navigate(`/services2/categories/${category.id}`);
+    // Create SEO-friendly URL: id-slug format
+    const slug = category.slug || (category.name ? category.name.toLowerCase().replace(/\s+/g, '-') : 'category');
+    navigate(`/services2/categories/${category.id}-${slug}`);
   };
 
   const handleSubcategorySelect = (subcategory) => {
     setSelectedSubcategory(subcategory);
-    navigate(`/services2/categories/${selectedCategory.id}/${subcategory.id}`);
+    // Create SEO-friendly URL: id-slug format
+    const slug = subcategory.slug || (subcategory.name ? subcategory.name.toLowerCase().replace(/\s+/g, '-') : 'category');
+    navigate(`/services2/categories/${subcategory.id}-${slug}`);
   };
 
   const handleServiceSelect = (service) => {
     setSelectedService(service);
-    navigate(`/services2/${service.id}`);
+    // Create SEO-friendly URL: id-slug format
+    const slug = service.slug || (service.name ? service.name.toLowerCase().replace(/\s+/g, '-') : 'service');
+    navigate(`/services2/${service.id}-${slug}`);
   };
 
   const handleBackToCategories = () => {
@@ -112,7 +118,9 @@ const ServicesPage2 = () => {
   const handleBackToSubcategories = () => {
     setSelectedSubcategory(null);
     setSelectedService(null);
-    navigate(`/services2/categories/${selectedCategory.id}`);
+    // Create SEO-friendly URL: id-slug format
+    const slug = selectedCategory.slug || (selectedCategory.name ? selectedCategory.name.toLowerCase().replace(/\s+/g, '-') : 'category');
+    navigate(`/services2/categories/${selectedCategory.id}-${slug}`);
   };
 
   if (loading) {

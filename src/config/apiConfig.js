@@ -6,8 +6,8 @@
 // Environment-based configuration
 const config = {
   // API Base URLs
-  API_BASE_URL: process.env.REACT_APP_BACKEND_API || 'http://127.0.0.1:8000/api',
-  BACKEND_URL: process.env.REACT_APP_BACKEND_URL || 'http://127.0.0.1:8000',
+  API_BASE_URL: process.env.REACT_APP_BACKEND_API || 'https://buildingz.digistuff.live/admin/public/api',
+  BACKEND_URL: process.env.REACT_APP_BACKEND_URL || 'https://buildingz.digistuff.live/admin/',
   
   // Specific API endpoints
   endpoints: {

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faSpinner, 
@@ -14,8 +15,11 @@ import placeholderImage from '../../assets/images/placeholder.png';
 import './CategoryDetailPage.css';
 
 const CategoryDetailPage = () => {
-  const { id } = useParams();
+  const { id: urlParam } = useParams();
   const navigate = useNavigate();
+  
+  // Extract ID from URL param (handle both "18" and "18-slug-name" formats)
+  const id = urlParam?.split('-')[0];
   
   const [category, setCategory] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -24,7 +28,9 @@ const CategoryDetailPage = () => {
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
 
   useEffect(() => {
-    fetchCategoryDetails();
+    if (id) {
+      fetchCategoryDetails();
+    }
   }, [id]);
 
   const fetchCategoryDetails = async () => {
@@ -55,11 +61,15 @@ const CategoryDetailPage = () => {
   };
 
   const handleSubcategoryClick = (subcategory) => {
-    navigate(`/services2/categories/${subcategory.id}`);
+    // Create SEO-friendly URL: id-slug format
+    const slug = subcategory.slug || (subcategory.name ? subcategory.name.toLowerCase().replace(/\s+/g, '-') : 'category');
+    navigate(`/services2/categories/${subcategory.id}-${slug}`);
   };
 
   const handleServiceClick = (service) => {
-    navigate(`/services2/${service.id}`);
+    // Create SEO-friendly URL: id-slug format
+    const slug = service.slug || (service.name ? service.name.toLowerCase().replace(/\s+/g, '-') : 'service');
+    navigate(`/services2/${service.id}-${slug}`);
   };
 
   const handleBackClick = () => {
@@ -117,10 +127,73 @@ const CategoryDetailPage = () => {
   const hasSubcategories = category.children && category.children.length > 0;
   const hasServices = category.services && category.services.length > 0;
 
+  // Prepare SEO data
+  const categorySlug = category.slug || (category.name ? category.name.toLowerCase().replace(/\s+/g, '-') : 'category');
+  const pageTitle = `${category.name || 'فئة'} - فئات الخدمات - BuildingZ`;
+  const pageDescription = category.description || `تصفح خدمات ${category.name || ''} على منصة BuildingZ`;
+  const pageUrl = `${window.location.origin}/services2/categories/${category.id || 'category'}-${categorySlug}`;
+  const categoryImage = serviceBuilderService.getImageUrl(category.preview_image_path || category.preview_image_url || category.image_path);
+
   return (
     <div className="category-detail-page">
+      <Helmet>
+        {/* Basic Meta Tags */}
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDescription} />
+        <meta name="keywords" content={`${category.name}, خدمات, BuildingZ, هندسة, إنشاءات`} />
+        <link rel="canonical" href={pageUrl} />
+        
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={pageUrl} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDescription} />
+        <meta property="og:image" content={categoryImage} />
+        <meta property="og:site_name" content="BuildingZ" />
+        <meta property="og:locale" content="ar_AE" />
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content={pageUrl} />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={pageDescription} />
+        <meta name="twitter:image" content={categoryImage} />
+        
+        {/* Additional SEO */}
+        <meta name="robots" content="index, follow" />
+        <meta name="language" content="Arabic" />
+        
+        {/* Structured Data */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Service",
+            "name": category.name,
+            "description": pageDescription,
+            "url": pageUrl,
+            "image": categoryImage,
+            "provider": {
+              "@type": "Organization",
+              "name": "BuildingZ",
+              "url": window.location.origin
+            },
+            ...(hasServices && {
+              "offers": category.services.map(service => {
+                const serviceSlug = service.slug || (service.name ? service.name.toLowerCase().replace(/\s+/g, '-') : 'service');
+                return {
+                  "@type": "Offer",
+                  "name": service.name || 'خدمة',
+                  "description": service.description || '',
+                  "url": `${window.location.origin}/services2/${service.id}-${serviceSlug}`
+                };
+              })
+            })
+          })}
+        </script>
+      </Helmet>
+
       <div className="hero-banner" style={{
-        backgroundImage: `linear-gradient(rgba(10, 50, 89, 0.7), rgba(10, 50, 89, 0.85)), url(${serviceBuilderService.getImageUrl(category.preview_image_path || category.preview_image_url || category.image_path)})`
+        backgroundImage: `linear-gradient(rgba(10, 50, 89, 0.7), rgba(10, 50, 89, 0.85)), url(${categoryImage})`
       }}>
         <div className="container">
           <button onClick={handleBackClick} className="back-button">
@@ -176,7 +249,7 @@ const CategoryDetailPage = () => {
             {/* Subcategories Tab */}
             {activeTab === 'subcategories' && hasSubcategories && (
               <div className={`subcategories-${viewMode}`}>
-                {category.children.map(subcategory => (
+                {category.children.map((subcategory, index) => (
                   <div 
                     key={subcategory.id} 
                     className={`subcategory-item ${viewMode === 'grid' ? 'card' : 'row'}`}
@@ -186,11 +259,12 @@ const CategoryDetailPage = () => {
                       <img 
                         src={serviceBuilderService.getImageUrl(subcategory.preview_image_path || subcategory.preview_image_url || subcategory.image_path)} 
                         alt={subcategory.name}
+                        loading={index < 6 ? "eager" : "lazy"}
+                        decoding="async"
                         onError={(e) => {
                           e.target.onerror = null;
                           e.target.src = placeholderImage;
                         }}
-                       
                       />
                       {viewMode === 'grid' && (
                         <div className="subcategory-overlay">
@@ -226,7 +300,7 @@ const CategoryDetailPage = () => {
             {/* Services Tab */}
             {activeTab === 'services' && hasServices && (
               <div className={`services-${viewMode}`}>
-                {category.services.map(service => (
+                {category.services.map((service, index) => (
                   <div 
                     key={service.id} 
                     className={`service-item ${viewMode === 'grid' ? 'card' : 'row'}`}
@@ -242,6 +316,8 @@ const CategoryDetailPage = () => {
                             service.image_path
                           )} 
                           alt={service.name}
+                          loading={index < 6 ? "eager" : "lazy"}
+                          decoding="async"
                           onError={(e) => {
                             e.target.onerror = null;
                             e.target.src = placeholderImage;

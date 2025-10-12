@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faSpinner, 
@@ -42,12 +43,16 @@ const CategoryPage = () => {
   };
 
   const handleCategoryClick = (category) => {
-    navigate(`/services2/categories/${category.id}`);
+    // Create SEO-friendly URL: id-slug format
+    const slug = category.slug || (category.name ? category.name.toLowerCase().replace(/\s+/g, '-') : 'category');
+    navigate(`/services2/categories/${category.id}-${slug}`);
   };
 
   const handleSubcategoryClick = (subcategory, event) => {
     event.stopPropagation();
-    navigate(`/services2/categories/${subcategory.id}`);
+    // Create SEO-friendly URL: id-slug format
+    const slug = subcategory.slug || (subcategory.name ? subcategory.name.toLowerCase().replace(/\s+/g, '-') : 'category');
+    navigate(`/services2/categories/${subcategory.id}-${slug}`);
   };
 
   const handleBackClick = () => {
@@ -79,8 +84,73 @@ const CategoryPage = () => {
     );
   }
 
+  // Prepare SEO data
+  const pageTitle = 'فئات الخدمات - BuildingZ';
+  const pageDescription = 'تصفح جميع فئات الخدمات الهندسية والإنشائية المتاحة على منصة BuildingZ';
+  const pageUrl = `${window.location.origin}/services2/categories`;
+  const firstCategoryImage = categories.length > 0 
+    ? serviceBuilderService.getImageUrl(categories[0].preview_image_path || categories[0].preview_image_url || categories[0].image_path)
+    : `${window.location.origin}/logo.png`;
+
   return (
     <div className="category-page">
+      <Helmet>
+        {/* Basic Meta Tags */}
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDescription} />
+        <meta name="keywords" content="خدمات هندسية, خدمات إنشائية, فئات الخدمات, BuildingZ, بناء, تشييد, استشارات هندسية" />
+        <link rel="canonical" href={pageUrl} />
+        
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={pageUrl} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDescription} />
+        <meta property="og:image" content={firstCategoryImage} />
+        <meta property="og:site_name" content="BuildingZ" />
+        <meta property="og:locale" content="ar_AE" />
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content={pageUrl} />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={pageDescription} />
+        <meta name="twitter:image" content={firstCategoryImage} />
+        
+        {/* Additional SEO */}
+        <meta name="robots" content="index, follow" />
+        <meta name="language" content="Arabic" />
+        <meta name="revisit-after" content="7 days" />
+        <meta name="author" content="BuildingZ" />
+        
+        {/* Structured Data for Categories */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "name": pageTitle,
+            "description": pageDescription,
+            "url": pageUrl,
+            "provider": {
+              "@type": "Organization",
+              "name": "BuildingZ",
+              "url": window.location.origin
+            },
+            "numberOfItems": categories.length,
+            "itemListElement": categories.map((category, index) => {
+              const slug = category.slug || (category.name ? category.name.toLowerCase().replace(/\s+/g, '-') : 'category');
+              return {
+                "@type": "ListItem",
+                "position": index + 1,
+                "name": category.name || 'فئة',
+                "url": `${window.location.origin}/services2/categories/${category.id}-${slug}`,
+                "description": category.description || category.name || 'فئة'
+              };
+            })
+          })}
+        </script>
+      </Helmet>
+
       <div className="hero-section">
         <div className="hero-content">
           <button onClick={handleBackClick} className="back-button">
@@ -99,7 +169,7 @@ const CategoryPage = () => {
           </div>
         ) : (
           <div className="categories-grid">
-            {categories.map(category => (
+            {categories.map((category, index) => (
               <div 
                 key={category.id} 
                 className="category-card"
@@ -109,6 +179,8 @@ const CategoryPage = () => {
                   <img 
                     src={serviceBuilderService.getImageUrl(category.preview_image_path || category.preview_image_url || category.image_path)} 
                     alt={category.name}
+                    loading={index < 6 ? "eager" : "lazy"}
+                    decoding="async"
                     onError={(e) => {
                       e.target.onerror = null;
                       e.target.src = placeholderImage;

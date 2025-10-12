@@ -12,42 +12,49 @@ const SearchPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [products, setProducts] = useState([]);
   const [services, setServices] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [totalResults, setTotalResults] = useState(0);
 
   useEffect(() => {
     const fetchSearchResults = async () => {
       setIsLoading(true);
       try {
-        // Use unified search for better performance
-        const searchResponse = await searchService.unifiedSearch(query, 'all', { limit: 50 });
+        // Use the new global search API
+        const searchResponse = await searchService.search(query, { type: 'all', limit: 20 });
         
         if (searchResponse && searchResponse.success) {
-          const { results: searchResults } = searchResponse;
+          const { results } = searchResponse;
           
-          // Extract products
-          const productsData = searchResults.products || [];
-          
-          // Extract services
-          const servicesData = searchResults.services || [];
-          
-          setProducts(productsData);
-          setServices(servicesData);
+          // Extract data from API response
+          setServices(results.services || []);
+          setCategories(results.categories || []);
+          setProducts(results.products || []);
+          setTotalResults(searchResponse.total_results || 0);
         } else {
-          setProducts([]);
           setServices([]);
+          setCategories([]);
+          setProducts([]);
+          setTotalResults(0);
         }
       } catch (error) {
         console.error('Error fetching search results:', error);
-        setProducts([]);
         setServices([]);
+        setCategories([]);
+        setProducts([]);
+        setTotalResults(0);
       } finally {
         setIsLoading(false);
       }
     };
 
-    if (query) {
+    if (query && query.length >= 2) {
       fetchSearchResults();
     } else {
       setIsLoading(false);
+      setServices([]);
+      setCategories([]);
+      setProducts([]);
+      setTotalResults(0);
     }
   }, [query]);
 
@@ -76,7 +83,7 @@ const SearchPage = () => {
         <div className="search-header">
           <h1 className="search-title">نتائج البحث عن: <span className="highlight">{query}</span></h1>
           <div className="search-stats">
-            تم العثور على {products.length + services.length} نتيجة
+            تم العثور على {totalResults} نتيجة
           </div>
         </div>
 
@@ -87,7 +94,7 @@ const SearchPage = () => {
           </div>
         ) : (
           <>
-            {products.length === 0 && services.length === 0 ? (
+            {totalResults === 0 ? (
               <div className="no-results">
                 <i className="fas fa-search"></i>
                 <h2>لم يتم العثور على نتائج</h2>
@@ -99,72 +106,112 @@ const SearchPage = () => {
               </div>
             ) : (
               <div className="search-results">
-                {services.length > 0 && (
+                {/* Categories Section */}
+                {categories.length > 0 && (
                   <div className="search-section">
-                    <h2 className="section-title">الخدمات</h2>
-                    <div className="services-grid">
-                      {services.map(service => (
-                        <Link to={`/services2/${service.id}`} key={service.id} className="service-card">
-                          <div className="service-image">
-                            <img src={service.image} alt={service.name} />
+                    <h2 className="section-title">الفئات ({categories.length})</h2>
+                    <div className="categories-grid">
+                      {categories.map(category => {
+                        const slug = category.slug || (category.name ? category.name.toLowerCase().replace(/\s+/g, '-') : 'category');
+                        return (
+                        <Link to={`/services2/categories/${category.id}-${slug}`} key={category.id} className="category-card">
+                          <div className="category-image">
+                            <img 
+                              src={category.image_path || PLACEHOLDER_IMAGE_SMALL} 
+                              alt={category.name}
+                              onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.src = PLACEHOLDER_IMAGE_SMALL;
+                              }}
+                            />
                           </div>
-                          <div className="service-content">
-                            <h3 className="service-title">{service.name}</h3>
-                            <p className="service-category">{service.categoryName}</p>
-                            <div className="service-price">
-                              <span className="price-value">{service.price} درهم</span>
-                              {service.discountedPrice && (
-                                <span className="original-price">{service.originalPrice} درهم</span>
-                              )}
+                          <div className="category-content">
+                            <h3 className="category-title">{category.name}</h3>
+                            {category.description && (
+                              <p className="category-description">{category.description}</p>
+                            )}
+                            <div className="category-count">
+                              {category.services_count} خدمة
                             </div>
                           </div>
                         </Link>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 )}
 
+                {/* Services Section */}
+                {services.length > 0 && (
+                  <div className="search-section">
+                    <h2 className="section-title">الخدمات ({services.length})</h2>
+                    <div className="services-grid">
+                      {services.map(service => {
+                        const slug = service.slug || (service.name ? service.name.toLowerCase().replace(/\s+/g, '-') : 'service');
+                        return (
+                        <Link to={`/services2/${service.id}-${slug}`} key={service.id} className="service-card">
+                          <div className="service-image">
+                            <img 
+                              src={service.preview_image_path || PLACEHOLDER_IMAGE_SMALL} 
+                              alt={service.name}
+                              onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.src = PLACEHOLDER_IMAGE_SMALL;
+                              }}
+                            />
+                          </div>
+                          <div className="service-content">
+                            <h3 className="service-title">{service.name}</h3>
+                            {service.category && (
+                              <p className="service-category">{service.category.name}</p>
+                            )}
+                            {service.description && (
+                              <p className="service-description">{service.description.substring(0, 100)}...</p>
+                            )}
+                            {service.base_price > 0 && (
+                              <div className="service-price">
+                                <span className="price-value">{service.base_price} درهم</span>
+                              </div>
+                            )}
+                          </div>
+                        </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Products Section */}
                 {products.length > 0 && (
                   <div className="search-section">
-                    <h2 className="section-title">المنتجات</h2>
+                    <h2 className="section-title">المنتجات ({products.length})</h2>
                     <div className="products-grid">
                       {products.map(product => (
                         <Link to={`/products/${product.id}`} key={product.id} className="product-card">
                           <div className="product-image">
                             <img 
-                              src={product.primary_image_url || 
-                                (product.images && product.images.length > 0 ? 
-                                  product.images[0] : 
-                                  PLACEHOLDER_IMAGE_SMALL)} 
+                              src={product.image || PLACEHOLDER_IMAGE_SMALL} 
                               alt={product.name}
                               onError={(e) => {
-                                e.target.onerror = null; // Prevent infinite loop
+                                e.target.onerror = null;
                                 e.target.src = PLACEHOLDER_IMAGE_SMALL;
                               }}
                             />
-                            {product.discountPercentage > 0 && (
-                              <div className="discount-badge">{product.discountPercentage}% خصم</div>
-                            )}
                           </div>
                           <div className="product-content">
                             <h3 className="product-title">{product.name}</h3>
-                            <p className="product-category">
-                              {product.category?.name || product.category || ''}
-                            </p>
+                            {product.description && (
+                              <p className="product-description">{product.description.substring(0, 80)}...</p>
+                            )}
                             <div className="product-price">
-                              <span className="price-value">
-                                {formatPrice(product.price)}
-                              </span>
-                              {product.discountPercentage > 0 && (
-                                <span className="original-price">
-                                  {Math.round(product.price / (1 - product.discountPercentage / 100))} درهم
-                                </span>
-                              )}
+                              <span className="price-value">{product.price} درهم</span>
+                              {product.unit && <span className="product-unit">/ {product.unit}</span>}
                             </div>
-                            {product.rating && (
-                              <div className="product-rating">
-                                <i className="fas fa-star"></i>
-                                <span>{product.rating}</span>
+                            {product.tags && product.tags.length > 0 && (
+                              <div className="product-tags">
+                                {product.tags.slice(0, 2).map(tag => (
+                                  <span key={tag.id} className="tag">{tag.name}</span>
+                                ))}
                               </div>
                             )}
                           </div>

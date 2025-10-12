@@ -85,9 +85,9 @@ const SearchModal = ({ isOpen, onClose }) => {
     try {
       let results = [];
       
-      // Use unified search for better performance
+      // Use global search API
       const searchType = activeTab === 'all' ? 'all' : activeTab;
-      const searchResponse = await searchService.unifiedSearch(searchQuery, searchType, { limit: 10 });
+      const searchResponse = await searchService.search(searchQuery, { type: searchType, limit: 10 });
       
       if (searchResponse && searchResponse.success) {
         const { results: searchResults } = searchResponse;
@@ -197,7 +197,7 @@ const SearchModal = ({ isOpen, onClose }) => {
     setIsLoading(true);
     
     try {
-      const searchResponse = await searchService.unifiedSearch(query, 'all', { limit: 10 });
+      const searchResponse = await searchService.search(query, { type: 'all', limit: 10 });
       let results = [];
       
       if (searchResponse && searchResponse.success) {
@@ -256,7 +256,7 @@ const SearchModal = ({ isOpen, onClose }) => {
     setIsLoading(true);
     
     try {
-      const searchResponse = await searchService.unifiedSearch(query, 'all', { limit: 10 });
+      const searchResponse = await searchService.search(query, { type: 'all', limit: 10 });
       let results = [];
       
       if (searchResponse && searchResponse.success) {
@@ -316,7 +316,7 @@ const SearchModal = ({ isOpen, onClose }) => {
       
       try {
         const searchType = tab === 'all' ? 'all' : tab;
-        const searchResponse = await searchService.unifiedSearch(searchQuery, searchType, { limit: 10 });
+        const searchResponse = await searchService.search(searchQuery, { type: searchType, limit: 10 });
         let results = [];
         
         if (searchResponse && searchResponse.success) {
