@@ -1,733 +1,625 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
-  faMapMarkerAlt, faSearch, faClock, faCheckCircle, 
-  faShieldAlt, faUserFriends, faStar, faHandshake,
-  faAppleAlt, faPlay, faArrowRight, faTools,
-  faHome, faWrench, faPaintRoller, faBolt, faWater,
-  faUserCheck, faMoneyBillWave, faHeadset, faQuoteRight,
-  faChevronDown, faChevronUp, faCheck, faPhone, faEnvelope,
-  faCouch, faArrowLeft, faArrowRight as faArrowRightSolid,
-  faMapMarkerAlt as faMapMarkerAltSolid
+  faChevronLeft, faChevronRight, faArrowLeft, faArrowRight,
+  faStar, faShoppingCart, faHeart, faPhone, faEnvelope,
+  faMapMarkerAlt, faTools, faHome, faWrench, faPaintRoller,
+  faBolt, faWater, faCouch, faHammer, faCog, faLeaf,
+  faShieldAlt, faTruck, faHeadset, faCheckCircle
 } from '@fortawesome/free-solid-svg-icons';
 import { 
   faApple, faGooglePlay, faFacebookF, faTwitter, 
   faInstagram, faLinkedinIn, faWhatsapp 
 } from '@fortawesome/free-brands-svg-icons';
 import './HomePage.css';
-import addressService from '../../services/addressService';
-import mockupImage from '../../assets/app-mockup';
-// Import hero background image
-import heroBgImage from '../../assets/images/hero-bg.png';
+import serviceBuilderService from '../../services/serviceBuilderService';
 
 const HomePage = () => {
-  // State variables
-  const [isDetectingLocation, setIsDetectingLocation] = useState(false);
-  const [locationStatus, setLocationStatus] = useState(null);
-  const [isFallbackLocation, setIsFallbackLocation] = useState(false);
-  
-  // Interactive state variables
-  const [activeFeature, setActiveFeature] = useState(null);
-  const [animateHero, setAnimateHero] = useState(false);
-  const [showScrollIndicator, setShowScrollIndicator] = useState(true);
-  const [activeTestimonial, setActiveTestimonial] = useState(0);
-  const [email, setEmail] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-  
   const navigate = useNavigate();
   
-  // Refs for scroll animations
-  const featuresRef = useRef(null);
-  const testimonialsRef = useRef(null);
-  const howItWorksRef = useRef(null);
-  const ctaRef = useRef(null);
-  const appDownloadRef = useRef(null);
-  const heroRef = useRef(null);
-  const finalSectionRef = useRef(null);
+  // State
+  const [categories, setCategories] = useState([]);
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentBanner, setCurrentBanner] = useState(0);
+  const [email, setEmail] = useState('');
   
-  // Initialize animations and effects
+  // Refs
+  const categoryScrollRef = useRef(null);
+  const bannerIntervalRef = useRef(null);
+  
+  // Banner data - promotional banners
+  const banners = [
+    {
+      id: 1,
+      title: "خصم 20% على خدمات التكييف",
+      subtitle: "صيانة وتركيب جميع أنواع التكييفات",
+      image: "https://images.unsplash.com/photo-1631545806609-34facf43f1f0?w=1200",
+      link: "/services2/categories",
+      bgColor: "#0A3259"
+    },
+    {
+      id: 2,
+      title: "خدمات التصميم الداخلي",
+      subtitle: "حوّل منزلك إلى تحفة فنية",
+      image: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1200",
+      link: "/services2/categories",
+      bgColor: "#1a4d80"
+    },
+    {
+      id: 3,
+      title: "خدمات الصيانة الشاملة",
+      subtitle: "سباكة - كهرباء - نجارة",
+      image: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=1200",
+      link: "/services2/categories",
+      bgColor: "#072441"
+    }
+  ];
+  
+  // Side banners
+  const sideBanners = [
+    {
+      id: 1,
+      title: "عروض حصرية",
+      subtitle: "خصم حتى 30%",
+      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600",
+      link: "/services2/categories"
+    },
+    {
+      id: 2,
+      title: "خدمات جديدة",
+      subtitle: "اكتشف المزيد",
+      image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600",
+      link: "/services2/categories"
+    }
+  ];
+  
+  // Default category icons mapping
+  const categoryIcons = {
+    'تكييف': faCog,
+    'سباكة': faWater,
+    'كهرباء': faBolt,
+    'نجارة': faHammer,
+    'دهان': faPaintRoller,
+    'تصميم': faCouch,
+    'صيانة': faWrench,
+    'تنظيف': faLeaf,
+    'default': faTools
+  };
+  
+  // Fetch data
   useEffect(() => {
-    // Trigger hero animation after a short delay
-    setTimeout(() => {
-      setAnimateHero(true);
-    }, 500);
-    
-    // Hide scroll indicator when user scrolls
-    const handleScroll = () => {
-      if (window.scrollY > 100) {
-        setShowScrollIndicator(false);
-      } else {
-        setShowScrollIndicator(true);
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch categories
+        const categoriesResponse = await serviceBuilderService.getAllCategories();
+        if (categoriesResponse?.data) {
+          setCategories(categoriesResponse.data);
+        }
+        
+        // Fetch services
+        const servicesResponse = await serviceBuilderService.getAllServices();
+        if (servicesResponse?.data) {
+          setServices(servicesResponse.data.slice(0, 12)); // Get first 12 services
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
       }
     };
     
-    window.addEventListener('scroll', handleScroll);
-    
-    // Setup intersection observer for animations
-    const observerOptions = {
-      threshold: 0.1,
-      rootMargin: '0px 0px -50px 0px'
-    };
-    
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const elements = entry.target.querySelectorAll('.fade-in, .stagger-item');
-          elements.forEach((el, index) => {
-            setTimeout(() => {
-              el.classList.add('visible');
-            }, index * 100);
-          });
-        }
-      });
-    }, observerOptions);
-    
-    // Observe all sections with animations
-    const animatedSections = document.querySelectorAll('.feature-section, .testimonials-section, .how-it-works-section, .cta-section, .app-download-section, .final-section');
-    animatedSections.forEach(section => {
-      observer.observe(section);
-    });
-    
-    // Detect user location
-    detectUserLocation();
-    
-    return () => {
-      observer.disconnect();
-      window.removeEventListener('scroll', handleScroll);
-    };
+    fetchData();
   }, []);
   
-  // Detect user location
-  const detectUserLocation = async () => {
-    setIsDetectingLocation(true);
-    setLocationStatus('جاري تحديد موقعك...');
+  // Auto-rotate banners
+  useEffect(() => {
+    bannerIntervalRef.current = setInterval(() => {
+      setCurrentBanner(prev => (prev + 1) % banners.length);
+    }, 5000);
     
-    try {
-      const locationData = await addressService.getCurrentLocation();
-      
-      // Check if this is a fallback location (Dubai)
-      const isFallback = locationData.latitude === 25.2048 && locationData.longitude === 55.2708;
-      setIsFallbackLocation(isFallback);
-      
-      if (isFallback) {
-        setLocationStatus('تم استخدام موقع افتراضي (إمارة دبي)');
-      } else {
-        setLocationStatus(locationData.formatted_address || 'تم تحديد موقعك بنجاح');
+    return () => {
+      if (bannerIntervalRef.current) {
+        clearInterval(bannerIntervalRef.current);
       }
-    } catch (error) {
-      console.error('Error getting location:', error);
-      
-      // Get a more specific error message based on the error code
-      let errorMessage = 'لم نتمكن من تحديد موقعك. يرجى المحاولة مرة أخرى.';
-      
-      if (error.code) {
-        switch (error.code) {
-          case 'PERMISSION_DENIED':
-            errorMessage = 'تم رفض إذن الموقع. يرجى تمكين الوصول إلى الموقع في إعدادات المتصفح.';
-            break;
-          case 'POSITION_UNAVAILABLE':
-            errorMessage = 'موقعك الحالي غير متاح. تم استخدام موقع افتراضي.';
-            setIsFallbackLocation(true);
-            break;
-          case 'TIMEOUT':
-            errorMessage = 'انتهت مهلة طلب الموقع. يرجى المحاولة مرة أخرى.';
-            break;
-          case 'GEOLOCATION_NOT_SUPPORTED':
-            errorMessage = 'متصفحك لا يدعم تحديد الموقع.';
-            break;
-        }
-      }
-      
-      setLocationStatus(errorMessage);
-    } finally {
-      setIsDetectingLocation(false);
+    };
+  }, [banners.length]);
+  
+  // Banner navigation
+  const goToBanner = (index) => {
+    setCurrentBanner(index);
+    // Reset interval
+    if (bannerIntervalRef.current) {
+      clearInterval(bannerIntervalRef.current);
     }
-  };
-
-  // Handle search form submission
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-    } else {
-      navigate('/services');
-    }
-  };
-
-  // Handle popular search tag click
-  const handlePopularSearch = (term) => {
-    navigate(`/search?q=${encodeURIComponent(term)}`);
+    bannerIntervalRef.current = setInterval(() => {
+      setCurrentBanner(prev => (prev + 1) % banners.length);
+    }, 5000);
   };
   
-  // Handle newsletter subscription
+  const nextBanner = () => {
+    goToBanner((currentBanner + 1) % banners.length);
+  };
+  
+  const prevBanner = () => {
+    goToBanner((currentBanner - 1 + banners.length) % banners.length);
+  };
+  
+  // Category scroll
+  const scrollCategories = (direction) => {
+    if (categoryScrollRef.current) {
+      const scrollAmount = 200;
+      categoryScrollRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
+  
+  // Get category icon
+  const getCategoryIcon = (categoryName) => {
+    for (const [key, icon] of Object.entries(categoryIcons)) {
+      if (categoryName?.includes(key)) {
+        return icon;
+      }
+    }
+    return categoryIcons.default;
+  };
+  
+  // Get image URL helper
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return 'https://via.placeholder.com/300x200?text=Buildinz';
+    if (imagePath.startsWith('http')) return imagePath;
+    return serviceBuilderService.getImageUrl(imagePath);
+  };
+  
+  // Newsletter handler
   const handleNewsletterSubmit = (e) => {
     e.preventDefault();
     if (email) {
-      // Here you would typically call an API to subscribe the user
-      console.log('Newsletter subscription:', email);
-      setEmail('');
-      // Show success message (you can add a toast notification here)
       alert('تم الاشتراك بنجاح في النشرة الإخبارية!');
+      setEmail('');
     }
   };
-  
-  // Scroll to section
-  const scrollToSection = (ref) => {
-    ref.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-  
-  // Feature hover handler
-  const handleFeatureHover = (index) => {
-    setActiveFeature(index);
-  };
-  
-  // Navigate testimonials
-  const navigateTestimonials = (direction) => {
-    if (direction === 'next') {
-      setActiveTestimonial(prev => (prev + 1) % testimonials.length);
-    } else {
-      setActiveTestimonial(prev => (prev - 1 + testimonials.length) % testimonials.length);
-    }
-  };
-  
+
   // Features data
   const features = [
-    {
-      icon: faCheckCircle,
-      title: "خدمات مضمونة",
-      description: "خدمات مضمونة، مدعومة بتقييمات عملاء حقيقيين"
-    },
-    {
-      icon: faMoneyBillWave,
-      title: "أسعار واضحة",
-      description: "أسعار واضحة دون مفاجآت"
-    },
-    {
-      icon: faUserCheck,
-      title: "فريق محترف",
-      description: "فريق محترف ومدرّب بعناية"
-    },
-    {
-      icon: faHeadset,
-      title: "دعم فني متواصل",
-      description: "دعم فني متواصل على مدار الساعة"
-    }
-  ];
-  
-  // Steps data
-  const steps = [
-    {
-      number: 1,
-      title: "اختر الخدمة",
-      description: "تصفح مجموعة واسعة من الخدمات واختر ما يناسب احتياجاتك",
-      icon: faSearch
-    },
-    {
-      number: 2,
-      title: "حدد الوقت والمكان",
-      description: "اختر الوقت المناسب لك وأدخل موقعك",
-      icon: faClock
-    },
-    {
-      number: 3,
-      title: "استمتع بالخدمة",
-      description: "سيصل الفني المختص في الموعد المحدد لإنجاز المهمة باحترافية",
-      icon: faHandshake
-    }
-  ];
-  
-  // Testimonials data
-  const testimonials = [
-    {
-      text: "تجربة رائعة مع Buildinz! وصل الفني في الموعد المحدد تماماً وأنجز العمل باحترافية عالية. سأستخدم الخدمة مرة أخرى بالتأكيد.",
-      name: "أحمد محمد",
-      location: "دبي",
-      rating: 5
-    },
-    {
-      text: "سهولة في الحجز ودقة في المواعيد وجودة ممتازة في العمل. أنصح بشدة بخدمات Buildinz لأي شخص يبحث عن خدمات منزلية موثوقة.",
-      name: "سارة عبدالله",
-      location: "أبوظبي",
-      rating: 5
-    },
-    {
-      text: "الأسعار شفافة تماماً والخدمة ممتازة. لم أعد أقلق بشأن الصيانة المنزلية بعد اكتشافي لـ Buildinz.",
-      name: "خالد العلي",
-      location: "الشارقة",
-      rating: 4
-    }
-  ];
-  
-  // App features data
-  const appFeatures = [
-    "سهولة الحجز والدفع",
-    "تتبع الفني في الوقت الفعلي",
-    "إشعارات فورية"
+    { icon: faShieldAlt, title: "ضمان الجودة", description: "خدمات مضمونة 100%" },
+    { icon: faTruck, title: "خدمة سريعة", description: "وصول في نفس اليوم" },
+    { icon: faHeadset, title: "دعم 24/7", description: "خدمة عملاء متواصلة" },
+    { icon: faCheckCircle, title: "فنيون محترفون", description: "خبرة عالية وموثوقة" }
   ];
   
   return (
-    <div className="homepage">
-      {/* Hero Section - KEEP INTACT but with enhancements */}
-      <section className="hero-section" ref={heroRef} style={{
-        background: `linear-gradient(rgba(10, 50, 89, 0.8), rgba(10, 50, 89, 0.8)), url(${heroBgImage})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      }}>
-        <div className="container">
-          <div className={`hero-content ${animateHero ? 'visible' : ''}`}>
-            <div className="hero-location">
-              <h3 className="location-heading">
-                <FontAwesomeIcon icon={faMapMarkerAlt} />
-                الموقع الحالي
-              </h3>
-              
-              <div className={`location-status ${isDetectingLocation ? 'detecting' : ''} ${locationStatus && !isDetectingLocation ? (isFallbackLocation ? 'fallback' : 'success') : ''}`}>
-                <FontAwesomeIcon icon={isDetectingLocation ? faClock : (isFallbackLocation ? faMapMarkerAlt : faCheckCircle)} spin={isDetectingLocation} />
-                <span>{locationStatus || 'يرجى السماح بالوصول إلى موقعك'}</span>
-                
-                {!isDetectingLocation && (
-                  <button onClick={detectUserLocation} disabled={isDetectingLocation}>
-                    <FontAwesomeIcon icon={faMapMarkerAlt} />
-                    تحديث الموقع
-                  </button>
-                )}
-              </div>
-            </div>
-            
-            <h1 className="hero-title">مرحباً بك في Buildinz – حيث تبدأ الراحة وتنتهي المهام</h1>
-            <p className="hero-description">
-              هل تبحث عن طريقة سهلة، سريعة وموثوقة لإنجاز الأعمال في منزلك أو مكان عملك؟
-              مع Buildinz، لم يعد الأمر معقداً. نحن هنا لنقدم لك حلاً شاملاً لكل ما تحتاجه.
-            </p>
-            
-            <div className="hero-search-form">
-              <form onSubmit={handleSearch}>
-                <div className="search-input-container">
-                  <FontAwesomeIcon icon={faSearch} className="search-icon" />
-                  <input 
-                    type="text" 
-                    className="hero-search-input" 
-                    placeholder="ما الخدمة التي تبحث عنها؟"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                  <button type="submit" className="search-button">
-                    بحث <FontAwesomeIcon icon={faSearch} />
-                  </button>
+    <div className="noon-homepage">
+      {/* Main Hero Section */}
+      <section className="noon-hero-section">
+        <div className="noon-hero-container">
+          {/* Main Banner Carousel */}
+          <div className="noon-main-banner">
+            <div className="noon-banner-wrapper">
+              {banners.map((banner, index) => (
+                <div 
+                  key={banner.id}
+                  className={`noon-banner-slide ${index === currentBanner ? 'active' : ''}`}
+                  style={{ backgroundColor: banner.bgColor }}
+                >
+                  <div className="noon-banner-content">
+                    <h2>{banner.title}</h2>
+                    <p>{banner.subtitle}</p>
+                    <Link to={banner.link} className="noon-banner-btn">
+                      اكتشف المزيد
+                    </Link>
+                  </div>
+                  <div className="noon-banner-image">
+                    <img src={banner.image} alt={banner.title} />
+                  </div>
                 </div>
-              </form>
+              ))}
             </div>
             
-            <div className="popular-searches">
-              <span className="popular-label">الأكثر بحثاً:</span>
-              <div className="popular-tags">
-                <button type="button" onClick={() => handlePopularSearch('تنظيف المنزل')}>تنظيف المنزل</button>
-                <button type="button" onClick={() => handlePopularSearch('صيانة التكييف')}>صيانة التكييف</button>
-                <button type="button" onClick={() => handlePopularSearch('سباكة')}>سباكة</button>
-                <button type="button" onClick={() => handlePopularSearch('كهرباء')}>كهرباء</button>
+            {/* Banner Navigation */}
+            <button className="noon-banner-nav noon-banner-prev" onClick={prevBanner}>
+              <FontAwesomeIcon icon={faChevronRight} />
+            </button>
+            <button className="noon-banner-nav noon-banner-next" onClick={nextBanner}>
+              <FontAwesomeIcon icon={faChevronLeft} />
+            </button>
+            
+            {/* Banner Dots */}
+            <div className="noon-banner-dots">
+              {banners.map((_, index) => (
+                <button 
+                  key={index}
+                  className={`noon-banner-dot ${index === currentBanner ? 'active' : ''}`}
+                  onClick={() => goToBanner(index)}
+                />
+              ))}
+            </div>
+          </div>
+          
+          {/* Side Banners */}
+          <div className="noon-side-banners">
+            {sideBanners.map(banner => (
+              <Link 
+                key={banner.id} 
+                to={banner.link} 
+                className="noon-side-banner"
+              >
+                <img src={banner.image} alt={banner.title} />
+                <div className="noon-side-banner-overlay">
+                  <h3>{banner.title}</h3>
+                  <p>{banner.subtitle}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+      
+      {/* Categories Section */}
+      <section className="noon-categories-section">
+        <div className="noon-section-container">
+          <div className="noon-categories-wrapper">
+            <button 
+              className="noon-scroll-btn noon-scroll-right"
+              onClick={() => scrollCategories('left')}
+            >
+              <FontAwesomeIcon icon={faChevronRight} />
+            </button>
+            
+            <div className="noon-categories-scroll" ref={categoryScrollRef}>
+              {loading ? (
+                // Skeleton loaders
+                Array(8).fill(0).map((_, i) => (
+                  <div key={i} className="noon-category-item skeleton">
+                    <div className="noon-category-icon skeleton-circle"></div>
+                    <div className="skeleton-text"></div>
+                  </div>
+                ))
+              ) : (
+                categories.map(category => (
+                  <Link 
+                    key={category.id}
+                    to={`/services2/categories/${category.id}`}
+                    className="noon-category-item"
+                  >
+                    <div className="noon-category-icon">
+                      {category.image ? (
+                        <img src={getImageUrl(category.image)} alt={category.name} />
+                      ) : (
+                        <FontAwesomeIcon icon={getCategoryIcon(category.name)} />
+                      )}
+                    </div>
+                    <span className="noon-category-name">{category.name}</span>
+                  </Link>
+                ))
+              )}
+            </div>
+            
+            <button 
+              className="noon-scroll-btn noon-scroll-left"
+              onClick={() => scrollCategories('right')}
+            >
+              <FontAwesomeIcon icon={faChevronLeft} />
+            </button>
+          </div>
+        </div>
+      </section>
+      
+      {/* Features Strip */}
+      <section className="noon-features-strip">
+        <div className="noon-section-container">
+          <div className="noon-features-grid">
+            {features.map((feature, index) => (
+              <div key={index} className="noon-feature-item">
+                <FontAwesomeIcon icon={feature.icon} className="noon-feature-icon" />
+                <div className="noon-feature-text">
+                  <h4>{feature.title}</h4>
+                  <p>{feature.description}</p>
+                </div>
               </div>
-            </div>
-            
-            <div className="hero-buttons">
-              <Link to="/services2/categories" className="primary-btn">
-                <FontAwesomeIcon icon={faSearch} className="btn-icon" />
+            ))}
+          </div>
+        </div>
+      </section>
+      
+      {/* Popular Services Section */}
+      <section className="noon-services-section">
+        <div className="noon-section-container">
+          <div className="noon-section-header">
+            <h2>الخدمات الأكثر طلباً</h2>
+            <Link to="/services2/categories" className="noon-view-all">
+              عرض الكل <FontAwesomeIcon icon={faArrowLeft} />
+            </Link>
+          </div>
+          
+          <div className="noon-services-grid">
+            {loading ? (
+              // Skeleton loaders
+              Array(8).fill(0).map((_, i) => (
+                <div key={i} className="noon-service-card skeleton">
+                  <div className="skeleton-image"></div>
+                  <div className="skeleton-content">
+                    <div className="skeleton-text"></div>
+                    <div className="skeleton-text short"></div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              services.slice(0, 8).map(service => (
+                <Link 
+                  key={service.id}
+                  to={`/services2/service/${service.id}`}
+                  className="noon-service-card"
+                >
+                  <div className="noon-service-image">
+                    <img 
+                      src={getImageUrl(service.image)} 
+                      alt={service.name}
+                      onError={(e) => {
+                        e.target.src = 'https://via.placeholder.com/300x200?text=Buildinz';
+                      }}
+                    />
+                    {service.discount && (
+                      <span className="noon-service-badge">خصم {service.discount}%</span>
+                    )}
+                  </div>
+                  <div className="noon-service-content">
+                    <h3 className="noon-service-name">{service.name}</h3>
+                    <p className="noon-service-desc">
+                      {service.description?.substring(0, 60)}...
+                    </p>
+                    <div className="noon-service-footer">
+                      {service.base_price && (
+                        <span className="noon-service-price">
+                          يبدأ من {service.base_price} درهم
+                        </span>
+                      )}
+                      <div className="noon-service-rating">
+                        <FontAwesomeIcon icon={faStar} />
+                        <span>{service.rating || '4.8'}</span>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))
+            )}
+          </div>
+        </div>
+      </section>
+      
+      {/* Promotional Banner */}
+      <section className="noon-promo-section">
+        <div className="noon-section-container">
+          <div className="noon-promo-banner">
+            <div className="noon-promo-content">
+              <h2>بضغطة زر بيتك يتشطب</h2>
+              <p>اكتشف مجموعة واسعة من خدمات البناء والصيانة والتصميم الداخلي</p>
+              <Link to="/services2/categories" className="noon-promo-btn">
                 استكشف الخدمات
               </Link>
-              <Link to="/services2/categories" className="secondary-btn">
-                <FontAwesomeIcon icon={faUserFriends} className="btn-icon" />
-                تصفح الفئات
+            </div>
+            <div className="noon-promo-image">
+              <img 
+                src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600" 
+                alt="خدمات البناء"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      {/* More Services Grid */}
+      {services.length > 8 && (
+        <section className="noon-services-section">
+          <div className="noon-section-container">
+            <div className="noon-section-header">
+              <h2>المزيد من الخدمات</h2>
+              <Link to="/services2/categories" className="noon-view-all">
+                عرض الكل <FontAwesomeIcon icon={faArrowLeft} />
               </Link>
             </div>
             
-            <div className="hero-stats">
-              <div className="stat-item">
-                <span className="stat-value">500+</span>
-                <span className="stat-label">خدمة متاحة</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-value">10,000+</span>
-                <span className="stat-label">عميل سعيد</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-value">4.8/5</span>
-                <span className="stat-label">تقييم العملاء</span>
-              </div>
-            </div>
-          </div>
-          
-
-        </div>
-        
-        {/* Scroll indicator */}
-        {showScrollIndicator && (
-          <div className="scroll-indicator" onClick={() => scrollToSection(featuresRef)}>
-            <span>اكتشف المزيد</span>
-            <FontAwesomeIcon icon={faChevronDown} bounce />
-          </div>
-        )}
-      </section>
-      
-      {/* About Us Section */}
-      <section className="about-us-section" id="about-us">
-        <div className="container">
-          <div className="about-us-header">
-            <h2 className="about-title-ar">مـــــــــــــــن نــــــــــــــــــحن</h2>
-          </div>
-          <div className="about-us-content">
-            <div className="about-us-text-ar">
-              <h3>BuildingZ شركة رائدة تقدم حلولاً مبتكرة في مجال البناء والخدمات الهندسية</h3>
-              <p>نحن نسعى لتقديم أعلى مستويات الجودة والشفافية لعملائنا، مع التركيز على تقديم كل ما يحتاجه العميل في مكان واحد دون الحاجة للبحث بين مقدمي خدمات مختلفين.</p>
-              <p className="about-tagline">بضغطة زر بيتك يتشطب</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Our Services Section */}
-      <section className="our-services-section" id="our-services">
-        <div className="container">
-          <div className="services-header">
-            <h2 className="services-title-ar">خـــــــــدمـــــــــاتـــــــنــــــا</h2>
-          </div>
-          <div className="services-preview">
-            <div className="service-preview-item">
-              <h4>جميع خدمات الاستشارات الهندسية</h4>
-            </div>
-            <div className="service-preview-item">
-              <h4>التصميم الداخلي والتشطيب</h4>
-            </div>
-            <div className="service-preview-item">
-              <h4>الألومنيوم والأخشاب</h4>
-            </div>
-            <div className="service-preview-item">
-              <h4>سمارت هوم وكاميرات</h4>
-            </div>
-            <div className="service-preview-item">
-              <h4>بناء وصيانة</h4>
-            </div>
-            <div className="service-preview-item">
-              <h4>جميع أنواع الأحجار</h4>
-            </div>
-            <div className="service-preview-item">
-              <h4>جميع مستلزمات التشطيب الداخلي</h4>
-            </div>
-            <div className="service-preview-item">
-              <h4>التصميم الخارجي والإشراف</h4>
-            </div>
-          </div>
-          <div className="services-cta-home">
-            <p>يمكنك الحصول على كل هذه الخدمات بسهولة من خلال موقع</p>
-            <a href="https://buildingzuae.com" className="website-link">BUILDINGZUAE.COM</a>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="feature-section" ref={featuresRef}>
-        <div className="feature-container">
-          <div className="section-title fade-in">
-            <h2>كل ما تحتاجه في مكان واحد</h2>
-            <p>لا داعي للبحث الطويل أو الاتصالات المملة. فقط اختر الخدمة، حدّد الوقت والمكان، ونحن نتكفّل بالباقي.</p>
-          </div>
-          
-          <div className="feature-grid">
-            {features.map((feature, index) => (
-              <div 
-                className="feature-card stagger-item" 
-                key={index}
-                onMouseEnter={() => handleFeatureHover(index)}
-                onMouseLeave={() => handleFeatureHover(null)}
-              >
-                <div className={`feature-icon ${activeFeature === index ? 'active' : ''}`}>
-                  <FontAwesomeIcon icon={feature.icon} style={{ '--i': index }} />
-                </div>
-                <h3>{feature.title}</h3>
-                <p>{feature.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-      
-      {/* How It Works Section - Vertical Timeline */}
-      <section className="how-it-works-section" ref={howItWorksRef}>
-        <div className="steps-container">
-          <div className="section-title fade-in">
-            <h2>كيف تعمل Buildinz؟</h2>
-            <p>من أول نقرة إلى إنجاز المهمة، Buildinz تضمن لك تجربة خالية من المتاعب.</p>
-          </div>
-          
-          <div className="steps-list">
-            {steps.map((step) => (
-              <div className="step-item stagger-item" key={step.number}>
-                <div className="step-number">{step.number}</div>
-                <div className="step-content">
-                  <h3>{step.title}</h3>
-                  <p>{step.description}</p>
-                </div>
-                <div className="step-image">
-                  <FontAwesomeIcon icon={step.icon} />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-      
-      {/* Testimonials Section */}
-      <section className="testimonials-section" ref={testimonialsRef}>
-        <div className="testimonial-container">
-          <div className="section-title fade-in">
-            <h2>ماذا يقول عملاؤنا؟</h2>
-            <p>آراء عملائنا هي أفضل شهادة على جودة خدماتنا</p>
-          </div>
-          
-          <div className="testimonial-grid">
-            {testimonials.map((testimonial, index) => (
-              <div 
-                className={`testimonial-card stagger-item ${index === activeTestimonial ? 'active' : ''}`} 
-                key={index}
-              >
-                <div className="testimonial-rating">
-                  {[...Array(5)].map((_, i) => (
-                    <FontAwesomeIcon 
-                      key={i} 
-                      icon={faStar} 
-                      className={i < testimonial.rating ? 'star-filled' : 'star-empty'} 
+            <div className="noon-services-grid">
+              {services.slice(8, 12).map(service => (
+                <Link 
+                  key={service.id}
+                  to={`/services2/service/${service.id}`}
+                  className="noon-service-card"
+                >
+                  <div className="noon-service-image">
+                    <img 
+                      src={getImageUrl(service.image)} 
+                      alt={service.name}
+                      onError={(e) => {
+                        e.target.src = 'https://via.placeholder.com/300x200?text=Buildinz';
+                      }}
                     />
-                  ))}
-                </div>
-                <p className="testimonial-text">
-                  {testimonial.text}
-                </p>
-                <div className="testimonial-author">
-                  <div className="author-avatar">
-                    <FontAwesomeIcon icon={faUserFriends} />
                   </div>
-                  <div className="author-info">
-                    <h4>{testimonial.name}</h4>
-                    <p>{testimonial.location}</p>
+                  <div className="noon-service-content">
+                    <h3 className="noon-service-name">{service.name}</h3>
+                    <p className="noon-service-desc">
+                      {service.description?.substring(0, 60)}...
+                    </p>
+                    <div className="noon-service-footer">
+                      {service.base_price && (
+                        <span className="noon-service-price">
+                          يبدأ من {service.base_price} درهم
+                        </span>
+                      )}
+                      <div className="noon-service-rating">
+                        <FontAwesomeIcon icon={faStar} />
+                        <span>{service.rating || '4.8'}</span>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            ))}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+      
+      {/* Categories Grid Section */}
+      <section className="noon-categories-grid-section">
+        <div className="noon-section-container">
+          <div className="noon-section-header">
+            <h2>تصفح حسب الفئة</h2>
           </div>
           
-          {/* Testimonial navigation controls for mobile */}
-          <div className="testimonial-controls">
-            <button 
-              className="testimonial-control-btn" 
-              onClick={() => navigateTestimonials('prev')}
-              aria-label="Previous testimonial"
-            >
-              <FontAwesomeIcon icon={faArrowRight} />
-            </button>
-            <button 
-              className="testimonial-control-btn" 
-              onClick={() => navigateTestimonials('next')}
-              aria-label="Next testimonial"
-            >
-              <FontAwesomeIcon icon={faArrowLeft} />
-            </button>
+          <div className="noon-categories-grid">
+            {categories.slice(0, 6).map(category => (
+              <Link 
+                key={category.id}
+                to={`/services2/categories/${category.id}`}
+                className="noon-category-card"
+              >
+                <div className="noon-category-card-image">
+                  {category.image ? (
+                    <img src={getImageUrl(category.image)} alt={category.name} />
+                  ) : (
+                    <div className="noon-category-card-icon">
+                      <FontAwesomeIcon icon={getCategoryIcon(category.name)} />
+                    </div>
+                  )}
+                </div>
+                <div className="noon-category-card-content">
+                  <h3>{category.name}</h3>
+                  <span className="noon-category-count">
+                    {category.services_count || category.subcategories?.length || 0} خدمة
+                  </span>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
       
       {/* App Download Section */}
-      <section className="app-download-section" ref={appDownloadRef}>
-        <div className="floating-shape shape-1"></div>
-        <div className="floating-shape shape-2"></div>
-        <div className="floating-shape shape-3"></div>
-        
-        <div className="app-download-container">
-          <div className="app-content fade-in">
-            <h2>حمل التطبيق واطلب في أي وقت</h2>
-            <p>جرب سهولة الحجز والتتبع من خلال تطبيق Buildinz الجديد كلياً.</p>
-            <div className="app-buttons">
-              <a href="#" className="app-button">
-                <FontAwesomeIcon icon={faApple} />
-                <span>App Store</span>
-              </a>
-              <a href="#" className="app-button">
-                <FontAwesomeIcon icon={faGooglePlay} />
-                <span>Google Play</span>
-              </a>
+      <section className="noon-app-section">
+        <div className="noon-section-container">
+          <div className="noon-app-content">
+            <div className="noon-app-text">
+              <h2>حمّل التطبيق</h2>
+              <p>احصل على تجربة أفضل مع تطبيق Buildinz للهاتف المحمول</p>
+              <div className="noon-app-buttons">
+                <a href="#" className="noon-app-btn">
+                  <FontAwesomeIcon icon={faApple} />
+                  <div>
+                    <span>حمّل من</span>
+                    <strong>App Store</strong>
+                  </div>
+                </a>
+                <a href="#" className="noon-app-btn">
+                  <FontAwesomeIcon icon={faGooglePlay} />
+                  <div>
+                    <span>حمّل من</span>
+                    <strong>Google Play</strong>
+                  </div>
+                </a>
+              </div>
             </div>
-            
-            <div className="app-features">
-              {appFeatures.map((feature, index) => (
-                <div className="app-feature" key={index}>
-                  <FontAwesomeIcon icon={faCheck} />
-                  <span>{feature}</span>
-                </div>
-              ))}
+            <div className="noon-app-image">
+              <img 
+                src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=400" 
+                alt="تطبيق Buildinz"
+              />
             </div>
-          </div>
-          
-          <div className="app-image fade-in">
-            <img src={mockupImage} alt="Buildinz App" />
           </div>
         </div>
       </section>
       
-      {/* CTA Section */}
-      <section className="cta-section" ref={ctaRef}>
-        <div className="cta-container">
-          <div className="cta-content fade-in">
-            <h2>جاهز تخفف عن نفسك؟</h2>
-            <p>سجّل الآن وابدأ أول تجربة لك معنا – ولن تكون الأخيرة. نحن نهتم بكل التفاصيل، لتستمتع أنت براحة البال.</p>
-            <Link to="/signup" className="cta-button">
-              ابدأ الآن <FontAwesomeIcon icon={faArrowRightSolid} />
-            </Link>
-            
-            <div className="cta-contact">
-              <div className="contact-item">
-                <FontAwesomeIcon icon={faPhone} />
-                <span>+971 XX XXX XXXX</span>
-              </div>
-              <div className="contact-item">
-                <FontAwesomeIcon icon={faEnvelope} />
-                <span>info@buildinz.com</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <button className="back-to-top" onClick={() => scrollToSection(heroRef)}>
-          <FontAwesomeIcon icon={faChevronUp} />
-        </button>
-      </section>
-      
-      {/* Final Message Section - IMPROVED */}
-      <section className="final-section" ref={finalSectionRef}>
-        <div className="container">
-          <div className="section-title fade-in">
-            <FontAwesomeIcon icon={faCouch} className="relaxation-icon" />
-            <h2>الراحة تبدأ هنا</h2>
-            <p>
-              سواء كنت في المنزل أو في المكتب، Buildinz هي الطريقة الذكية لإنجاز الأمور بسرعة وبجودة عالية.
-              استمتع بتجربة سلسة، واضحة، ومريحة – كما يجب أن تكون.
-            </p>
-            <Link to="/services" className="final-cta-button">
-              <FontAwesomeIcon icon={faSearch} />
-              ابدأ رحلتك معنا
-            </Link>
-            <h3>Buildinz – خلّي كل شي أسهل.</h3>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer Section - NEW */}
-      <footer className="footer">
-        <div className="footer-container">
-          <div className="footer-content">
+      {/* Footer */}
+      <footer className="noon-footer">
+        <div className="noon-footer-container">
+          <div className="noon-footer-content">
             {/* About Section */}
-            <div className="footer-section footer-about">
-              <div className="footer-logo">
+            <div className="noon-footer-section noon-footer-about">
+              <div className="noon-footer-logo">
                 <FontAwesomeIcon icon={faTools} />
                 Buildinz
               </div>
               <p>
                 منصة شاملة تربط بين العملاء ومقدمي الخدمات المنزلية والمهنية في دولة الإمارات العربية المتحدة.
-                نحن نضمن لك خدمة عالية الجودة وتجربة مريحة وآمنة.
               </p>
-              <div className="footer-social">
-                <a href="#" className="social-link" aria-label="Facebook">
+              <div className="noon-footer-social">
+                <a href="#" aria-label="Facebook">
                   <FontAwesomeIcon icon={faFacebookF} />
                 </a>
-                <a href="#" className="social-link" aria-label="Twitter">
+                <a href="#" aria-label="Twitter">
                   <FontAwesomeIcon icon={faTwitter} />
                 </a>
-                <a href="#" className="social-link" aria-label="Instagram">
+                <a href="#" aria-label="Instagram">
                   <FontAwesomeIcon icon={faInstagram} />
                 </a>
-                <a href="#" className="social-link" aria-label="LinkedIn">
+                <a href="#" aria-label="LinkedIn">
                   <FontAwesomeIcon icon={faLinkedinIn} />
                 </a>
-                <a href="#" className="social-link" aria-label="WhatsApp">
+                <a href="#" aria-label="WhatsApp">
                   <FontAwesomeIcon icon={faWhatsapp} />
                 </a>
-              </div>
-              <div className="footer-certificates">
-                <span className="certificate-badge">مرخص تجارياً</span>
-                <span className="certificate-badge">معتمد</span>
               </div>
             </div>
 
             {/* Quick Links */}
-            <div className="footer-section footer-links">
+            <div className="noon-footer-section noon-footer-links">
               <h3>روابط سريعة</h3>
               <ul>
-                <li><Link to="/services">الخدمات</Link></li>
+                <li><Link to="/services2/categories">الخدمات</Link></li>
                 <li><Link to="/about">من نحن</Link></li>
-                <li><Link to="/how-it-works">كيف نعمل</Link></li>
-                <li><Link to="/pricing">الأسعار</Link></li>
-                <li><Link to="/become-provider">انضم كمقدم خدمة</Link></li>
-                <li><Link to="/careers">الوظائف</Link></li>
-                <li><Link to="/blog">المدونة</Link></li>
+                <li><Link to="/faq">الأسئلة الشائعة</Link></li>
+                <li><Link to="/contact">تواصل معنا</Link></li>
               </ul>
             </div>
 
             {/* Support */}
-            <div className="footer-section footer-links">
-              <h3>الدعم والمساعدة</h3>
+            <div className="noon-footer-section noon-footer-links">
+              <h3>الدعم</h3>
               <ul>
                 <li><Link to="/help">مركز المساعدة</Link></li>
-                <li><Link to="/faq">الأسئلة الشائعة</Link></li>
-                <li><Link to="/contact">تواصل معنا</Link></li>
-                <li><Link to="/feedback">تقييم الخدمة</Link></li>
-                <li><Link to="/report-issue">بلاغ مشكلة</Link></li>
-                <li><Link to="/safety">الأمان والسلامة</Link></li>
-                <li><Link to="/insurance">التأمين</Link></li>
+                <li><Link to="/privacy">سياسة الخصوصية</Link></li>
+                <li><Link to="/terms">الشروط والأحكام</Link></li>
               </ul>
             </div>
 
             {/* Contact & Newsletter */}
-            <div className="footer-section footer-contact">
+            <div className="noon-footer-section noon-footer-contact">
               <h3>تواصل معنا</h3>
-              <div className="contact-info">
+              <div className="noon-contact-info">
                 <FontAwesomeIcon icon={faPhone} />
                 <span>+971 XX XXX XXXX</span>
               </div>
-              <div className="contact-info">
+              <div className="noon-contact-info">
                 <FontAwesomeIcon icon={faEnvelope} />
                 <span>info@buildinz.com</span>
               </div>
-              <div className="contact-info">
-                <FontAwesomeIcon icon={faMapMarkerAltSolid} />
-                <span>دبي، الإمارات العربية المتحدة</span>
+              <div className="noon-contact-info">
+                <FontAwesomeIcon icon={faMapMarkerAlt} />
+                <span>دبي، الإمارات</span>
               </div>
               
-              <div className="footer-newsletter">
-                <h3>النشرة الإخبارية</h3>
-                <p>اشترك لتحصل على آخر العروض والأخبار</p>
-                <form className="newsletter-form" onSubmit={handleNewsletterSubmit}>
+              <div className="noon-newsletter">
+                <h4>النشرة الإخبارية</h4>
+                <form onSubmit={handleNewsletterSubmit}>
                   <input
                     type="email"
-                    placeholder="أدخل بريدك الإلكتروني"
+                    placeholder="بريدك الإلكتروني"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="newsletter-input"
                     required
                   />
-                  <button type="submit" className="newsletter-btn">
-                    اشتراك
-                  </button>
+                  <button type="submit">اشتراك</button>
                 </form>
               </div>
             </div>
           </div>
 
-          <div className="footer-bottom">
+          <div className="noon-footer-bottom">
             <p>&copy; 2024 Buildinz. جميع الحقوق محفوظة.</p>
-            <div className="footer-bottom-links">
-              <Link to="/privacy">سياسة الخصوصية</Link>
-              <Link to="/terms">الشروط والأحكام</Link>
-              <Link to="/cookies">سياسة ملفات تعريف الارتباط</Link>
-              <Link to="/accessibility">إمكانية الوصول</Link>
-            </div>
           </div>
         </div>
       </footer>
@@ -735,4 +627,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage; 
+export default HomePage;
