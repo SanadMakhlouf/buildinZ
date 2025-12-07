@@ -1,10 +1,89 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo, memo } from "react";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSpinner, faLayerGroup } from '@fortawesome/free-solid-svg-icons';
+import { faSpinner, faLayerGroup, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import "./ServicesPage2.css";
 import serviceBuilderService from '../../services/serviceBuilderService';
 import placeholderImage from '../../assets/images/placeholder.png';
+
+// Skeleton Loader Component
+const CategorySkeleton = memo(() => (
+  <div className="category-card skeleton-card">
+    <div className="category-image">
+      <div className="skeleton-image"></div>
+    </div>
+    <div className="category-content">
+      <div className="skeleton-text skeleton-title"></div>
+      <div className="skeleton-text skeleton-badge"></div>
+      <div className="skeleton-button"></div>
+    </div>
+  </div>
+));
+
+CategorySkeleton.displayName = 'CategorySkeleton';
+
+// Category Card Component (Optimized with memo)
+const CategoryCard = memo(({ category, index, onSelect }) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  
+  const imagePath = category.preview_image_path || category.preview_image_url || category.image_path;
+  const fullImageUrl = imagePath ? serviceBuilderService.getImageUrl(imagePath) : null;
+
+  const handleImageLoad = useCallback(() => {
+    setImageLoaded(true);
+  }, []);
+
+  const handleImageError = useCallback(() => {
+    setImageError(true);
+    setImageLoaded(true);
+  }, []);
+
+  return (
+    <div 
+      className="category-card"
+      onClick={() => onSelect(category)}
+      style={{ animationDelay: `${index * 0.1}s` }}
+    >
+      <div className="category-image">
+        {!imageLoaded && !imageError && fullImageUrl && (
+          <div className="image-skeleton"></div>
+        )}
+        {fullImageUrl && !imageError ? (
+          <img 
+            src={fullImageUrl} 
+            alt={category.name}
+            loading={index < 3 ? "eager" : "lazy"}
+            decoding="async"
+            onLoad={handleImageLoad}
+            onError={handleImageError}
+            style={{ opacity: imageLoaded ? 1 : 0 }}
+          />
+        ) : (
+          <div className="category-placeholder">
+            <FontAwesomeIcon icon={faLayerGroup} />
+          </div>
+        )}
+      </div>
+      <div className="category-content">
+        <h3>{category.name}</h3>
+        {category.children && category.children.length > 0 && (
+          <div className="category-meta">
+            <span className="subcategory-count">
+              {category.children.length} فئة فرعية
+            </span>
+          </div>
+        )}
+        <button className="category-action-btn">
+          <span>عرض الخدمات</span>
+          <FontAwesomeIcon icon={faArrowLeft} />
+        </button>
+      </div>
+    </div>
+  );
+});
+
+CategoryCard.displayName = 'CategoryCard';
 
 const ServicesPage2 = () => {
   const navigate = useNavigate();
@@ -17,9 +96,44 @@ const ServicesPage2 = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Fetch categories first (most important for initial render)
+      const categoriesResponse = await serviceBuilderService.getAllCategories();
+      
+      if (categoriesResponse.success) {
+        const categories = categoriesResponse.categories || [];
+        setCategories(categories);
+        setLoading(false); // Show categories immediately
+      } else {
+        console.error('Failed to fetch categories:', categoriesResponse.message);
+        setError('حدث خطأ أثناء جلب البيانات. يرجى المحاولة مرة أخرى.');
+        setLoading(false);
+      }
+      
+      // Fetch services in background (less critical)
+      try {
+        const servicesResponse = await serviceBuilderService.getAllServices();
+        if (servicesResponse.success) {
+          setServices(servicesResponse.services || []);
+        }
+      } catch (err) {
+        console.error('Failed to fetch services:', err);
+        // Don't show error for services, as they're not critical for initial render
+      }
+    } catch (err) {
+      setError('حدث خطأ أثناء جلب البيانات. يرجى المحاولة مرة أخرى.');
+      console.error(err);
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   useEffect(() => {
     // Parse URL to set the selected items
@@ -51,48 +165,12 @@ const ServicesPage2 = () => {
     }
   }, [location.pathname, categories, services]);
 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      // Fetch both services and categories in parallel
-      const [servicesResponse, categoriesResponse] = await Promise.all([
-        serviceBuilderService.getAllServices(),
-        serviceBuilderService.getAllCategories()
-      ]);
-      
-      if (servicesResponse.success) {
-        setServices(servicesResponse.services || []);
-      } else {
-        console.error('Failed to fetch services:', servicesResponse.message);
-      }
-      
-      if (categoriesResponse.success) {
-        const categories = categoriesResponse.categories || [];
-        console.log('Categories API Response:', categoriesResponse);
-        console.log('Categories Data:', categories);
-        if (categories.length > 0) {
-          console.log('First Category Sample:', categories[0]);
-        }
-        setCategories(categories);
-      } else {
-        console.error('Failed to fetch categories:', categoriesResponse.message);
-      }
-    } catch (err) {
-      setError('حدث خطأ أثناء جلب البيانات. يرجى المحاولة مرة أخرى.');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCategorySelect = (category) => {
+  const handleCategorySelect = useCallback((category) => {
     setSelectedCategory(category);
     // Create SEO-friendly URL: id-slug format
     const slug = category.slug || (category.name ? category.name.toLowerCase().replace(/\s+/g, '-') : 'category');
     navigate(`/services2/categories/${category.id}-${slug}`);
-  };
+  }, [navigate]);
 
   const handleSubcategorySelect = (subcategory) => {
     setSelectedSubcategory(subcategory);
@@ -123,16 +201,9 @@ const ServicesPage2 = () => {
     navigate(`/services2/categories/${selectedCategory.id}-${slug}`);
   };
 
-  if (loading) {
-    return (
-      <div className="services-page2">
-        <div className="loading-container">
-          <FontAwesomeIcon icon={faSpinner} spin size="3x" />
-          <p>جاري تحميل الخدمات...</p>
-        </div>
-      </div>
-    );
-  }
+  const handleCategorySelectMemo = useCallback((category) => {
+    handleCategorySelect(category);
+  }, [handleCategorySelect]);
 
   if (error) {
     return (
@@ -147,7 +218,7 @@ const ServicesPage2 = () => {
     );
   }
 
-  if (!categories || categories.length === 0) {
+  if (!loading && (!categories || categories.length === 0)) {
     return (
       <div className="services-page2">
         <div className="empty-state">
@@ -168,62 +239,22 @@ const ServicesPage2 = () => {
         <div className="categories-section">
           <h2>اختر الخيارات المناسبة</h2>
           <div className="categories-grid">
-            {categories.map(category => (
-              <div 
-                key={category.id} 
-                className="category-card"
-                onClick={() => handleCategorySelect(category)}
-              >
-                <div className="category-image">
-                  {(category.preview_image_path || category.preview_image_url || category.image_path) ? (
-                    (() => {
-                      const imagePath = category.preview_image_path || category.preview_image_url || category.image_path;
-                      const fullImageUrl = serviceBuilderService.getImageUrl(imagePath);
-                      console.log('Category Image Debug:', {
-                        categoryName: category.name,
-                        categoryId: category.id,
-                        preview_image_path: category.preview_image_path,
-                        preview_image_url: category.preview_image_url,
-                        image_path: category.image_path,
-                        selectedPath: imagePath,
-                        fullImageUrl: fullImageUrl
-                      });
-                      return (
-                        <img 
-                          src={fullImageUrl} 
-                          alt={category.name}
-                          onError={(e) => {
-                            console.log('Image failed to load:', fullImageUrl);
-                            e.target.onerror = null;
-                            e.target.src = placeholderImage;
-                          }}
-                          onLoad={() => {
-                            console.log('Image loaded successfully:', fullImageUrl);
-                          }}
-                        />
-                      );
-                    })()
-                  ) : (
-                    <div className="category-placeholder">
-                      <FontAwesomeIcon icon={faLayerGroup} />
-                    </div>
-                  )}
-                  <div className="category-overlay">
-                    <h3>{category.name}</h3>
-                    
-                    {category.children && category.children.length > 0 && (
-                      <div className="subcategories-preview">
-                        <span className="subcategory-count">
-                          {category.children.length} فئة فرعية
-                        </span>
-                      </div>
-                    )}
-                    
-                    <div className="category-action">عرض الخدمات</div>
-                  </div>
-                </div>
-              </div>
-            ))}
+            {loading ? (
+              // Show skeleton loaders while loading
+              Array.from({ length: 6 }).map((_, index) => (
+                <CategorySkeleton key={`skeleton-${index}`} />
+              ))
+            ) : (
+              // Show actual category cards
+              categories.map((category, index) => (
+                <CategoryCard
+                  key={category.id}
+                  category={category}
+                  index={index}
+                  onSelect={handleCategorySelectMemo}
+                />
+              ))
+            )}
           </div>
         </div>
       </div>

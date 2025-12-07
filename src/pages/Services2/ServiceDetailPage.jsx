@@ -315,11 +315,17 @@ const ServiceDetailPage = () => {
       setSubmitting(true);
       setBookingError(null);
 
+      // Check if there are any uploaded files
+      const hasFiles = Object.keys(uploadedFiles).length > 0;
+
       // Format field values for submission
       const formattedFieldValues = Object.entries(fieldValues)
         .map(([fieldId, value]) => {
           const field = service.fields.find(f => f.id === parseInt(fieldId));
           if (!field || !value) return null;
+
+          // Skip file fields in field_values (files are sent separately)
+          if (field.type === 'file') return null;
 
           switch (field.type) {
             case 'select':
@@ -346,38 +352,98 @@ const ServiceDetailPage = () => {
         })
         .filter(v => v !== null);
 
-      const orderData = {
-        service_id: parseInt(id),
-        customer_name: customerInfo.name,
-        customer_email: customerInfo.email || 'optional+email+notselected@buildingz.ae',
-        customer_phone: customerInfo.phone,
-        emirate: customerInfo.emirate,
-        field_values: formattedFieldValues,
-        products: selectedProducts,
-        notes: customerInfo.notes || undefined,
-        payment_method: paymentMethod
-      };
+      let requestData;
 
-      // Include shipping address if provided
-      if (selectedAddress) {
-        orderData.shipping_address = {
-          name: selectedAddress.name || customerInfo.name,
-          street: selectedAddress.street || selectedAddress.address_line1,
-          city: selectedAddress.city,
-          state: customerInfo.emirate || selectedAddress.state || selectedAddress.city,
-          country: selectedAddress.country || 'UAE',
-          phone: selectedAddress.phone || customerInfo.phone
+      if (hasFiles) {
+        // Use FormData for file uploads
+        const formData = new FormData();
+        
+        // Add basic fields
+        formData.append('service_id', parseInt(id));
+        formData.append('customer_name', customerInfo.name);
+        formData.append('customer_email', customerInfo.email || 'optional+email+notselected@buildingz.ae');
+        formData.append('customer_phone', customerInfo.phone);
+        formData.append('emirate', customerInfo.emirate);
+        formData.append('payment_method', paymentMethod);
+        
+        if (customerInfo.notes) {
+          formData.append('notes', customerInfo.notes);
+        }
+
+        // Add field values
+        formattedFieldValues.forEach((fieldValue, index) => {
+          formData.append(`field_values[${index}][field_id]`, fieldValue.field_id);
+          if (fieldValue.option_id) {
+            formData.append(`field_values[${index}][option_id]`, fieldValue.option_id);
+          }
+          formData.append(`field_values[${index}][value]`, fieldValue.value);
+        });
+
+        // Add products
+        selectedProducts.forEach((product, index) => {
+          formData.append(`products[${index}][product_id]`, product.product_id);
+          formData.append(`products[${index}][quantity]`, product.quantity);
+        });
+
+        // Add uploaded files with correct key format: field_files[field_{id}]
+        Object.entries(uploadedFiles).forEach(([fieldId, file]) => {
+          formData.append(`field_files[field_${fieldId}]`, file);
+        });
+
+        // Include shipping address if provided
+        if (selectedAddress) {
+          formData.append('shipping_address[name]', selectedAddress.name || customerInfo.name);
+          formData.append('shipping_address[street]', selectedAddress.street || selectedAddress.address_line1);
+          formData.append('shipping_address[city]', selectedAddress.city);
+          formData.append('shipping_address[state]', customerInfo.emirate || selectedAddress.state || selectedAddress.city);
+          formData.append('shipping_address[country]', selectedAddress.country || 'UAE');
+          formData.append('shipping_address[phone]', selectedAddress.phone || customerInfo.phone);
+        }
+
+        requestData = formData;
+        console.log('Submitting order with files:', {
+          hasFiles,
+          fileCount: Object.keys(uploadedFiles).length,
+          fieldValuesCount: formattedFieldValues.length
+        });
+      } else {
+        // Use JSON for regular orders without files
+        requestData = {
+          service_id: parseInt(id),
+          customer_name: customerInfo.name,
+          customer_email: customerInfo.email || 'optional+email+notselected@buildingz.ae',
+          customer_phone: customerInfo.phone,
+          emirate: customerInfo.emirate,
+          field_values: formattedFieldValues,
+          products: selectedProducts,
+          notes: customerInfo.notes || undefined,
+          payment_method: paymentMethod
         };
+
+        // Include shipping address if provided
+        if (selectedAddress) {
+          requestData.shipping_address = {
+            name: selectedAddress.name || customerInfo.name,
+            street: selectedAddress.street || selectedAddress.address_line1,
+            city: selectedAddress.city,
+            state: customerInfo.emirate || selectedAddress.state || selectedAddress.city,
+            country: selectedAddress.country || 'UAE',
+            phone: selectedAddress.phone || customerInfo.phone
+          };
+        }
+
+        console.log('Submitting order (JSON):', requestData);
       }
 
-      console.log('Submitting order:', orderData);
-
-      const response = await serviceBuilderService.submitOrder(orderData);
+      const response = await serviceBuilderService.submitOrder(requestData);
 
       if (response.success) {
         setOrderData(response);
         setOrderSuccess(true);
         setShowBookingModal(false);
+        
+        // Clear uploaded files after successful submission
+        setUploadedFiles({});
       } else {
         setBookingError(response.message || 'فشل في إرسال الطلب');
       }
@@ -926,7 +992,9 @@ const ServiceDetailPage = () => {
                         <div className="product-info">
                               <h4>{product.name}</h4>
                           {product.description && <p>{product.description}</p>}
-                          <div className="product-price">{product.price} درهم</div>
+                          {product.price && parseFloat(product.price) > 0 && (
+                            <div className="product-price">{product.price} درهم</div>
+                          )}
                             </div>
                         
                             <div className="product-actions">
@@ -1062,7 +1130,9 @@ const ServiceDetailPage = () => {
                         return product ? (
                           <div key={sp.product_id} className="summary-product-item">
                             <span>{product.name} × {sp.quantity}</span>
-                            <strong>{product.price * sp.quantity} درهم</strong>
+                            {product.price && parseFloat(product.price) > 0 && (
+                              <strong>{product.price * sp.quantity} درهم</strong>
+                            )}
                           </div>
                         ) : null;
                       })}
@@ -1073,6 +1143,13 @@ const ServiceDetailPage = () => {
                     <div className="summary-total-simple">
                       <span>الإجمالي</span>
                       <strong>{calculation.total || calculation.total_price || 0} درهم</strong>
+                    </div>
+                  )}
+                  
+                  {!calculation && service?.requires_pricing === false && (
+                    <div className="summary-total-simple">
+                      <span>الخدمة متاحة</span>
+                      <strong>سيتم الاتصال بك</strong>
                     </div>
                   )}
                 </div>
@@ -1264,6 +1341,13 @@ const ServiceDetailPage = () => {
                       <div className="summary-row total">
                         <span>المجموع الإجمالي:</span>
                         <span>{calculation.total || 0} درهم</span>
+                      </div>
+                    )}
+                    
+                    {!calculation && service?.requires_pricing === false && (
+                      <div className="summary-row total">
+                        <span>حالة الطلب:</span>
+                        <span>سيتم الاتصال بك</span>
                       </div>
                     )}
                   </div>

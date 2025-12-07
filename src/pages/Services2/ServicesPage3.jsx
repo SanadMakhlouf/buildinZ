@@ -398,7 +398,16 @@ const ServicesPage3 = () => {
     // Handle products with tags (like ServicesPage2)
     if (selectedService.productsByTag) {
       selectedService.productsByTag.forEach(tagGroup => {
-        const category = tagGroup.tag.name;
+        // Handle both string tags and object tags
+        let category;
+        if (typeof tagGroup.tag === 'string') {
+          category = tagGroup.tag;
+        } else if (tagGroup.tag && typeof tagGroup.tag === 'object') {
+          category = tagGroup.tag.name || tagGroup.tag.id || 'منتجات';
+        } else {
+          category = 'منتجات';
+        }
+        
         if (!grouped[category]) {
           grouped[category] = [];
         }
@@ -751,15 +760,19 @@ const ServicesPage3 = () => {
                       >
                         جميع الخيارات
                       </button>
-                      {Object.keys(getProductsByCategory()).map(category => (
-                        <button 
-                          key={category}
-                          className={`filter-btn ${selectedProductCategory === category ? 'active' : ''}`}
-                          onClick={() => setSelectedProductCategory(category)}
-                        >
-                          {category}
-                        </button>
-                      ))}
+                      {Object.keys(getProductsByCategory()).map(category => {
+                        // Ensure category is a string
+                        const categoryName = typeof category === 'string' ? category : (category?.name || category?.id || String(category));
+                        return (
+                          <button 
+                            key={categoryName}
+                            className={`filter-btn ${selectedProductCategory === categoryName ? 'active' : ''}`}
+                            onClick={() => setSelectedProductCategory(categoryName)}
+                          >
+                            {categoryName}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
@@ -852,63 +865,69 @@ const ServicesPage3 = () => {
                       {(() => {
                         const productsByCategory = getProductsByCategory();
                         if (Object.keys(productsByCategory).length > 0) {
-                          return Object.entries(productsByCategory).map(([category, products]) => (
-                            <div key={category} className="products-by-category">
-                              <h3 className="category-title">{category}</h3>
-                              <div className="products-grid">
-                                {products.map(product => {
-                                  const selectedProduct = getSelectedProduct(product.id);
-                                  return (
-                                    <div
-                                      key={product.id}
-                                      className={`product-card ${selectedProduct ? 'selected' : ''}`}
-                                      onClick={() => handleProductSelect(product.id, 1)}
-                                    >
-                                      <div className="product-image">
-                                        {product.image_url ? (
-                                          <img 
-                                            src={product.image_url} 
-                                            alt={product.name}
-                                            onError={(e) => e.target.style.display = 'none'}
-                                          />
-                                        ) : (
-                                          <div className="product-placeholder">
-                                            <FontAwesomeIcon icon={faImage} />
-                                          </div>
-                                        )}
-                                      </div>
-                                      <div className="product-content">
-                                        <h4>{product.name}</h4>
-                                        <div className="product-price">{product.price} درهم</div>
-                                        {product.description && (
-                                          <div className="product-description">{product.description}</div>
-                                        )}
-                                      </div>
-                                      <div className="product-actions">
-                                        {selectedProduct ? (
-                                          <div className="quantity-selector">
-                                            <label>الكمية:</label>
-                                            <input
-                                              type="number"
-                                              min="1"
-                                              value={selectedProduct.quantity}
-                                              onChange={(e) => handleProductQuantityChange(product.id, parseInt(e.target.value) || 0)}
-                                              onClick={(e) => e.stopPropagation()}
+                          return Object.entries(productsByCategory).map(([category, products]) => {
+                            // Ensure category is a string
+                            const categoryName = typeof category === 'string' ? category : (category?.name || category?.id || String(category));
+                            return (
+                              <div key={categoryName} className="products-by-category">
+                                <h3 className="category-title">{categoryName}</h3>
+                                <div className="products-grid">
+                                  {products.map(product => {
+                                    const selectedProduct = getSelectedProduct(product.id);
+                                    return (
+                                      <div
+                                        key={product.id}
+                                        className={`product-card ${selectedProduct ? 'selected' : ''}`}
+                                        onClick={() => handleProductSelect(product.id, 1)}
+                                      >
+                                        <div className="product-image">
+                                          {product.image_url ? (
+                                            <img 
+                                              src={product.image_url} 
+                                              alt={product.name}
+                                              onError={(e) => e.target.style.display = 'none'}
                                             />
-                                          </div>
-                                        ) : (
-                                          <button className="add-product-btn">
-                                            <FontAwesomeIcon icon={faPlus} />
-                                            إضافة
-                                          </button>
-                                        )}
+                                          ) : (
+                                            <div className="product-placeholder">
+                                              <FontAwesomeIcon icon={faImage} />
+                                            </div>
+                                          )}
+                                        </div>
+                                        <div className="product-content">
+                                          <h4>{product.name}</h4>
+                                          {product.price && parseFloat(product.price) > 0 && (
+                                            <div className="product-price">{product.price} درهم</div>
+                                          )}
+                                          {product.description && (
+                                            <div className="product-description">{product.description}</div>
+                                          )}
+                                        </div>
+                                        <div className="product-actions">
+                                          {selectedProduct ? (
+                                            <div className="quantity-selector">
+                                              <label>الكمية:</label>
+                                              <input
+                                                type="number"
+                                                min="1"
+                                                value={selectedProduct.quantity}
+                                                onChange={(e) => handleProductQuantityChange(product.id, parseInt(e.target.value) || 0)}
+                                                onClick={(e) => e.stopPropagation()}
+                                              />
+                                            </div>
+                                          ) : (
+                                            <button className="add-product-btn">
+                                              <FontAwesomeIcon icon={faPlus} />
+                                              إضافة
+                                            </button>
+                                          )}
+                                        </div>
                                       </div>
-                                    </div>
-                                  );
-                                })}
+                                    );
+                                  })}
+                                </div>
                               </div>
-                            </div>
-                          ));
+                            );
+                          });
                         } else {
                           return (
                             <div className="no-products">

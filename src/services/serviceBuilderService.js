@@ -135,12 +135,20 @@ const serviceBuilderService = {
 
   /**
    * Submit service order
-   * @param {Object} orderData - Order data
+   * @param {Object|FormData} orderData - Order data (can be JSON or FormData for file uploads)
    * @returns {Promise} Promise with order submission result
    */
   submitOrder: async (orderData) => {
     try {
-      const response = await axiosInstance.post('/orders', orderData);
+      // If orderData is FormData, set proper headers
+      const config = {};
+      if (orderData instanceof FormData) {
+        config.headers = {
+          'Content-Type': 'multipart/form-data'
+        };
+      }
+      
+      const response = await axiosInstance.post('/orders', orderData, config);
       return response.data;
     } catch (error) {
       console.error('Error submitting order:', error);

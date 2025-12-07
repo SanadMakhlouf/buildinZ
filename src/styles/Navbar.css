@@ -33,7 +33,7 @@
   height: 70px;
   z-index: 1000;
   transition: var(--transition);
-  font-family: 'Cairo', 'Roboto', sans-serif;
+  font-family: 'ReadexPro', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   color: var(--white);
 }
 

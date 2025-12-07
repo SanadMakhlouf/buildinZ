@@ -3,7 +3,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  font-family: 'Tajawal', sans-serif;
+  font-family: 'ReadexPro', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   direction: rtl;
   background: #fafafa;
 }

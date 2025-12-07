@@ -266,13 +266,31 @@ const CategoryDetailPage = () => {
                           e.target.src = placeholderImage;
                         }}
                       />
-                      {viewMode === 'grid' && (
-                        <div className="subcategory-overlay">
-                          <h3>{subcategory.name}</h3>
-                          <div className="subcategory-action">عرض الفئة</div>
-                        </div>
-                      )}
                     </div>
+                    
+                    {viewMode === 'grid' && (
+                      <div className="subcategory-content">
+                        <h3>{subcategory.name}</h3>
+                        {subcategory.description && <p>{subcategory.description}</p>}
+                        <div className="subcategory-footer">
+                          {(subcategory.children && subcategory.children.length > 0) || (subcategory.services && subcategory.services.length > 0) ? (
+                            <div className="subcategory-meta">
+                              {subcategory.children && subcategory.children.length > 0 && (
+                                <span className="subcategory-count">
+                                  {subcategory.children.length} فئة فرعية
+                                </span>
+                              )}
+                              {subcategory.services && subcategory.services.length > 0 && (
+                                <span className="service-count">
+                                  {subcategory.services.length} خدمة
+                                </span>
+                              )}
+                            </div>
+                          ) : null}
+                          <button className="subcategory-action-btn">عرض الفئة</button>
+                        </div>
+                      </div>
+                    )}
                     
                     {viewMode === 'list' && (
                       <div className="subcategory-details">
@@ -331,23 +349,33 @@ const CategoryDetailPage = () => {
                           <div className="service-bg-pattern"></div>
                         </div>
                       )}
-                      {viewMode === 'grid' && (
-                        <div className="service-overlay">
-                          <h3>{service.name}</h3>
-                          {service.description && <p>{service.description}</p>}
-                          <div className="service-action">عرض الخدمة</div>
-                        </div>
-                      )}
                     </div>
+                    
+                    {viewMode === 'grid' && (
+                      <div className="service-content">
+                        <h3>{service.name}</h3>
+                        {service.description && <p>{service.description}</p>}
+                        <div className="service-footer">
+                          {service.base_price && parseFloat(service.base_price) > 0 && (
+                            <span className="service-price">
+                              {service.base_price} ر.س
+                            </span>
+                          )}
+                          <button className="service-action-btn">عرض الخدمة</button>
+                        </div>
+                      </div>
+                    )}
                     
                     {viewMode === 'list' && (
                       <div className="service-details">
                         <h3>{service.name}</h3>
                         {service.description && <p>{service.description}</p>}
                         <div className="service-meta">
-                          <span className="service-price">
-                            {service.base_price ? `${service.base_price} ر.س` : 'السعر عند الطلب'}
-                          </span>
+                          {service.base_price && parseFloat(service.base_price) > 0 ? (
+                            <span className="service-price">
+                              {service.base_price} ر.س
+                            </span>
+                          ) : null}
                           <button className="view-service-btn">عرض الخدمة</button>
                         </div>
                       </div>

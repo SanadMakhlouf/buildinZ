@@ -112,13 +112,8 @@ const CheckoutPage = () => {
     }
   }, [location]);
   
-  // Check authentication
-  useEffect(() => {
-    if (!authService.isAuthenticated() && !paymentStatus) {
-      // Redirect to login page with return URL
-      navigate('/login?redirect=/checkout');
-    }
-  }, [navigate, paymentStatus]);
+  // Don't redirect automatically - show auth prompt instead
+  // useEffect removed - we'll show auth prompt in the UI
   
   // Redirect to cart if cart is empty
   useEffect(() => {
@@ -425,22 +420,98 @@ const CheckoutPage = () => {
     );
   }
   
+  // Show authentication prompt if not logged in
   if (!authService.isAuthenticated()) {
     return (
       <div className="checkout-page">
         <div className="container">
-          <div className="auth-required">
-            <div className="auth-icon">
-              <FontAwesomeIcon icon={faLock} />
+          <div className="checkout-auth-required">
+            <div className="auth-prompt-card">
+              <div className="auth-icon-large">
+                <FontAwesomeIcon icon={faLock} />
+              </div>
+              
+              <h1>تسجيل الدخول مطلوب</h1>
+              
+              <div className="auth-info-box">
+                <div className="info-item">
+                  <FontAwesomeIcon icon={faShoppingBag} />
+                  <div className="info-text">
+                    <strong>لإتمام عملية الشراء</strong>
+                    <p>يجب تسجيل الدخول لإنشاء الطلب ومعالجة الدفع</p>
+                  </div>
+                </div>
+                
+                <div className="info-item">
+                  <FontAwesomeIcon icon={faCheck} />
+                  <div className="info-text">
+                    <strong>عربة التسوق الخاصة بك آمنة</strong>
+                    <p>لا تقلق، لن نفقد أي منتجات من سلة التسوق الخاصة بك</p>
+                  </div>
+                </div>
+                
+                <div className="info-item">
+                  <FontAwesomeIcon icon={faShoppingBag} />
+                  <div className="info-text">
+                    <strong>عملية سريعة وسهلة</strong>
+                    <p>سجل الدخول أو أنشئ حساباً جديداً في ثوانٍ</p>
+                  </div>
+                </div>
+              </div>
+
+              {cart.length > 0 && (
+                <div className="cart-preview">
+                  <h3>سلة التسوق الخاصة بك ({cartTotal.items} منتج)</h3>
+                  <div className="cart-items-preview">
+                    {cart.slice(0, 3).map(item => (
+                      <div key={item.id} className="cart-preview-item">
+                        <div className="preview-item-image">
+                          {item.image ? (
+                            <img src={item.image} alt={item.name} />
+                          ) : (
+                            <FontAwesomeIcon icon={faShoppingBag} />
+                          )}
+                        </div>
+                        <div className="preview-item-info">
+                          <span className="preview-item-name">{item.name}</span>
+                          <span className="preview-item-quantity">{item.quantity} × {item.price.toFixed(0)} درهم</span>
+                        </div>
+                      </div>
+                    ))}
+                    {cart.length > 3 && (
+                      <div className="more-items">
+                        + {cart.length - 3} منتج آخر
+                      </div>
+                    )}
+                  </div>
+                  <div className="cart-total-preview">
+                    <span>المجموع الكلي:</span>
+                    <span className="total-amount">{(cartTotal.price * 1.05).toFixed(0)} درهم</span>
+                  </div>
+                </div>
+              )}
+              
+              <div className="auth-actions">
+                <button 
+                  className="login-btn-primary" 
+                  onClick={() => navigate('/login?redirect=/checkout')}
+                >
+                  <FontAwesomeIcon icon={faLock} />
+                  تسجيل الدخول
+                </button>
+                
+                <button 
+                  className="signup-btn-secondary" 
+                  onClick={() => navigate('/signup?redirect=/checkout')}
+                >
+                  إنشاء حساب جديد
+                </button>
+              </div>
+              
+              <div className="auth-footer">
+                <p>لا تقلق، سلة التسوق الخاصة بك آمنة وسيتم حفظها تلقائياً</p>
+              </div>
             </div>
-            <h2>يرجى تسجيل الدخول</h2>
-            <p>يجب تسجيل الدخول لإتمام عملية الشراء</p>
-            <button 
-              className="login-btn" 
-              onClick={() => navigate('/login?redirect=/checkout')}
-            >
-              تسجيل الدخول
-            </button>
           </div>
         </div>
       </div>

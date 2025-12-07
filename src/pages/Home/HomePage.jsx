@@ -33,6 +33,7 @@ const HomePage = () => {
   const [showScrollIndicator, setShowScrollIndicator] = useState(true);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [email, setEmail] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   
   const navigate = useNavigate();
   
@@ -147,7 +148,16 @@ const HomePage = () => {
   // Handle search form submission
   const handleSearch = (e) => {
     e.preventDefault();
-    navigate('/services');
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      navigate('/services');
+    }
+  };
+
+  // Handle popular search tag click
+  const handlePopularSearch = (term) => {
+    navigate(`/search?q=${encodeURIComponent(term)}`);
   };
   
   // Handle newsletter subscription
@@ -299,7 +309,9 @@ const HomePage = () => {
                   <input 
                     type="text" 
                     className="hero-search-input" 
-                    placeholder="ما الخدمة التي تبحث عنها؟" 
+                    placeholder="ما الخدمة التي تبحث عنها؟"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                   />
                   <button type="submit" className="search-button">
                     بحث <FontAwesomeIcon icon={faSearch} />
@@ -311,21 +323,21 @@ const HomePage = () => {
             <div className="popular-searches">
               <span className="popular-label">الأكثر بحثاً:</span>
               <div className="popular-tags">
-                <button>تنظيف المنزل</button>
-                <button>صيانة التكييف</button>
-                <button>سباكة</button>
-                <button>كهرباء</button>
+                <button type="button" onClick={() => handlePopularSearch('تنظيف المنزل')}>تنظيف المنزل</button>
+                <button type="button" onClick={() => handlePopularSearch('صيانة التكييف')}>صيانة التكييف</button>
+                <button type="button" onClick={() => handlePopularSearch('سباكة')}>سباكة</button>
+                <button type="button" onClick={() => handlePopularSearch('كهرباء')}>كهرباء</button>
               </div>
             </div>
             
             <div className="hero-buttons">
-              <Link to="/services" className="primary-btn">
+              <Link to="/services2/categories" className="primary-btn">
                 <FontAwesomeIcon icon={faSearch} className="btn-icon" />
                 استكشف الخدمات
               </Link>
-              <Link to="/signup" className="secondary-btn">
+              <Link to="/services2/categories" className="secondary-btn">
                 <FontAwesomeIcon icon={faUserFriends} className="btn-icon" />
-                انضم إلينا
+                تصفح الفئات
               </Link>
             </div>
             
@@ -357,6 +369,61 @@ const HomePage = () => {
         )}
       </section>
       
+      {/* About Us Section */}
+      <section className="about-us-section" id="about-us">
+        <div className="container">
+          <div className="about-us-header">
+            <h2 className="about-title-ar">مـــــــــــــــن نــــــــــــــــــحن</h2>
+          </div>
+          <div className="about-us-content">
+            <div className="about-us-text-ar">
+              <h3>BuildingZ شركة رائدة تقدم حلولاً مبتكرة في مجال البناء والخدمات الهندسية</h3>
+              <p>نحن نسعى لتقديم أعلى مستويات الجودة والشفافية لعملائنا، مع التركيز على تقديم كل ما يحتاجه العميل في مكان واحد دون الحاجة للبحث بين مقدمي خدمات مختلفين.</p>
+              <p className="about-tagline">بضغطة زر بيتك يتشطب</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Our Services Section */}
+      <section className="our-services-section" id="our-services">
+        <div className="container">
+          <div className="services-header">
+            <h2 className="services-title-ar">خـــــــــدمـــــــــاتـــــــنــــــا</h2>
+          </div>
+          <div className="services-preview">
+            <div className="service-preview-item">
+              <h4>جميع خدمات الاستشارات الهندسية</h4>
+            </div>
+            <div className="service-preview-item">
+              <h4>التصميم الداخلي والتشطيب</h4>
+            </div>
+            <div className="service-preview-item">
+              <h4>الألومنيوم والأخشاب</h4>
+            </div>
+            <div className="service-preview-item">
+              <h4>سمارت هوم وكاميرات</h4>
+            </div>
+            <div className="service-preview-item">
+              <h4>بناء وصيانة</h4>
+            </div>
+            <div className="service-preview-item">
+              <h4>جميع أنواع الأحجار</h4>
+            </div>
+            <div className="service-preview-item">
+              <h4>جميع مستلزمات التشطيب الداخلي</h4>
+            </div>
+            <div className="service-preview-item">
+              <h4>التصميم الخارجي والإشراف</h4>
+            </div>
+          </div>
+          <div className="services-cta-home">
+            <p>يمكنك الحصول على كل هذه الخدمات بسهولة من خلال موقع</p>
+            <a href="https://buildingzuae.com" className="website-link">BUILDINGZUAE.COM</a>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section className="feature-section" ref={featuresRef}>
         <div className="feature-container">

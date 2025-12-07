@@ -6,8 +6,8 @@
 // Environment-based configuration
 const config = {
   // API Base URLs
-  API_BASE_URL: process.env.REACT_APP_BACKEND_API || 'https://buildingz.digistuff.live/admin/public/api',
-  BACKEND_URL: process.env.REACT_APP_BACKEND_URL || 'https://buildingz.digistuff.live/admin/',
+  API_BASE_URL: process.env.REACT_APP_BACKEND_API || 'https://admin.digistuff.live/api',
+  BACKEND_URL: process.env.REACT_APP_BACKEND_URL || 'https://admin.digistuff.live',
   
   // Specific API endpoints
   endpoints: {

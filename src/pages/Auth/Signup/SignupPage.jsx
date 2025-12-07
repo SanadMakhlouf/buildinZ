@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import authService from '../../../services/authService';
 import './SignupPage.css';
@@ -20,6 +20,7 @@ const SignupPage = () => {
   const [apiError, setApiError] = useState(null);
   const [signupSuccess, setSignupSuccess] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Password strength checker
   useEffect(() => {
@@ -106,8 +107,12 @@ const SignupPage = () => {
         // Handle auto-login result
         if (response.autoLogin) {
           // User is now logged in automatically
+          // Get redirect path from URL parameters or use default
+          const params = new URLSearchParams(location.search);
+          const redirectPath = params.get('redirect') || '/';
+          
           setTimeout(() => {
-            navigate('/', { 
+            navigate(redirectPath, { 
               state: { 
                 message: 'تم إنشاء الحساب وتسجيل الدخول بنجاح!',
                 type: 'success'
@@ -115,9 +120,12 @@ const SignupPage = () => {
             });
           }, 2000);
         } else {
-          // Auto-login failed, redirect to login page
+          // Auto-login failed, redirect to login page with redirect param
+          const params = new URLSearchParams(location.search);
+          const redirectPath = params.get('redirect') || '/';
+          
           setTimeout(() => {
-            navigate('/login', { 
+            navigate(`/login?redirect=${encodeURIComponent(redirectPath)}`, { 
               state: { 
                 message: 'تم إنشاء الحساب بنجاح. يرجى تسجيل الدخول.',
                 type: 'info'
