@@ -5,107 +5,64 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faSearch, 
   faBars, 
-  faBell, 
   faShoppingBag, 
   faUser,
   faTimes,
-  faHome,
-  faStore,
-  faTools,
-  faQuestionCircle,
   faHeart
 } from '@fortawesome/free-solid-svg-icons';
 import SearchModal from './SearchModal';
-import NotificationBell from './NotificationBell';
 
 const Navbar = () => {
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
-  const [searchActive, setSearchActive] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [cartCount] = useState(2);
   const [searchModalOpen, setSearchModalOpen] = useState(false);
 
-  // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 50) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
+      setScrolled(window.scrollY > 50);
     };
-
     window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close mobile menu when route changes
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
-  const toggleSearch = () => {
-    setSearchModalOpen(true);
-  };
-
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
-  };
+  const toggleSearch = () => setSearchModalOpen(true);
+  const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
 
   return (
     <>
       <header className={`navbar ${scrolled ? 'navbar-scrolled' : ''}`} dir="rtl">
         <div className="navbar-container">
-          {/* Logo */}
           <div className="navbar-logo">
             <Link to="/" className="logo-link">
-              <img src="/logo.png" alt="BuildingZ Logo" className="logo-image" style={{ height: '180px', width: 'auto' }} />
+              <img src="/logo.png" alt="BuildingZ Logo" className="logo-image" />
             </Link>
           </div>
 
-          {/* Navigation Links - Desktop */}
           <nav className="navbar-nav">
-            <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>
-              <span className="nav-text">الرئيسية</span>
-            </Link>
-            <Link to="/services" className={`nav-link ${location.pathname === '/services' || location.pathname.includes('/services2') ? 'active' : ''}`}>
-              <span className="nav-text">الخدمات</span>
-            </Link>
-            <Link to="/products" className={`nav-link ${location.pathname.includes('/products') ? 'active' : ''}`}>
-              <span className="nav-text">المتجر</span>
-            </Link>
-            <Link to="/about" className={`nav-link ${location.pathname.includes('/about') ? 'active' : ''}`}>
-              <span className="nav-text">من نحن</span>
-            </Link>
+            <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>الرئيسية</Link>
+            <Link to="/services" className={`nav-link ${location.pathname === '/services' || location.pathname.includes('/services2') ? 'active' : ''}`}>الخدمات</Link>
+            <Link to="/products" className={`nav-link ${location.pathname.includes('/products') ? 'active' : ''}`}>المتجر</Link>
+            <Link to="/about" className={`nav-link ${location.pathname.includes('/about') ? 'active' : ''}`}>من نحن</Link>
           </nav>
 
-          {/* Right Section - Actions */}
           <div className="navbar-actions">
-            {/* Search */}
-            <div className={`search-wrapper ${searchActive ? 'active' : ''}`}>
-              <button className="action-button search-toggle" onClick={toggleSearch}>
-                <FontAwesomeIcon icon={faSearch} />
-              </button>
-            </div>
-
-            {/* Notifications - Temporarily disabled to test redirect issue */}
-            {/* <div className="notification-wrapper">
-              <NotificationBell />
-            </div> */}
-
-           
-
-            {/* User Profile */}
-            <div className="profile-wrapper">
-              <Link to="/profile" className="action-button profile-button">
-                <FontAwesomeIcon icon={faUser} />
-              </Link>
-            </div>
-
-            {/* Mobile Menu Toggle */}
+            <button className="action-button search-toggle" onClick={toggleSearch}>
+              <FontAwesomeIcon icon={faSearch} />
+            </button>
+            <Link to="/favorites" className="action-button">
+              <FontAwesomeIcon icon={faHeart} />
+            </Link>
+            <Link to="/cart" className="action-button">
+              <FontAwesomeIcon icon={faShoppingBag} />
+            </Link>
+            <Link to="/login" className="action-button profile-button">
+              <FontAwesomeIcon icon={faUser} />
+            </Link>
             <button 
               className={`mobile-menu-toggle ${mobileMenuOpen ? 'active' : ''}`}
               onClick={toggleMobileMenu}
@@ -115,10 +72,8 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Menu */}
         <div className={`mobile-menu ${mobileMenuOpen ? 'open' : ''}`}>
           <div className="mobile-menu-container">
-            {/* Mobile Search */}
             <div className="mobile-search">
               <input 
                 type="text" 
@@ -141,34 +96,17 @@ const Navbar = () => {
               </button>
             </div>
 
-            {/* Mobile Navigation Links */}
             <nav className="mobile-nav">
-              <Link to="/" className="mobile-nav-link">
-                <FontAwesomeIcon icon={faHome} />
-                <span>الرئيسية</span>
-              </Link>
-              <Link to="/services" className="mobile-nav-link">
-                <FontAwesomeIcon icon={faTools} />
-                <span>الخدمات</span>
-              </Link>
-              <Link to="/products" className="mobile-nav-link">
-                <FontAwesomeIcon icon={faStore} />
-                <span>المتجر</span>
-              </Link>
-              <Link to="/about" className="mobile-nav-link">
-                <FontAwesomeIcon icon={faQuestionCircle} />
-                <span>من نحن</span>
-              </Link>
-              <Link to="/favorites" className="mobile-nav-link">
-                <FontAwesomeIcon icon={faHeart} />
-                <span>المفضلة</span>
-              </Link>
+              <Link to="/" className="mobile-nav-link">الرئيسية</Link>
+              <Link to="/services" className="mobile-nav-link">الخدمات</Link>
+              <Link to="/products" className="mobile-nav-link">المتجر</Link>
+              <Link to="/about" className="mobile-nav-link">من نحن</Link>
+              <Link to="/favorites" className="mobile-nav-link">المفضلة</Link>
             </nav>
           </div>
         </div>
       </header>
 
-      {/* Search Modal */}
       <SearchModal 
         isOpen={searchModalOpen}
         onClose={() => setSearchModalOpen(false)}

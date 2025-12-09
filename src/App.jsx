@@ -19,6 +19,9 @@ import ResetPassword from './pages/Auth/Login/ResetPassword';
 import AdminPage from './pages/Admin/AdminPage';
 import FAQPage from './pages/FAQ/FAQPage';
 import PrivacyPage from './pages/Privacy/PrivacyPage';
+import ContactPage from './pages/Contact/ContactPage';
+import HelpPage from './pages/Help/HelpPage';
+import TermsPage from './pages/Terms/TermsPage';
 import CartPage from './pages/Cart/CartPage';
 import CheckoutPage from './pages/Checkout/CheckoutPage';
 import SearchPage from './pages/Search/SearchPage';
@@ -59,6 +62,9 @@ function App() {
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/faq" element={<FAQPage />} />
             <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/help" element={<HelpPage />} />
+            <Route path="/terms" element={<TermsPage />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/payment/success" element={<PaymentSuccessPage />} />

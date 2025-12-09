@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faSpinner,
@@ -17,7 +17,15 @@ import {
   faArrowRight,
   faArrowLeft,
   faChevronLeft,
-  faChevronRight
+  faChevronRight,
+  faThLarge,
+  faList,
+  faSlidersH,
+  faPercent,
+  faPalette,
+  faGem,
+  faTruck,
+  faTag
 } from '@fortawesome/free-solid-svg-icons';
 import { useCart } from '../../context/CartContext';
 import config from '../../config/apiConfig';
@@ -40,11 +48,12 @@ const ProductsPage = () => {
   const [selectedBrands, setSelectedBrands] = useState([]);
   const [priceRange, setPriceRange] = useState({ min: '', max: '' });
   const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'popular');
+  const [viewMode, setViewMode] = useState('grid'); // grid or list
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [expandedFilters, setExpandedFilters] = useState({
     category: true,
     brand: false,
-    price: false
+    price: true
   });
 
   // Pagination
@@ -60,40 +69,56 @@ const ProductsPage = () => {
       const response = await fetch(`${config.BACKEND_URL}/api/products`);
       
       if (!response.ok) {
-        throw new Error('Failed to fetch products');
+        throw new Error(`Failed to fetch products: ${response.status} ${response.statusText}`);
       }
       
-      const responseData = await response.json();
+      let responseData;
+      try {
+        responseData = await response.json();
+      } catch (parseError) {
+        throw new Error('Failed to parse response from server');
+      }
       
       if (responseData.success && responseData.data?.products) {
-        const formattedProducts = responseData.data.products.map(product => ({
-          id: product.id,
-          name: product.name,
-          vendor: product.vendor_profile?.business_name || '',
-          vendorId: product.vendor_profile?.id || '',
-          category: product.category?.name || '',
-          categoryId: product.category?.id || '',
-          price: parseFloat(product.price) || 0,
-          originalPrice: product.original_price ? parseFloat(product.original_price) : null,
-          description: product.description || '',
-          image: product.primary_image_url || 
-                 (product.image_urls?.length > 0 ? product.image_urls[0] : null),
-          images: product.image_urls || [],
-          stockQuantity: product.stock_quantity || 0,
-          rating: product.reviews?.length > 0 
-            ? product.reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / product.reviews.length 
-            : 0,
-          reviewCount: product.reviews?.length || 0,
-          sku: product.sku || ''
-        }));
+        const formattedProducts = responseData.data.products
+          .filter(product => product && product.id) // Filter out invalid products
+          .map(product => {
+            try {
+              return {
+                id: product.id,
+                name: product.name || '',
+                vendor: product.vendor_profile?.business_name || '',
+                vendorId: product.vendor_profile?.id || '',
+                category: product.category?.name || '',
+                categoryId: product.category?.id || '',
+                price: parseFloat(product.price) || 0,
+                originalPrice: product.original_price ? parseFloat(product.original_price) : null,
+                description: product.description || '',
+                image: product.primary_image_url || 
+                       (Array.isArray(product.image_urls) && product.image_urls.length > 0 ? product.image_urls[0] : null),
+                images: Array.isArray(product.image_urls) ? product.image_urls : [],
+                stockQuantity: product.stock_quantity !== undefined ? product.stock_quantity : null,
+                rating: Array.isArray(product.reviews) && product.reviews.length > 0 
+                  ? product.reviews.reduce((sum, r) => sum + (r?.rating || 0), 0) / product.reviews.length 
+                  : 0,
+                reviewCount: Array.isArray(product.reviews) ? product.reviews.length : 0,
+                sku: product.sku || ''
+              };
+            } catch (mapError) {
+              console.error('Error mapping product:', mapError, product);
+              return null;
+            }
+          })
+          .filter(product => product !== null); // Remove any null products from mapping errors
         
         setProducts(formattedProducts);
       } else {
         setProducts([]);
       }
     } catch (err) {
-      console.error('Error fetching products:', err);
-      setError(err.message);
+      const errorMessage = err?.message || err?.toString() || 'حدث خطأ أثناء تحميل المنتجات';
+      console.error('Error fetching products:', errorMessage, err);
+      setError(errorMessage);
       setProducts([]);
     } finally {
       setLoading(false);
@@ -105,16 +130,25 @@ const ProductsPage = () => {
     try {
       const response = await fetch(`${config.BACKEND_URL}/api/categories`);
       if (response.ok) {
-        const responseData = await response.json();
+        let responseData;
+        try {
+          responseData = await response.json();
+        } catch (parseError) {
+          console.error('Error parsing categories response:', parseError);
+          return;
+        }
+        
         if (responseData.success && responseData.data) {
-          const sortedCategories = [...responseData.data].sort((a, b) => 
+          const mainCategories = responseData.data.filter(cat => !cat.parent_id);
+          const sortedCategories = mainCategories.sort((a, b) => 
             (a.sort_order || 0) - (b.sort_order || 0)
           );
           setCategories(sortedCategories);
         }
       }
     } catch (err) {
-      console.error('Error fetching categories:', err);
+      const errorMessage = err?.message || err?.toString() || 'Error fetching categories';
+      console.error('Error fetching categories:', errorMessage, err);
     }
   }, []);
 
@@ -136,58 +170,94 @@ const ProductsPage = () => {
 
   // Filter and sort products
   const filteredProducts = useMemo(() => {
-    let filtered = [...products];
+    try {
+      if (!Array.isArray(products)) {
+        return [];
+      }
 
-    // Search filter
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(p => 
-        p.name.toLowerCase().includes(term) ||
-        p.description.toLowerCase().includes(term) ||
-        p.category.toLowerCase().includes(term) ||
-        p.vendor.toLowerCase().includes(term)
-      );
-    }
+      let filtered = [...products];
 
-    // Category filter
-    if (selectedCategory) {
-      filtered = filtered.filter(p => p.categoryId === selectedCategory);
-    }
+      // Search filter
+      if (searchTerm && typeof searchTerm === 'string') {
+        const term = searchTerm.toLowerCase();
+        filtered = filtered.filter(p => {
+          if (!p) return false;
+          try {
+            return (
+              (p.name && typeof p.name === 'string' && p.name.toLowerCase().includes(term)) ||
+              (p.description && typeof p.description === 'string' && p.description.toLowerCase().includes(term)) ||
+              (p.category && typeof p.category === 'string' && p.category.toLowerCase().includes(term)) ||
+              (p.vendor && typeof p.vendor === 'string' && p.vendor.toLowerCase().includes(term))
+            );
+          } catch (err) {
+            console.error('Error in search filter:', err);
+            return false;
+          }
+        });
+      }
 
-    // Brand filter
-    if (selectedBrands.length > 0) {
-      filtered = filtered.filter(p => selectedBrands.includes(p.vendor));
-    }
+      // Category filter
+      if (selectedCategory) {
+        filtered = filtered.filter(p => {
+          if (!p) return false;
+          return p.categoryId?.toString() === selectedCategory.toString();
+        });
+      }
 
-    // Price range filter
-    if (priceRange.min) {
-      filtered = filtered.filter(p => p.price >= parseFloat(priceRange.min));
-    }
-    if (priceRange.max) {
-      filtered = filtered.filter(p => p.price <= parseFloat(priceRange.max));
-    }
+      // Brand filter
+      if (Array.isArray(selectedBrands) && selectedBrands.length > 0) {
+        filtered = filtered.filter(p => {
+          if (!p || !p.vendor) return false;
+          return selectedBrands.includes(p.vendor);
+        });
+      }
 
-    // Sort
-    switch (sortBy) {
-      case 'price-low':
-        filtered.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-high':
-        filtered.sort((a, b) => b.price - a.price);
-        break;
-      case 'name':
-        filtered.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      case 'rating':
-        filtered.sort((a, b) => b.rating - a.rating);
-        break;
-      default:
-        // Popular/default - keep original order or sort by rating
-        filtered.sort((a, b) => b.rating - a.rating);
-        break;
-    }
+      // Price range filter
+      if (priceRange.min) {
+        const minPrice = parseFloat(priceRange.min);
+        if (!isNaN(minPrice)) {
+          filtered = filtered.filter(p => p && typeof p.price === 'number' && p.price >= minPrice);
+        }
+      }
+      if (priceRange.max) {
+        const maxPrice = parseFloat(priceRange.max);
+        if (!isNaN(maxPrice)) {
+          filtered = filtered.filter(p => p && typeof p.price === 'number' && p.price <= maxPrice);
+        }
+      }
 
-    return filtered;
+      // Sort
+      try {
+        switch (sortBy) {
+          case 'price-low':
+            filtered.sort((a, b) => (a?.price || 0) - (b?.price || 0));
+            break;
+          case 'price-high':
+            filtered.sort((a, b) => (b?.price || 0) - (a?.price || 0));
+            break;
+          case 'name':
+            filtered.sort((a, b) => {
+              const nameA = a?.name || '';
+              const nameB = b?.name || '';
+              return nameA.localeCompare(nameB);
+            });
+            break;
+          case 'rating':
+            filtered.sort((a, b) => (b?.rating || 0) - (a?.rating || 0));
+            break;
+          default:
+            filtered.sort((a, b) => (b?.rating || 0) - (a?.rating || 0));
+            break;
+        }
+      } catch (sortError) {
+        console.error('Error sorting products:', sortError);
+      }
+
+      return filtered;
+    } catch (err) {
+      console.error('Error filtering products:', err);
+      return [];
+    }
   }, [products, searchTerm, selectedCategory, selectedBrands, priceRange, sortBy]);
 
   // Pagination
@@ -196,7 +266,7 @@ const ProductsPage = () => {
     const startIndex = (currentPage - 1) * productsPerPage;
     const endIndex = startIndex + productsPerPage;
     return filteredProducts.slice(startIndex, endIndex);
-  }, [filteredProducts, currentPage]);
+  }, [filteredProducts, currentPage, productsPerPage]);
 
   // Reset pagination when filters change
   useEffect(() => {
@@ -252,100 +322,71 @@ const ProductsPage = () => {
 
   // Product Card Component
   const ProductCard = ({ product }) => {
+    const [imageError, setImageError] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
-    const [imageError, setImageError] = useState({});
-    const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-    const availableImages = product.images && product.images.length > 0 
-      ? product.images 
-      : product.image 
-        ? [product.image] 
-        : [];
+    if (!product || !product.id) {
+      return null;
+    }
 
-    const discount = product.originalPrice && product.originalPrice > product.price
+    const discount = product.originalPrice && product.price && product.originalPrice > product.price
       ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
       : 0;
 
-    const handleImageError = (index) => {
-      setImageError(prev => ({ ...prev, [index]: true }));
-    };
-
-    const nextImage = (e) => {
-      e.stopPropagation();
-      if (availableImages.length > 1) {
-        setCurrentImageIndex((prev) => (prev + 1) % availableImages.length);
+    const getImageUrl = (imagePath) => {
+      try {
+        if (!imagePath) return null;
+        if (typeof imagePath !== 'string') return null;
+        if (imagePath.startsWith('http')) return imagePath;
+        if (imagePath.startsWith('/')) return `${config.BACKEND_URL}${imagePath}`;
+        return `${config.BACKEND_URL}/storage/${imagePath}`;
+      } catch (err) {
+        console.error('Error processing image URL:', err);
+        return null;
       }
     };
-
-    const prevImage = (e) => {
-      e.stopPropagation();
-      if (availableImages.length > 1) {
-        setCurrentImageIndex((prev) => (prev - 1 + availableImages.length) % availableImages.length);
-      }
-    };
-
-    const currentImage = availableImages[currentImageIndex];
 
     return (
       <div
-        className="product-card"
+        className={`product-card ${viewMode === 'list' ? 'list-view' : ''}`}
         onClick={() => navigate(`/products/${product.id}`)}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <div className="product-image-wrapper">
-          {currentImage && !imageError[currentImageIndex] ? (
-            <>
-              <img
-                src={currentImage}
-                alt={product.name}
-                className="product-image"
-                onError={() => handleImageError(currentImageIndex)}
-              />
-              {availableImages.length > 1 && (
-                <>
-                  <button
-                    className="product-carousel-btn product-carousel-prev"
-                    onClick={prevImage}
-                    title="الصورة السابقة"
-                  >
-                    <FontAwesomeIcon icon={faChevronRight} />
-                  </button>
-                  <button
-                    className="product-carousel-btn product-carousel-next"
-                    onClick={nextImage}
-                    title="الصورة التالية"
-                  >
-                    <FontAwesomeIcon icon={faChevronLeft} />
-                  </button>
-                  <div className="product-carousel-indicators">
-                    {availableImages.map((_, index) => (
-                      <button
-                        key={index}
-                        className={`carousel-indicator ${index === currentImageIndex ? 'active' : ''}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setCurrentImageIndex(index);
-                        }}
-                        aria-label={`صورة ${index + 1}`}
-                      />
-                    ))}
-                  </div>
-                </>
-              )}
-            </>
+        <div className="product-image-container">
+          {product.image && !imageError ? (
+            <img
+              src={getImageUrl(product.image)}
+              alt={product.name}
+              className="product-image"
+              onError={() => setImageError(true)}
+              loading="lazy"
+            />
           ) : (
             <div className="product-image-placeholder">
               <FontAwesomeIcon icon={faShoppingCart} />
             </div>
           )}
           
+          {/* Ad Label */}
+          <span className="product-ad-label">Ad</span>
+          
+          {/* Discount Badge */}
           {discount > 0 && (
-            <div className="product-discount-badge">
-              {discount}%
-            </div>
+            <span className="product-badge discount-badge">{discount}% OFF</span>
+          )}
+          
+          {/* Deal Banner */}
+          {discount > 0 && (
+            <div className="product-deal-banner">Deal</div>
+          )}
+          
+          {/* Out of Stock Badge */}
+          {(product.stockQuantity === 0 || product.stockQuantity === null) && (
+            <span className="product-badge out-of-stock-badge">نفذت الكمية</span>
           )}
 
+          {/* Wishlist Button */}
           <button
             className="product-wishlist-btn"
             onClick={(e) => {
@@ -356,58 +397,37 @@ const ProductsPage = () => {
           >
             <FontAwesomeIcon icon={faHeart} />
           </button>
-
-          {product.stockQuantity > 0 && (
-            <button
-              className={`product-cart-btn ${isHovered ? 'show' : ''}`}
-              onClick={(e) => handleAddToCart(e, product)}
-              title="إضافة للسلة"
-            >
-              <FontAwesomeIcon icon={faShoppingCart} />
-            </button>
-          )}
         </div>
 
-        <div className="product-info">
-          {product.rating > 0 && (
-            <div className="product-rating">
-              <div className="rating-stars">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <FontAwesomeIcon
-                    key={star}
-                    icon={faStar}
-                    className={`star ${star <= Math.round(product.rating) ? 'filled' : ''}`}
-                  />
-                ))}
-              </div>
-              <span className="rating-value">{product.rating.toFixed(1)}</span>
-              {product.reviewCount > 0 && (
-                <span className="rating-count">({product.reviewCount})</span>
-              )}
-            </div>
-          )}
+        <div className="product-details">
+          <h3 className="product-name">{product.name || 'منتج بدون اسم'}</h3>
 
-          <h3 className="product-title">{product.name}</h3>
-
-          {product.vendor && (
-            <div className="product-vendor">{product.vendor}</div>
-          )}
-
-          <div className="product-price-container">
+          {/* Price Section */}
+          <div className="product-price-section">
             <div className="product-price">
-              <span className="price-value">{product.price.toFixed(2)}</span>
+              <span className="price-value">{(product.price || 0).toFixed(2)}</span>
               <span className="price-currency">درهم</span>
             </div>
-            {product.originalPrice && product.originalPrice > product.price && (
-              <div className="product-original-price">
-                {product.originalPrice.toFixed(2)} درهم
-              </div>
+            {product.originalPrice && product.price && product.originalPrice > product.price && (
+              <>
+                <span className="product-original-price">{product.originalPrice.toFixed(2)} درهم</span>
+                {discount > 0 && (
+                  <span className="product-discount-text">{discount}% OFF</span>
+                )}
+              </>
             )}
           </div>
 
-          {product.stockQuantity === 0 && (
-            <div className="product-out-of-stock">غير متوفر</div>
-          )}
+          {/* Delivery Information */}
+          <div className="product-delivery-info">
+            <div className="delivery-free">
+              <FontAwesomeIcon icon={faTruck} />
+              <span>Free Delivery</span>
+            </div>
+            <div className="delivery-express">
+              express Get it by {getDeliveryDate()}
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -441,47 +461,77 @@ const ProductsPage = () => {
     );
   }
 
+  // Calculate delivery date (example: tomorrow or specific date)
+  const getDeliveryDate = () => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long' });
+  };
+
   return (
     <div className="products-page">
-      {/* Header */}
-      <div className="products-header">
-        <div className="products-header-content">
-          <div className="products-header-title">
-            <h1>المنتجات</h1>
-            <p className="products-count">{filteredProducts.length} منتج متاح</p>
-          </div>
+      {/* Breadcrumb */}
+     
+
+      {/* Page Header */}
+     
+
+      {/* Horizontal Filter Chips */}
+      <div className="filter-chips-container">
+        <div className="filter-chips-scroll">
+          <button
+            className={`filter-chip ${selectedCategory === '' ? 'active' : ''}`}
+            onClick={() => setSelectedCategory('')}
+          >
+            <FontAwesomeIcon icon={faPercent} />
+            <span>العروض</span>
+            <FontAwesomeIcon icon={faChevronDown} className="chip-arrow" />
+          </button>
           
-          <div className="products-header-search">
-            <div className="search-input-wrapper">
-              <FontAwesomeIcon icon={faSearch} className="search-icon" />
-              <input
-                type="text"
-                placeholder="ابحث عن منتج..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="search-input"
-              />
-              {searchTerm && (
-                <button
-                  className="search-clear"
-                  onClick={() => setSearchTerm('')}
-                >
-                  <FontAwesomeIcon icon={faTimes} />
-                </button>
-              )}
-            </div>
-          </div>
+          <button
+            className="filter-chip"
+            onClick={() => toggleFilter('category')}
+          >
+            <FontAwesomeIcon icon={faPalette} />
+            <span>اللون</span>
+            <FontAwesomeIcon icon={faChevronDown} className="chip-arrow" />
+          </button>
+          
+          <button
+            className="filter-chip"
+            onClick={() => toggleFilter('brand')}
+          >
+            <FontAwesomeIcon icon={faGem} />
+            <span>الماركة</span>
+            <FontAwesomeIcon icon={faChevronDown} className="chip-arrow" />
+          </button>
+
+          {categories.slice(0, 8).map(category => (
+            <button
+              key={category.id}
+              className={`filter-chip ${selectedCategory === category.id.toString() ? 'active' : ''}`}
+              onClick={() => setSelectedCategory(category.id.toString())}
+            >
+              <span>{category.name}</span>
+            </button>
+          ))}
         </div>
+        <button className="filter-chips-scroll-btn scroll-right">
+          <FontAwesomeIcon icon={faChevronLeft} />
+        </button>
       </div>
 
       {/* Main Content */}
-      <div className="products-content">
-        {/* Sidebar Filters */}
+      <div className="products-main-container">
+        {/* Sidebar Filters - Hidden on desktop, shown on mobile */}
         <aside className={`products-sidebar ${showMobileFilters ? 'mobile-open' : ''}`}>
           <div className="sidebar-header">
-            <h2>الفلاتر</h2>
+            <h2>
+              <FontAwesomeIcon icon={faSlidersH} />
+              الفلاتر
+            </h2>
             <button
-              className="sidebar-close"
+              className="sidebar-close-btn"
               onClick={() => setShowMobileFilters(false)}
             >
               <FontAwesomeIcon icon={faTimes} />
@@ -489,10 +539,28 @@ const ProductsPage = () => {
           </div>
 
           <div className="sidebar-content">
-            {/* Categories Filter */}
-            <div className="filter-group">
+            {/* Search */}
+            <div className="filter-section">
+              <div className="filter-search">
+                <FontAwesomeIcon icon={faSearch} />
+                <input
+                  type="text"
+                  placeholder="ابحث عن منتج..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                {searchTerm && (
+                  <button onClick={() => setSearchTerm('')}>
+                    <FontAwesomeIcon icon={faTimes} />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Categories */}
+            <div className="filter-section">
               <button
-                className="filter-group-header"
+                className="filter-section-header"
                 onClick={() => toggleFilter('category')}
               >
                 <span>الفئات</span>
@@ -501,7 +569,7 @@ const ProductsPage = () => {
                 />
               </button>
               {expandedFilters.category && (
-                <div className="filter-group-content">
+                <div className="filter-options">
                   <label className="filter-option">
                     <input
                       type="radio"
@@ -526,11 +594,11 @@ const ProductsPage = () => {
               )}
             </div>
 
-            {/* Brands Filter */}
+            {/* Brands */}
             {brands.length > 0 && (
-              <div className="filter-group">
+              <div className="filter-section">
                 <button
-                  className="filter-group-header"
+                  className="filter-section-header"
                   onClick={() => toggleFilter('brand')}
                 >
                   <span>الماركات</span>
@@ -539,36 +607,26 @@ const ProductsPage = () => {
                   />
                 </button>
                 {expandedFilters.brand && (
-                  <div className="filter-group-content">
-                    <div className="brand-search-wrapper">
-                      <FontAwesomeIcon icon={faSearch} />
-                      <input
-                        type="text"
-                        placeholder="ابحث عن ماركة..."
-                        className="brand-search-input"
-                      />
-                    </div>
-                    <div className="filter-checkbox-list">
-                      {brands.slice(0, 10).map(brand => (
-                        <label key={brand} className="filter-checkbox">
-                          <input
-                            type="checkbox"
-                            checked={selectedBrands.includes(brand)}
-                            onChange={() => handleBrandToggle(brand)}
-                          />
-                          <span>{brand}</span>
-                        </label>
-                      ))}
-                    </div>
+                  <div className="filter-options">
+                    {brands.map(brand => (
+                      <label key={brand} className="filter-option checkbox">
+                        <input
+                          type="checkbox"
+                          checked={selectedBrands.includes(brand)}
+                          onChange={() => handleBrandToggle(brand)}
+                        />
+                        <span>{brand}</span>
+                      </label>
+                    ))}
                   </div>
                 )}
               </div>
             )}
 
-            {/* Price Filter */}
-            <div className="filter-group">
+            {/* Price Range */}
+            <div className="filter-section">
               <button
-                className="filter-group-header"
+                className="filter-section-header"
                 onClick={() => toggleFilter('price')}
               >
                 <span>السعر</span>
@@ -577,14 +635,13 @@ const ProductsPage = () => {
                 />
               </button>
               {expandedFilters.price && (
-                <div className="filter-group-content">
-                  <div className="price-range-inputs">
+                <div className="filter-options price-range">
+                  <div className="price-inputs">
                     <input
                       type="number"
                       placeholder="من"
                       value={priceRange.min}
                       onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
-                      className="price-input"
                     />
                     <span>إلى</span>
                     <input
@@ -592,7 +649,6 @@ const ProductsPage = () => {
                       placeholder="إلى"
                       value={priceRange.max}
                       onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
-                      className="price-input"
                     />
                   </div>
                 </div>
@@ -601,37 +657,53 @@ const ProductsPage = () => {
 
             {/* Clear Filters */}
             {activeFiltersCount() > 0 && (
-              <button className="clear-filters-button" onClick={clearFilters}>
-                مسح جميع الفلاتر
+              <button className="clear-filters-btn" onClick={clearFilters}>
+                مسح جميع الفلاتر ({activeFiltersCount()})
               </button>
             )}
           </div>
         </aside>
 
-        {/* Products Grid */}
-        <main className="products-main">
+        {/* Products Area */}
+        <main className="products-content-area">
           {/* Toolbar */}
           <div className="products-toolbar">
             <div className="toolbar-left">
               <button
-                className="mobile-filters-button"
+                className="mobile-filters-btn"
                 onClick={() => setShowMobileFilters(true)}
               >
                 <FontAwesomeIcon icon={faFilter} />
                 الفلاتر
                 {activeFiltersCount() > 0 && (
-                  <span className="filter-badge">{activeFiltersCount()}</span>
+                  <span className="filter-count-badge">{activeFiltersCount()}</span>
                 )}
               </button>
             </div>
 
             <div className="toolbar-right">
-              <div className="sort-wrapper">
-                <FontAwesomeIcon icon={faSort} className="sort-icon" />
+              <div className="view-mode-toggle">
+                <button
+                  className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
+                  onClick={() => setViewMode('grid')}
+                  title="عرض الشبكة"
+                >
+                  <FontAwesomeIcon icon={faThLarge} />
+                </button>
+                <button
+                  className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
+                  onClick={() => setViewMode('list')}
+                  title="عرض القائمة"
+                >
+                  <FontAwesomeIcon icon={faList} />
+                </button>
+              </div>
+
+              <div className="sort-selector">
+                <FontAwesomeIcon icon={faSort} />
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="sort-select"
                 >
                   <option value="popular">الأكثر رواجاً</option>
                   <option value="price-low">السعر: من الأقل للأعلى</option>
@@ -643,10 +715,10 @@ const ProductsPage = () => {
             </div>
           </div>
 
-          {/* Products Grid */}
+          {/* Products Grid/List */}
           {paginatedProducts.length > 0 ? (
             <>
-              <div className="products-grid">
+              <div className={`products-grid ${viewMode === 'list' ? 'list-view' : ''}`}>
                 {paginatedProducts.map(product => (
                   <ProductCard key={product.id} product={product} />
                 ))}
@@ -656,11 +728,11 @@ const ProductsPage = () => {
               {totalPages > 1 && (
                 <div className="products-pagination">
                   <button
-                    className="pagination-button"
+                    className="pagination-btn"
                     disabled={currentPage === 1}
                     onClick={() => setCurrentPage(prev => prev - 1)}
                   >
-                    <FontAwesomeIcon icon={faArrowRight} />
+                    <FontAwesomeIcon icon={faChevronRight} />
                     السابق
                   </button>
 
@@ -692,12 +764,12 @@ const ProductsPage = () => {
                   </div>
 
                   <button
-                    className="pagination-button"
+                    className="pagination-btn"
                     disabled={currentPage === totalPages}
                     onClick={() => setCurrentPage(prev => prev + 1)}
                   >
                     التالي
-                    <FontAwesomeIcon icon={faArrowLeft} />
+                    <FontAwesomeIcon icon={faChevronLeft} />
                   </button>
                 </div>
               )}
@@ -708,7 +780,7 @@ const ProductsPage = () => {
               <h3>لم يتم العثور على منتجات</h3>
               <p>حاول تعديل الفلاتر أو البحث عن منتج آخر</p>
               {activeFiltersCount() > 0 && (
-                <button className="clear-filters-button" onClick={clearFilters}>
+                <button className="clear-filters-btn" onClick={clearFilters}>
                   مسح جميع الفلاتر
                 </button>
               )}

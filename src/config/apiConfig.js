@@ -6,8 +6,8 @@
 // Environment-based configuration
 const config = {
   // API Base URLs
-  API_BASE_URL: process.env.REACT_APP_BACKEND_API || 'https://admin.digistuff.live/api',
-  BACKEND_URL: process.env.REACT_APP_BACKEND_URL || 'https://admin.digistuff.live',
+  API_BASE_URL: process.env.REACT_APP_BACKEND_API || 'http://localhost:8000/api',
+  BACKEND_URL: process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000',
   
   // Specific API endpoints
   endpoints: {
