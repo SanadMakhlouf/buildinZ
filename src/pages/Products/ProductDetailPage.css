@@ -7,6 +7,12 @@
   direction: rtl;
 }
 
+@media (max-width: 768px) {
+  .product-detail-page {
+    padding-top: 80px;
+  }
+}
+
 .product-container {
   max-width: 1280px;
   margin: 0 auto;
@@ -19,6 +25,13 @@
   border-bottom: 1px solid #e5e7eb;
   padding: 0.75rem 0;
   margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .product-breadcrumbs {
+    padding: 1rem 0;
+    margin-bottom: 1.5rem;
+  }
 }
 
 .breadcrumb-nav {
@@ -1038,12 +1051,55 @@
 
 @media (max-width: 768px) {
   .product-detail-page {
-    padding-top: 70px;
+    padding-top: 80px;
+  }
+
+  .product-container {
+    padding: 0 1rem;
+  }
+
+  .product-breadcrumbs {
+    padding: 1rem 0;
+    margin-bottom: 1.5rem;
   }
 
   .product-detail-layout {
     grid-template-columns: 1fr;
     gap: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .product-info-column {
+    gap: 1.5rem;
+  }
+
+  .product-header-section {
+    gap: 1.25rem;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+  }
+
+  .product-price-display {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    padding: 1.5rem;
+  }
+
+  .product-actions {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    gap: 1.25rem;
+  }
+
+  .product-quick-info {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+  }
+
+  .product-details-section {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
   }
 
   .product-images-column {
@@ -1119,13 +1175,53 @@
 }
 
 @media (max-width: 480px) {
+  .product-detail-page {
+    padding-top: 85px;
+  }
+
   .product-container {
     padding: 0 1rem;
   }
 
   .product-breadcrumbs {
-    padding: 0.75rem 0;
+    padding: 1rem 0;
     margin-bottom: 1.5rem;
+  }
+
+  .product-detail-layout {
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .product-info-column {
+    gap: 1.25rem;
+  }
+
+  .product-header-section {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+  }
+
+  .product-price-display {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    padding: 1.25rem;
+  }
+
+  .product-actions {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .product-quick-info {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+  }
+
+  .product-details-section {
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
   }
 
   .breadcrumb-nav {

@@ -50,6 +50,8 @@ const ProductDetailPage = () => {
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [imageError, setImageError] = useState({});
+  const showVendorSection = false;
+  const showReviewsSection = false;
 
   const slugify = (text = '', fallback = '') => {
     const base = text && text.toString().trim();
@@ -412,25 +414,6 @@ const ProductDetailPage = () => {
               {product.description && (
                 <p className="product-description">{product.description}</p>
               )}
-
-              {/* Rating */}
-              {product.reviews && Array.isArray(product.reviews) && product.reviews.length > 0 && averageRating > 0 && (
-                <div className="product-rating-display">
-                  <div className="rating-stars-large">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <FontAwesomeIcon
-                        key={star}
-                        icon={faStar}
-                        className={`star ${star <= Math.round(averageRating) ? 'filled' : 'empty'}`}
-                      />
-                    ))}
-                  </div>
-                  <span className="rating-value-large">{averageRating.toFixed(1)}</span>
-                  <span className="rating-count-large">
-                    ({product.reviews.length} {product.reviews.length === 1 ? 'تقييم' : 'تقييم'})
-                  </span>
-                </div>
-              )}
             </div>
 
             {/* Price Section */}
@@ -445,15 +428,7 @@ const ProductDetailPage = () => {
               </div>
             </div>
 
-            {/* Stock Status */}
-            <div className={`stock-status ${product.stock_quantity > 0 ? 'in-stock' : 'out-of-stock'}`}>
-              <FontAwesomeIcon icon={product.stock_quantity > 0 ? faCheckCircle : faExclamationTriangle} />
-              <span>
-                {product.stock_quantity > 0 
-                  ? `متوفر في المخزون (${product.stock_quantity} قطعة)` 
-                  : 'غير متوفر في المخزون'}
-              </span>
-            </div>
+            {/* Stock status hidden per request */}
 
             {/* Quick Info */}
             <div className="product-quick-info">
@@ -648,8 +623,8 @@ const ProductDetailPage = () => {
           </div>
         </div>
 
-        {/* Vendor Section */}
-        {product.vendor_profile && (
+        {/* Vendor Section hidden per request */}
+        {false && product.vendor_profile && (
           <div className="vendor-section">
             <h2 className="section-title">
               <FontAwesomeIcon icon={faStore} />
@@ -735,51 +710,7 @@ const ProductDetailPage = () => {
           </div>
         )}
 
-        {/* Reviews Section */}
-        <div className="reviews-section">
-          <h2 className="section-title">
-            <FontAwesomeIcon icon={faStar} />
-            التقييمات ({product.reviews && Array.isArray(product.reviews) ? product.reviews.length : 0})
-          </h2>
-          
-          {product.reviews && Array.isArray(product.reviews) && product.reviews.length > 0 ? (
-            <div className="reviews-list">
-              {product.reviews.map((review, index) => (
-                <div key={index} className="review-card">
-                  <div className="review-header">
-                    <div className="reviewer-info">
-                      <span className="reviewer-name">{review.user?.name || review.name || 'مستخدم'}</span>
-                      {review.rating && (
-                        <div className="review-rating">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <FontAwesomeIcon
-                              key={star}
-                              icon={faStar}
-                              className={`star ${star <= (review.rating || 0) ? 'filled' : 'empty'}`}
-                            />
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    {review.created_at && (
-                      <span className="review-date">
-                        {new Date(review.created_at).toLocaleDateString('ar-SA')}
-                      </span>
-                    )}
-                  </div>
-                  {review.comment && (
-                    <p className="review-comment">{review.comment}</p>
-                  )}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="no-reviews">
-              <FontAwesomeIcon icon={faStar} size="3x" />
-              <p>لا توجد تقييمات لهذا المنتج بعد. كن أول من يقيم!</p>
-            </div>
-          )}
-        </div>
+        {/* Reviews Section hidden per request */}
       </div>
     </div>
   );
