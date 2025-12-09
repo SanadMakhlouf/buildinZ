@@ -51,6 +51,19 @@ const ProductDetailPage = () => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [imageError, setImageError] = useState({});
 
+  const slugify = (text = '', fallback = '') => {
+    const base = text && text.toString().trim();
+    const cleaned = base
+      ? base
+          .toLowerCase()
+          .replace(/\s+/g, '-')
+          .replace(/[^-\w\u0600-\u06FF]+/g, '')
+          .replace(/-+/g, '-')
+          .replace(/^-+|-+$/g, '')
+      : '';
+    return cleaned || fallback;
+  };
+
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
@@ -247,7 +260,10 @@ const ProductDetailPage = () => {
   // SEO Data
   const pageTitle = `${product.name} - ${product.category?.name || 'منتج'} - BuildingZ`;
   const pageDescription = product.description || `اشتري ${product.name} من BuildingZ`;
-  const pageUrl = `${window.location.origin}/products/${product.id}`;
+  const pageUrl = `${window.location.origin}/products/${product.id}/${slugify(
+    product.name,
+    `product-${product.id}`
+  )}`;
   const productImage = availableImages.length > 0 ? availableImages[0] : null;
 
   return (

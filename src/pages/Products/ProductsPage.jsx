@@ -56,6 +56,20 @@ const ProductsPage = () => {
     price: true
   });
 
+  const slugify = (text = '', fallback = '') => {
+    const base = text && text.toString().trim();
+    const cleaned = base
+      ? base
+          .toLowerCase()
+          // keep Arabic letters, numbers, and hyphens
+          .replace(/\s+/g, '-')
+          .replace(/[^-\w\u0600-\u06FF]+/g, '')
+          .replace(/-+/g, '-')
+          .replace(/^-+|-+$/g, '')
+      : '';
+    return cleaned || fallback;
+  };
+
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 24;
@@ -349,7 +363,9 @@ const ProductsPage = () => {
     return (
       <div
         className={`product-card ${viewMode === 'list' ? 'list-view' : ''}`}
-        onClick={() => navigate(`/products/${product.id}`)}
+        onClick={() =>
+          navigate(`/products/${product.id}/${slugify(product.name, `product-${product.id}`)}`)
+        }
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
