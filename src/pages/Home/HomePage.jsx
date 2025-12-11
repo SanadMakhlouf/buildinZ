@@ -530,7 +530,7 @@ const HomePage = () => {
       title: "ضمان الجودة",
       description: "خدمات مضمونة 100%",
     },
-    { icon: faTruck, title: "خدمة سريعة", description: "وصول في نفس اليوم" },
+    { icon: faTruck, title: "خدمة سريعة", description: "سرعة قصوى للوصول" },
     { icon: faHeadset, title: "دعم 24/7", description: "خدمة عملاء متواصلة" },
     {
       icon: faCheckCircle,
