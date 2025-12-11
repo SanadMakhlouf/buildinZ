@@ -1390,7 +1390,7 @@ const HomePage = () => {
               </div>
               <div className="noon-contact-info">
                 <FontAwesomeIcon icon={faMapMarkerAlt} />
-                <span>دبي، الإمارات</span>
+                <span> ابو ظبي</span>
               </div>
 
               <div className="noon-newsletter">
