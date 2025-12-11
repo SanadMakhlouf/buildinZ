@@ -658,6 +658,7 @@
   flex-direction: column;
   gap: 0.5rem;
   flex: 1;
+  color: #333;
 }
 
 .product-card.list-view .product-details {
@@ -697,25 +698,36 @@
   display: flex;
   align-items: baseline;
   gap: 0.25rem;
+  color: #111 !important;
+}
+
+.product-price * {
+  color: inherit !important;
 }
 
 .price-value {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #333;
+  color: #111 !important;
   direction: ltr;
   display: inline-block;
 }
 
+.product-details .price-value,
+.product-card .price-value,
+.product-price-section .price-value {
+  color: #111 !important;
+}
+
 .price-currency {
   font-size: 0.9rem;
-  color: #666;
+  color: #444 !important;
   font-weight: 500;
 }
 
 .product-original-price {
   font-size: 0.85rem;
-  color: #999;
+  color: #777 !important;
   text-decoration: line-through;
 }
 
