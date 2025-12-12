@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSpinner,
@@ -13,22 +13,16 @@ import {
   faSearch,
   faStar,
   faSort,
-  faCheck,
-  faArrowRight,
-  faArrowLeft,
   faChevronLeft,
   faChevronRight,
   faThLarge,
   faList,
   faSlidersH,
-  faPercent,
-  faPalette,
-  faGem,
   faTruck,
-  faTag,
 } from "@fortawesome/free-solid-svg-icons";
 import { useCart } from "../../context/CartContext";
 import config from "../../config/apiConfig";
+import CategoryCarousel from "../../components/CategoryCarousel";
 import "./ProductsPage.css";
 
 const ProductsPage = () => {
@@ -604,49 +598,14 @@ const ProductsPage = () => {
         </div>
       </div>
 
-      {/* Horizontal Filter Chips */}
-      <div className="filter-chips-container">
-        <div className="filter-chips-scroll">
-          <button
-            className={`filter-chip ${selectedCategory === "" ? "active" : ""}`}
-            onClick={() => setSelectedCategory("")}
-          >
-            <FontAwesomeIcon icon={faPercent} />
-            <span>العروض</span>
-            <FontAwesomeIcon icon={faChevronDown} className="chip-arrow" />
-          </button>
-
-          <button
-            className="filter-chip"
-            onClick={() => toggleFilter("category")}
-          >
-            <FontAwesomeIcon icon={faPalette} />
-            <span>اللون</span>
-            <FontAwesomeIcon icon={faChevronDown} className="chip-arrow" />
-          </button>
-
-          <button className="filter-chip" onClick={() => toggleFilter("brand")}>
-            <FontAwesomeIcon icon={faGem} />
-            <span>الماركة</span>
-            <FontAwesomeIcon icon={faChevronDown} className="chip-arrow" />
-          </button>
-
-          {categories.slice(0, 8).map((category) => (
-            <button
-              key={category.id}
-              className={`filter-chip ${
-                selectedCategory === category.id.toString() ? "active" : ""
-              }`}
-              onClick={() => setSelectedCategory(category.id.toString())}
-            >
-              <span>{category.name}</span>
-            </button>
-          ))}
-        </div>
-        <button className="filter-chips-scroll-btn scroll-right">
-          <FontAwesomeIcon icon={faChevronLeft} />
-        </button>
-      </div>
+      {/* Category Carousel */}
+      <CategoryCarousel
+        categories={categories}
+        loading={loading}
+        onCategoryClick={(category) => {
+          setSelectedCategory(category.id.toString());
+        }}
+      />
 
       {/* Main Content */}
       <div className="products-main-container">
