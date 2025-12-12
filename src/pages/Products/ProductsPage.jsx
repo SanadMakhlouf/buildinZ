@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSpinner,
@@ -19,10 +19,13 @@ import {
   faList,
   faSlidersH,
   faTruck,
+  faArrowLeft,
+  faTools,
 } from "@fortawesome/free-solid-svg-icons";
 import { useCart } from "../../context/CartContext";
 import config from "../../config/apiConfig";
 import CategoryCarousel from "../../components/CategoryCarousel";
+import serviceBuilderService from "../../services/serviceBuilderService";
 import "./ProductsPage.css";
 
 const ProductsPage = () => {
@@ -33,6 +36,7 @@ const ProductsPage = () => {
   // State
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -187,10 +191,74 @@ const ProductsPage = () => {
     }
   }, []);
 
+  // Fetch services
+  const fetchServices = useCallback(async () => {
+    try {
+      const servicesResponse = await serviceBuilderService.getAllServices();
+      let servicesData = [];
+      if (servicesResponse?.success && servicesResponse?.services) {
+        servicesData = Array.isArray(servicesResponse.services)
+          ? servicesResponse.services
+          : [];
+      } else if (servicesResponse?.data) {
+        servicesData = Array.isArray(servicesResponse.data)
+          ? servicesResponse.data
+          : servicesResponse.data.services || servicesResponse.data.data || [];
+      } else if (Array.isArray(servicesResponse)) {
+        servicesData = servicesResponse;
+      }
+      setServices(servicesData);
+    } catch (err) {
+      console.error("Error fetching services:", err);
+    }
+  }, []);
+
   useEffect(() => {
     fetchProducts();
     fetchCategories();
-  }, [fetchProducts, fetchCategories]);
+    fetchServices();
+  }, [fetchProducts, fetchCategories, fetchServices]);
+
+  // Shuffle array function (for random selection)
+  const shuffleArray = (array) => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  };
+
+  // Get random products and services
+  const popularProducts = useMemo(() => {
+    if (products.length === 0) return [];
+    return shuffleArray(products).slice(0, 8);
+  }, [products]);
+
+  const popularServices = useMemo(() => {
+    if (services.length === 0) return [];
+    return shuffleArray(services).slice(0, 8);
+  }, [services]);
+
+  // Get image URL helper
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return null;
+    if (imagePath.startsWith("http")) return imagePath;
+    if (imagePath.startsWith("/")) return `${config.BACKEND_URL}${imagePath}`;
+    return `${config.BACKEND_URL}/storage/${imagePath}`;
+  };
+
+  // Get service image helper
+  const getServiceImage = (service) => {
+    return (
+      service.main_image?.url ||
+      service.preview_image?.url ||
+      service.preview_image_path ||
+      service.image_path ||
+      service.image_url ||
+      null
+    );
+  };
 
   // Get unique brands
   const brands = useMemo(() => {
@@ -896,6 +964,168 @@ const ProductsPage = () => {
           )}
         </main>
       </div>
+
+      {/* Popular Services Section */}
+      {popularServices.length > 0 && (
+        <section className="popular-section">
+          <div className="popular-section-container">
+            <div className="popular-section-header">
+              <h2>الخدمات الأكثر طلباً</h2>
+              <Link to="/services2/categories" className="popular-view-all">
+                عرض الكل <FontAwesomeIcon icon={faArrowLeft} />
+              </Link>
+            </div>
+
+            <div className="popular-grid">
+              {popularServices.map((service) => {
+                const serviceImage = getServiceImage(service);
+                const imageUrl = serviceImage
+                  ? getImageUrl(serviceImage)
+                  : null;
+
+                return (
+                  <Link
+                    key={service.id}
+                    to={`/services2/service/${service.id}`}
+                    className="popular-card"
+                  >
+                    <div className="popular-image">
+                      {imageUrl ? (
+                        <img
+                          src={imageUrl}
+                          alt={service.name}
+                          onError={(e) => {
+                            e.target.style.display = "none";
+                          }}
+                        />
+                      ) : (
+                        <div className="popular-image-placeholder">
+                          <FontAwesomeIcon icon={faTools} />
+                        </div>
+                      )}
+                      {service.discount && (
+                        <span className="popular-badge">
+                          خصم {service.discount}%
+                        </span>
+                      )}
+                    </div>
+                    <div className="popular-content">
+                      <h3 className="popular-name">{service.name}</h3>
+                      <p className="popular-desc">
+                        {service.description?.substring(0, 60)}...
+                      </p>
+                      <div className="popular-footer">
+                        {service.base_price && (
+                          <span className="popular-price">
+                            يبدأ من {service.base_price} درهم
+                          </span>
+                        )}
+                        <div className="popular-rating">
+                          <FontAwesomeIcon icon={faStar} />
+                          <span>{service.rating?.toFixed(1) || "4.8"}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Popular Products Section */}
+      {popularProducts.length > 0 && (
+        <section className="popular-section">
+          <div className="popular-section-container">
+            <div className="popular-section-header">
+              <h2>المنتجات الأكثر طلباً</h2>
+              <Link to="/products" className="popular-view-all">
+                عرض الكل <FontAwesomeIcon icon={faArrowLeft} />
+              </Link>
+            </div>
+
+            <div className="popular-grid">
+              {popularProducts.map((product) => {
+                const imageUrl = product.image
+                  ? getImageUrl(
+                      product.image.startsWith("http")
+                        ? product.image
+                        : product.image.startsWith("/")
+                        ? product.image
+                        : `/storage/${product.image}`
+                    )
+                  : null;
+
+                return (
+                  <Link
+                    key={product.id}
+                    to={`/products/${product.id}`}
+                    className="popular-card"
+                  >
+                    <div className="popular-image">
+                      {imageUrl ? (
+                        <img
+                          src={imageUrl}
+                          alt={product.name}
+                          onError={(e) => {
+                            e.target.style.display = "none";
+                          }}
+                        />
+                      ) : (
+                        <div className="popular-image-placeholder">
+                          <FontAwesomeIcon icon={faShoppingCart} />
+                        </div>
+                      )}
+                      {product.originalPrice &&
+                        product.price < product.originalPrice && (
+                          <span className="popular-badge">
+                            خصم{" "}
+                            {Math.round(
+                              ((product.originalPrice - product.price) /
+                                product.originalPrice) *
+                                100
+                            )}
+                            %
+                          </span>
+                        )}
+                    </div>
+                    <div className="popular-content">
+                      <h3 className="popular-name">{product.name}</h3>
+                      <p className="popular-desc">
+                        {product.description?.substring(0, 60)}...
+                      </p>
+                      <div className="popular-footer">
+                        {product.originalPrice &&
+                        product.price < product.originalPrice ? (
+                          <div className="popular-price-wrapper">
+                            <span className="popular-price old-price">
+                              {product.originalPrice.toFixed(2)} درهم
+                            </span>
+                            <span className="popular-price">
+                              {product.price.toFixed(2)} درهم
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="popular-price">
+                            {product.price.toFixed(2)} درهم
+                          </span>
+                        )}
+                        <div className="popular-rating">
+                          <FontAwesomeIcon icon={faStar} />
+                          <span>
+                            {(product.rating || 0).toFixed(1) || "4.8"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   );
 };
