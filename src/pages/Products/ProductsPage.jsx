@@ -982,51 +982,108 @@ const ProductsPage = () => {
                 const imageUrl = serviceImage
                   ? getImageUrl(serviceImage)
                   : null;
+                const serviceDiscount = service.discount || 0;
 
                 return (
-                  <Link
+                  <div
                     key={service.id}
-                    to={`/services2/service/${service.id}`}
-                    className="popular-card"
+                    className="product-card"
+                    onClick={() => navigate(`/services2/service/${service.id}`)}
                   >
-                    <div className="popular-image">
+                    <div className="product-image-container">
                       {imageUrl ? (
                         <img
                           src={imageUrl}
                           alt={service.name}
+                          className="product-image"
                           onError={(e) => {
                             e.target.style.display = "none";
                           }}
+                          loading="lazy"
                         />
                       ) : (
-                        <div className="popular-image-placeholder">
+                        <div className="product-image-placeholder">
                           <FontAwesomeIcon icon={faTools} />
                         </div>
                       )}
-                      {service.discount && (
-                        <span className="popular-badge">
-                          خصم {service.discount}%
+
+                      {/* Discount Badge */}
+                      {serviceDiscount > 0 && (
+                        <span className="product-badge discount-badge">
+                          {serviceDiscount}% OFF
                         </span>
                       )}
+
+                      {/* Deal Banner */}
+                      {serviceDiscount > 0 && (
+                        <div className="product-deal-banner">Deal</div>
+                      )}
+
+                      {/* Wishlist Button */}
+                      <button
+                        className="product-wishlist-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // TODO: Implement wishlist
+                        }}
+                        title="إضافة للمفضلة"
+                      >
+                        <FontAwesomeIcon icon={faHeart} />
+                      </button>
                     </div>
-                    <div className="popular-content">
-                      <h3 className="popular-name">{service.name}</h3>
-                      <p className="popular-desc">
-                        {service.description?.substring(0, 60)}...
-                      </p>
-                      <div className="popular-footer">
-                        {service.base_price && (
-                          <span className="popular-price">
-                            يبدأ من {service.base_price} درهم
+
+                    <div className="product-details">
+                      {/* Rating Section */}
+                      <div className="product-rating-section">
+                        <span className="review-count">(0)</span>
+                        <span className="rating-value">
+                          {service.rating?.toFixed(1) || "4.8"}
+                        </span>
+                        <FontAwesomeIcon
+                          icon={faStar}
+                          className="rating-star"
+                        />
+                      </div>
+
+                      <h3 className="product-name">{service.name}</h3>
+
+                      {/* Price Section */}
+                      <div className="product-price-section">
+                        {serviceDiscount > 0 && (
+                          <span className="discount-percentage">
+                            {serviceDiscount}%
                           </span>
                         )}
-                        <div className="popular-rating">
-                          <FontAwesomeIcon icon={faStar} />
-                          <span>{service.rating?.toFixed(1) || "4.8"}</span>
+                        <div className="product-price">
+                          {service.base_price && (
+                            <>
+                              <span className="price-currency">D</span>
+                              <span className="price-value">
+                                {service.base_price.toLocaleString("en-US", {
+                                  minimumFractionDigits: 0,
+                                  maximumFractionDigits: 0,
+                                })}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Delivery Information */}
+                      <div className="product-delivery-info">
+                        <div className="delivery-free">
+                          <FontAwesomeIcon
+                            icon={faTruck}
+                            className="delivery-icon"
+                          />
+                          <span>التوصيل مجانا</span>
+                        </div>
+                        <div className="delivery-express">
+                          express Get it by {getDeliveryDate()}
                         </div>
                       </div>
                     </div>
-                  </Link>
+                  </div>
                 );
               })}
             </div>
@@ -1056,70 +1113,142 @@ const ProductsPage = () => {
                         : `/storage/${product.image}`
                     )
                   : null;
+                const discount =
+                  product.originalPrice &&
+                  product.price &&
+                  product.originalPrice > product.price
+                    ? Math.round(
+                        ((product.originalPrice - product.price) /
+                          product.originalPrice) *
+                          100
+                      )
+                    : 0;
 
                 return (
-                  <Link
+                  <div
                     key={product.id}
-                    to={`/products/${product.id}`}
-                    className="popular-card"
+                    className="product-card"
+                    onClick={() =>
+                      navigate(
+                        `/products/${product.id}/${slugify(
+                          product.name,
+                          `product-${product.id}`
+                        )}`
+                      )
+                    }
                   >
-                    <div className="popular-image">
+                    <div className="product-image-container">
                       {imageUrl ? (
                         <img
                           src={imageUrl}
                           alt={product.name}
+                          className="product-image"
                           onError={(e) => {
                             e.target.style.display = "none";
                           }}
+                          loading="lazy"
                         />
                       ) : (
-                        <div className="popular-image-placeholder">
+                        <div className="product-image-placeholder">
                           <FontAwesomeIcon icon={faShoppingCart} />
                         </div>
                       )}
-                      {product.originalPrice &&
-                        product.price < product.originalPrice && (
-                          <span className="popular-badge">
-                            خصم{" "}
-                            {Math.round(
-                              ((product.originalPrice - product.price) /
-                                product.originalPrice) *
-                                100
-                            )}
-                            %
-                          </span>
-                        )}
+
+                      {/* Discount Badge */}
+                      {discount > 0 && (
+                        <span className="product-badge discount-badge">
+                          {discount}% OFF
+                        </span>
+                      )}
+
+                      {/* Deal Banner */}
+                      {discount > 0 && (
+                        <div className="product-deal-banner">Deal</div>
+                      )}
+
+                      {/* Out of Stock Badge */}
+                      {(product.stockQuantity === 0 ||
+                        product.stockQuantity === null) && (
+                        <span className="product-badge out-of-stock-badge">
+                          نفذت الكمية
+                        </span>
+                      )}
+
+                      {/* Wishlist Button */}
+                      <button
+                        className="product-wishlist-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // TODO: Implement wishlist
+                        }}
+                        title="إضافة للمفضلة"
+                      >
+                        <FontAwesomeIcon icon={faHeart} />
+                      </button>
                     </div>
-                    <div className="popular-content">
-                      <h3 className="popular-name">{product.name}</h3>
-                      <p className="popular-desc">
-                        {product.description?.substring(0, 60)}...
-                      </p>
-                      <div className="popular-footer">
-                        {product.originalPrice &&
-                        product.price < product.originalPrice ? (
-                          <div className="popular-price-wrapper">
-                            <span className="popular-price old-price">
-                              {product.originalPrice.toFixed(2)} درهم
-                            </span>
-                            <span className="popular-price">
-                              {product.price.toFixed(2)} درهم
-                            </span>
-                          </div>
-                        ) : (
-                          <span className="popular-price">
-                            {product.price.toFixed(2)} درهم
+
+                    <div className="product-details">
+                      {/* Rating Section */}
+                      <div className="product-rating-section">
+                        <span className="review-count">
+                          ({formatReviewCount(product.reviewCount || 0)})
+                        </span>
+                        <span className="rating-value">
+                          {(product.rating || 0).toFixed(1)}
+                        </span>
+                        <FontAwesomeIcon
+                          icon={faStar}
+                          className="rating-star"
+                        />
+                      </div>
+
+                      <h3 className="product-name">
+                        {product.name || "منتج بدون اسم"}
+                      </h3>
+
+                      {/* Price Section */}
+                      <div className="product-price-section">
+                        {discount > 0 && (
+                          <span className="discount-percentage">
+                            {discount}%
                           </span>
                         )}
-                        <div className="popular-rating">
-                          <FontAwesomeIcon icon={faStar} />
-                          <span>
-                            {(product.rating || 0).toFixed(1) || "4.8"}
+                        <div className="product-price">
+                          {product.originalPrice &&
+                            product.price &&
+                            product.originalPrice > product.price && (
+                              <span className="product-original-price">
+                                {product.originalPrice.toLocaleString("en-US", {
+                                  minimumFractionDigits: 0,
+                                  maximumFractionDigits: 0,
+                                })}
+                              </span>
+                            )}
+                          <span className="price-currency">D</span>
+                          <span className="price-value">
+                            {(product.price || 0).toLocaleString("en-US", {
+                              minimumFractionDigits: 0,
+                              maximumFractionDigits: 0,
+                            })}
                           </span>
                         </div>
                       </div>
+
+                      {/* Delivery Information */}
+                      <div className="product-delivery-info">
+                        <div className="delivery-free">
+                          <FontAwesomeIcon
+                            icon={faTruck}
+                            className="delivery-icon"
+                          />
+                          <span>التوصيل مجانا</span>
+                        </div>
+                        <div className="delivery-express">
+                          express Get it by {getDeliveryDate()}
+                        </div>
+                      </div>
                     </div>
-                  </Link>
+                  </div>
                 );
               })}
             </div>

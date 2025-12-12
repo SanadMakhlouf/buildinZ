@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faSpinner, 
-  faLayerGroup, 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faSpinner,
+  faLayerGroup,
   faArrowLeft,
   faHeart,
   faPlus,
@@ -10,11 +10,11 @@ import {
   faSearch,
   faTimes,
   faShoppingCart,
-  faCalculator
-} from '@fortawesome/free-solid-svg-icons';
+  faCalculator,
+} from "@fortawesome/free-solid-svg-icons";
 import { motion, AnimatePresence } from "framer-motion";
 import "./ServicesPage3.css";
-import serviceBuilderService from '../../services/serviceBuilderService';
+import serviceBuilderService from "../../services/serviceBuilderService";
 
 const ServicesPage3 = () => {
   // Data states
@@ -22,31 +22,31 @@ const ServicesPage3 = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   // Sidebar states
   const [expandedCategory, setExpandedCategory] = useState(null);
   const [expandedSubcategory, setExpandedSubcategory] = useState(null);
   const [activeService, setActiveService] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredCategories, setFilteredCategories] = useState([]);
-  
+
   // Service detail states
   const [selectedService, setSelectedService] = useState(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState(null);
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [fieldValues, setFieldValues] = useState({});
-  const [selectedProductCategory, setSelectedProductCategory] = useState('all');
+  const [selectedProductCategory, setSelectedProductCategory] = useState("all");
   const [calculation, setCalculation] = useState(null);
   const [calculating, setCalculating] = useState(false);
   const [calculationError, setCalculationError] = useState(null);
-  
+
   // Modal states
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [orderFormData, setOrderFormData] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    notes: ''
+    name: "",
+    phone: "",
+    email: "",
+    notes: "",
   });
   const [submitting, setSubmitting] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
@@ -68,27 +68,34 @@ const ServicesPage3 = () => {
       }
 
       // Check if any direct service in category matches
-      const hasMatchingDirectService = category.services && category.services.some((service) =>
-        service.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      const hasMatchingDirectService =
+        category.services &&
+        category.services.some((service) =>
+          service.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
 
       if (hasMatchingDirectService) {
         return true;
       }
 
       // Check if any subcategory matches
-      const hasMatchingSubcategory = category.children && category.children.some(
-        (subcategory) => {
-          if (subcategory.name.toLowerCase().includes(searchTerm.toLowerCase())) {
+      const hasMatchingSubcategory =
+        category.children &&
+        category.children.some((subcategory) => {
+          if (
+            subcategory.name.toLowerCase().includes(searchTerm.toLowerCase())
+          ) {
             return true;
           }
 
           // Check if any service in subcategory matches
-          return subcategory.services && subcategory.services.some((service) =>
-            service.name.toLowerCase().includes(searchTerm.toLowerCase())
+          return (
+            subcategory.services &&
+            subcategory.services.some((service) =>
+              service.name.toLowerCase().includes(searchTerm.toLowerCase())
+            )
           );
-        }
-      );
+        });
 
       return hasMatchingSubcategory;
     });
@@ -103,86 +110,124 @@ const ServicesPage3 = () => {
 
       const [servicesResponse, categoriesResponse] = await Promise.all([
         serviceBuilderService.getAllServices(),
-        serviceBuilderService.getAllCategories()
+        serviceBuilderService.getAllCategories(),
       ]);
 
       let services = [];
       if (servicesResponse.success) {
         services = servicesResponse.services || [];
-        console.log('Raw services response:', servicesResponse);
+        console.log("Raw services response:", servicesResponse);
       } else {
-        console.error('Failed to fetch services:', servicesResponse.message);
+        console.error("Failed to fetch services:", servicesResponse.message);
       }
 
       let categories = [];
       if (categoriesResponse.success) {
         categories = categoriesResponse.categories || [];
-        console.log('Raw categories response:', categoriesResponse);
-        
-        const organizedCategories = categories.map(category => {
-          let categoryServices = services.filter(service => {
-            const match = parseInt(service.category_id) === parseInt(category.id);
-            console.log(`Service ${service.id} (${service.name}) category_id: ${service.category_id}, Category ${category.id}: ${match}`);
+        console.log("Raw categories response:", categoriesResponse);
+
+        const organizedCategories = categories.map((category) => {
+          let categoryServices = services.filter((service) => {
+            const match =
+              parseInt(service.category_id) === parseInt(category.id);
+            console.log(
+              `Service ${service.id} (${service.name}) category_id: ${service.category_id}, Category ${category.id}: ${match}`
+            );
             return match;
           });
-          
+
           // If no services are mapped by category_id, try to map by name similarity
           if (categoryServices.length === 0) {
-            categoryServices = services.filter(service => {
+            categoryServices = services.filter((service) => {
               const serviceName = service.name.toLowerCase();
               const categoryName = category.name.toLowerCase();
-              
+
               // More comprehensive name matching
-              if (categoryName.includes('دهان') && (serviceName.includes('دهان') || serviceName.includes('طلاء'))) return true;
-              if (categoryName.includes('أرضيات') && (serviceName.includes('بلاط') || serviceName.includes('أرضية') || serviceName.includes('سيراميك'))) return true;
-              if (categoryName.includes('مكافحة') && (serviceName.includes('حشرات') || serviceName.includes('مكافحة'))) return true;
-              if (categoryName.includes('تنظيف') && (serviceName.includes('تنظيف') || serviceName.includes('غسيل'))) return true;
-              if (categoryName.includes('مكيفات') && (serviceName.includes('مكيف') || serviceName.includes('تكييف'))) return true;
-              if (categoryName.includes('نوافذ') && (serviceName.includes('نافذة') || serviceName.includes('زجاج'))) return true;
-              
+              if (
+                categoryName.includes("دهان") &&
+                (serviceName.includes("دهان") || serviceName.includes("طلاء"))
+              )
+                return true;
+              if (
+                categoryName.includes("أرضيات") &&
+                (serviceName.includes("بلاط") ||
+                  serviceName.includes("أرضية") ||
+                  serviceName.includes("سيراميك"))
+              )
+                return true;
+              if (
+                categoryName.includes("مكافحة") &&
+                (serviceName.includes("حشرات") ||
+                  serviceName.includes("مكافحة"))
+              )
+                return true;
+              if (
+                categoryName.includes("تنظيف") &&
+                (serviceName.includes("تنظيف") || serviceName.includes("غسيل"))
+              )
+                return true;
+              if (
+                categoryName.includes("مكيفات") &&
+                (serviceName.includes("مكيف") || serviceName.includes("تكييف"))
+              )
+                return true;
+              if (
+                categoryName.includes("نوافذ") &&
+                (serviceName.includes("نافذة") || serviceName.includes("زجاج"))
+              )
+                return true;
+
               return false;
             });
           }
-          
-          console.log(`Category ${category.id} (${category.name}) has ${categoryServices.length} services:`, categoryServices);
-          
+
+          console.log(
+            `Category ${category.id} (${category.name}) has ${categoryServices.length} services:`,
+            categoryServices
+          );
+
           return {
             ...category,
             children: category.children || [],
-            services: categoryServices
+            services: categoryServices,
           };
         });
-        
-        console.log('Services from API:', services);
-        console.log('Categories from API:', categories);
-        console.log('Organized Categories:', organizedCategories);
-        
+
+        console.log("Services from API:", services);
+        console.log("Categories from API:", categories);
+        console.log("Organized Categories:", organizedCategories);
+
         // Fallback mechanism
-        const totalMappedServices = organizedCategories.reduce((total, cat) => total + cat.services.length, 0);
+        const totalMappedServices = organizedCategories.reduce(
+          (total, cat) => total + cat.services.length,
+          0
+        );
         if (totalMappedServices === 0 && services.length > 0) {
-          console.log('No services mapped to categories, creating fallback...');
+          console.log("No services mapped to categories, creating fallback...");
           const fallbackCategory = {
-            id: 'fallback',
-            name: 'جميع الخدمات',
+            id: "fallback",
+            name: "جميع الخدمات",
             children: [],
-            services: services
+            services: services,
           };
           setCategories([fallbackCategory]);
           setFilteredCategories([fallbackCategory]);
         } else if (totalMappedServices < services.length) {
           // Some services are mapped, but not all - add unmapped services to fallback
           const mappedServiceIds = new Set();
-          organizedCategories.forEach(cat => {
-            cat.services.forEach(service => mappedServiceIds.add(service.id));
+          organizedCategories.forEach((cat) => {
+            cat.services.forEach((service) => mappedServiceIds.add(service.id));
           });
-          
-          const unmappedServices = services.filter(service => !mappedServiceIds.has(service.id));
+
+          const unmappedServices = services.filter(
+            (service) => !mappedServiceIds.has(service.id)
+          );
           if (unmappedServices.length > 0) {
             const fallbackCategory = {
-              id: 'fallback',
-              name: 'خدمات أخرى',
+              id: "fallback",
+              name: "خدمات أخرى",
               children: [],
-              services: unmappedServices
+              services: unmappedServices,
             };
             const finalCategories = [...organizedCategories, fallbackCategory];
             setCategories(finalCategories);
@@ -196,11 +241,14 @@ const ServicesPage3 = () => {
           setFilteredCategories(organizedCategories);
         }
       } else {
-        console.error('Failed to fetch categories:', categoriesResponse.message);
+        console.error(
+          "Failed to fetch categories:",
+          categoriesResponse.message
+        );
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
-      setError('حدث خطأ أثناء تحميل البيانات. يرجى المحاولة مرة أخرى.');
+      console.error("Error fetching data:", error);
+      setError("حدث خطأ أثناء تحميل البيانات. يرجى المحاولة مرة أخرى.");
     } finally {
       setLoading(false);
     }
@@ -212,7 +260,9 @@ const ServicesPage3 = () => {
   };
 
   const toggleSubcategory = (subcategoryId) => {
-    setExpandedSubcategory(expandedSubcategory === subcategoryId ? null : subcategoryId);
+    setExpandedSubcategory(
+      expandedSubcategory === subcategoryId ? null : subcategoryId
+    );
   };
 
   const handleServiceClick = async (service) => {
@@ -220,24 +270,24 @@ const ServicesPage3 = () => {
       setActiveService(service.id);
       setSelectedService(service);
       setSelectedSubcategory(service.subcategory || null);
-      
+
       const response = await serviceBuilderService.getServiceById(service.id);
-      
+
       if (response.success) {
         const detailedService = response.service;
-        console.log('Detailed service response:', detailedService);
-        console.log('Service products structure:', {
+        console.log("Detailed service response:", detailedService);
+        console.log("Service products structure:", {
           products: detailedService.products,
           productsByTag: detailedService.productsByTag,
-          productsWithoutTags: detailedService.productsWithoutTags
+          productsWithoutTags: detailedService.productsWithoutTags,
         });
         setSelectedService(detailedService);
-        
+
         const initialValues = {};
         if (detailedService.fields) {
-          detailedService.fields.forEach(field => {
-            if (field.type === 'number') {
-              initialValues[field.id] = { value: '', type: field.type };
+          detailedService.fields.forEach((field) => {
+            if (field.type === "number") {
+              initialValues[field.id] = { value: "", type: field.type };
             } else if (field.options && field.options.length > 0) {
               initialValues[field.id] = { option_id: null, type: field.type };
             }
@@ -247,12 +297,12 @@ const ServicesPage3 = () => {
         setSelectedProducts([]);
         setCalculation(null);
         setCalculationError(null);
-        setSelectedProductCategory('all');
+        setSelectedProductCategory("all");
       } else {
-        console.error('Failed to fetch service details:', response.message);
+        console.error("Failed to fetch service details:", response.message);
       }
     } catch (error) {
-      console.error('Error fetching service details:', error);
+      console.error("Error fetching service details:", error);
     }
   };
 
@@ -261,59 +311,59 @@ const ServicesPage3 = () => {
     setFieldValues({});
     setCalculation(null);
     setCalculationError(null);
-    setSelectedProductCategory('all');
+    setSelectedProductCategory("all");
     setSelectedSubcategory(null);
   };
 
   const handleFieldValueChange = (fieldId, value) => {
-    setFieldValues(prev => ({
+    setFieldValues((prev) => ({
       ...prev,
-      [fieldId]: { value, type: 'number' }
+      [fieldId]: { value, type: "number" },
     }));
   };
 
   const handleOptionSelect = (fieldId, optionId) => {
-    setFieldValues(prev => ({
+    setFieldValues((prev) => ({
       ...prev,
-      [fieldId]: { option_id: optionId, type: 'option' }
+      [fieldId]: { option_id: optionId, type: "option" },
     }));
   };
 
   const handleProductSelect = (productId, quantity = 1) => {
-    setSelectedProducts(prev => {
-      const existing = prev.find(p => p.id === productId);
+    setSelectedProducts((prev) => {
+      const existing = prev.find((p) => p.id === productId);
       if (existing) {
-        return prev.map(p => 
-          p.id === productId 
-            ? { ...p, quantity: p.quantity + quantity }
-            : p
+        return prev.map((p) =>
+          p.id === productId ? { ...p, quantity: p.quantity + quantity } : p
         );
       } else {
         // Find product in different possible locations
         let product = null;
-        
+
         // Check in productsByTag
         if (selectedService.productsByTag) {
           for (const tagGroup of selectedService.productsByTag) {
-            product = tagGroup.products.find(p => p.id === productId);
+            product = tagGroup.products.find((p) => p.id === productId);
             if (product) break;
           }
         }
-        
+
         // Check in productsWithoutTags
         if (!product && selectedService.productsWithoutTags) {
-          product = selectedService.productsWithoutTags.find(p => p.id === productId);
+          product = selectedService.productsWithoutTags.find(
+            (p) => p.id === productId
+          );
         }
-        
+
         // Check in simple products array
         if (!product && selectedService.products) {
-          product = selectedService.products.find(p => p.id === productId);
+          product = selectedService.products.find((p) => p.id === productId);
         }
-        
+
         if (product) {
           return [...prev, { ...product, quantity }];
         }
-        
+
         return prev;
       }
     });
@@ -321,10 +371,10 @@ const ServicesPage3 = () => {
 
   const handleProductQuantityChange = (productId, quantity) => {
     if (quantity <= 0) {
-      setSelectedProducts(prev => prev.filter(p => p.id !== productId));
+      setSelectedProducts((prev) => prev.filter((p) => p.id !== productId));
     } else {
-      setSelectedProducts(prev => 
-        prev.map(p => p.id === productId ? { ...p, quantity } : p)
+      setSelectedProducts((prev) =>
+        prev.map((p) => (p.id === productId ? { ...p, quantity } : p))
       );
     }
   };
@@ -337,23 +387,25 @@ const ServicesPage3 = () => {
       const calculationData = {
         service_id: selectedService.id,
         field_values: fieldValues,
-        selected_products: selectedProducts.map(p => ({
+        selected_products: selectedProducts.map((p) => ({
           product_id: p.id,
-          quantity: p.quantity
-        }))
+          quantity: p.quantity,
+        })),
       };
 
-      const response = await serviceBuilderService.calculatePrice(calculationData);
-      
+      const response = await serviceBuilderService.calculatePrice(
+        calculationData
+      );
+
       if (response.success) {
         setCalculation(response.calculation);
         setShowBookingModal(true);
       } else {
-        setCalculationError(response.message || 'حدث خطأ أثناء حساب السعر');
+        setCalculationError(response.message || "حدث خطأ أثناء حساب السعر");
       }
     } catch (error) {
-      console.error('Error calculating price:', error);
-      setCalculationError('حدث خطأ أثناء حساب السعر');
+      console.error("Error calculating price:", error);
+      setCalculationError("حدث خطأ أثناء حساب السعر");
     } finally {
       setCalculating(false);
     }
@@ -362,29 +414,29 @@ const ServicesPage3 = () => {
   const handleSubmitOrder = async () => {
     try {
       setSubmitting(true);
-      
+
       const orderData = {
         service_id: selectedService.id,
         field_values: fieldValues,
-        selected_products: selectedProducts.map(p => ({
+        selected_products: selectedProducts.map((p) => ({
           product_id: p.id,
-          quantity: p.quantity
+          quantity: p.quantity,
         })),
         customer_info: orderFormData,
-        calculation: calculation
+        calculation: calculation,
       };
 
       const response = await serviceBuilderService.submitOrder(orderData);
-      
+
       if (response.success) {
         setOrderSuccess(true);
         setShowBookingModal(false);
       } else {
-        setCalculationError(response.message || 'حدث خطأ أثناء إرسال الطلب');
+        setCalculationError(response.message || "حدث خطأ أثناء إرسال الطلب");
       }
     } catch (error) {
-      console.error('Error submitting order:', error);
-      setCalculationError('حدث خطأ أثناء إرسال الطلب');
+      console.error("Error submitting order:", error);
+      setCalculationError("حدث خطأ أثناء إرسال الطلب");
     } finally {
       setSubmitting(false);
     }
@@ -392,62 +444,68 @@ const ServicesPage3 = () => {
 
   const getProductsByCategory = () => {
     if (!selectedService) return {};
-    
+
     const grouped = {};
-    
+
     // Handle products with tags (like ServicesPage2)
     if (selectedService.productsByTag) {
-      selectedService.productsByTag.forEach(tagGroup => {
+      selectedService.productsByTag.forEach((tagGroup) => {
         // Handle both string tags and object tags
         let category;
-        if (typeof tagGroup.tag === 'string') {
+        if (typeof tagGroup.tag === "string") {
           category = tagGroup.tag;
-        } else if (tagGroup.tag && typeof tagGroup.tag === 'object') {
-          category = tagGroup.tag.name || tagGroup.tag.id || 'منتجات';
+        } else if (tagGroup.tag && typeof tagGroup.tag === "object") {
+          category = tagGroup.tag.name || tagGroup.tag.id || "منتجات";
         } else {
-          category = 'منتجات';
+          category = "منتجات";
         }
-        
+
         if (!grouped[category]) {
           grouped[category] = [];
         }
         grouped[category].push(...tagGroup.products);
       });
     }
-    
+
     // Handle products without tags
-    if (selectedService.productsWithoutTags && selectedService.productsWithoutTags.length > 0) {
-      const category = 'منتجات إضافية';
+    if (
+      selectedService.productsWithoutTags &&
+      selectedService.productsWithoutTags.length > 0
+    ) {
+      const category = "منتجات إضافية";
       if (!grouped[category]) {
         grouped[category] = [];
       }
       grouped[category].push(...selectedService.productsWithoutTags);
     }
-    
+
     // Handle simple products array (fallback)
     if (selectedService.products && selectedService.products.length > 0) {
-      const category = 'منتجات الخدمة';
+      const category = "منتجات الخدمة";
       if (!grouped[category]) {
         grouped[category] = [];
       }
       grouped[category].push(...selectedService.products);
     }
-    
+
     return grouped;
   };
 
   const getSelectedProduct = (productId) => {
-    return selectedProducts.find(p => p.id === productId);
+    return selectedProducts.find((p) => p.id === productId);
   };
 
   const getTotalPrice = () => {
     return selectedProducts.reduce((total, product) => {
-      return total + (product.price * product.quantity);
+      return total + product.price * product.quantity;
     }, 0);
   };
 
   const getSelectedProductsCount = () => {
-    return selectedProducts.reduce((total, product) => total + product.quantity, 0);
+    return selectedProducts.reduce(
+      (total, product) => total + product.quantity,
+      0
+    );
   };
 
   // Animation variants
@@ -515,8 +573,8 @@ const ServicesPage3 = () => {
           <p>سنقوم بالتواصل معك قريباً لتأكيد الطلب</p>
           <p>رقم الطلب: {Date.now()}</p>
           <div className="success-actions">
-            <button 
-              className="primary-button" 
+            <button
+              className="primary-button"
               onClick={() => {
                 setOrderSuccess(false);
                 setSelectedService(null);
@@ -570,14 +628,20 @@ const ServicesPage3 = () => {
                   whileTap={{ scale: 0.98 }}
                 >
                   <div className="category-icon-container">
-                    {(category.preview_image_path || category.preview_image_url || category.image_path) ? (
-                      <img 
-                        src={serviceBuilderService.getImageUrl(category.preview_image_path || category.preview_image_url || category.image_path)} 
+                    {category.preview_image_path ||
+                    category.preview_image_url ||
+                    category.image_path ? (
+                      <img
+                        src={serviceBuilderService.getImageUrl(
+                          category.preview_image_path ||
+                            category.preview_image_url ||
+                            category.image_path
+                        )}
                         alt={category.name}
                         className="category-icon-image"
                         onError={(e) => {
-                          e.target.style.display = 'none';
-                          e.target.nextSibling.style.display = 'flex';
+                          e.target.style.display = "none";
+                          e.target.nextSibling.style.display = "flex";
                         }}
                       />
                     ) : (
@@ -589,7 +653,9 @@ const ServicesPage3 = () => {
                   <span className="category-name">{category.name}</span>
                   <motion.span
                     className="category-arrow"
-                    animate={{ rotate: expandedCategory === category.id ? 90 : 0 }}
+                    animate={{
+                      rotate: expandedCategory === category.id ? 90 : 0,
+                    }}
                     transition={{ duration: 0.3 }}
                   >
                     ❯
@@ -605,75 +671,86 @@ const ServicesPage3 = () => {
                       exit="exit"
                       variants={categoryVariants}
                     >
-                      {category.children && category.children.map((subcategory) => (
-                        <motion.div
-                          key={subcategory.id}
-                          className="subcategory"
-                          variants={itemVariants}
-                        >
+                      {category.children &&
+                        category.children.map((subcategory) => (
                           <motion.div
-                            className={`subcategory-header ${
-                              expandedSubcategory === subcategory.id
-                                ? "expanded"
-                                : ""
-                            }`}
-                            onClick={() => toggleSubcategory(subcategory.id)}
-                            whileTap={{ scale: 0.98 }}
+                            key={subcategory.id}
+                            className="subcategory"
+                            variants={itemVariants}
                           >
-                            <span className="subcategory-name">
-                              {subcategory.name}
-                            </span>
-                            <motion.span
-                              className="subcategory-arrow"
-                              animate={{
-                                rotate: expandedSubcategory === subcategory.id ? 90 : 0,
-                              }}
-                              transition={{ duration: 0.3 }}
+                            <motion.div
+                              className={`subcategory-header ${
+                                expandedSubcategory === subcategory.id
+                                  ? "expanded"
+                                  : ""
+                              }`}
+                              onClick={() => toggleSubcategory(subcategory.id)}
+                              whileTap={{ scale: 0.98 }}
                             >
-                              ❯
-                            </motion.span>
-                          </motion.div>
-
-                          <AnimatePresence>
-                            {expandedSubcategory === subcategory.id && (
-                              <motion.div
-                                className="services-list"
-                                initial="hidden"
-                                animate="visible"
-                                exit="exit"
-                                variants={categoryVariants}
+                              <span className="subcategory-name">
+                                {subcategory.name}
+                              </span>
+                              <motion.span
+                                className="subcategory-arrow"
+                                animate={{
+                                  rotate:
+                                    expandedSubcategory === subcategory.id
+                                      ? 90
+                                      : 0,
+                                }}
+                                transition={{ duration: 0.3 }}
                               >
-                                {subcategory.services && subcategory.services.length > 0 ? (
-                                  subcategory.services.map((service) => (
-                                    <motion.div
-                                      key={service.id}
-                                      className={`service-item ${
-                                        activeService === service.id ? "active" : ""
-                                      }`}
-                                      onClick={() => handleServiceClick(service)}
-                                      variants={itemVariants}
-                                      whileTap={{ scale: 0.98 }}
-                                    >
-                                      <div className="service-content">
-                                        <div className="service-name">{service.name}</div>
-                                        {service.description && (
-                                          <div className="service-description">
-                                            {service.description}
+                                ❯
+                              </motion.span>
+                            </motion.div>
+
+                            <AnimatePresence>
+                              {expandedSubcategory === subcategory.id && (
+                                <motion.div
+                                  className="services-list"
+                                  initial="hidden"
+                                  animate="visible"
+                                  exit="exit"
+                                  variants={categoryVariants}
+                                >
+                                  {subcategory.services &&
+                                  subcategory.services.length > 0 ? (
+                                    subcategory.services.map((service) => (
+                                      <motion.div
+                                        key={service.id}
+                                        className={`service-item ${
+                                          activeService === service.id
+                                            ? "active"
+                                            : ""
+                                        }`}
+                                        onClick={() =>
+                                          handleServiceClick(service)
+                                        }
+                                        variants={itemVariants}
+                                        whileTap={{ scale: 0.98 }}
+                                      >
+                                        <div className="service-content">
+                                          <div className="service-name">
+                                            {service.name}
                                           </div>
-                                        )}
-                                      </div>
-                                    </motion.div>
-                                  ))
-                                ) : (
-                                  <div className="no-services">
-                                    لا توجد خدمات متاحة في هذا التصنيف الفرعي
-                                  </div>
-                                )}
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </motion.div>
-                      ))}
+                                          {service.description && (
+                                            <div className="service-description">
+                                              {service.description}
+                                            </div>
+                                          )}
+                                        </div>
+                                      </motion.div>
+                                    ))
+                                  ) : (
+                                    <div className="no-services">
+                                      لا توجد خدمات متاحة في هذا التصنيف الفرعي
+                                    </div>
+                                  )}
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </motion.div>
+                        ))}
 
                       {/* Direct services in category */}
                       {category.services && category.services.length > 0 && (
@@ -692,7 +769,9 @@ const ServicesPage3 = () => {
                               whileTap={{ scale: 0.98 }}
                             >
                               <div className="service-content">
-                                <div className="service-name">{service.name}</div>
+                                <div className="service-name">
+                                  {service.name}
+                                </div>
                                 {service.description && (
                                   <div className="service-description">
                                     {service.description}
@@ -726,11 +805,14 @@ const ServicesPage3 = () => {
               <div className="service-header">
                 <div className="header-content">
                   <div className="header-left">
-                    <button className="back-button" onClick={() => {
-                      setSelectedService(null);
-                      setActiveService(null);
-                      resetServiceStates();
-                    }}>
+                    <button
+                      className="back-button"
+                      onClick={() => {
+                        setSelectedService(null);
+                        setActiveService(null);
+                        resetServiceStates();
+                      }}
+                    >
                       <FontAwesomeIcon icon={faArrowLeft} />
                       رجوع
                     </button>
@@ -738,7 +820,9 @@ const ServicesPage3 = () => {
                       <span className="step-text">الخطوة 1 من 3</span>
                     </div>
                     <h1>{selectedService?.name}</h1>
-                    <p className="service-description">{selectedService?.description}</p>
+                    <p className="service-description">
+                      {selectedService?.description}
+                    </p>
                   </div>
                   <div className="header-right">
                     <button className="favorite-button">
@@ -754,20 +838,33 @@ const ServicesPage3 = () => {
                   {/* Category Filters */}
                   <div className="category-filters">
                     <div className="filter-buttons">
-                      <button 
-                        className={`filter-btn ${selectedProductCategory === 'all' ? 'active' : ''}`}
-                        onClick={() => setSelectedProductCategory('all')}
+                      <button
+                        className={`filter-btn ${
+                          selectedProductCategory === "all" ? "active" : ""
+                        }`}
+                        onClick={() => setSelectedProductCategory("all")}
                       >
                         جميع الخيارات
                       </button>
-                      {Object.keys(getProductsByCategory()).map(category => {
+                      {Object.keys(getProductsByCategory()).map((category) => {
                         // Ensure category is a string
-                        const categoryName = typeof category === 'string' ? category : (category?.name || category?.id || String(category));
+                        const categoryName =
+                          typeof category === "string"
+                            ? category
+                            : category?.name ||
+                              category?.id ||
+                              String(category);
                         return (
-                          <button 
+                          <button
                             key={categoryName}
-                            className={`filter-btn ${selectedProductCategory === categoryName ? 'active' : ''}`}
-                            onClick={() => setSelectedProductCategory(categoryName)}
+                            className={`filter-btn ${
+                              selectedProductCategory === categoryName
+                                ? "active"
+                                : ""
+                            }`}
+                            onClick={() =>
+                              setSelectedProductCategory(categoryName)
+                            }
                           >
                             {categoryName}
                           </button>
@@ -780,20 +877,25 @@ const ServicesPage3 = () => {
                   <div className="main-content-wrapper">
                     {/* Fields Section - Always show */}
                     <div className="fields-section">
-                      <h2>اختر الخيارات المناسبة</h2>
+                      <h2>تصفح الخدمات</h2>
                       <div className="fields-container">
-                        {selectedService?.fields && selectedService.fields.length > 0 ? (
-                          selectedService.fields.map(field => (
+                        {selectedService?.fields &&
+                        selectedService.fields.length > 0 ? (
+                          selectedService.fields.map((field) => (
                             <div key={field.id} className="field-item">
                               <h3>
-                                {field.required && <span className="required">*</span>}
+                                {field.required && (
+                                  <span className="required">*</span>
+                                )}
                                 {field.label}
                               </h3>
                               {field.description && (
-                                <p className="field-description">{field.description}</p>
+                                <p className="field-description">
+                                  {field.description}
+                                </p>
                               )}
-                              
-                              {field.type === 'number' ? (
+
+                              {field.type === "number" ? (
                                 <div className="number-input-container">
                                   <input
                                     type="number"
@@ -802,25 +904,45 @@ const ServicesPage3 = () => {
                                     min={field.min_value}
                                     max={field.max_value}
                                     step={field.step}
-                                    value={fieldValues[field.id]?.value || ''}
-                                    onChange={(e) => handleFieldValueChange(field.id, e.target.value)}
+                                    value={fieldValues[field.id]?.value || ""}
+                                    onChange={(e) =>
+                                      handleFieldValueChange(
+                                        field.id,
+                                        e.target.value
+                                      )
+                                    }
                                   />
-                                  {field.unit && <span className="unit-label">{field.unit}</span>}
+                                  {field.unit && (
+                                    <span className="unit-label">
+                                      {field.unit}
+                                    </span>
+                                  )}
                                 </div>
                               ) : field.options && field.options.length > 0 ? (
                                 <div className="field-options">
-                                  {field.options.map(option => (
+                                  {field.options.map((option) => (
                                     <div
                                       key={option.id}
-                                      className={`option-card ${fieldValues[field.id]?.option_id === option.id ? 'selected' : ''}`}
-                                      onClick={() => handleOptionSelect(field.id, option.id)}
+                                      className={`option-card ${
+                                        fieldValues[field.id]?.option_id ===
+                                        option.id
+                                          ? "selected"
+                                          : ""
+                                      }`}
+                                      onClick={() =>
+                                        handleOptionSelect(field.id, option.id)
+                                      }
                                     >
                                       {option.image_url ? (
                                         <div className="option-image">
-                                          <img 
-                                            src={serviceBuilderService.getImageUrl(option.image_url)} 
+                                          <img
+                                            src={serviceBuilderService.getImageUrl(
+                                              option.image_url
+                                            )}
                                             alt={option.label}
-                                            onError={(e) => e.target.style.display = 'none'}
+                                            onError={(e) =>
+                                              (e.target.style.display = "none")
+                                            }
                                           />
                                         </div>
                                       ) : (
@@ -832,11 +954,15 @@ const ServicesPage3 = () => {
                                         <h4>{option.label}</h4>
                                         {option.price_modifier && (
                                           <span className="price-adjustment">
-                                            {option.price_modifier > 0 ? '+' : ''}{option.price_modifier} درهم
+                                            {option.price_modifier > 0
+                                              ? "+"
+                                              : ""}
+                                            {option.price_modifier} درهم
                                           </span>
                                         )}
                                       </div>
-                                      {fieldValues[field.id]?.option_id === option.id && (
+                                      {fieldValues[field.id]?.option_id ===
+                                        option.id && (
                                         <div className="selected-indicator">
                                           <FontAwesomeIcon icon={faPlus} />
                                         </div>
@@ -865,69 +991,109 @@ const ServicesPage3 = () => {
                       {(() => {
                         const productsByCategory = getProductsByCategory();
                         if (Object.keys(productsByCategory).length > 0) {
-                          return Object.entries(productsByCategory).map(([category, products]) => {
-                            // Ensure category is a string
-                            const categoryName = typeof category === 'string' ? category : (category?.name || category?.id || String(category));
-                            return (
-                              <div key={categoryName} className="products-by-category">
-                                <h3 className="category-title">{categoryName}</h3>
-                                <div className="products-grid">
-                                  {products.map(product => {
-                                    const selectedProduct = getSelectedProduct(product.id);
-                                    return (
-                                      <div
-                                        key={product.id}
-                                        className={`product-card ${selectedProduct ? 'selected' : ''}`}
-                                        onClick={() => handleProductSelect(product.id, 1)}
-                                      >
-                                        <div className="product-image">
-                                          {product.image_url ? (
-                                            <img 
-                                              src={product.image_url} 
-                                              alt={product.name}
-                                              onError={(e) => e.target.style.display = 'none'}
-                                            />
-                                          ) : (
-                                            <div className="product-placeholder">
-                                              <FontAwesomeIcon icon={faImage} />
-                                            </div>
-                                          )}
-                                        </div>
-                                        <div className="product-content">
-                                          <h4>{product.name}</h4>
-                                          {product.price && parseFloat(product.price) > 0 && (
-                                            <div className="product-price">{product.price} درهم</div>
-                                          )}
-                                          {product.description && (
-                                            <div className="product-description">{product.description}</div>
-                                          )}
-                                        </div>
-                                        <div className="product-actions">
-                                          {selectedProduct ? (
-                                            <div className="quantity-selector">
-                                              <label>الكمية:</label>
-                                              <input
-                                                type="number"
-                                                min="1"
-                                                value={selectedProduct.quantity}
-                                                onChange={(e) => handleProductQuantityChange(product.id, parseInt(e.target.value) || 0)}
-                                                onClick={(e) => e.stopPropagation()}
+                          return Object.entries(productsByCategory).map(
+                            ([category, products]) => {
+                              // Ensure category is a string
+                              const categoryName =
+                                typeof category === "string"
+                                  ? category
+                                  : category?.name ||
+                                    category?.id ||
+                                    String(category);
+                              return (
+                                <div
+                                  key={categoryName}
+                                  className="products-by-category"
+                                >
+                                  <h3 className="category-title">
+                                    {categoryName}
+                                  </h3>
+                                  <div className="products-grid">
+                                    {products.map((product) => {
+                                      const selectedProduct =
+                                        getSelectedProduct(product.id);
+                                      return (
+                                        <div
+                                          key={product.id}
+                                          className={`product-card ${
+                                            selectedProduct ? "selected" : ""
+                                          }`}
+                                          onClick={() =>
+                                            handleProductSelect(product.id, 1)
+                                          }
+                                        >
+                                          <div className="product-image">
+                                            {product.image_url ? (
+                                              <img
+                                                src={product.image_url}
+                                                alt={product.name}
+                                                onError={(e) =>
+                                                  (e.target.style.display =
+                                                    "none")
+                                                }
                                               />
-                                            </div>
-                                          ) : (
-                                            <button className="add-product-btn">
-                                              <FontAwesomeIcon icon={faPlus} />
-                                              إضافة
-                                            </button>
-                                          )}
+                                            ) : (
+                                              <div className="product-placeholder">
+                                                <FontAwesomeIcon
+                                                  icon={faImage}
+                                                />
+                                              </div>
+                                            )}
+                                          </div>
+                                          <div className="product-content">
+                                            <h4>{product.name}</h4>
+                                            {product.price &&
+                                              parseFloat(product.price) > 0 && (
+                                                <div className="product-price">
+                                                  {product.price} درهم
+                                                </div>
+                                              )}
+                                            {product.description && (
+                                              <div className="product-description">
+                                                {product.description}
+                                              </div>
+                                            )}
+                                          </div>
+                                          <div className="product-actions">
+                                            {selectedProduct ? (
+                                              <div className="quantity-selector">
+                                                <label>الكمية:</label>
+                                                <input
+                                                  type="number"
+                                                  min="1"
+                                                  value={
+                                                    selectedProduct.quantity
+                                                  }
+                                                  onChange={(e) =>
+                                                    handleProductQuantityChange(
+                                                      product.id,
+                                                      parseInt(
+                                                        e.target.value
+                                                      ) || 0
+                                                    )
+                                                  }
+                                                  onClick={(e) =>
+                                                    e.stopPropagation()
+                                                  }
+                                                />
+                                              </div>
+                                            ) : (
+                                              <button className="add-product-btn">
+                                                <FontAwesomeIcon
+                                                  icon={faPlus}
+                                                />
+                                                إضافة
+                                              </button>
+                                            )}
+                                          </div>
                                         </div>
-                                      </div>
-                                    );
-                                  })}
+                                      );
+                                    })}
+                                  </div>
                                 </div>
-                              </div>
-                            );
-                          });
+                              );
+                            }
+                          );
                         } else {
                           return (
                             <div className="no-products">
@@ -941,7 +1107,7 @@ const ServicesPage3 = () => {
 
                   {/* Calculate Section */}
                   <div className="calculate-section">
-                    <button 
+                    <button
                       className="calculate-button"
                       onClick={handleCalculatePrice}
                       disabled={calculating || getSelectedProductsCount() === 0}
@@ -958,7 +1124,7 @@ const ServicesPage3 = () => {
                         </>
                       )}
                     </button>
-                    
+
                     {calculationError && (
                       <div className="calculation-error">
                         <FontAwesomeIcon icon={faTimes} />
@@ -977,7 +1143,10 @@ const ServicesPage3 = () => {
                   <FontAwesomeIcon icon={faCalculator} />
                 </div>
                 <h1>حاسبة التكاليف الذكية</h1>
-                <p>اختر الخدمة المطلوبة من القائمة الجانبية واحصل على عرض سعر دقيق ومفصل</p>
+                <p>
+                  اختر الخدمة المطلوبة من القائمة الجانبية واحصل على عرض سعر
+                  دقيق ومفصل
+                </p>
                 <div className="welcome-features">
                   <div className="feature">
                     <FontAwesomeIcon icon={faLayerGroup} />
@@ -1000,18 +1169,21 @@ const ServicesPage3 = () => {
 
       {/* Booking Modal */}
       {showBookingModal && calculation && (
-        <div className="modal-overlay" onClick={() => setShowBookingModal(false)}>
+        <div
+          className="modal-overlay"
+          onClick={() => setShowBookingModal(false)}
+        >
           <div className="booking-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2>تفاصيل الطلب</h2>
-              <button 
+              <button
                 className="close-button"
                 onClick={() => setShowBookingModal(false)}
               >
                 <FontAwesomeIcon icon={faTimes} />
               </button>
             </div>
-            
+
             <div className="modal-content">
               <div className="calculation-summary">
                 <h3>ملخص الحساب</h3>
@@ -1036,7 +1208,12 @@ const ServicesPage3 = () => {
                   <input
                     type="text"
                     value={orderFormData.name}
-                    onChange={(e) => setOrderFormData(prev => ({ ...prev, name: e.target.value }))}
+                    onChange={(e) =>
+                      setOrderFormData((prev) => ({
+                        ...prev,
+                        name: e.target.value,
+                      }))
+                    }
                     placeholder="أدخل اسمك الكامل"
                     required
                   />
@@ -1046,7 +1223,12 @@ const ServicesPage3 = () => {
                   <input
                     type="tel"
                     value={orderFormData.phone}
-                    onChange={(e) => setOrderFormData(prev => ({ ...prev, phone: e.target.value }))}
+                    onChange={(e) =>
+                      setOrderFormData((prev) => ({
+                        ...prev,
+                        phone: e.target.value,
+                      }))
+                    }
                     placeholder="أدخل رقم الهاتف"
                     required
                   />
@@ -1056,7 +1238,12 @@ const ServicesPage3 = () => {
                   <input
                     type="email"
                     value={orderFormData.email}
-                    onChange={(e) => setOrderFormData(prev => ({ ...prev, email: e.target.value }))}
+                    onChange={(e) =>
+                      setOrderFormData((prev) => ({
+                        ...prev,
+                        email: e.target.value,
+                      }))
+                    }
                     placeholder="أدخل البريد الإلكتروني"
                   />
                 </div>
@@ -1064,7 +1251,12 @@ const ServicesPage3 = () => {
                   <label>ملاحظات إضافية</label>
                   <textarea
                     value={orderFormData.notes}
-                    onChange={(e) => setOrderFormData(prev => ({ ...prev, notes: e.target.value }))}
+                    onChange={(e) =>
+                      setOrderFormData((prev) => ({
+                        ...prev,
+                        notes: e.target.value,
+                      }))
+                    }
                     placeholder="أي ملاحظات إضافية..."
                     rows="3"
                   />
@@ -1073,16 +1265,18 @@ const ServicesPage3 = () => {
             </div>
 
             <div className="modal-footer">
-              <button 
+              <button
                 className="cancel-button"
                 onClick={() => setShowBookingModal(false)}
               >
                 إلغاء
               </button>
-              <button 
+              <button
                 className="submit-button"
                 onClick={handleSubmitOrder}
-                disabled={submitting || !orderFormData.name || !orderFormData.phone}
+                disabled={
+                  submitting || !orderFormData.name || !orderFormData.phone
+                }
               >
                 {submitting ? (
                   <>
@@ -1090,7 +1284,7 @@ const ServicesPage3 = () => {
                     جاري الإرسال...
                   </>
                 ) : (
-                  'إرسال الطلب'
+                  "إرسال الطلب"
                 )}
               </button>
             </div>
