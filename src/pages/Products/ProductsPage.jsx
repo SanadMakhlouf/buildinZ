@@ -579,6 +579,31 @@ const ProductsPage = () => {
 
       {/* Page Header */}
 
+      {/* Search Bar */}
+      <div className="products-search-bar-container">
+        <div className="products-search-bar-wrapper">
+          <div className="products-search-bar">
+            <FontAwesomeIcon icon={faSearch} className="search-icon" />
+            <input
+              type="text"
+              className="products-search-input"
+              placeholder="ابحث عن منتج..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            {searchTerm && (
+              <button
+                className="search-clear-btn"
+                onClick={() => setSearchTerm("")}
+                type="button"
+              >
+                <FontAwesomeIcon icon={faTimes} />
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* Horizontal Filter Chips */}
       <div className="filter-chips-container">
         <div className="filter-chips-scroll">
