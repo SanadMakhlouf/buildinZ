@@ -828,7 +828,8 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  margin-top: 0.4rem;
+  margin-bottom: 0;
 }
 
 .review-count {
@@ -854,22 +855,34 @@
 /* Product Name */
 .product-name {
   font-size: 0.95rem;
-  font-weight: 500;
-  color: #333;
+  font-weight: 600;
+  color: #0c141d;
   margin: 0;
-  line-height: 1.4;
+  line-height: 1.3;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  min-height: 2.8em;
+  min-height: 2.6em;
 }
 
 .product-card.list-view .product-name {
   -webkit-line-clamp: 1;
   line-clamp: 1;
   min-height: auto;
+}
+
+.product-description {
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin: 0.1rem 0 0 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 /* Product Price */
@@ -879,7 +892,7 @@
   align-items: center;
   gap: 0.5rem;
   flex-wrap: wrap;
-  margin-top: -0.9rem;
+  margin-top: 0.5rem;
 }
 
 .discount-percentage {
@@ -1238,7 +1251,17 @@
 
   .product-name {
     font-size: 0.85rem;
-    min-height: 2.4em;
+    min-height: 2.2em;
+    font-weight: 600;
+  }
+
+  .product-description {
+    font-size: 0.75rem;
+    margin-top: -20px;
+  }
+
+  .product-price-section {
+    margin-top: 0.4rem;
   }
 
   .price-value {

@@ -542,8 +542,12 @@ const ProductsPage = () => {
         </div>
 
         <div className="product-details">
-          {/* Rating Section */}
+          <h3 className="product-name">{product.name || "منتج بدون اسم"}</h3>
+          {product.description && (
+            <p className="product-description">{product.description}</p>
+          )}
 
+          {/* Rating Section */}
           <div className="product-rating-section">
             <span className="review-count">
               ({formatReviewCount(product.reviewCount || 0)})
@@ -553,8 +557,6 @@ const ProductsPage = () => {
             </span>
             <FontAwesomeIcon icon={faStar} className="rating-star" />
           </div>
-
-          <h3 className="product-name">{product.name || "منتج بدون اسم"}</h3>
 
           {/* Price Section */}
           <div className="product-price-section">
@@ -1033,6 +1035,11 @@ const ProductsPage = () => {
                     </div>
 
                     <div className="product-details">
+                      <h3 className="product-name">{service.name}</h3>
+                      {service.description && (
+                        <p className="product-description">{service.description}</p>
+                      )}
+
                       {/* Rating Section */}
                       <div className="product-rating-section">
                         <span className="review-count">(0)</span>
@@ -1044,8 +1051,6 @@ const ProductsPage = () => {
                           className="rating-star"
                         />
                       </div>
-
-                      <h3 className="product-name">{service.name}</h3>
 
                       {/* Price Section */}
                       <div className="product-price-section">
@@ -1188,6 +1193,13 @@ const ProductsPage = () => {
                     </div>
 
                     <div className="product-details">
+                      <h3 className="product-name">
+                        {product.name || "منتج بدون اسم"}
+                      </h3>
+                      {product.description && (
+                        <p className="product-description">{product.description}</p>
+                      )}
+
                       {/* Rating Section */}
                       <div className="product-rating-section">
                         <span className="review-count">
@@ -1201,10 +1213,6 @@ const ProductsPage = () => {
                           className="rating-star"
                         />
                       </div>
-
-                      <h3 className="product-name">
-                        {product.name || "منتج بدون اسم"}
-                      </h3>
 
                       {/* Price Section */}
                       <div className="product-price-section">

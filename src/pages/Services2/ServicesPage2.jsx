@@ -1,5 +1,11 @@
 import React, { useState, useEffect, useCallback, useMemo, memo } from "react";
-import { Routes, Route, useNavigate, useLocation, Link } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  useNavigate,
+  useLocation,
+  Link,
+} from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSpinner,
@@ -266,7 +272,9 @@ const ServicesPage2 = () => {
     const term = searchTerm.toLowerCase();
     return categories.filter((category) => {
       const nameMatch = category.name?.toLowerCase().includes(term);
-      const descriptionMatch = category.description?.toLowerCase().includes(term);
+      const descriptionMatch = category.description
+        ?.toLowerCase()
+        .includes(term);
       return nameMatch || descriptionMatch;
     });
   }, [categories, searchTerm]);
@@ -381,26 +389,26 @@ const ServicesPage2 = () => {
         <div className="categories-section">
           <h2>تصفح الخدمات </h2>
           <div className="categories-grid">
-            {loading
-              ? // Show skeleton loaders while loading
-                Array.from({ length: 6 }).map((_, index) => (
-                  <CategorySkeleton key={`skeleton-${index}`} />
-                ))
-              : // Show actual category cards
-                filteredCategories.length > 0 ? (
-                  filteredCategories.map((category, index) => (
-                    <CategoryCard
-                      key={category.id}
-                      category={category}
-                      index={index}
-                      onSelect={handleCategorySelectMemo}
-                    />
-                  ))
-                ) : (
-                  <div className="no-results">
-                    <p>لم يتم العثور على نتائج للبحث "{searchTerm}"</p>
-                  </div>
-                )}
+            {loading ? (
+              // Show skeleton loaders while loading
+              Array.from({ length: 6 }).map((_, index) => (
+                <CategorySkeleton key={`skeleton-${index}`} />
+              ))
+            ) : // Show actual category cards
+            filteredCategories.length > 0 ? (
+              filteredCategories.map((category, index) => (
+                <CategoryCard
+                  key={category.id}
+                  category={category}
+                  index={index}
+                  onSelect={handleCategorySelectMemo}
+                />
+              ))
+            ) : (
+              <div className="no-results">
+                <p>لم يتم العثور على نتائج للبحث "{searchTerm}"</p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -472,16 +480,24 @@ const ServicesPage2 = () => {
                       </div>
 
                       <div className="product-details">
+                        <h3 className="product-name">{service.name}</h3>
+                        {service.description && (
+                          <p className="product-description">
+                            {service.description}
+                          </p>
+                        )}
+
                         {/* Rating Section */}
                         <div className="product-rating-section">
                           <span className="review-count">(0)</span>
                           <span className="rating-value">
                             {service.rating?.toFixed(1) || "4.8"}
                           </span>
-                          <FontAwesomeIcon icon={faStar} className="rating-star" />
+                          <FontAwesomeIcon
+                            icon={faStar}
+                            className="rating-star"
+                          />
                         </div>
-
-                        <h3 className="product-name">{service.name}</h3>
 
                         {/* Price Section */}
                         <div className="product-price-section">
@@ -508,7 +524,10 @@ const ServicesPage2 = () => {
                         {/* Delivery Information */}
                         <div className="product-delivery-info">
                           <div className="delivery-free">
-                            <FontAwesomeIcon icon={faTruck} className="delivery-icon" />
+                            <FontAwesomeIcon
+                              icon={faTruck}
+                              className="delivery-icon"
+                            />
                             <span>التوصيل مجانا</span>
                           </div>
                           <div className="delivery-express">
