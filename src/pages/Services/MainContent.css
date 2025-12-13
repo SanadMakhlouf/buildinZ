@@ -123,6 +123,7 @@
   flex-direction: column;
   height: 100%;
   position: relative;
+  margin-bottom: 12px;
 }
 
 .product-card:hover {

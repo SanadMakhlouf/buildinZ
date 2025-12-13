@@ -70,6 +70,7 @@
   cursor: pointer;
   height: 250px;
   display: block;
+  margin-bottom: 12px;
 }
 
 .category-card:hover {

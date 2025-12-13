@@ -123,6 +123,7 @@
   color: inherit;
   display: flex;
   flex-direction: column;
+  margin-bottom: 12px;
 }
 
 .service-card:hover,
@@ -175,6 +176,13 @@
   margin-bottom: 8px;
   color: #0a3259;
   font-weight: 600;
+}
+
+.product-details h3 {
+  margin: 0 0 0;
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 13px;
 }
 
 .service-category,
@@ -233,6 +241,7 @@
   transition: all 0.3s ease;
   text-decoration: none;
   color: inherit;
+  margin-bottom: 12px;
 }
 
 .category-card:hover {

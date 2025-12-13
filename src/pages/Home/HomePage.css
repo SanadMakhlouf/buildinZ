@@ -3,10 +3,10 @@
 
 /* ===== CSS Variables ===== */
 :root {
-  --noon-primary: #0A3259;
+  --noon-primary: #0a3259;
   --noon-primary-light: #1a4d80;
   --noon-primary-dark: #072441;
-  --noon-accent: #DAA520;
+  --noon-accent: #daa520;
   --noon-accent-light: #f0c14b;
   --noon-accent-dark: #b58a1b;
   --noon-bg: #f7f7f7;
@@ -24,7 +24,8 @@
 
 /* ===== Base Styles ===== */
 .noon-homepage {
-  font-family: 'ReadexPro', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: "ReadexPro", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
   direction: rtl;
   background-color: var(--noon-bg);
   min-height: 100vh;
@@ -580,6 +581,7 @@
   display: flex;
   flex-direction: column;
   border: 1px solid #f0f0f0;
+  margin-bottom: 12px;
 }
 
 .product-card:hover {
@@ -727,7 +729,7 @@
 .product-description {
   font-size: 0.8rem;
   color: #6b7280;
-  margin: 0.1rem 0 0 0;
+  margin: 0.5rem 0 0 0;
   line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -827,7 +829,11 @@
 }
 
 .noon-promo-banner {
-  background: linear-gradient(135deg, var(--noon-primary) 0%, var(--noon-primary-light) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--noon-primary) 0%,
+    var(--noon-primary-light) 100%
+  );
   border-radius: var(--noon-radius-lg);
   overflow: hidden;
   display: flex;
@@ -967,7 +973,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--noon-primary) 0%, var(--noon-primary-light) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--noon-primary) 0%,
+    var(--noon-primary-light) 100%
+  );
 }
 
 .noon-category-card-icon svg {
@@ -1000,7 +1010,11 @@
 /* ===== App Section ===== */
 .noon-app-section {
   padding: 48px 0;
-  background: linear-gradient(135deg, var(--noon-primary-dark) 0%, var(--noon-primary) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--noon-primary-dark) 0%,
+    var(--noon-primary) 100%
+  );
 }
 
 .noon-app-content {
@@ -1233,7 +1247,8 @@
 }
 
 @keyframes skeleton-pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -1280,11 +1295,11 @@
   .noon-hero-container {
     grid-template-columns: 1fr 240px;
   }
-  
+
   .noon-services-grid {
     grid-template-columns: repeat(3, 1fr);
   }
-  
+
   .noon-categories-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -1295,53 +1310,53 @@
     grid-template-columns: 1fr;
     gap: 16px;
   }
-  
+
   .noon-side-banners {
     display: flex;
     flex-direction: row;
     gap: 12px;
     margin-top: 16px;
   }
-  
+
   .noon-side-banner {
     flex: 1;
     min-height: 150px;
   }
-  
+
   .noon-main-banner {
     height: 300px;
   }
-  
+
   .noon-banner-content h2 {
     font-size: 2rem;
   }
-  
+
   .noon-features-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .noon-services-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .noon-promo-banner {
     flex-direction: column;
   }
-  
+
   .noon-promo-image {
     flex: 0 0 200px;
     width: 100%;
   }
-  
+
   .noon-app-content {
     flex-direction: column;
     text-align: center;
   }
-  
+
   .noon-app-buttons {
     justify-content: center;
   }
-  
+
   .noon-footer-content {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -1351,44 +1366,44 @@
   .noon-main-banner {
     height: 280px;
   }
-  
+
   .noon-banner-image img {
     object-fit: contain;
     object-position: center;
   }
-  
+
   .noon-side-banners {
     flex-direction: row;
     gap: 12px;
   }
-  
+
   .noon-side-banner {
     min-height: 120px;
   }
-  
+
   .noon-side-banner img {
     object-fit: contain;
     object-position: center;
   }
-  
+
   .noon-banner-content {
     padding: 24px;
   }
-  
+
   .noon-banner-content h2 {
     font-size: 1.5rem;
   }
-  
+
   .noon-banner-content p {
     font-size: 1rem;
   }
-  
+
   .noon-banner-nav {
     width: 36px;
     height: 36px;
     font-size: 1rem;
   }
-  
+
   .noon-categories-wrapper {
     padding: 0 1rem;
   }
@@ -1407,90 +1422,90 @@
     width: 60px;
     height: 60px;
   }
-  
+
   .noon-category-icon svg {
     font-size: 1.5rem;
   }
-  
+
   .noon-category-name {
     font-size: 0.8rem;
   }
-  
+
   .noon-features-grid {
     grid-template-columns: 1fr;
     gap: 16px;
   }
-  
+
   .noon-feature-item {
     justify-content: center;
     text-align: center;
     flex-direction: column;
   }
-  
+
   .noon-section-header h2 {
     font-size: 1.2rem;
   }
-  
+
   .noon-services-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
   }
-  
+
   .noon-service-image {
     aspect-ratio: 1 / 1 !important;
     height: auto !important;
   }
-  
+
   .noon-service-content {
     padding: 12px;
   }
-  
+
   .noon-service-name {
     font-size: 0.9rem;
   }
-  
+
   .noon-service-desc {
     display: none;
   }
-  
+
   .noon-categories-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .noon-category-card {
     height: 160px;
   }
-  
+
   .noon-promo-content {
     padding: 24px;
   }
-  
+
   .noon-promo-content h2 {
     font-size: 1.5rem;
   }
-  
+
   .noon-app-text h2 {
     font-size: 1.8rem;
   }
-  
+
   .noon-app-buttons {
     flex-direction: column;
     align-items: center;
   }
-  
+
   .noon-app-image {
     flex: 0 0 auto;
   }
-  
+
   .noon-app-image img {
     max-width: 200px;
   }
-  
+
   .noon-footer-content {
     grid-template-columns: 1fr;
     gap: 32px;
   }
-  
+
   .noon-footer-about {
     max-width: none;
   }
@@ -1500,44 +1515,44 @@
   .noon-section-container {
     padding: 0 12px;
   }
-  
+
   .noon-main-banner {
     height: 240px;
   }
-  
+
   .noon-banner-image img {
     object-fit: contain;
     object-position: center;
   }
-  
+
   .noon-side-banner img {
     object-fit: contain;
     object-position: center;
   }
-  
+
   .noon-banner-content h2 {
     font-size: 1.3rem;
   }
-  
+
   .noon-banner-content p {
     font-size: 0.9rem;
     margin-bottom: 16px;
   }
-  
+
   .noon-banner-btn {
     padding: 10px 24px;
     font-size: 0.9rem;
   }
-  
+
   .noon-categories-scroll {
     padding: 16px 40px;
     gap: 16px;
   }
-  
+
   .noon-category-item {
     min-width: 70px;
   }
-  
+
   .noon-category-icon {
     width: 60px;
     height: 60px;
@@ -1550,40 +1565,50 @@
   .noon-category-name {
     font-size: 0.8rem;
   }
-  
+
+  .product-name {
+    font-size: 0.85rem;
+    min-height: 2.2em;
+  }
+
+  .product-description {
+    font-size: 0.75rem;
+    margin-top: 0.5rem;
+  }
+
   .noon-services-grid {
     grid-template-columns: 1fr 1fr;
     gap: 8px;
   }
-  
+
   .noon-service-image {
     aspect-ratio: 1 / 1 !important;
     height: auto !important;
   }
-  
+
   .noon-service-content {
     padding: 8px;
   }
-  
+
   .noon-service-name {
     font-size: 0.8rem;
     -webkit-line-clamp: 1;
   }
-  
+
   .noon-service-footer {
     flex-direction: column;
     align-items: flex-start;
     gap: 4px;
   }
-  
+
   .noon-service-price {
     font-size: 0.8rem;
   }
-  
+
   .noon-promo-content h2 {
     font-size: 1.3rem;
   }
-  
+
   .noon-promo-content p {
     font-size: 0.9rem;
   }
