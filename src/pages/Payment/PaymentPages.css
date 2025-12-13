@@ -224,6 +224,6 @@
   }
   
   .action-button {
-    min-width: 180px;
+    /* min-width: 180px; */
   }
 } 

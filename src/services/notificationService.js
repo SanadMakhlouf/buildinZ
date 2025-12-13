@@ -1,5 +1,17 @@
 import axios from 'axios';
 import config from '../config/apiConfig';
+import {
+  faInfoCircle,
+  faCheckCircle,
+  faExclamationTriangle,
+  faTimesCircle,
+  faShoppingCart,
+  faTruck,
+  faUserCog,
+  faCheckDouble,
+  faBullhorn,
+  faBell
+} from '@fortawesome/free-solid-svg-icons';
 
 // Create axios instance with authentication
 const axiosInstance = axios.create({
@@ -328,20 +340,20 @@ const notificationService = {
   /**
    * Get notification type icon
    * @param {string} type - Notification type
-   * @returns {string} FontAwesome icon class
+   * @returns {object} FontAwesome icon object
    */
   getNotificationIcon(type) {
     const iconMap = {
-      'info': 'fa-info-circle',
-      'success': 'fa-check-circle',
-      'warning': 'fa-exclamation-triangle',
-      'error': 'fa-times-circle',
-      'order_confirmation': 'fa-shopping-cart',
-      'order_status': 'fa-truck',
-      'handyman_assigned': 'fa-user-cog',
-      'service_completed': 'fa-check-double',
-      'marketing': 'fa-bullhorn',
-      'default': 'fa-bell'
+      'info': faInfoCircle,
+      'success': faCheckCircle,
+      'warning': faExclamationTriangle,
+      'error': faTimesCircle,
+      'order_confirmation': faShoppingCart,
+      'order_status': faTruck,
+      'handyman_assigned': faUserCog,
+      'service_completed': faCheckDouble,
+      'marketing': faBullhorn,
+      'default': faBell
     };
     
     return iconMap[type] || iconMap.default;
