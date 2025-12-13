@@ -28,6 +28,7 @@ import SearchPage from './pages/Search/SearchPage';
 import PaymentSuccessPage from './pages/Payment/PaymentSuccessPage';
 import PaymentFailurePage from './pages/Payment/PaymentFailurePage';
 import NotificationsPage from './pages/Notifications/NotificationsPage';
+import FavoritesPage from './pages/Favorites/FavoritesPage';
 
 // Components
 import Navbar from './components/Navbar';
@@ -72,6 +73,7 @@ function App() {
             <Route path="/payment/failure" element={<PaymentFailurePage />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
+            <Route path="/favorites" element={<FavoritesPage />} />
           </Routes>
           <FloatingCart />
         </div>

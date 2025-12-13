@@ -39,6 +39,14 @@ const ProductsPage = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [wishlist, setWishlist] = useState(() => {
+    try {
+      const saved = localStorage.getItem("wishlist");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
 
   // Filter states
   const [searchTerm, setSearchTerm] = useState(
@@ -219,6 +227,45 @@ const ProductsPage = () => {
     fetchCategories();
     fetchServices();
   }, [fetchProducts, fetchCategories, fetchServices]);
+
+  // Save wishlist to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("wishlist", JSON.stringify(wishlist));
+  }, [wishlist]);
+
+  // Toggle wishlist function
+  const toggleWishlist = useCallback((product) => {
+    setWishlist((prev) => {
+      const isInWishlist = prev.some((item) => item.id === product.id);
+      let updated;
+      if (isInWishlist) {
+        updated = prev.filter((item) => item.id !== product.id);
+      } else {
+        updated = [
+          ...prev,
+          {
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            image: product.image,
+            label: product.label,
+          },
+        ];
+      }
+      localStorage.setItem("wishlist", JSON.stringify(updated));
+      // Dispatch custom event to notify other components (like FavoritesPage)
+      window.dispatchEvent(new Event("wishlistUpdated"));
+      return updated;
+    });
+  }, []);
+
+  // Check if product is in wishlist
+  const isInWishlist = useCallback(
+    (productId) => {
+      return wishlist.some((item) => item.id === productId);
+    },
+    [wishlist]
+  );
 
   // Shuffle array function (for random selection)
   const shuffleArray = (array) => {
@@ -538,12 +585,16 @@ const ProductsPage = () => {
 
           {/* Wishlist Button */}
           <button
-            className="product-wishlist-btn"
+            className={`product-wishlist-btn ${
+              isInWishlist(product.id) ? "active" : ""
+            }`}
             onClick={(e) => {
               e.stopPropagation();
-              // TODO: Implement wishlist
+              toggleWishlist(product);
             }}
-            title="إضافة للمفضلة"
+            title={
+              isInWishlist(product.id) ? "إزالة من المفضلة" : "إضافة للمفضلة"
+            }
           >
             <FontAwesomeIcon icon={faHeart} />
           </button>
@@ -1028,18 +1079,6 @@ const ProductsPage = () => {
                       {serviceDiscount > 0 && (
                         <div className="product-deal-banner">Deal</div>
                       )}
-
-                      {/* Wishlist Button */}
-                      <button
-                        className="product-wishlist-btn"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          // TODO: Implement wishlist
-                        }}
-                        title="إضافة للمفضلة"
-                      >
-                        <FontAwesomeIcon icon={faHeart} />
-                      </button>
                     </div>
 
                     <div className="product-details">

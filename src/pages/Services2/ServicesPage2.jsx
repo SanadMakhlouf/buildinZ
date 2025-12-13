@@ -469,17 +469,6 @@ const ServicesPage2 = () => {
                           <div className="product-deal-banner">Deal</div>
                         )}
 
-                        {/* Wishlist Button */}
-                        <button
-                          className="product-wishlist-btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            // TODO: Implement wishlist
-                          }}
-                          title="إضافة للمفضلة"
-                        >
-                          <FontAwesomeIcon icon={faHeart} />
-                        </button>
                       </div>
 
                       <div className="product-details">
