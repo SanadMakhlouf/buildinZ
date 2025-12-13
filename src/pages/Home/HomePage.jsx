@@ -449,7 +449,7 @@ const HomePage = () => {
   const getDeliveryDate = () => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    return tomorrow.toLocaleDateString("ar-EG", {
+    return tomorrow.toLocaleDateString("en-US", {
       day: "numeric",
       month: "long",
     });
