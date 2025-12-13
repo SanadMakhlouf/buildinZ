@@ -627,6 +627,15 @@
   z-index: 2;
 }
 
+.product-label-badge {
+  top: 8px;
+  left: 8px;
+  background: #22c55e;
+  color: white;
+  font-weight: 600;
+  z-index: 3;
+}
+
 .discount-badge {
   top: 8px;
   right: 8px;

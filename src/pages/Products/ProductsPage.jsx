@@ -138,6 +138,7 @@ const ProductsPage = () => {
                   ? product.reviews.length
                   : 0,
                 sku: product.sku || "",
+                label: product.label || null,
               };
             } catch (mapError) {
               console.error("Error mapping product:", mapError, product);
@@ -509,6 +510,13 @@ const ProductsPage = () => {
             <div className="product-image-placeholder">
               <FontAwesomeIcon icon={faShoppingCart} />
             </div>
+          )}
+
+          {/* Product Label */}
+          {product.label && (
+            <span className="product-badge product-label-badge">
+              {product.label}
+            </span>
           )}
 
           {/* Discount Badge */}
@@ -1037,7 +1045,9 @@ const ProductsPage = () => {
                     <div className="product-details">
                       <h3 className="product-name">{service.name}</h3>
                       {service.description && (
-                        <p className="product-description">{service.description}</p>
+                        <p className="product-description">
+                          {service.description}
+                        </p>
                       )}
 
                       {/* Rating Section */}
@@ -1137,6 +1147,13 @@ const ProductsPage = () => {
                         </div>
                       )}
 
+                      {/* Product Label */}
+                      {product.label && (
+                        <span className="product-badge product-label-badge">
+                          {product.label}
+                        </span>
+                      )}
+
                       {/* Discount Badge */}
                       {discount > 0 && (
                         <span className="product-badge discount-badge">
@@ -1175,7 +1192,9 @@ const ProductsPage = () => {
                         {product.name || "منتج بدون اسم"}
                       </h3>
                       {product.description && (
-                        <p className="product-description">{product.description}</p>
+                        <p className="product-description">
+                          {product.description}
+                        </p>
                       )}
 
                       {/* Rating Section */}

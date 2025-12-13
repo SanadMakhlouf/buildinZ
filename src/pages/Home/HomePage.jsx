@@ -364,6 +364,7 @@ const HomePage = () => {
                       : 0,
                   reviewCount: product.reviews?.length || 0,
                   stockQuantity: product.stock_quantity || 0,
+                  label: product.label || null,
                 })
               );
               setProducts(formattedProducts);
@@ -1009,6 +1010,13 @@ const HomePage = () => {
                           </div>
                         )}
 
+                        {/* Product Label */}
+                        {product.label && (
+                          <span className="product-badge product-label-badge">
+                            {product.label}
+                          </span>
+                        )}
+
                         {/* Discount Badge */}
                         {discount > 0 && (
                           <span className="product-badge discount-badge">
@@ -1327,6 +1335,13 @@ const HomePage = () => {
                         <div className="product-image-placeholder">
                           <FontAwesomeIcon icon={faShoppingCart} />
                         </div>
+                      )}
+
+                      {/* Product Label */}
+                      {product.label && (
+                        <span className="product-badge product-label-badge">
+                          {product.label}
+                        </span>
                       )}
 
                       {/* Discount Badge */}
