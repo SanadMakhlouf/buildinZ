@@ -3,11 +3,11 @@
    ============================================ */
 
 :root {
-  --primary: #0A3259;
+  --primary: #0a3259;
   --primary-dark: #072441;
   --primary-light: #1a4d80;
   --primary-lighter: #e8f0f5;
-  --accent: #DAA520;
+  --accent: #daa520;
   --accent-light: #f0c14b;
   --gray-50: #f9fafb;
   --gray-100: #f3f4f6;
@@ -29,9 +29,12 @@
   --border-radius-lg: 8px;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
   --transition: all 0.2s ease;
 }
 
@@ -43,7 +46,8 @@
   min-height: 100vh;
   background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
   padding-bottom: 60px;
-  font-family: 'ReadexPro', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: "ReadexPro", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
 }
 
 .container {
@@ -65,13 +69,17 @@
 }
 
 .service-header::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+  background: linear-gradient(
+    90deg,
+    var(--primary) 0%,
+    var(--primary-light) 100%
+  );
 }
 
 .btn-back {
@@ -103,19 +111,29 @@
   align-items: start;
 }
 
+.service-title-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
 .service-title-section h1 {
   font-size: 2rem;
   font-weight: 700;
   color: var(--gray-900);
-  margin: 0 0 10px 0;
-  line-height: 1.2;
+  margin: 0 0 0.75rem 0;
+  line-height: 1.3;
 }
 
 .service-description {
   font-size: 1rem;
   color: var(--gray-600);
-  margin: 0 0 12px 0;
-  line-height: 1.6;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.service-title-section .service-category-badge {
+  margin-top: 0.25rem;
 }
 
 .service-category-badge {
@@ -131,7 +149,11 @@
 .service-price-section {
   text-align: center;
   padding: 24px 32px;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--primary) 0%,
+    var(--primary-dark) 100%
+  );
   border-radius: var(--border-radius-lg);
   color: white;
   box-shadow: var(--shadow-lg);
@@ -324,7 +346,7 @@
 
 /* Zoom hint overlay */
 .gallery-main::after {
-  content: '🔍 انقر للتكبير';
+  content: "🔍 انقر للتكبير";
   position: absolute;
   bottom: 0;
   left: 0;
@@ -378,10 +400,14 @@
 }
 
 .section-title::before {
-  content: '';
+  content: "";
   width: 3px;
   height: 24px;
-  background: linear-gradient(180deg, var(--primary) 0%, var(--primary-light) 100%);
+  background: linear-gradient(
+    180deg,
+    var(--primary) 0%,
+    var(--primary-light) 100%
+  );
   border-radius: 2px;
 }
 
@@ -424,7 +450,11 @@
 
 /* Quick Summary */
 .quick-summary {
-  background: linear-gradient(135deg, var(--primary-lighter) 0%, var(--primary-light) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--primary-lighter) 0%,
+    var(--primary-light) 100%
+  );
   border: 2px solid var(--primary);
   border-radius: var(--border-radius);
   padding: 16px 20px;
@@ -769,7 +799,11 @@
   left: 10px;
   width: 32px;
   height: 32px;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--primary) 0%,
+    var(--primary-dark) 100%
+  );
   color: white;
   border-radius: 50%;
   display: flex;
@@ -973,7 +1007,11 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--primary) 0%,
+    var(--primary-dark) 100%
+  );
   color: white;
   box-shadow: var(--shadow-md);
 }
@@ -1160,7 +1198,7 @@
 }
 
 .booking-steps::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   left: 60px;
@@ -1266,7 +1304,11 @@
   justify-content: space-between;
   align-items: center;
   padding: 24px;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--primary) 0%,
+    var(--primary-dark) 100%
+  );
   color: white;
   border-radius: var(--border-radius);
   margin-top: 8px;
@@ -1548,7 +1590,7 @@
 
 /* WhatsApp Contact Section */
 .whatsapp-contact {
-  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
   border-radius: var(--border-radius-lg);
   padding: 24px;
   margin: 24px 0;
@@ -1573,7 +1615,7 @@
   align-items: center;
   gap: 16px;
   background: white;
-  color: #128C7E;
+  color: #128c7e;
   padding: 16px 20px;
   border-radius: var(--border-radius);
   text-decoration: none;
@@ -1591,7 +1633,7 @@
   width: 32px;
   height: 32px;
   flex-shrink: 0;
-  color: #25D366;
+  color: #25d366;
 }
 
 .whatsapp-button span {
@@ -1604,7 +1646,7 @@
 
 .whatsapp-button strong {
   font-size: 1.1rem;
-  color: #128C7E;
+  color: #128c7e;
   font-weight: 600;
   margin-bottom: 4px;
 }
@@ -1644,7 +1686,7 @@
     grid-template-columns: 450px 1fr;
     gap: 30px;
   }
-  
+
   .gallery-thumbnails {
     grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
   }
@@ -1654,22 +1696,22 @@
   .service-layout {
     grid-template-columns: 1fr;
   }
-  
+
   .service-gallery-section {
     position: relative;
     top: 0;
     max-width: 600px;
     margin: 0 auto;
   }
-  
+
   .gallery-main {
     aspect-ratio: 1.2;
   }
-  
+
   .service-header-content {
     grid-template-columns: 1fr;
   }
-  
+
   .service-price-section {
     margin-top: 24px;
   }
@@ -1679,37 +1721,37 @@
   .service-header {
     padding: 80px 0 30px;
   }
-  
+
   .service-title-section h1 {
     font-size: 2rem;
   }
-  
+
   .service-form-section {
     padding: 24px;
   }
-  
+
   .field-options-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
   }
-  
+
   .option-card {
     border-width: 2px;
   }
-  
+
   .option-content {
     padding: 16px 12px;
   }
-  
+
   .option-label {
     font-size: 1rem;
   }
-  
+
   .option-price {
     font-size: 0.85rem;
     padding: 4px 10px;
   }
-  
+
   .option-check {
     width: 36px;
     height: 36px;
@@ -1717,37 +1759,37 @@
     top: 12px;
     left: 12px;
   }
-  
+
   .option-image-container::after {
     width: 60px;
     height: 60px;
     font-size: 2rem;
   }
-  
+
   .products-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .form-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .modal-content {
     padding: 24px;
   }
-  
+
   .booking-steps {
     padding: 24px 20px;
   }
-  
+
   .booking-steps::before {
     display: none;
   }
-  
+
   .step span {
     font-size: 0.75rem;
   }
-  
+
   .modal-actions {
     flex-direction: column;
   }
@@ -1783,32 +1825,32 @@
   .service-title-section h1 {
     font-size: 1.5rem;
   }
-  
+
   .base-price .price {
     font-size: 2rem;
   }
-  
+
   .service-form-section {
     padding: 20px;
   }
-  
+
   .section-title {
     font-size: 1.4rem;
   }
-  
+
   .field-options-grid {
     grid-template-columns: 1fr;
     gap: 12px;
   }
-  
+
   .option-card:hover {
     transform: translateY(-4px) scale(1);
   }
-  
+
   .option-image-container {
     aspect-ratio: 1.2;
   }
-  
+
   .gallery-thumbnails {
     grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
   }
