@@ -88,6 +88,9 @@ const CategoryCard = memo(({ category, index, onSelect }) => {
       </div>
       <div className="category-content">
         <h3>{category.name}</h3>
+        {category.description && (
+          <p className="category-description">{category.description}</p>
+        )}
         {category.children && category.children.length > 0 && (
           <div className="category-meta">
             <span className="subcategory-count">
