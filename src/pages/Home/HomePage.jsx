@@ -812,7 +812,7 @@ const HomePage = () => {
         <div className="noon-section-container">
           <div className="noon-section-header">
             <h2>الخدمات الأكثر طلباً</h2>
-            <Link to="/services2/services" className="noon-view-all">
+            <Link to="/services" className="noon-view-all">
               عرض الكل <FontAwesomeIcon icon={faArrowLeft} />
             </Link>
           </div>
@@ -1154,7 +1154,7 @@ const HomePage = () => {
                 مجموعة واسعة من خدمات البناء والصيانة والتصميم الداخلي الصورة
                 اعتقد مقاسها صغير ، لو نخلي ا
               </p>
-              <Link to="/services2/services" className="noon-promo-btn">
+              <Link to="/services" className="noon-promo-btn">
                 استكشف الخدمات
               </Link>
             </div>
