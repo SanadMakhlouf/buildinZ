@@ -906,28 +906,6 @@ const HomePage = () => {
                           />
                         </div>
 
-                        {/* Price Section */}
-                        <div className="product-price-section">
-                          {serviceDiscount > 0 && (
-                            <span className="discount-percentage">
-                              {serviceDiscount}%
-                            </span>
-                          )}
-                          <div className="product-price">
-                            {service.base_price && (
-                              <>
-                                <span className="price-currency">D</span>
-                                <span className="price-value">
-                                  {service.base_price.toLocaleString("en-US", {
-                                    minimumFractionDigits: 0,
-                                    maximumFractionDigits: 0,
-                                  })}
-                                </span>
-                              </>
-                            )}
-                          </div>
-                        </div>
-
                         {/* Delivery Information */}
                         <div className="product-delivery-info">
                           <div className="delivery-free">
@@ -1257,28 +1235,6 @@ const HomePage = () => {
                           icon={faStar}
                           className="rating-star"
                         />
-                      </div>
-
-                      {/* Price Section */}
-                      <div className="product-price-section">
-                        {serviceDiscount > 0 && (
-                          <span className="discount-percentage">
-                            {serviceDiscount}%
-                          </span>
-                        )}
-                        <div className="product-price">
-                          {service.base_price && (
-                            <>
-                              <span className="price-currency">D</span>
-                              <span className="price-value">
-                                {service.base_price.toLocaleString("en-US", {
-                                  minimumFractionDigits: 0,
-                                  maximumFractionDigits: 0,
-                                })}
-                              </span>
-                            </>
-                          )}
-                        </div>
                       </div>
 
                       {/* Delivery Information */}
