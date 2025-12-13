@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, memo } from "react";
-import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import { Routes, Route, useNavigate, useLocation, Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSpinner,
@@ -7,6 +7,10 @@ import {
   faArrowLeft,
   faSearch,
   faTimes,
+  faStar,
+  faHeart,
+  faTruck,
+  faTools,
 } from "@fortawesome/free-solid-svg-icons";
 import "./ServicesPage2.css";
 import serviceBuilderService from "../../services/serviceBuilderService";
@@ -87,7 +91,6 @@ const CategoryCard = memo(({ category, index, onSelect }) => {
         )}
         <button className="category-action-btn">
           <span>عرض الخدمات</span>
-          <FontAwesomeIcon icon={faArrowLeft} />
         </button>
       </div>
     </div>
@@ -268,6 +271,57 @@ const ServicesPage2 = () => {
     });
   }, [categories, searchTerm]);
 
+  // Helper functions
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return null;
+    if (imagePath.startsWith("http")) return imagePath;
+    return serviceBuilderService.getImageUrl(imagePath);
+  };
+
+  const getServiceImage = (service) => {
+    return (
+      service.main_image?.url ||
+      service.preview_image_path ||
+      service.preview_image_url ||
+      service.image_path ||
+      service.image ||
+      null
+    );
+  };
+
+  const formatReviewCount = (count) => {
+    if (!count || count === 0) return "0";
+    if (count >= 1000) {
+      return (count / 1000).toFixed(1) + "K";
+    }
+    return count.toString();
+  };
+
+  const getDeliveryDate = () => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toLocaleDateString("ar-EG", {
+      day: "numeric",
+      month: "long",
+    });
+  };
+
+  // Shuffle array function (for random selection)
+  const shuffleArray = (array) => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  };
+
+  // Get random services
+  const popularServices = useMemo(() => {
+    if (services.length === 0) return [];
+    return shuffleArray(services).slice(0, 8);
+  }, [services]);
+
   if (error) {
     return (
       <div className="services-page2">
@@ -349,6 +403,126 @@ const ServicesPage2 = () => {
                 )}
           </div>
         </div>
+
+        {/* Popular Services Section */}
+        {popularServices.length > 0 && (
+          <section className="popular-section">
+            <div className="popular-section-container">
+              <div className="popular-section-header">
+                <h2>الخدمات الأكثر طلباً</h2>
+                <Link to="/services2/categories" className="popular-view-all">
+                  عرض الكل <FontAwesomeIcon icon={faArrowLeft} />
+                </Link>
+              </div>
+
+              <div className="popular-grid">
+                {popularServices.map((service) => {
+                  const serviceImage = getServiceImage(service);
+                  const imageUrl = serviceImage
+                    ? getImageUrl(serviceImage)
+                    : null;
+                  const serviceDiscount = service.discount || 0;
+
+                  return (
+                    <div
+                      key={service.id}
+                      className="product-card"
+                      onClick={() => navigate(`/services2/${service.id}`)}
+                    >
+                      <div className="product-image-container">
+                        {imageUrl ? (
+                          <img
+                            src={imageUrl}
+                            alt={service.name}
+                            className="product-image"
+                            onError={(e) => {
+                              e.target.style.display = "none";
+                            }}
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="product-image-placeholder">
+                            <FontAwesomeIcon icon={faTools} />
+                          </div>
+                        )}
+
+                        {/* Discount Badge */}
+                        {serviceDiscount > 0 && (
+                          <span className="product-badge discount-badge">
+                            {serviceDiscount}% OFF
+                          </span>
+                        )}
+
+                        {/* Deal Banner */}
+                        {serviceDiscount > 0 && (
+                          <div className="product-deal-banner">Deal</div>
+                        )}
+
+                        {/* Wishlist Button */}
+                        <button
+                          className="product-wishlist-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // TODO: Implement wishlist
+                          }}
+                          title="إضافة للمفضلة"
+                        >
+                          <FontAwesomeIcon icon={faHeart} />
+                        </button>
+                      </div>
+
+                      <div className="product-details">
+                        {/* Rating Section */}
+                        <div className="product-rating-section">
+                          <span className="review-count">(0)</span>
+                          <span className="rating-value">
+                            {service.rating?.toFixed(1) || "4.8"}
+                          </span>
+                          <FontAwesomeIcon icon={faStar} className="rating-star" />
+                        </div>
+
+                        <h3 className="product-name">{service.name}</h3>
+
+                        {/* Price Section */}
+                        <div className="product-price-section">
+                          {serviceDiscount > 0 && (
+                            <span className="discount-percentage">
+                              {serviceDiscount}%
+                            </span>
+                          )}
+                          <div className="product-price">
+                            {service.base_price && (
+                              <>
+                                <span className="price-currency">D</span>
+                                <span className="price-value">
+                                  {service.base_price.toLocaleString("en-US", {
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 0,
+                                  })}
+                                </span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Delivery Information */}
+                        <div className="product-delivery-info">
+                          <div className="delivery-free">
+                            <FontAwesomeIcon icon={faTruck} className="delivery-icon" />
+                            <span>التوصيل مجانا</span>
+                          </div>
+                          <div className="delivery-express">
+                            express Get it by {getDeliveryDate()}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+        )}
       </div>
     </div>
   );

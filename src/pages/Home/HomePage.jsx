@@ -823,9 +823,9 @@ const HomePage = () => {
                 Array(8)
                   .fill(0)
                   .map((_, i) => (
-                    <div key={i} className="noon-service-card skeleton">
-                      <div className="skeleton-image"></div>
-                      <div className="skeleton-content">
+                    <div key={i} className="product-card skeleton">
+                      <div className="product-image-container skeleton-image"></div>
+                      <div className="product-details skeleton-content">
                         <div className="skeleton-text"></div>
                         <div className="skeleton-text short"></div>
                       </div>
@@ -842,7 +842,7 @@ const HomePage = () => {
                     <div
                       key={service.id}
                       className="product-card"
-                      onClick={() => navigate(`/services2/service/${service.id}`)}
+                      onClick={() => navigate(`/services2/${service.id}`)}
                     >
                       <div className="product-image-container">
                         {imageUrl ? (
@@ -893,7 +893,10 @@ const HomePage = () => {
                           <span className="rating-value">
                             {service.rating?.toFixed(1) || "4.8"}
                           </span>
-                          <FontAwesomeIcon icon={faStar} className="rating-star" />
+                          <FontAwesomeIcon
+                            icon={faStar}
+                            className="rating-star"
+                          />
                         </div>
 
                         <h3 className="product-name">{service.name}</h3>
@@ -923,7 +926,10 @@ const HomePage = () => {
                         {/* Delivery Information */}
                         <div className="product-delivery-info">
                           <div className="delivery-free">
-                            <FontAwesomeIcon icon={faTruck} className="delivery-icon" />
+                            <FontAwesomeIcon
+                              icon={faTruck}
+                              className="delivery-icon"
+                            />
                             <span>التوصيل مجانا</span>
                           </div>
                           <div className="delivery-express">
@@ -954,9 +960,9 @@ const HomePage = () => {
                 Array(8)
                   .fill(0)
                   .map((_, i) => (
-                    <div key={i} className="noon-service-card skeleton">
-                      <div className="skeleton-image"></div>
-                      <div className="skeleton-content">
+                    <div key={i} className="product-card skeleton">
+                      <div className="product-image-container skeleton-image"></div>
+                      <div className="product-details skeleton-content">
                         <div className="skeleton-text"></div>
                         <div className="skeleton-text short"></div>
                       </div>
@@ -1062,7 +1068,10 @@ const HomePage = () => {
                           <span className="rating-value">
                             {(product.rating || 0).toFixed(1)}
                           </span>
-                          <FontAwesomeIcon icon={faStar} className="rating-star" />
+                          <FontAwesomeIcon
+                            icon={faStar}
+                            className="rating-star"
+                          />
                         </div>
 
                         <h3 className="product-name">
@@ -1072,17 +1081,22 @@ const HomePage = () => {
                         {/* Price Section */}
                         <div className="product-price-section">
                           {discount > 0 && (
-                            <span className="discount-percentage">{discount}%</span>
+                            <span className="discount-percentage">
+                              {discount}%
+                            </span>
                           )}
                           <div className="product-price">
                             {product.originalPrice &&
                               product.price &&
                               product.originalPrice > product.price && (
                                 <span className="product-original-price">
-                                  {product.originalPrice.toLocaleString("en-US", {
-                                    minimumFractionDigits: 0,
-                                    maximumFractionDigits: 0,
-                                  })}
+                                  {product.originalPrice.toLocaleString(
+                                    "en-US",
+                                    {
+                                      minimumFractionDigits: 0,
+                                      maximumFractionDigits: 0,
+                                    }
+                                  )}
                                 </span>
                               )}
                             <span className="price-currency">D</span>
@@ -1098,7 +1112,10 @@ const HomePage = () => {
                         {/* Delivery Information */}
                         <div className="product-delivery-info">
                           <div className="delivery-free">
-                            <FontAwesomeIcon icon={faTruck} className="delivery-icon" />
+                            <FontAwesomeIcon
+                              icon={faTruck}
+                              className="delivery-icon"
+                            />
                             <span>التوصيل مجانا</span>
                           </div>
                           <div className="delivery-express">
@@ -1162,58 +1179,108 @@ const HomePage = () => {
                 const imageUrl = serviceImage
                   ? getImageUrl(serviceImage)
                   : null;
+                const serviceDiscount = service.discount || 0;
 
                 return (
-                  <Link
+                  <div
                     key={service.id}
-                    to={`/services2/service/${service.id}`}
-                    className="noon-service-card"
+                    className="product-card"
+                    onClick={() => navigate(`/services2/${service.id}`)}
                   >
-                    <div className="noon-service-image">
+                    <div className="product-image-container">
                       {imageUrl ? (
                         <img
                           src={imageUrl}
                           alt={service.name}
+                          className="product-image"
                           onError={(e) => {
                             e.target.style.display = "none";
                           }}
+                          loading="lazy"
                         />
                       ) : (
-                        <div
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            background:
-                              "linear-gradient(135deg, #0A3259 0%, #1a4d80 100%)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            color: "#DAA520",
-                            fontSize: "3rem",
-                          }}
-                        >
+                        <div className="product-image-placeholder">
                           <FontAwesomeIcon icon={faTools} />
                         </div>
                       )}
+
+                      {/* Discount Badge */}
+                      {serviceDiscount > 0 && (
+                        <span className="product-badge discount-badge">
+                          {serviceDiscount}% OFF
+                        </span>
+                      )}
+
+                      {/* Deal Banner */}
+                      {serviceDiscount > 0 && (
+                        <div className="product-deal-banner">Deal</div>
+                      )}
+
+                      {/* Wishlist Button */}
+                      <button
+                        className="product-wishlist-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // TODO: Implement wishlist
+                        }}
+                        title="إضافة للمفضلة"
+                      >
+                        <FontAwesomeIcon icon={faHeart} />
+                      </button>
                     </div>
-                    <div className="noon-service-content">
-                      <h3 className="noon-service-name">{service.name}</h3>
-                      <p className="noon-service-desc">
-                        {service.description?.substring(0, 60)}...
-                      </p>
-                      <div className="noon-service-footer">
-                        {service.base_price && (
-                          <span className="noon-service-price">
-                            يبدأ من {service.base_price} درهم
+
+                    <div className="product-details">
+                      {/* Rating Section */}
+                      <div className="product-rating-section">
+                        <span className="review-count">(0)</span>
+                        <span className="rating-value">
+                          {service.rating?.toFixed(1) || "4.8"}
+                        </span>
+                        <FontAwesomeIcon
+                          icon={faStar}
+                          className="rating-star"
+                        />
+                      </div>
+
+                      <h3 className="product-name">{service.name}</h3>
+
+                      {/* Price Section */}
+                      <div className="product-price-section">
+                        {serviceDiscount > 0 && (
+                          <span className="discount-percentage">
+                            {serviceDiscount}%
                           </span>
                         )}
-                        <div className="noon-service-rating">
-                          <FontAwesomeIcon icon={faStar} />
-                          <span>{service.rating?.toFixed(1) || "4.8"}</span>
+                        <div className="product-price">
+                          {service.base_price && (
+                            <>
+                              <span className="price-currency">D</span>
+                              <span className="price-value">
+                                {service.base_price.toLocaleString("en-US", {
+                                  minimumFractionDigits: 0,
+                                  maximumFractionDigits: 0,
+                                })}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Delivery Information */}
+                      <div className="product-delivery-info">
+                        <div className="delivery-free">
+                          <FontAwesomeIcon
+                            icon={faTruck}
+                            className="delivery-icon"
+                          />
+                          <span>التوصيل مجانا</span>
+                        </div>
+                        <div className="delivery-express">
+                          express Get it by {getDeliveryDate()}
                         </div>
                       </div>
                     </div>
-                  </Link>
+                  </div>
                 );
               })}
             </div>
@@ -1237,94 +1304,155 @@ const HomePage = () => {
                 const imageUrl = product.image
                   ? getImageUrl(product.image)
                   : null;
+                const discount =
+                  product.originalPrice &&
+                  product.price &&
+                  product.originalPrice > product.price
+                    ? Math.round(
+                        ((product.originalPrice - product.price) /
+                          product.originalPrice) *
+                          100
+                      )
+                    : 0;
+
+                const slugify = (text = "", fallback = "") => {
+                  const base = text && text.toString().trim();
+                  const cleaned = base
+                    ? base
+                        .toLowerCase()
+                        .replace(/\s+/g, "-")
+                        .replace(/[^-\w\u0600-\u06FF]+/g, "")
+                        .replace(/-+/g, "-")
+                        .replace(/^-+|-+$/g, "")
+                    : "";
+                  return cleaned || fallback;
+                };
 
                 return (
-                  <Link
+                  <div
                     key={product.id}
-                    to={`/products/${product.id}`}
-                    className="noon-service-card"
+                    className="product-card"
+                    onClick={() =>
+                      navigate(
+                        `/products/${product.id}/${slugify(
+                          product.name,
+                          `product-${product.id}`
+                        )}`
+                      )
+                    }
                   >
-                    <div className="noon-service-image">
+                    <div className="product-image-container">
                       {imageUrl ? (
                         <img
                           src={imageUrl}
                           alt={product.name}
+                          className="product-image"
                           onError={(e) => {
                             e.target.style.display = "none";
                           }}
+                          loading="lazy"
                         />
                       ) : (
-                        <div
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            background:
-                              "linear-gradient(135deg, #0A3259 0%, #1a4d80 100%)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            color: "#DAA520",
-                            fontSize: "3rem",
-                          }}
-                        >
+                        <div className="product-image-placeholder">
                           <FontAwesomeIcon icon={faShoppingCart} />
                         </div>
                       )}
-                      {product.originalPrice &&
-                        product.price < product.originalPrice && (
-                          <span className="noon-service-badge">
-                            خصم{" "}
-                            {Math.round(
-                              ((product.originalPrice - product.price) /
-                                product.originalPrice) *
-                                100
-                            )}
-                            %
-                          </span>
-                        )}
+
+                      {/* Discount Badge */}
+                      {discount > 0 && (
+                        <span className="product-badge discount-badge">
+                          {discount}% OFF
+                        </span>
+                      )}
+
+                      {/* Deal Banner */}
+                      {discount > 0 && (
+                        <div className="product-deal-banner">Deal</div>
+                      )}
+
+                      {/* Out of Stock Badge */}
+                      {(product.stockQuantity === 0 ||
+                        product.stockQuantity === null) && (
+                        <span className="product-badge out-of-stock-badge">
+                          نفذت الكمية
+                        </span>
+                      )}
+
+                      {/* Wishlist Button */}
+                      <button
+                        className="product-wishlist-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // TODO: Implement wishlist
+                        }}
+                        title="إضافة للمفضلة"
+                      >
+                        <FontAwesomeIcon icon={faHeart} />
+                      </button>
                     </div>
-                    <div className="noon-service-content">
-                      <h3 className="noon-service-name">{product.name}</h3>
-                      <p className="noon-service-desc">
-                        {product.description?.substring(0, 60)}...
-                      </p>
-                      <div className="noon-service-footer">
-                        {product.originalPrice &&
-                        product.price < product.originalPrice ? (
-                          <div
-                            style={{
-                              display: "flex",
-                              gap: "8px",
-                              alignItems: "center",
-                              flexWrap: "wrap",
-                            }}
-                          >
-                            <span
-                              className="noon-service-price"
-                              style={{
-                                textDecoration: "line-through",
-                                opacity: 0.6,
-                                fontSize: "0.85rem",
-                              }}
-                            >
-                              {product.originalPrice} درهم
-                            </span>
-                            <span className="noon-service-price">
-                              {product.price} درهم
-                            </span>
-                          </div>
-                        ) : (
-                          <span className="noon-service-price">
-                            {product.price} درهم
+
+                    <div className="product-details">
+                      {/* Rating Section */}
+                      <div className="product-rating-section">
+                        <span className="review-count">
+                          ({formatReviewCount(product.reviewCount || 0)})
+                        </span>
+                        <span className="rating-value">
+                          {(product.rating || 0).toFixed(1)}
+                        </span>
+                        <FontAwesomeIcon
+                          icon={faStar}
+                          className="rating-star"
+                        />
+                      </div>
+
+                      <h3 className="product-name">
+                        {product.name || "منتج بدون اسم"}
+                      </h3>
+
+                      {/* Price Section */}
+                      <div className="product-price-section">
+                        {discount > 0 && (
+                          <span className="discount-percentage">
+                            {discount}%
                           </span>
                         )}
-                        <div className="noon-service-rating">
-                          <FontAwesomeIcon icon={faStar} />
-                          <span>{product.rating?.toFixed(1) || "4.8"}</span>
+                        <div className="product-price">
+                          {product.originalPrice &&
+                            product.price &&
+                            product.originalPrice > product.price && (
+                              <span className="product-original-price">
+                                {product.originalPrice.toLocaleString("en-US", {
+                                  minimumFractionDigits: 0,
+                                  maximumFractionDigits: 0,
+                                })}
+                              </span>
+                            )}
+                          <span className="price-currency">D</span>
+                          <span className="price-value">
+                            {(product.price || 0).toLocaleString("en-US", {
+                              minimumFractionDigits: 0,
+                              maximumFractionDigits: 0,
+                            })}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Delivery Information */}
+                      <div className="product-delivery-info">
+                        <div className="delivery-free">
+                          <FontAwesomeIcon
+                            icon={faTruck}
+                            className="delivery-icon"
+                          />
+                          <span>التوصيل مجانا</span>
+                        </div>
+                        <div className="delivery-express">
+                          express Get it by {getDeliveryDate()}
                         </div>
                       </div>
                     </div>
-                  </Link>
+                  </div>
                 );
               })}
             </div>
