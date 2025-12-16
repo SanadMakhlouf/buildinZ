@@ -7,9 +7,9 @@
 const config = {
   // API Base URLs
   API_BASE_URL:
-    process.env.REACT_APP_BACKEND_API || "https://admin.digistuff.live/api",
+    process.env.REACT_APP_BACKEND_API || "https://admin.buildingzuae.com/api",
   BACKEND_URL:
-    process.env.REACT_APP_BACKEND_URL || "https://admin.digistuff.live",
+    process.env.REACT_APP_BACKEND_URL || "https://admin.buildingzuae.com",
 
   // Specific API endpoints
   endpoints: {

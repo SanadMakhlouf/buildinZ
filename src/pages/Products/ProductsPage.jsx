@@ -633,7 +633,7 @@ const ProductsPage = () => {
                     })}
                   </span>
                 )}
-              <span className="price-currency">D</span>
+              <span className="price-currency">درهم</span>
               <span className="price-value">
                 {(product.price || 0).toLocaleString("en-US", {
                   minimumFractionDigits: 0,
@@ -1268,7 +1268,7 @@ const ProductsPage = () => {
                                 })}
                               </span>
                             )}
-                          <span className="price-currency">D</span>
+                          <span className="price-currency">درهم</span>
                           <span className="price-value">
                             {(product.price || 0).toLocaleString("en-US", {
                               minimumFractionDigits: 0,

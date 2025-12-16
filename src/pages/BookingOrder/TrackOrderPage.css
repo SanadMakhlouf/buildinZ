@@ -1,0 +1,210 @@
+.track-order-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f6f6f6 0%, #e9ecef 100%);
+  padding: 120px 0 60px;
+  direction: rtl;
+  font-family: 'ReadexPro', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.track-order-page .container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.track-order-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+}
+
+.track-order-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.track-order-header h1 {
+  margin: 0 0 12px 0;
+  font-size: 2rem;
+  color: #111827;
+  font-weight: 700;
+}
+
+.track-order-header p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 1rem;
+}
+
+.track-order-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  color: #dc2626;
+  font-size: 0.95rem;
+}
+
+.error-message svg {
+  flex-shrink: 0;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.95rem;
+}
+
+.form-group label svg {
+  color: #0A3259;
+}
+
+.form-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #0A3259;
+  box-shadow: 0 0 0 3px rgba(10, 50, 89, 0.1);
+}
+
+.form-input::placeholder {
+  color: #9ca3af;
+}
+
+.track-button {
+  width: 100%;
+  padding: 16px;
+  background: #0A3259;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.track-button:hover:not(:disabled) {
+  background: #072441;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(10, 50, 89, 0.3);
+}
+
+.track-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.track-order-help {
+  margin-top: 32px;
+  padding-top: 32px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.track-order-help h3 {
+  margin: 0 0 12px 0;
+  font-size: 1.1rem;
+  color: #111827;
+}
+
+.track-order-help p {
+  margin: 0 0 16px 0;
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+.track-order-help ul {
+  margin: 0;
+  padding-right: 20px;
+  list-style: none;
+}
+
+.track-order-help li {
+  margin-bottom: 8px;
+  color: #6b7280;
+  font-size: 0.9rem;
+  position: relative;
+}
+
+.track-order-help li::before {
+  content: '•';
+  color: #0A3259;
+  font-weight: bold;
+  position: absolute;
+  right: -15px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .track-order-page {
+    padding: 100px 0 40px;
+  }
+
+  .track-order-card {
+    padding: 32px 24px;
+  }
+
+  .track-order-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .track-order-header p {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .track-order-page {
+    padding: 110px 0 30px;
+  }
+
+  .track-order-card {
+    padding: 24px 20px;
+  }
+
+  .track-order-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .form-input {
+    padding: 12px 14px;
+    font-size: 0.95rem;
+  }
+
+  .track-button {
+    padding: 14px;
+    font-size: 1rem;
+  }
+}

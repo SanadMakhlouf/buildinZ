@@ -35,6 +35,7 @@ import {
   faInstagram,
   faLinkedinIn,
   faWhatsapp,
+  faTiktok,
 } from "@fortawesome/free-brands-svg-icons";
 import "./HomePage.css";
 import serviceBuilderService from "../../services/serviceBuilderService";
@@ -1148,7 +1149,7 @@ const HomePage = () => {
                                   )}
                                 </span>
                               )}
-                            <span className="price-currency">D</span>
+                            <span className="price-currency">درهم</span>
                             <span className="price-value">
                               {(product.price || 0).toLocaleString("en-US", {
                                 minimumFractionDigits: 0,
@@ -1466,7 +1467,7 @@ const HomePage = () => {
                                 })}
                               </span>
                             )}
-                          <span className="price-currency">D</span>
+                          <span className="price-currency">درهم</span>
                           <span className="price-value">
                             {(product.price || 0).toLocaleString("en-US", {
                               minimumFractionDigits: 0,
@@ -1601,20 +1602,14 @@ const HomePage = () => {
                 دولة الإمارات العربية المتحدة.
               </p>
               <div className="noon-footer-social">
-                <a href="#" aria-label="Facebook">
+                <a href="https://www.facebook.com/buildingzuae" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
                   <FontAwesomeIcon icon={faFacebookF} />
                 </a>
-                <a href="#" aria-label="Twitter">
-                  <FontAwesomeIcon icon={faTwitter} />
-                </a>
-                <a href="#" aria-label="Instagram">
+                <a href="https://www.instagram.com/buildingzuae/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
                   <FontAwesomeIcon icon={faInstagram} />
                 </a>
-                <a href="#" aria-label="LinkedIn">
-                  <FontAwesomeIcon icon={faLinkedinIn} />
-                </a>
-                <a href="#" aria-label="WhatsApp">
-                  <FontAwesomeIcon icon={faWhatsapp} />
+                <a href="https://www.tiktok.com/@buildingzuae" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+                  <FontAwesomeIcon icon={faTiktok} />
                 </a>
               </div>
             </div>

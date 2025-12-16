@@ -2,49 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faShieldAlt, 
-  faUserShield, 
-  faCookie, 
   faDatabase, 
+  faCookie, 
   faLock, 
   faEye, 
-  faTrashAlt, 
-  faEdit, 
-  faDownload, 
-  faShare,
+  faCheckCircle,
   faChevronDown,
-  faChevronUp,
-  faExclamationTriangle,
-  faCheckCircle
+  faChevronUp
 } from '@fortawesome/free-solid-svg-icons';
 import './PrivacyPage.css';
 
 const PrivacyPage = () => {
   const [activeSection, setActiveSection] = useState('privacy');
   const [expandedItems, setExpandedItems] = useState({});
-  const [isVisible, setIsVisible] = useState({});
-
-  useEffect(() => {
-    const observerOptions = {
-      threshold: 0.1,
-      rootMargin: '0px 0px -50px 0px'
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          setIsVisible(prev => ({
-            ...prev,
-            [entry.target.id]: true
-          }));
-        }
-      });
-    }, observerOptions);
-
-    const elements = document.querySelectorAll('.animate-on-scroll');
-    elements.forEach(el => observer.observe(el));
-
-    return () => observer.disconnect();
-  }, []);
 
   const toggleExpanded = (itemId) => {
     setExpandedItems(prev => ({
@@ -55,189 +25,189 @@ const PrivacyPage = () => {
 
   const privacyData = {
     privacy: {
-      title: 'Privacy Policy',
+      title: 'سياسة الخصوصية',
       icon: faShieldAlt,
-      lastUpdated: 'December 2024',
+      lastUpdated: 'ديسمبر 2024',
       sections: [
         {
           id: 'introduction',
-          title: 'Introduction',
-          content: `At BuildinZ, we take your privacy seriously. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our platform. We are committed to protecting your personal data and ensuring transparency in our data practices.`
+          title: 'مقدمة',
+          content: `في BuildingZ، نأخذ خصوصيتك على محمل الجد. توضح سياسة الخصوصية هذه كيفية جمع واستخدام وكشف وحماية معلوماتك عند استخدام منصتنا. نحن ملتزمون بحماية بياناتك الشخصية وضمان الشفافية في ممارساتنا المتعلقة بالبيانات.`
         },
         {
           id: 'information-collection',
-          title: 'Information We Collect',
-          content: `We collect information you provide directly to us, such as when you create an account, make a booking, or contact us. This includes:`,
+          title: 'المعلومات التي نجمعها',
+          content: `نجمع المعلومات التي تقدمها لنا مباشرة، مثل عند إنشاء حساب أو إجراء حجز أو الاتصال بنا. يتضمن ذلك:`,
           items: [
-            'Personal identifiers (name, email, phone number)',
-            'Location data (address, GPS coordinates)',
-            'Payment information (processed securely)',
-            'Service preferences and history',
-            'Communication records',
-            'Device and usage information'
+            'المعلومات الشخصية (الاسم، البريد الإلكتروني، رقم الهاتف)',
+            'بيانات الموقع (العنوان، إحداثيات GPS)',
+            'معلومات الدفع (يتم معالجتها بأمان)',
+            'تفضيلات الخدمة والسجل',
+            'سجلات الاتصال',
+            'معلومات الجهاز والاستخدام'
           ]
         },
         {
           id: 'how-we-use',
-          title: 'How We Use Your Information',
-          content: `We use your information to provide and improve our services:`,
+          title: 'كيف نستخدم معلوماتك',
+          content: `نستخدم معلوماتك لتقديم وتحسين خدماتنا:`,
           items: [
-            'Process bookings and transactions',
-            'Provide customer support',
-            'Send important notifications',
-            'Improve our platform and services',
-            'Ensure security and prevent fraud',
-            'Comply with legal obligations'
+            'معالجة الحجوزات والمعاملات',
+            'تقديم دعم العملاء',
+            'إرسال الإشعارات المهمة',
+            'تحسين منصتنا وخدماتنا',
+            'ضمان الأمان ومنع الاحتيال',
+            'الامتثال للالتزامات القانونية'
           ]
         },
         {
           id: 'data-sharing',
-          title: 'Information Sharing',
-          content: `We do not sell your personal information. We may share your data only in these circumstances:`,
+          title: 'مشاركة المعلومات',
+          content: `لا نبيع معلوماتك الشخصية. قد نشارك بياناتك فقط في هذه الحالات:`,
           items: [
-            'With service providers to complete your bookings',
-            'With payment processors for transactions',
-            'With our trusted partners and vendors',
-            'When required by law or legal process',
-            'To protect our rights and safety',
-            'In connection with business transfers'
+            'مع مقدمي الخدمات لإكمال حجوزاتك',
+            'مع معالجات الدفع للمعاملات',
+            'مع شركائنا الموردين الموثوق بهم',
+            'عندما يتطلب القانون أو الإجراءات القانونية',
+            'لحماية حقوقنا وسلامتنا',
+            'في حالة نقل الأعمال'
           ]
         },
         {
           id: 'data-security',
-          title: 'Data Security',
-          content: `We implement comprehensive security measures to protect your information:`,
+          title: 'أمان البيانات',
+          content: `نطبق تدابير أمنية شاملة لحماية معلوماتك:`,
           items: [
-            'End-to-end encryption for sensitive data',
-            'Secure server infrastructure',
-            'Regular security audits and updates',
-            'Access controls and authentication',
-            'Data backup and recovery systems',
-            'Staff training on data protection'
+            'التشفير من طرف إلى طرف للبيانات الحساسة',
+            'بنية الخوادم الآمنة',
+            'عمليات التدقيق الأمني والتحديثات المنتظمة',
+            'ضوابط الوصول والمصادقة',
+            'أنظمة النسخ الاحتياطي والاستعادة',
+            'تدريب الموظفين على حماية البيانات'
           ]
         },
         {
           id: 'your-rights',
-          title: 'Your Rights',
-          content: `You have several rights regarding your personal data:`,
+          title: 'حقوقك',
+          content: `لديك عدة حقوق فيما يتعلق ببياناتك الشخصية:`,
           items: [
-            'Access your personal information',
-            'Correct inaccurate data',
-            'Delete your account and data',
-            'Export your data',
-            'Restrict processing',
-            'Object to certain uses',
-            'Withdraw consent'
+            'الوصول إلى معلوماتك الشخصية',
+            'تصحيح البيانات غير الدقيقة',
+            'حذف حسابك وبياناتك',
+            'تصدير بياناتك',
+            'تقييد المعالجة',
+            'الاعتراض على استخدامات معينة',
+            'سحب الموافقة'
           ]
         }
       ]
     },
     userData: {
-      title: 'User Data Management',
+      title: 'إدارة بيانات المستخدم',
       icon: faDatabase,
-      lastUpdated: 'December 2024',
+      lastUpdated: 'ديسمبر 2024',
       sections: [
         {
           id: 'data-types',
-          title: 'Types of Data We Store',
-          content: `We store different categories of user data to provide our services:`,
+          title: 'أنواع البيانات التي نخزنها',
+          content: `نخزن فئات مختلفة من بيانات المستخدم لتقديم خدماتنا:`,
           items: [
-            'Account Information: Username, email, profile details',
-            'Service Data: Bookings, preferences, service history',
-            'Location Data: Addresses, service locations, GPS coordinates',
-            'Communication Data: Messages, support tickets, feedback',
-            'Usage Data: App interactions, feature usage, performance metrics',
-            'Device Data: Device type, operating system, app version'
+            'معلومات الحساب: اسم المستخدم، البريد الإلكتروني، تفاصيل الملف الشخصي',
+            'بيانات الخدمة: الحجوزات، التفضيلات، سجل الخدمات',
+            'بيانات الموقع: العناوين، مواقع الخدمة، إحداثيات GPS',
+            'بيانات الاتصال: الرسائل، تذاكر الدعم، الملاحظات',
+            'بيانات الاستخدام: تفاعلات التطبيق، استخدام الميزات، مقاييس الأداء',
+            'بيانات الجهاز: نوع الجهاز، نظام التشغيل، إصدار التطبيق'
           ]
         },
         {
           id: 'data-retention',
-          title: 'Data Retention',
-          content: `We retain your data for specific periods based on the type of information:`,
+          title: 'الاحتفاظ بالبيانات',
+          content: `نحتفظ ببياناتك لفترات محددة بناءً على نوع المعلومات:`,
           items: [
-            'Account Data: Until account deletion or 3 years of inactivity',
-            'Transaction Records: 7 years for legal and tax compliance',
-            'Communication Logs: 2 years for quality assurance',
-            'Usage Analytics: 18 months in anonymized form',
-            'Location Data: Until you disable location services',
-            'Marketing Data: Until you unsubscribe or object'
+            'بيانات الحساب: حتى حذف الحساب أو 3 سنوات من عدم النشاط',
+            'سجلات المعاملات: 7 سنوات للامتثال القانوني والضريبي',
+            'سجلات الاتصال: سنتان لضمان الجودة',
+            'تحليلات الاستخدام: 18 شهرًا في شكل مجهول',
+            'بيانات الموقع: حتى تعطيل خدمات الموقع',
+            'بيانات التسويق: حتى إلغاء الاشتراك أو الاعتراض'
           ]
         },
         {
           id: 'data-processing',
-          title: 'Data Processing Activities',
-          content: `We process your data for various legitimate purposes:`,
+          title: 'أنشطة معالجة البيانات',
+          content: `نعالج بياناتك لأغراض مشروعة مختلفة:`,
           items: [
-            'Service Delivery: Connecting you with service providers',
-            'Quality Assurance: Monitoring and improving service quality',
-            'Analytics: Understanding usage patterns and preferences',
-            'Personalization: Customizing your app experience',
-            'Security: Detecting and preventing fraudulent activities',
-            'Compliance: Meeting legal and regulatory requirements'
+            'تقديم الخدمة: ربطك بمقدمي الخدمات',
+            'ضمان الجودة: مراقبة وتحسين جودة الخدمة',
+            'التحليلات: فهم أنماط الاستخدام والتفضيلات',
+            'التخصيص: تخصيص تجربة التطبيق',
+            'الأمان: اكتشاف ومنع الأنشطة الاحتيالية',
+            'الامتثال: تلبية المتطلبات القانونية والتنظيمية'
           ]
         },
         {
           id: 'data-portability',
-          title: 'Data Portability',
-          content: `You can request a copy of your data in a portable format:`,
+          title: 'قابلية نقل البيانات',
+          content: `يمكنك طلب نسخة من بياناتك بتنسيق قابل للنقل:`,
           items: [
-            'Complete profile and account information',
-            'Service history and booking records',
-            'Saved addresses and preferences',
-            'Communication history',
-            'Usage statistics (where applicable)',
-            'Data in common formats (JSON, CSV, PDF)'
+            'معلومات الملف الشخصي والحساب الكاملة',
+            'سجل الخدمة وسجلات الحجز',
+            'العناوين المحفوظة والتفضيلات',
+            'سجل الاتصال',
+            'إحصائيات الاستخدام (حيثما ينطبق)',
+            'البيانات بتنسيقات شائعة (JSON، CSV، PDF)'
           ]
         }
       ]
     },
     cookies: {
-      title: 'Cookie Policy',
+      title: 'سياسة ملفات تعريف الارتباط',
       icon: faCookie,
-      lastUpdated: 'December 2024',
+      lastUpdated: 'ديسمبر 2024',
       sections: [
         {
           id: 'what-are-cookies',
-          title: 'What Are Cookies',
-          content: `Cookies are small text files stored on your device when you visit our platform. They help us provide a better user experience and analyze how our services are used.`
+          title: 'ما هي ملفات تعريف الارتباط',
+          content: `ملفات تعريف الارتباط هي ملفات نصية صغيرة يتم تخزينها على جهازك عند زيارة منصتنا. تساعدنا في توفير تجربة مستخدم أفضل وتحليل كيفية استخدام خدماتنا.`
         },
         {
           id: 'types-of-cookies',
-          title: 'Types of Cookies We Use',
-          content: `We use different types of cookies for various purposes:`,
+          title: 'أنواع ملفات تعريف الارتباط التي نستخدمها',
+          content: `نستخدم أنواعًا مختلفة من ملفات تعريف الارتباط لأغراض مختلفة:`,
           items: [
-            'Essential Cookies: Required for basic platform functionality',
-            'Performance Cookies: Help us analyze and improve performance',
-            'Functional Cookies: Remember your preferences and settings',
-            'Analytics Cookies: Understand how you use our platform',
-            'Marketing Cookies: Deliver relevant advertisements',
-            'Social Media Cookies: Enable social sharing features'
+            'ملفات تعريف الارتباط الأساسية: مطلوبة للوظائف الأساسية للمنصة',
+            'ملفات تعريف الارتباط للأداء: تساعدنا في تحليل وتحسين الأداء',
+            'ملفات تعريف الارتباط الوظيفية: تتذكر تفضيلاتك وإعداداتك',
+            'ملفات تعريف الارتباط التحليلية: فهم كيفية استخدامك لمنصتنا',
+            'ملفات تعريف الارتباط التسويقية: تقديم إعلانات ذات صلة',
+            'ملفات تعريف الارتباط لوسائل التواصل الاجتماعي: تمكين ميزات المشاركة الاجتماعية'
           ]
         },
         {
           id: 'cookie-management',
-          title: 'Managing Cookies',
-          content: `You have control over cookie settings:`,
+          title: 'إدارة ملفات تعريف الارتباط',
+          content: `لديك سيطرة على إعدادات ملفات تعريف الارتباط:`,
           items: [
-            'Browser Settings: Disable cookies in your browser',
-            'Cookie Preferences: Manage preferences in our app',
-            'Third-party Cookies: Control external service cookies',
-            'Opt-out Tools: Use industry opt-out mechanisms',
-            'Clear Cookies: Delete existing cookies anytime',
-            'Selective Control: Choose which types to allow'
+            'إعدادات المتصفح: تعطيل ملفات تعريف الارتباط في متصفحك',
+            'تفضيلات ملفات تعريف الارتباط: إدارة التفضيلات في تطبيقنا',
+            'ملفات تعريف الارتباط لجهات خارجية: التحكم في ملفات تعريف الارتباط لخدمات خارجية',
+            'أدوات إلغاء الاشتراك: استخدام آليات إلغاء الاشتراك في الصناعة',
+            'مسح ملفات تعريف الارتباط: حذف ملفات تعريف الارتباط الموجودة في أي وقت',
+            'التحكم الانتقائي: اختيار الأنواع المسموح بها'
           ]
         },
         {
           id: 'third-party-cookies',
-          title: 'Third-Party Cookies',
-          content: `Some cookies are set by third-party services we use:`,
+          title: 'ملفات تعريف الارتباط لجهات خارجية',
+          content: `يتم تعيين بعض ملفات تعريف الارتباط بواسطة خدمات خارجية نستخدمها:`,
           items: [
-            'Google Analytics: Website usage statistics',
-            'Payment Processors: Secure transaction processing',
-            'Social Media: Sharing and login functionality',
-            'Customer Support: Chat and feedback tools',
-            'Content Delivery: Faster loading times',
-            'Security Services: Fraud detection and prevention'
+            'Google Analytics: إحصائيات استخدام الموقع',
+            'معالجات الدفع: معالجة المعاملات الآمنة',
+            'وسائل التواصل الاجتماعي: وظائف المشاركة وتسجيل الدخول',
+            'دعم العملاء: أدوات الدردشة والملاحظات',
+            'تسليم المحتوى: أوقات تحميل أسرع',
+            'خدمات الأمان: اكتشاف الاحتيال والوقاية'
           ]
         }
       ]
@@ -249,27 +219,23 @@ const PrivacyPage = () => {
   return (
     <div className="privacy-page">
       {/* Header */}
-      <div className="privacy-header">
-        <div className="container">
-          <div className="header-content animate-on-scroll" id="header">
-            <h1 className={isVisible.header ? 'fade-in' : ''}>
-              Legal & Privacy Center
-            </h1>
-            <p className={isVisible.header ? 'fade-in delay-1' : ''}>
-              Your privacy and data protection rights explained
-            </p>
+      <div className="privacy-hero">
+        <div className="privacy-container">
+          <div className="privacy-hero-content">
+            <h1>الخصوصية وحماية البيانات</h1>
+            <p>نحن ملتزمون بحماية خصوصيتك وبياناتك</p>
           </div>
         </div>
       </div>
 
       {/* Navigation Tabs */}
       <div className="privacy-nav">
-        <div className="container">
-          <div className="nav-tabs animate-on-scroll" id="nav">
+        <div className="privacy-container">
+          <div className="nav-tabs">
             {Object.entries(privacyData).map(([key, data]) => (
               <button
                 key={key}
-                className={`nav-tab ${activeSection === key ? 'active' : ''} ${isVisible.nav ? 'slide-up' : ''}`}
+                className={`nav-tab ${activeSection === key ? 'active' : ''}`}
                 onClick={() => setActiveSection(key)}
               >
                 <FontAwesomeIcon icon={data.icon} />
@@ -282,124 +248,75 @@ const PrivacyPage = () => {
 
       {/* Content */}
       <div className="privacy-content">
-        <div className="container">
-          <div className="content-wrapper">
-            {/* Sidebar */}
-            <div className="content-sidebar animate-on-scroll" id="sidebar">
-              <div className={`sidebar-content ${isVisible.sidebar ? 'slide-right' : ''}`}>
-                <div className="sidebar-header">
-                  <FontAwesomeIcon icon={currentData.icon} />
-                  <h3>{currentData.title}</h3>
-                  <span className="last-updated">
-                    Last updated: {currentData.lastUpdated}
-                  </span>
+        <div className="privacy-container">
+          <div className="privacy-header-info">
+            <div className="header-icon">
+              <FontAwesomeIcon icon={currentData.icon} />
+            </div>
+            <div>
+              <h2>{currentData.title}</h2>
+              <p className="last-updated">آخر تحديث: {currentData.lastUpdated}</p>
+            </div>
+          </div>
+
+          <div className="privacy-sections">
+            {currentData.sections.map((section) => (
+              <div key={section.id} className="privacy-section-card">
+                <div className="section-header">
+                  <h3>{section.title}</h3>
+                  {section.items && (
+                    <button
+                      className="expand-toggle"
+                      onClick={() => toggleExpanded(section.id)}
+                      aria-label={expandedItems[section.id] ? 'إغلاق' : 'فتح'}
+                    >
+                      <FontAwesomeIcon 
+                        icon={expandedItems[section.id] ? faChevronUp : faChevronDown} 
+                      />
+                    </button>
+                  )}
                 </div>
                 
-                <div className="section-nav">
-                  {currentData.sections.map((section) => (
-                    <a
-                      key={section.id}
-                      href={`#${section.id}`}
-                      className="section-link"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        document.getElementById(section.id)?.scrollIntoView({ 
-                          behavior: 'smooth' 
-                        });
-                      }}
-                    >
-                      {section.title}
-                    </a>
-                  ))}
-                </div>
-
-                {/* Quick Actions */}
-                <div className="quick-actions">
-                  <h4>Quick Actions</h4>
-                  <div className="action-buttons">
-                    <button className="action-btn">
-                      <FontAwesomeIcon icon={faDownload} />
-                      Download Policy
-                    </button>
-                    <button className="action-btn">
-                      <FontAwesomeIcon icon={faShare} />
-                      Share
-                    </button>
-                    <button className="action-btn">
-                      <FontAwesomeIcon icon={faEdit} />
-                      Manage Preferences
-                    </button>
-                  </div>
+                <div className="section-content">
+                  <p>{section.content}</p>
+                  
+                  {section.items && (
+                    <div className={`items-list ${expandedItems[section.id] ? 'expanded' : ''}`}>
+                      <ul>
+                        {section.items.map((item, itemIndex) => (
+                          <li key={itemIndex}>
+                            <FontAwesomeIcon icon={faCheckCircle} className="check-icon" />
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
+            ))}
+          </div>
 
-            {/* Main Content */}
-            <div className="main-content">
-              {currentData.sections.map((section, index) => (
-                <div
-                  key={section.id}
-                  id={section.id}
-                  className={`content-section animate-on-scroll ${isVisible[section.id] ? 'fade-in-up' : ''}`}
-                >
-                  <div className="section-header">
-                    <h2>{section.title}</h2>
-                    {section.items && (
-                      <button
-                        className="expand-toggle"
-                        onClick={() => toggleExpanded(section.id)}
-                      >
-                        <FontAwesomeIcon 
-                          icon={expandedItems[section.id] ? faChevronUp : faChevronDown} 
-                        />
-                      </button>
-                    )}
-                  </div>
-                  
-                  <div className="section-content">
-                    <p>{section.content}</p>
-                    
-                    {section.items && (
-                      <div className={`items-list ${expandedItems[section.id] ? 'expanded' : ''}`}>
-                        <ul>
-                          {section.items.map((item, itemIndex) => (
-                            <li key={itemIndex}>
-                              <FontAwesomeIcon icon={faCheckCircle} className="check-icon" />
-                              {item}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
+          {/* Contact Section */}
+          <div className="privacy-contact">
+            <div className="contact-card">
+              <div className="contact-header">
+                <FontAwesomeIcon icon={faLock} />
+                <h3>أسئلة أو استفسارات؟</h3>
+              </div>
+              <p>
+                إذا كان لديك أي أسئلة حول هذه السياسة أو ممارساتنا المتعلقة بالبيانات، 
+                لا تتردد في الاتصال بنا.
+              </p>
+              <div className="contact-methods">
+                <div className="contact-method">
+                  <strong>البريد الإلكتروني:</strong> privacy@buildingzuae.com
                 </div>
-              ))}
-
-              {/* Contact Section */}
-              <div className="contact-section animate-on-scroll" id="contact">
-                <div className={`contact-content ${isVisible.contact ? 'fade-in-up' : ''}`}>
-                  <div className="contact-header">
-                    <FontAwesomeIcon icon={faExclamationTriangle} />
-                    <h3>Questions or Concerns?</h3>
-                  </div>
-                  <p>
-                    If you have any questions about this policy or our data practices, 
-                    please don't hesitate to contact us.
-                  </p>
-                  <div className="contact-methods">
-                    <div className="contact-method">
-                      <strong>Email:</strong> privacy@buildinz.com
-                    </div>
-                    <div className="contact-method">
-                      <strong>Phone:</strong> +971 (4) 123-4567
-                    </div>
-                    <div className="contact-method">
-                      <strong>Address:</strong> Dubai, United Arab Emirates
-                    </div>
-                  </div>
-                  <button className="contact-btn">
-                    Contact Privacy Team
-                  </button>
+                <div className="contact-method">
+                  <strong>الهاتف:</strong> +971 XX XXX XXXX
+                </div>
+                <div className="contact-method">
+                  <strong>العنوان:</strong> أبو ظبي، الإمارات العربية المتحدة
                 </div>
               </div>
             </div>
@@ -410,4 +327,4 @@ const PrivacyPage = () => {
   );
 };
 
-export default PrivacyPage; 
+export default PrivacyPage;

@@ -9,7 +9,8 @@ import {
   faTwitter as faTwitterBrand, 
   faInstagram as faInstagramBrand, 
   faLinkedinIn as faLinkedinInBrand, 
-  faWhatsapp as faWhatsappBrand 
+  faWhatsapp as faWhatsappBrand,
+  faTiktok as faTiktokBrand
 } from '@fortawesome/free-brands-svg-icons';
 import './ContactPage.css';
 
@@ -72,7 +73,7 @@ const ContactPage = () => {
                 <FontAwesomeIcon icon={faMapMarkerAlt} />
               </div>
               <h3>العنوان</h3>
-              <p>دبي، الإمارات العربية المتحدة</p>
+              <p>أبو ظبي، الإمارات العربية المتحدة</p>
             </div>
 
             <div className="contact-info-card">
@@ -178,20 +179,14 @@ const ContactPage = () => {
           <div className="contact-social">
             <h3>تابعنا على</h3>
             <div className="social-links">
-              <a href="#" aria-label="Facebook">
+              <a href="https://www.facebook.com/buildingzuae" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
                 <FontAwesomeIcon icon={faFacebookFBrand} />
               </a>
-              <a href="#" aria-label="Twitter">
-                <FontAwesomeIcon icon={faTwitterBrand} />
-              </a>
-              <a href="#" aria-label="Instagram">
+              <a href="https://www.instagram.com/buildingzuae/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
                 <FontAwesomeIcon icon={faInstagramBrand} />
               </a>
-              <a href="#" aria-label="LinkedIn">
-                <FontAwesomeIcon icon={faLinkedinInBrand} />
-              </a>
-              <a href="#" aria-label="WhatsApp">
-                <FontAwesomeIcon icon={faWhatsappBrand} />
+              <a href="https://www.tiktok.com/@buildingzuae" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+                <FontAwesomeIcon icon={faTiktokBrand} />
               </a>
             </div>
           </div>

@@ -433,6 +433,21 @@
   margin: 0;
 }
 
+/* Mobile adjustments for 2x2 grid */
+@media (max-width: 768px) {
+  .noon-feature-icon {
+    font-size: 1.5rem;
+  }
+
+  .noon-feature-text h4 {
+    font-size: 0.85rem;
+  }
+
+  .noon-feature-text p {
+    font-size: 0.75rem;
+  }
+}
+
 /* ===== Services Section ===== */
 .noon-services-section {
   padding: 48px 0 32px;
@@ -1465,14 +1480,14 @@
   }
 
   .noon-features-grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
   }
 
   .noon-feature-item {
-    justify-content: center;
-    text-align: center;
-    flex-direction: column;
+    justify-content: flex-start;
+    text-align: right;
+    flex-direction: row;
   }
 
   .noon-section-header h2 {

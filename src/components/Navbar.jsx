@@ -11,6 +11,7 @@ import {
   faHeart
 } from '@fortawesome/free-solid-svg-icons';
 import SearchModal from './SearchModal';
+import authService from '../services/authService';
 
 const Navbar = () => {
   const location = useLocation();
@@ -47,6 +48,7 @@ const Navbar = () => {
             <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>الرئيسية</Link>
             <Link to="/services" className={`nav-link ${location.pathname === '/services' || location.pathname.includes('/services2') ? 'active' : ''}`}>الخدمات</Link>
             <Link to="/products" className={`nav-link ${location.pathname.includes('/products') ? 'active' : ''}`}>المتجر</Link>
+            <Link to="/track-order" className={`nav-link ${location.pathname.includes('/track-order') ? 'active' : ''}`}>تتبع الطلب</Link>
             <Link to="/about" className={`nav-link ${location.pathname.includes('/about') ? 'active' : ''}`}>من نحن</Link>
           </nav>
 
@@ -60,7 +62,10 @@ const Navbar = () => {
             <Link to="/cart" className="action-button">
               <FontAwesomeIcon icon={faShoppingBag} />
             </Link>
-            <Link to="/login" className="action-button profile-button">
+            <Link 
+              to={authService.isAuthenticated() ? "/profile" : "/login"} 
+              className="action-button profile-button"
+            >
               <FontAwesomeIcon icon={faUser} />
             </Link>
             <button 
@@ -100,6 +105,7 @@ const Navbar = () => {
               <Link to="/" className="mobile-nav-link">الرئيسية</Link>
               <Link to="/services" className="mobile-nav-link">الخدمات</Link>
               <Link to="/products" className="mobile-nav-link">المتجر</Link>
+              <Link to="/track-order" className="mobile-nav-link">تتبع الطلب</Link>
               <Link to="/about" className="mobile-nav-link">من نحن</Link>
               <Link to="/favorites" className="mobile-nav-link">المفضلة</Link>
             </nav>

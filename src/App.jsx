@@ -29,6 +29,8 @@ import PaymentSuccessPage from './pages/Payment/PaymentSuccessPage';
 import PaymentFailurePage from './pages/Payment/PaymentFailurePage';
 import NotificationsPage from './pages/Notifications/NotificationsPage';
 import FavoritesPage from './pages/Favorites/FavoritesPage';
+import BookingOrderDetailPage from './pages/BookingOrder/BookingOrderDetailPage';
+import TrackOrderPage from './pages/BookingOrder/TrackOrderPage';
 
 // Components
 import Navbar from './components/Navbar';
@@ -74,6 +76,8 @@ function App() {
             <Route path="/search" element={<SearchPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/favorites" element={<FavoritesPage />} />
+            <Route path="/track-order" element={<TrackOrderPage />} />
+            <Route path="/booking-order" element={<BookingOrderDetailPage />} />
           </Routes>
           <FloatingCart />
         </div>

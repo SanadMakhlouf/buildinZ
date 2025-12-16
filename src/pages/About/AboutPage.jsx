@@ -3,10 +3,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faBuilding, faUsers, faHandshake, faLightbulb, 
   faStar, faTrophy, faChartLine, faGlobe, faCheck,
-  faPaintRoller, faWindowMaximize, faDoorOpen,
-  faHome, faKitchenSet, faCog, faCamera, faShieldAlt,
-  faClipboardCheck, faFileContract, faCalculator, faCheckCircle,
-  faEnvelope, faLayerGroup
+  faShieldAlt, faAward, faHeart, faRocket, faBullseye,
+  faEnvelope
 } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 import './AboutPage.css';
@@ -15,9 +13,9 @@ const AboutPage = () => {
   const [animateSection, setAnimateSection] = useState({
     hero: false,
     about: false,
-    services: false,
-    consultant: false,
-    thirdParty: false
+    values: false,
+    mission: false,
+    cta: false
   });
 
   useEffect(() => {
@@ -44,104 +42,34 @@ const AboutPage = () => {
     return () => observer.disconnect();
   }, []);
 
-  const services = [
+  const values = [
     {
-      icon: faPaintRoller,
-      titleAr: 'الأصباغ',
-      titleEn: 'Painting Services',
-      descAr: 'خدمات دهانات داخلية وخارجية بجودة عالية، مع اختيار ألوان وخامات تناسب التصميم، وتنفيذ احترافي يضمن ثبات اللون ومظهر فاخر.',
-      descEn: 'High-quality interior and exterior painting, with color and material selection to match the design, and professional execution ensuring long-lasting color and a luxurious finish.'
+      icon: faShieldAlt,
+      title: 'الجودة والموثوقية',
+      description: 'نلتزم بأعلى معايير الجودة في جميع خدماتنا، ونضمن لك نتائج متميزة تدوم طويلاً.'
     },
     {
-      icon: faLayerGroup,
-      titleAr: 'الستائر',
-      titleEn: 'Curtains',
-      descAr: 'خدمة تصميم وتركيب جميع أنواع الستائر مع توفر كل المستلزمات، تركيب دقيق وانسيابي يتناسب مع ديكور المكان.',
-      descEn: 'Design and installation of all types of curtains, with all necessary materials available, ensuring precise and smooth fitting that complements the decor.'
+      icon: faHandshake,
+      title: 'الشفافية والثقة',
+      description: 'نؤمن بالشفافية الكاملة في التعامل مع عملائنا، مع تقديم معلومات واضحة ودقيقة عن كل خطوة.'
     },
     {
-      icon: faDoorOpen,
-      titleAr: 'الأبواب',
-      titleEn: 'Doors',
-      descAr: 'نقدّم مجموعة من الأبواب الداخلية والخارجية بتصاميم عصرية وفاخرة، تجمع بين المتانة والجمال، وتُنفّذ بدقة عالية لتضفي لمسة من الأناقة والخصوصية على كل مساحة في الفيلا.',
-      descEn: 'We offer modern and luxurious interior and exterior doors, combining durability and beauty, with precise installation that adds elegance and privacy to every space.'
+      icon: faUsers,
+      title: 'خدمة العملاء المتميزة',
+      description: 'فريقنا متاح دائماً لمساعدتك، ونقدم دعمًا مستمرًا لضمان رضاك التام عن خدماتنا.'
     },
     {
-      icon: faWindowMaximize,
-      titleAr: 'النوافذ',
-      titleEn: 'Windows',
-      descAr: 'نوفر نوافذ عالية الجودة بتصاميم أنيقة، مع عزل ممتاز للصوت والحرارة، وخيارات متعددة من المواد والتشطيبات لإضاءة طبيعية وإطلالة راقية.',
-      descEn: 'We provide high-quality windows with elegant designs, excellent sound and heat insulation, and various materials and finishes, offering natural light and a premium view.'
-    },
-    {
-      icon: faHome,
-      titleAr: 'البراغولا والمظلات',
-      titleEn: 'Pergolas & Shades',
-      descAr: 'تصميم وتنفيذ براغولا ومظلات فاخرة تجمع بين الجمال والمتانة، لتوفير جلسات خارجية أنيقة ومريحة طوال العام.',
-      descEn: 'Design and installation of elegant, durable pergolas and shades for stylish and comfortable outdoor spaces all year round.'
-    },
-    {
-      icon: faKitchenSet,
-      titleAr: 'المطابخ',
-      titleEn: 'Kitchens',
-      descAr: 'نصمم مطابخ عصرية تجمع بين الأناقة والوظيفة، بخامات فاخرة وتشطيبات دقيقة تعكس ذوقك وتمنحك تجربة مريحة كل يوم.',
-      descEn: 'We design modern kitchens that combine elegance and functionality, using premium materials and fine finishes to reflect your style and provide a comfortable daily experience.'
-    },
-    {
-      icon: faCog,
-      titleAr: 'المنزل الذكي',
-      titleEn: 'Smart Home',
-      descAr: 'نوفّر أنظمة منزل ذكي للتحكم في الإضاءة، التكييف، الستائر، والأمان بسهولة عبر الهاتف أو الأوامر الصوتية، لتعيش راحة وأمان بتقنيات عصرية.',
-      descEn: 'We provide smart home systems to control lighting, AC, curtains, and security through your phone or voice commands — offering modern comfort and safety.'
-    },
-    {
-      icon: faCamera,
-      titleAr: 'كاميرات وإنترنت',
-      titleEn: 'Cameras & Internet',
-      descAr: 'نقدّم أنظمة مراقبة وشبكات إنترنت متكاملة بتقنيات حديثة لأمان عالي واتصال مستقر في كل أنحاء الفيلا، مع تركيب احترافي وتصميم يناسب احتياجاتك اليومية.',
-      descEn: 'We provide integrated surveillance and internet systems with modern technology, ensuring high security and stable connectivity throughout the villa, with professional installation and design tailored to your daily needs.'
+      icon: faRocket,
+      title: 'الابتكار والتطوير',
+      description: 'نواكب أحدث التقنيات والاتجاهات في المجال لنقدم لك حلولاً مبتكرة وعصرية.'
     }
   ];
 
-  const thirdPartyServices = [
-    {
-      icon: faClipboardCheck,
-      titleAr: 'التقييم والمراجعة كطرف ثالث',
-      titleEn: 'Evaluation and Review as a Third Party',
-      descAr: 'نوفر خدمات تقييم ومراجعة محايدة كمستشار مستقل، لضمان التزام المشاريع بالمواصفات والمعايير المعتمدة، مع التحقق من جودة التنفيذ في جميع مراحله.',
-      descEn: 'We provide neutral evaluation and review services as an independent consultant to ensure that projects comply with approved specifications and standards, while verifying the quality of execution at every stage.',
-      features: [
-        'مراجعة دقيقة ومحايدة للمشاريع',
-        'ضمان الالتزام بالمواصفات والمعايير',
-        'التأكد من جودة التنفيذ في كل التفاصيل'
-      ]
-    },
-    {
-      icon: faFileContract,
-      titleAr: 'مراجعة العقود والمخططات',
-      titleEn: 'Contract and Drawing Review',
-      descAr: 'نساعد عملاءنا في فحص ومراجعة العقود الهندسية والمخططات التنفيذية بدقة عالية، لضمان الشفافية الكاملة وتفادي أي ثغرات تعاقدية قد تؤثر على سير المشروع أو جودة تنفيذه.',
-      descEn: 'We assist our clients in thoroughly examining and reviewing engineering contracts and execution drawings to ensure full transparency and avoid any contractual gaps that could affect the project\'s progress or execution quality.',
-      features: [
-        'تدقيق شامل للعقود والمستندات الهندسية',
-        'ضمان وضوح البنود وحماية حقوق العميل',
-        'تقليل المخاطر المحتملة أثناء التنفيذ'
-      ]
-    },
-    {
-      icon: faCalculator,
-      titleAr: 'تحليل وتدقيق جداول الكميات',
-      titleEn: 'Bill of Quantities Analysis and Audit',
-      descAr: 'نراجع جداول الكميات بدقة للتأكد من صحة الحسابات ومطابقتها للمخططات، لضبط التكاليف وتقليل الهدر.',
-      descEn: 'We accurately review BOQs to ensure correct calculations and alignment with drawings, helping control costs and reduce waste.'
-    },
-    {
-      icon: faCheckCircle,
-      titleAr: 'إعداد السناك ليست',
-      titleEn: 'Snag List Preparation',
-      descAr: 'نقوم بإعداد تقارير مفصلة بالملاحظات والعيوب النهائية قبل استلام المشروع، بناءً على زيارة ميدانية من المهندسين المختصين لضمان تسليم الأعمال خالية من العيوب.',
-      descEn: 'We prepare detailed reports of final observations and defects before project handover, based on on-site visits by specialized engineers, ensuring the work is delivered defect-free.'
-    }
+  const stats = [
+    { number: '500+', label: 'مشروع منجز' },
+    { number: '1000+', label: 'عميل راضٍ' },
+    { number: '50+', label: 'فني محترف' },
+    { number: '5+', label: 'سنوات خبرة' }
   ];
 
   return (
@@ -150,7 +78,8 @@ const AboutPage = () => {
       <section className={`about-hero ${animateSection.hero ? 'animate' : ''}`}>
         <div className="about-hero-overlay"></div>
         <div className="about-container">
-          <h1 className="about-hero-title-ar">مـــــــــــــــن نــــــــــــــــــحن</h1>
+          <h1 className="about-hero-title">من نحن</h1>
+          <p className="about-hero-subtitle">شركة BuildingZ - شريكك الموثوق في البناء والتشطيب</p>
         </div>
       </section>
 
@@ -158,113 +87,105 @@ const AboutPage = () => {
       <section id="about" className={`about-section about-content ${animateSection.about ? 'animate' : ''}`}>
         <div className="about-container">
           <div className="about-content-wrapper">
-            <div className="about-text-ar">
-              <h2>BuildingZ شركة رائدة تقدم حلولاً مبتكرة في مجال البناء والخدمات الهندسية</h2>
+            <div className="about-text">
+              <h2>نبذة عن BuildingZ</h2>
               <p>
-                نحن نسعى لتقديم أعلى مستويات الجودة والشفافية لعملائنا، مع التركيز على تقديم كل ما يحتاجه العميل في مكان واحد دون الحاجة للبحث بين مقدمي خدمات مختلفين.
+                BuildingZ هي شركة رائدة متخصصة في تقديم حلول شاملة في مجال البناء والتشطيب والخدمات الهندسية في دولة الإمارات العربية المتحدة. نحن نقدم مجموعة واسعة من الخدمات التي تغطي جميع احتياجاتك من التصميم إلى التنفيذ والتشطيب النهائي.
               </p>
-              <p className="about-tagline">بضغطة زر بيتك يتشطب</p>
+              <p>
+                نسعى جاهدين لتقديم أعلى مستويات الجودة والشفافية لعملائنا، مع التركيز على توفير كل ما يحتاجه العميل في مكان واحد دون الحاجة للبحث بين مقدمي خدمات مختلفين. هدفنا هو تبسيط عملية البناء والتشطيب وجعلها تجربة سلسة ومريحة.
+              </p>
+              <p className="about-tagline">
+                <FontAwesomeIcon icon={faLightbulb} /> بضغطة زر بيتك يتشطب
+              </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Our Services Section */}
-      <section id="services" className={`about-section about-services ${animateSection.services ? 'animate' : ''}`}>
+      {/* Stats Section */}
+      <section className="about-stats">
+        <div className="about-container">
+          <div className="stats-grid">
+            {stats.map((stat, index) => (
+              <div className="stat-card" key={index}>
+                <div className="stat-number">{stat.number}</div>
+                <div className="stat-label">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Values Section */}
+      <section id="values" className={`about-section about-values ${animateSection.values ? 'animate' : ''}`}>
         <div className="about-container">
           <div className="section-header">
-            <h2 className="section-title-ar">خـــــــــدمـــــــــاتـــــــنــــــا</h2>
+            <h2 className="section-title">قيمنا ومبادئنا</h2>
+            <p className="section-subtitle">ما يميزنا ويجعلنا الخيار الأمثل لك</p>
           </div>
           
-          <div className="services-grid">
-            {services.map((service, index) => (
-              <div className="service-card" key={index}>
-                <div className="service-icon">
-                  <FontAwesomeIcon icon={service.icon} />
+          <div className="values-grid">
+            {values.map((value, index) => (
+              <div className="value-card" key={index}>
+                <div className="value-icon">
+                  <FontAwesomeIcon icon={value.icon} />
                 </div>
-                <h3 className="service-title-ar">{service.titleAr}</h3>
-                <p className="service-desc-ar">{service.descAr}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="services-cta">
-            <p className="cta-text-ar">يمكنك الحصول على كل هذه الخدمات بسهولة من خلال موقع</p>
-            <a href="https://buildingzuae.com" className="cta-link">BUILDINGZUAE.COM</a>
-          </div>
-        </div>
-      </section>
-
-      {/* Third Party Consultant Section */}
-      <section id="consultant" className={`about-section about-consultant ${animateSection.consultant ? 'animate' : ''}`}>
-        <div className="about-container">
-          <div className="section-header">
-            <h2 className="section-title-ar">الاستشاري الطرف الثالث</h2>
-          </div>
-
-          <div className="consultant-services-grid">
-            {thirdPartyServices.map((service, index) => (
-              <div className="consultant-card" key={index}>
-                <div className="consultant-icon">
-                  <FontAwesomeIcon icon={service.icon} />
-                </div>
-                <h3 className="consultant-title-ar">{service.titleAr}</h3>
-                <p className="consultant-desc-ar">{service.descAr}</p>
-                {service.features && (
-                  <div className="consultant-features">
-                    <h4>مميزات الخدمة:</h4>
-                    <ul>
-                      {service.features.map((feature, idx) => (
-                        <li key={idx}>{feature}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                <h3 className="value-title">{value.title}</h3>
+                <p className="value-description">{value.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Additional Services */}
-      <section id="additional" className={`about-section about-additional ${animateSection.thirdParty ? 'animate' : ''}`}>
+      {/* Mission Section */}
+      <section id="mission" className={`about-section about-mission ${animateSection.mission ? 'animate' : ''}`}>
         <div className="about-container">
-          <div className="additional-services">
-            <div className="additional-service-item">
-              <h3 className="service-title-ar">تغيير الاستخدام من سكني إلى تجاري</h3>
-              <p className="service-desc-ar">نُعد الدراسات الفنية والمعمارية اللازمة لتغيير نشاط العقار من سكني إلى تجاري، مع تقديم الدعم الفني في الإجراءات النظامية.</p>
-            </div>
-            <div className="additional-service-item">
-              <h3 className="service-title-ar">تقنين المباني المخالفة</h3>
-              <p className="service-desc-ar">نساعد في دراسة وتقديم الحلول لتقنين أوضاع المباني المخالفة بالتنسيق مع الجهات المختصة، وفق الأنظمة واللوائح المعمول بها. في أبو ظبي والعين</p>
+          <div className="mission-content">
+            <div className="mission-text">
+              <h2>رؤيتنا ورسالتنا</h2>
+              <div className="mission-item">
+                <FontAwesomeIcon icon={faRocket} className="mission-icon" />
+                <div>
+                  <h3>رؤيتنا</h3>
+                  <p>أن نكون الشركة الرائدة في مجال البناء والتشطيب في دولة الإمارات، من خلال تقديم حلول مبتكرة وخدمات متميزة تلبي جميع احتياجات عملائنا.</p>
+                </div>
+              </div>
+              <div className="mission-item">
+                <FontAwesomeIcon icon={faBullseye} className="mission-icon" />
+                <div>
+                  <h3>رسالتنا</h3>
+                  <p>تقديم خدمات بناء وتشطيب عالية الجودة بأسعار عادلة، مع ضمان الشفافية الكاملة والالتزام بالمواعيد. نهدف إلى جعل عملية البناء والتشطيب تجربة سهلة ومريحة لعملائنا من خلال توفير جميع الخدمات في مكان واحد.</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="about-cta">
+      <section className={`about-cta ${animateSection.cta ? 'animate' : ''}`}>
         <div className="about-container">
-          <h2>كل هذه الخدمات في تطبيق واحد</h2>
-          <div className="app-badges">
-            <div className="app-badge">
-              <h3>BUILDINGZ</h3>
-            </div>
+          <h2>ابدأ مشروعك معنا اليوم</h2>
+          <p className="cta-text">نقدم لك جميع الخدمات التي تحتاجها في مكان واحد</p>
+          <div className="about-cta-buttons">
+            <Link to="/services2/categories" className="about-btn about-btn-primary">
+              استكشف خدماتنا
+            </Link>
+            <Link to="/contact" className="about-btn about-btn-secondary">
+              تواصل معنا
+            </Link>
           </div>
-          <p className="cta-text-ar">نقدّم دعمًا ضمان رضاك واستمرارية جودة كل الخدمات المقدمة.</p>
           <div className="contact-info">
-            <a href="https://instagram.com/buildingzuae" className="contact-link">
+            <a href="https://www.instagram.com/buildingzuae/" target="_blank" rel="noopener noreferrer" className="contact-link">
               <FontAwesomeIcon icon={faGlobe} />
-              @BUILDINGZUAE
+              @buildingzuae
             </a>
             <a href="mailto:info@buildingzuae.com" className="contact-link">
               <FontAwesomeIcon icon={faEnvelope} />
-              INFO@BUILDINGZUAE.COM
+              info@buildingzuae.com
             </a>
-          </div>
-          <div className="about-cta-buttons">
-            <Link to="/services2/categories" className="about-btn about-btn-primary">استكشف خدماتنا</Link>
-            <Link to="/services" className="about-btn about-btn-secondary">تصفح الفئات</Link>
           </div>
         </div>
       </section>

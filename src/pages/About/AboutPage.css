@@ -18,7 +18,7 @@
 .about-hero {
   position: relative;
   min-height: 500px;
-  background: linear-gradient(rgba(10, 50, 89, 0.85), rgba(10, 50, 89, 0.9));
+  background: linear-gradient(135deg, #0A3259 0%, #1a4d80 100%);
   color: #fff;
   display: flex;
   align-items: center;
@@ -49,18 +49,23 @@
   width: 100%;
 }
 
-.about-hero-title-ar {
+.about-hero-title {
   font-size: 4rem;
   margin-bottom: 1rem;
   font-weight: 700;
-  letter-spacing: 0.3rem;
   color: #DAA520;
 }
 
+.about-hero-subtitle {
+  font-size: 1.5rem;
+  opacity: 0.95;
+  font-weight: 400;
+}
 
 /* About Content Section */
 .about-content {
   background-color: #fff;
+  padding: 5rem 0;
 }
 
 .about-content-wrapper {
@@ -68,31 +73,74 @@
   margin: 0 auto;
 }
 
-.about-text-ar {
+.about-text {
   padding: 2rem;
 }
 
-.about-text-ar h2 {
-  font-size: 1.8rem;
+.about-text h2 {
+  font-size: 2rem;
   color: #0A3259;
   margin-bottom: 1.5rem;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.4;
 }
 
-.about-text-ar p {
+.about-text p {
   font-size: 1.1rem;
   line-height: 1.8;
   color: #555;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .about-tagline {
   font-size: 1.5rem;
   font-weight: 600;
   color: #DAA520;
-  margin-top: 1.5rem;
+  margin-top: 2rem;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* Stats Section */
+.about-stats {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 4rem 0;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+}
+
+.stat-number {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #0A3259;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 1.1rem;
+  color: #666;
+  font-weight: 500;
 }
 
 /* Section Header */
@@ -101,208 +149,131 @@
   margin-bottom: 4rem;
 }
 
-.section-title-ar {
-  font-size: 3rem;
+.section-title {
+  font-size: 2.5rem;
   color: #0A3259;
   margin-bottom: 0.5rem;
   font-weight: 700;
-  letter-spacing: 0.2rem;
 }
 
-
-/* Services Section */
-.about-services {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+.section-subtitle {
+  font-size: 1.2rem;
+  color: #666;
 }
 
-.services-grid {
+/* Values Section */
+.about-values {
+  background-color: #fff;
+  padding: 5rem 0;
+}
+
+.values-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 2rem;
-  margin-bottom: 4rem;
 }
 
-.service-card {
+.value-card {
   background: white;
   border-radius: 16px;
-  padding: 2rem;
+  padding: 2.5rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
   border: 1px solid rgba(0, 0, 0, 0.05);
-  margin-bottom: 12px;
+  text-align: center;
 }
 
-.service-card:hover {
+.value-card:hover {
   transform: translateY(-8px);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
   border-color: rgba(218, 165, 32, 0.3);
 }
 
-.service-icon {
-  width: 70px;
-  height: 70px;
+.value-icon {
+  width: 80px;
+  height: 80px;
   background: linear-gradient(135deg, #0A3259, #1a5fa2);
-  border-radius: 12px;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   font-size: 2rem;
-  margin-bottom: 1.5rem;
+  margin: 0 auto 1.5rem;
 }
 
-.service-title-ar {
+.value-title {
   font-size: 1.5rem;
   color: #0A3259;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
   font-weight: 600;
 }
 
-.service-desc-ar {
-  font-size: 0.95rem;
+.value-description {
+  font-size: 1rem;
   line-height: 1.7;
   color: #555;
-  margin-bottom: 0.8rem;
 }
 
-.services-cta {
-  text-align: center;
-  padding: 3rem;
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  margin-top: 3rem;
+/* Mission Section */
+.about-mission {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 5rem 0;
 }
 
-.cta-text-ar {
-  font-size: 1.2rem;
-  color: #333;
-  margin-bottom: 0.5rem;
+.mission-content {
+  max-width: 900px;
+  margin: 0 auto;
 }
 
-.cta-link {
-  display: inline-block;
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: #DAA520;
-  text-decoration: none;
-  margin-top: 1rem;
-  transition: color 0.3s ease;
-}
-
-.cta-link:hover {
+.mission-text h2 {
+  font-size: 2.5rem;
   color: #0A3259;
+  margin-bottom: 3rem;
+  text-align: center;
+  font-weight: 700;
 }
 
-/* Consultant Section */
-.about-consultant {
-  background-color: #fff;
-}
-
-.consultant-services-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 2.5rem;
-}
-
-.consultant-card {
-  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-  border-radius: 16px;
+.mission-item {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 3rem;
+  background: white;
   padding: 2.5rem;
+  border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 2px solid rgba(10, 50, 89, 0.1);
   transition: all 0.3s ease;
 }
 
-.consultant-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
-  border-color: rgba(218, 165, 32, 0.4);
+.mission-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
 }
 
-.consultant-icon {
+.mission-icon {
+  font-size: 3rem;
+  color: #DAA520;
+  flex-shrink: 0;
   width: 80px;
   height: 80px;
-  background: linear-gradient(135deg, #DAA520, #e6c478);
-  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  font-size: 2.5rem;
-  margin-bottom: 1.5rem;
+  background: rgba(218, 165, 32, 0.1);
+  border-radius: 16px;
 }
 
-.consultant-title-ar {
-  font-size: 1.6rem;
+.mission-item h3 {
+  font-size: 1.8rem;
   color: #0A3259;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
   font-weight: 600;
 }
 
-.consultant-desc-ar {
-  font-size: 1rem;
+.mission-item p {
+  font-size: 1.1rem;
   line-height: 1.8;
   color: #555;
-  margin-bottom: 1rem;
-}
-
-.consultant-features {
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 2px solid rgba(218, 165, 32, 0.2);
-}
-
-.consultant-features h4 {
-  font-size: 1.1rem;
-  color: #0A3259;
-  margin-bottom: 1rem;
-  font-weight: 600;
-}
-
-.consultant-features ul {
-  list-style: none;
-  padding: 0;
-}
-
-.consultant-features li {
-  padding: 0.5rem 0;
-  padding-right: 1.5rem;
-  position: relative;
-  color: #555;
-  font-size: 0.95rem;
-}
-
-.consultant-features li::before {
-  content: '✓';
-  position: absolute;
-  right: 0;
-  color: #DAA520;
-  font-weight: bold;
-}
-
-/* Additional Services Section */
-.about-additional {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-}
-
-.additional-services {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 2.5rem;
-}
-
-.additional-service-item {
-  background: white;
-  border-radius: 16px;
-  padding: 2.5rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
-}
-
-.additional-service-item:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
 }
 
 /* CTA Section */
@@ -311,33 +282,26 @@
   color: #fff;
   text-align: center;
   padding: 5rem 0;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.about-cta.animate {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .about-cta h2 {
   font-size: 2.5rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.cta-text {
+  font-size: 1.2rem;
+  opacity: 0.95;
   margin-bottom: 2rem;
-  font-weight: 700;
-}
-
-.app-badges {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin: 2rem 0;
-}
-
-.app-badge {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 1.5rem 3rem;
-  border-radius: 12px;
-  backdrop-filter: blur(10px);
-}
-
-.app-badge h3 {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #DAA520;
-  margin: 0;
 }
 
 .contact-info {
@@ -409,7 +373,6 @@
 
 /* Section Styles */
 .about-section {
-  padding: 5rem 0;
   opacity: 0;
   transform: translateY(30px);
   transition: opacity 0.8s ease, transform 0.8s ease;
@@ -426,10 +389,9 @@
     max-width: 90%;
   }
   
-  .about-hero-title-ar {
+  .about-hero-title {
     font-size: 3rem;
   }
-  
 }
 
 @media (max-width: 992px) {
@@ -437,22 +399,22 @@
     max-width: 100%;
   }
   
-  .services-grid {
+  .values-grid {
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   }
   
-  .consultant-services-grid {
-    grid-template-columns: 1fr;
+  .section-title {
+    font-size: 2rem;
   }
   
-  .additional-services {
-    grid-template-columns: 1fr;
+  .mission-item {
+    flex-direction: column;
+    text-align: center;
   }
   
-  .section-title-ar {
-    font-size: 2.5rem;
+  .mission-icon {
+    margin: 0 auto;
   }
-  
 }
 
 @media (max-width: 768px) {
@@ -464,32 +426,28 @@
     min-height: 400px;
   }
   
-  .about-hero-title-ar {
+  .about-hero-title {
     font-size: 2.5rem;
   }
   
-  .about-hero-title-en {
-    font-size: 1.5rem;
-  }
-  
-  .section-title-ar {
-    font-size: 2rem;
-  }
-  
-  .section-title-en {
+  .about-hero-subtitle {
     font-size: 1.2rem;
   }
   
-  .services-grid {
+  .section-title {
+    font-size: 1.8rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .values-grid {
     grid-template-columns: 1fr;
   }
   
   .about-cta h2 {
     font-size: 2rem;
-  }
-  
-  .cta-en {
-    font-size: 1.2rem;
   }
   
   .about-cta-buttons {
@@ -506,27 +464,32 @@
 }
 
 @media (max-width: 576px) {
-  .about-hero-title-ar {
+  .about-hero-title {
     font-size: 2rem;
-    letter-spacing: 0.1rem;
   }
   
-  .about-hero-title-en {
-    font-size: 1.2rem;
-    letter-spacing: 0.2rem;
+  .about-hero-subtitle {
+    font-size: 1rem;
   }
   
-  .section-title-ar {
-    font-size: 1.8rem;
+  .section-title {
+    font-size: 1.5rem;
   }
   
   .about-section {
     padding: 3rem 0;
   }
   
-  .service-card,
-  .consultant-card,
-  .additional-service-item {
+  .value-card,
+  .mission-item {
     padding: 1.5rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .stat-number {
+    font-size: 2.5rem;
   }
 }

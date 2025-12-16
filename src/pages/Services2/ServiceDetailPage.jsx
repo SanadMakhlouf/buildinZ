@@ -23,6 +23,8 @@ import {
   faTimes
 } from '@fortawesome/free-solid-svg-icons';
 import serviceBuilderService from '../../services/serviceBuilderService';
+import authService from '../../services/authService';
+import config from '../../config/apiConfig';
 import './ServiceDetailPage.css';
 
 const ServiceDetailPage = () => {
@@ -61,7 +63,8 @@ const ServiceDetailPage = () => {
     phone: '',
     email: '',
     emirate: '',
-    notes: ''
+    notes: '',
+    preferredDate: ''
   });
   const [submitting, setSubmitting] = useState(false);
   const [bookingError, setBookingError] = useState(null);
@@ -92,6 +95,50 @@ const ServiceDetailPage = () => {
   useEffect(() => {
     fetchServiceDetails();
   }, [fetchServiceDetails]);
+
+  // Prefill customer info if user is logged in
+  useEffect(() => {
+    if (authService.isAuthenticated()) {
+      const user = authService.getCurrentUser();
+      if (user) {
+        setCustomerInfo(prev => ({
+          ...prev,
+          name: user.name || prev.name,
+          email: user.email || prev.email,
+          phone: user.phone || prev.phone // Phone might not be in localStorage user object
+        }));
+      }
+      
+      // Try to fetch full profile to get phone number
+      // We'll do this async so it doesn't block the initial render
+      const fetchUserProfile = async () => {
+        try {
+          const response = await fetch(`${config.API_BASE_URL}/user`, {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`,
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            const userData = data.data?.user || data;
+            if (userData.phone) {
+              setCustomerInfo(prev => ({
+                ...prev,
+                phone: userData.phone
+              }));
+            }
+          }
+        } catch (error) {
+          // Silently fail - phone number is optional to prefill
+          console.debug('Could not fetch user profile for phone number:', error);
+        }
+      };
+      
+      fetchUserProfile();
+    }
+  }, []);
 
   // Initialize field values based on field types
   const initializeFieldValues = (fields) => {
@@ -306,8 +353,8 @@ const ServiceDetailPage = () => {
 
   // Submit order
   const handleSubmitOrder = async () => {
-    if (!customerInfo.name || !customerInfo.phone || !customerInfo.emirate) {
-      setBookingError('يرجى ملء جميع الحقول المطلوبة (الاسم، الهاتف، الإمارة)');
+    if (!customerInfo.name || !customerInfo.phone || !customerInfo.emirate || !customerInfo.preferredDate) {
+      setBookingError('يرجى ملء جميع الحقول المطلوبة (الاسم، الهاتف، الإمارة، التاريخ المفضل)');
       return;
     }
 
@@ -364,6 +411,7 @@ const ServiceDetailPage = () => {
         formData.append('customer_email', customerInfo.email || 'optional+email+notselected@buildingz.ae');
         formData.append('customer_phone', customerInfo.phone);
         formData.append('emirate', customerInfo.emirate);
+        formData.append('preferred_date', customerInfo.preferredDate);
         formData.append('payment_method', paymentMethod);
         
         if (customerInfo.notes) {
@@ -414,6 +462,7 @@ const ServiceDetailPage = () => {
           customer_email: customerInfo.email || 'optional+email+notselected@buildingz.ae',
           customer_phone: customerInfo.phone,
           emirate: customerInfo.emirate,
+          preferred_date: customerInfo.preferredDate,
           field_values: formattedFieldValues,
           products: selectedProducts,
           notes: customerInfo.notes || undefined,
@@ -612,11 +661,6 @@ const ServiceDetailPage = () => {
                   )}
                   <div className="option-content">
                     <h4 className="option-label">{option.label}</h4>
-                    {option.price_modifier !== 0 && (
-                      <span className="option-price">
-                        {option.price_modifier > 0 ? '+' : ''}{option.price_modifier} درهم
-                      </span>
-                    )}
                   </div>
                   <div className="option-check">
                     {value === option.id && <FontAwesomeIcon icon={faCheck} />}
@@ -640,7 +684,6 @@ const ServiceDetailPage = () => {
               {field.options?.map(option => (
                 <option key={option.id} value={option.id}>
                   {option.label}
-                  {option.price_modifier !== 0 && ` (${option.price_modifier > 0 ? '+' : ''}${option.price_modifier} درهم)`}
                 </option>
               ))}
             </select>
@@ -695,11 +738,6 @@ const ServiceDetailPage = () => {
                   )}
                   <div className="option-content">
                     <h4 className="option-label">{option.label}</h4>
-                    {option.price_modifier !== 0 && (
-                      <span className="option-price">
-                        {option.price_modifier > 0 ? '+' : ''}{option.price_modifier} درهم
-                      </span>
-                    )}
                   </div>
                   <div className="option-check">
                     {isSelected && <FontAwesomeIcon icon={faCheck} />}
@@ -992,9 +1030,6 @@ const ServiceDetailPage = () => {
                         <div className="product-info">
                               <h4>{product.name}</h4>
                           {product.description && <p>{product.description}</p>}
-                          {product.price && parseFloat(product.price) > 0 && (
-                            <div className="product-price">{product.price} درهم</div>
-                          )}
                             </div>
                         
                             <div className="product-actions">
@@ -1056,14 +1091,9 @@ const ServiceDetailPage = () => {
                     <FontAwesomeIcon icon={faSpinner} spin />
                     جاري الحساب...
                   </>
-                ) : service?.requires_pricing === false ? (
-                  <>
-                    احجز الآن
-                    <FontAwesomeIcon icon={faArrowLeft} />
-                  </>
                 ) : (
                   <>
-                    احسب السعر واحجز
+                    احجز الآن
                     <FontAwesomeIcon icon={faArrowLeft} />
                   </>
                 )}
@@ -1115,43 +1145,24 @@ const ServiceDetailPage = () => {
                     <strong className="summary-value">{service?.name}</strong>
                   </div>
 
-                  {calculation?.field_adjustments > 0 && (
-                    <div className="summary-item">
-                      <span className="summary-label">إضافات الخيارات:</span>
-                      <strong className="summary-value text-primary">+{calculation.field_adjustments} درهم</strong>
-                    </div>
-                  )}
-
                   {selectedProducts.length > 0 && (
                     <div className="summary-products">
-                      <span className="summary-label">المنتجات:</span>
+                      <span className="summary-label">المنتجات المختارة:</span>
                       {selectedProducts.map(sp => {
                         const product = service?.products?.find(p => p.id === sp.product_id);
                         return product ? (
                           <div key={sp.product_id} className="summary-product-item">
                             <span>{product.name} × {sp.quantity}</span>
-                            {product.price && parseFloat(product.price) > 0 && (
-                              <strong>{product.price * sp.quantity} درهم</strong>
-                            )}
                           </div>
                         ) : null;
                       })}
                     </div>
                   )}
 
-                  {calculation && (
-                    <div className="summary-total-simple">
-                      <span>الإجمالي</span>
-                      <strong>{calculation.total || calculation.total_price || 0} درهم</strong>
-                    </div>
-                  )}
-                  
-                  {!calculation && service?.requires_pricing === false && (
                     <div className="summary-total-simple">
                       <span>الخدمة متاحة</span>
                       <strong>سيتم الاتصال بك</strong>
                     </div>
-                  )}
                 </div>
 
                 <button className="btn btn-primary btn-lg" onClick={() => setBookingStep('details')}>
@@ -1229,6 +1240,26 @@ const ServiceDetailPage = () => {
                   </div>
 
                   <div className="form-group full-width">
+                    <label>التاريخ المفضل للخدمة <span className="required">*</span></label>
+                    <input
+                      type="date"
+                      className="form-input"
+                      value={customerInfo.preferredDate}
+                      onChange={(e) => setCustomerInfo(prev => ({ ...prev, preferredDate: e.target.value }))}
+                      min={new Date().toISOString().split('T')[0]}
+                      required
+                      style={{ 
+                        padding: '12px',
+                        fontSize: '16px',
+                        border: '1px solid #ddd',
+                        borderRadius: '8px',
+                        width: '100%',
+                        fontFamily: 'inherit'
+                      }}
+                    />
+                  </div>
+
+                  <div className="form-group full-width">
                     <label>ملاحظات إضافية <span className="optional">(اختياري)</span></label>
                     <textarea
                       className="form-textarea"
@@ -1249,7 +1280,7 @@ const ServiceDetailPage = () => {
                   <button 
                     className="btn btn-primary btn-lg"
                     onClick={handleSubmitOrder}
-                    disabled={!customerInfo.name || !customerInfo.phone || !customerInfo.emirate || submitting}
+                    disabled={!customerInfo.name || !customerInfo.phone || !customerInfo.emirate || !customerInfo.preferredDate || submitting}
                   >
                     {submitting ? (
                       <>
