@@ -12,9 +12,11 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import SearchModal from './SearchModal';
 import authService from '../services/authService';
+import { useCart } from '../context/CartContext';
 
 const Navbar = () => {
   const location = useLocation();
+  const { cartTotal } = useCart();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchModalOpen, setSearchModalOpen] = useState(false);
@@ -59,8 +61,11 @@ const Navbar = () => {
             <Link to="/favorites" className="action-button">
               <FontAwesomeIcon icon={faHeart} />
             </Link>
-            <Link to="/cart" className="action-button">
+            <Link to="/cart" className="action-button cart-button">
               <FontAwesomeIcon icon={faShoppingBag} />
+              {cartTotal.items > 0 && (
+                <span className="cart-badge">{cartTotal.items}</span>
+              )}
             </Link>
             <Link 
               to={authService.isAuthenticated() ? "/profile" : "/login"} 

@@ -312,7 +312,7 @@ const ProductDetailPage = () => {
       <div className="product-breadcrumbs">
         <div className="product-container">
           <nav className="breadcrumb-nav">
-            <button className="breadcrumb-back" onClick={() => navigate('/products')}>
+            <button className="breadcrumb-back" onClick={() => navigate(-1)}>
               <FontAwesomeIcon icon={faArrowLeft} />
               <span>العودة</span>
             </button>
