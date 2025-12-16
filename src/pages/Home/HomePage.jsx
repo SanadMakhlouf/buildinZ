@@ -635,30 +635,57 @@ const HomePage = () => {
           {banners.length > 0 && (
             <div className="noon-main-banner">
               <div className="noon-banner-wrapper">
-                {banners.map((banner, index) => (
-                  <div
-                    key={banner.id}
-                    className={`noon-banner-slide ${
-                      index === currentBanner ? "active" : ""
-                    }`}
-                  >
-                    <div className="noon-banner-image">
-                      <picture>
-                        {banner.mobileImage &&
-                          banner.mobileImage !== banner.image && (
-                            <source
-                              media="(max-width: 768px)"
-                              srcSet={banner.mobileImage}
-                            />
-                          )}
-                        <img
-                          src={banner.image}
-                          alt={banner.title || "Banner"}
-                        />
-                      </picture>
+                {banners.map((banner, index) => {
+                  const isExternalLink = banner.link && (banner.link.startsWith('http://') || banner.link.startsWith('https://'));
+                  const bannerContent = (
+                    <picture>
+                      {banner.mobileImage &&
+                        banner.mobileImage !== banner.image && (
+                          <source
+                            media="(max-width: 768px)"
+                            srcSet={banner.mobileImage}
+                          />
+                        )}
+                      <img
+                        src={banner.image}
+                        alt={banner.title || "Banner"}
+                      />
+                    </picture>
+                  );
+
+                  return (
+                    <div
+                      key={banner.id}
+                      className={`noon-banner-slide ${
+                        index === currentBanner ? "active" : ""
+                      }`}
+                    >
+                      {banner.link ? (
+                        isExternalLink ? (
+                          <a
+                            href={banner.link}
+                            className="noon-banner-image"
+                            style={{ display: 'block', textDecoration: 'none' }}
+                          >
+                            {bannerContent}
+                          </a>
+                        ) : (
+                          <Link
+                            to={banner.link}
+                            className="noon-banner-image"
+                            style={{ display: 'block', textDecoration: 'none' }}
+                          >
+                            {bannerContent}
+                          </Link>
+                        )
+                      ) : (
+                        <div className="noon-banner-image">
+                          {bannerContent}
+                        </div>
+                      )}
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               {/* Banner Navigation */}
@@ -693,12 +720,9 @@ const HomePage = () => {
           {/* Side Banners */}
           {sideBanners.length > 0 && (
             <div className="noon-side-banners">
-              {sideBanners.map((banner) => (
-                <Link
-                  key={banner.id}
-                  to={banner.link || "#"}
-                  className="noon-side-banner"
-                >
+              {sideBanners.map((banner) => {
+                const isExternalLink = banner.link && (banner.link.startsWith('http://') || banner.link.startsWith('https://'));
+                const bannerContent = (
                   <picture>
                     {banner.mobileImage &&
                       banner.mobileImage !== banner.image && (
@@ -712,8 +736,33 @@ const HomePage = () => {
                       alt={banner.title || "Side Banner"}
                     />
                   </picture>
-                </Link>
-              ))}
+                );
+
+                return banner.link ? (
+                  isExternalLink ? (
+                    <a
+                      key={banner.id}
+                      href={banner.link}
+                      className="noon-side-banner"
+                      style={{ textDecoration: 'none' }}
+                    >
+                      {bannerContent}
+                    </a>
+                  ) : (
+                    <Link
+                      key={banner.id}
+                      to={banner.link}
+                      className="noon-side-banner"
+                    >
+                      {bannerContent}
+                    </Link>
+                  )
+                ) : (
+                  <div key={banner.id} className="noon-side-banner">
+                    {bannerContent}
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
