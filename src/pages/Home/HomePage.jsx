@@ -608,10 +608,10 @@ const HomePage = () => {
   ];
 
   return (
-    <div className="noon-homepage">
+    <div className="noon-homepage" role="document">
       {/* Service Categories Names (no images) */}
       {serviceCategoriesNames.length > 0 && (
-        <section className="noon-service-names-strip">
+        <section className="noon-service-names-strip" aria-label="فئات الخدمات">
           <div className="noon-section-container">
             <div className="noon-service-names-list" dir="rtl">
               {serviceCategoriesNames.map((cat) => (
@@ -769,7 +769,7 @@ const HomePage = () => {
       </section>
 
       {/* Categories Section */}
-      <section className="noon-categories-section">
+      <section className="noon-categories-section" aria-label="الفئات">
         <div className="noon-section-container">
           <div className="noon-categories-wrapper">
             {!loading && categories.length > 0 && (
@@ -886,7 +886,7 @@ const HomePage = () => {
       </section>
 
       {/* Features Strip */}
-      <section className="noon-features-strip">
+      <section className="noon-features-strip" aria-label="المميزات">
         <div className="noon-section-container">
           <div className="noon-features-grid">
             {features.map((feature, index) => (
@@ -906,14 +906,14 @@ const HomePage = () => {
       </section>
 
       {/* Popular Services Section */}
-      <section className="noon-services-section">
+      <section className="noon-services-section" aria-label="الخدمات الأكثر طلباً">
         <div className="noon-section-container">
-          <div className="noon-section-header">
+          <header className="noon-section-header">
             <h2>الخدمات الأكثر طلباً</h2>
             <Link to="/services" className="noon-view-all">
               عرض الكل <FontAwesomeIcon icon={faArrowLeft} />
             </Link>
-          </div>
+          </header>
 
           <div className="noon-services-grid">
             {loading
@@ -1026,14 +1026,14 @@ const HomePage = () => {
       </section>
 
       {/* Popular Products Section */}
-      <section className="noon-services-section">
+      <section className="noon-services-section" aria-label="المنتجات الأكثر طلباً">
         <div className="noon-section-container">
-          <div className="noon-section-header">
+          <header className="noon-section-header">
             <h2>المنتجات الأكثر طلباً</h2>
             <Link to="/products" className="noon-view-all">
               عرض الكل <FontAwesomeIcon icon={faArrowLeft} />
             </Link>
-          </div>
+          </header>
 
           <div className="noon-services-grid">
             {loading
@@ -1230,7 +1230,7 @@ const HomePage = () => {
       </section>
 
       {/* Promotional Banner */}
-      <section className="noon-promo-section">
+      <section className="noon-promo-section" aria-label="عرض ترويجي">
         <div className="noon-section-container">
           <div
             className="noon-promo-banner"
@@ -1263,14 +1263,14 @@ const HomePage = () => {
 
       {/* More Services Grid */}
       {services.length > 8 && (
-        <section className="noon-services-section">
+        <section className="noon-services-section" aria-label="المزيد من الخدمات">
           <div className="noon-section-container">
-            <div className="noon-section-header">
+            <header className="noon-section-header">
               <h2>المزيد من الخدمات</h2>
               <Link to="/services2/categories" className="noon-view-all">
                 عرض الكل <FontAwesomeIcon icon={faArrowLeft} />
               </Link>
-            </div>
+            </header>
 
             <div className="noon-services-grid">
               {services.slice(8, 12).map((service) => {
@@ -1360,14 +1360,14 @@ const HomePage = () => {
 
       {/* More Products Grid */}
       {products.length > 8 && (
-        <section className="noon-services-section">
+        <section className="noon-services-section" aria-label="المزيد من المنتجات">
           <div className="noon-section-container">
-            <div className="noon-section-header">
+            <header className="noon-section-header">
               <h2>المزيد من المنتجات</h2>
               <Link to="/products" className="noon-view-all">
                 عرض الكل <FontAwesomeIcon icon={faArrowLeft} />
               </Link>
-            </div>
+            </header>
 
             <div className="noon-services-grid">
               {products.slice(8, 12).map((product) => {
@@ -1549,11 +1549,11 @@ const HomePage = () => {
       )}
 
       {/* Categories Grid Section */}
-      <section className="noon-categories-grid-section">
+      <section className="noon-categories-grid-section" aria-label="تصفح حسب الفئة">
         <div className="noon-section-container">
-          <div className="noon-section-header">
+          <header className="noon-section-header">
             <h2>تصفح حسب الفئة</h2>
-          </div>
+          </header>
 
           <div className="noon-categories-grid">
             {categories.slice(0, 6).map((category) => {
@@ -1603,7 +1603,7 @@ const HomePage = () => {
       </section>
 
       {/* App Download Section */}
-      <section className="noon-app-section">
+      <section className="noon-app-section" aria-label="تحميل التطبيق">
         <div className="noon-section-container">
           <div className="noon-app-content">
             <div className="noon-app-text">
@@ -1637,7 +1637,7 @@ const HomePage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="noon-footer">
+      <footer className="noon-footer" role="contentinfo" aria-label="تذييل الموقع">
         <div className="noon-footer-container">
           <div className="noon-footer-content">
             {/* About Section */}
@@ -1664,7 +1664,7 @@ const HomePage = () => {
             </div>
 
             {/* Quick Links */}
-            <div className="noon-footer-section noon-footer-links">
+            <nav className="noon-footer-section noon-footer-links" aria-label="روابط سريعة">
               <h3>روابط سريعة</h3>
               <ul>
                 <li>
@@ -1680,10 +1680,10 @@ const HomePage = () => {
                   <Link to="/contact">تواصل معنا</Link>
                 </li>
               </ul>
-            </div>
+            </nav>
 
             {/* Support */}
-            <div className="noon-footer-section noon-footer-links">
+            <nav className="noon-footer-section noon-footer-links" aria-label="الدعم">
               <h3>الدعم</h3>
               <ul>
                 <li>
@@ -1696,7 +1696,7 @@ const HomePage = () => {
                   <Link to="/terms">الشروط والأحكام</Link>
                 </li>
               </ul>
-            </div>
+            </nav>
 
             {/* Contact & Newsletter */}
             <div className="noon-footer-section noon-footer-contact">
@@ -1716,7 +1716,7 @@ const HomePage = () => {
 
               <div className="noon-newsletter">
                 <h4>النشرة الإخبارية</h4>
-                <form onSubmit={handleNewsletterSubmit}>
+                <form onSubmit={handleNewsletterSubmit} aria-label="النشرة الإخبارية">
                   <input
                     type="email"
                     placeholder="بريدك الإلكتروني"

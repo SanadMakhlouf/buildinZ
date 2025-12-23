@@ -134,10 +134,54 @@ const SignupPage = () => {
           }, 2000);
         }
       } catch (error) {
-        // Handle signup errors
-        const errorMessage = error.response?.data?.message || 
-                             'حدث خطأ أثناء إنشاء الحساب. يرجى المحاولة مرة أخرى.';
-        setApiError(errorMessage);
+        // Handle signup errors with structured error response
+        const errorData = error.response?.data;
+        
+        if (errorData?.code === 'VALIDATION_ERROR' && errorData?.errors) {
+          // Handle validation errors - map field-specific errors
+          const validationErrors = {};
+          
+          // Map API field names to form field names
+          const fieldMapping = {
+            'email': 'email',
+            'password': 'password',
+            'name': 'fullName',
+            'fullName': 'fullName',
+            'password_confirmation': 'confirmPassword',
+            'confirmPassword': 'confirmPassword'
+          };
+          
+          // Extract and map validation errors
+          Object.keys(errorData.errors).forEach((apiField) => {
+            const formField = fieldMapping[apiField] || apiField;
+            const fieldErrors = errorData.errors[apiField];
+            
+            // Use the first error message for each field
+            if (Array.isArray(fieldErrors) && fieldErrors.length > 0) {
+              validationErrors[formField] = fieldErrors[0];
+            } else if (typeof fieldErrors === 'string') {
+              validationErrors[formField] = fieldErrors;
+            }
+          });
+          
+          // Set field-specific errors
+          if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+          }
+          
+          // Set general error message if provided
+          if (errorData.message) {
+            setApiError(errorData.message);
+          } else {
+            setApiError('يرجى التحقق من البيانات المدخلة وإصلاح الأخطاء.');
+          }
+        } else {
+          // Handle other types of errors (network, server, etc.)
+          const errorMessage = errorData?.message || 
+                               errorData?.error ||
+                               'حدث خطأ أثناء إنشاء الحساب. يرجى المحاولة مرة أخرى.';
+          setApiError(errorMessage);
+        }
       } finally {
         setIsLoading(false);
       }

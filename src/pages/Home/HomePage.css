@@ -28,8 +28,10 @@
     sans-serif;
   direction: rtl;
   background-color: var(--noon-bg);
-  min-height: 100vh;
-  padding-top: 80px; /* keeps content clear of fixed navbar */
+  min-height: calc(100vh - 70px); /* Account for header height */
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 .noon-section-container {
@@ -44,6 +46,8 @@
   padding: 12px 0 20px;
   margin-top: 0;
   margin-bottom: 12px;
+  width: 100%;
+  position: relative;
 }
 
 .noon-hero-container {
@@ -61,6 +65,8 @@
   border-bottom: 1px solid var(--noon-border);
   padding: 10px 0;
   margin-top: 0;
+  width: 100%;
+  position: relative;
 }
 
 .noon-service-names-list {

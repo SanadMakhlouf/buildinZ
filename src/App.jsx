@@ -43,42 +43,44 @@ function App() {
   return (
     <Router>
       <CartProvider>
-        <div className="app">
+        <div className="app" id="app-root">
           <Navbar />
           <LocationSelector />
           <SearchModal />
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/services" element={<ServicesPage2 />} />
-            <Route path="/services2" element={<ServicesPage2 />} />
-            <Route path="/services2/categories" element={<CategoryPage />} />
-            <Route path="/services2/categories/:id" element={<CategoryDetailPage />} />
-            <Route path="/services2/:id" element={<ServiceDetailPage />} />
-            <Route path="/products" element={<ProductsPage />} />
-            <Route path="/products/:productId" element={<ProductDetailPage />} />
-            <Route path="/products/:productId/:slug" element={<ProductDetailPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignupPage />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/admin" element={<AdminPage />} />
-            <Route path="/faq" element={<FAQPage />} />
-            <Route path="/privacy" element={<PrivacyPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/help" element={<HelpPage />} />
-            <Route path="/terms" element={<TermsPage />} />
-            <Route path="/cart" element={<CartPage />} />
-            <Route path="/checkout" element={<CheckoutPage />} />
-            <Route path="/payment/success" element={<PaymentSuccessPage />} />
-            <Route path="/payment/failure" element={<PaymentFailurePage />} />
-            <Route path="/search" element={<SearchPage />} />
-            <Route path="/notifications" element={<NotificationsPage />} />
-            <Route path="/favorites" element={<FavoritesPage />} />
-            <Route path="/track-order" element={<TrackOrderPage />} />
-            <Route path="/booking-order" element={<BookingOrderDetailPage />} />
-          </Routes>
+          <main id="main-content" className="main-content" role="main">
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/services" element={<ServicesPage2 />} />
+              <Route path="/services2" element={<ServicesPage2 />} />
+              <Route path="/services2/categories" element={<CategoryPage />} />
+              <Route path="/services2/categories/:id" element={<CategoryDetailPage />} />
+              <Route path="/services2/:id" element={<ServiceDetailPage />} />
+              <Route path="/products" element={<ProductsPage />} />
+              <Route path="/products/:productId" element={<ProductDetailPage />} />
+              <Route path="/products/:productId/:slug" element={<ProductDetailPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/signup" element={<SignupPage />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/admin" element={<AdminPage />} />
+              <Route path="/faq" element={<FAQPage />} />
+              <Route path="/privacy" element={<PrivacyPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/help" element={<HelpPage />} />
+              <Route path="/terms" element={<TermsPage />} />
+              <Route path="/cart" element={<CartPage />} />
+              <Route path="/checkout" element={<CheckoutPage />} />
+              <Route path="/payment/success" element={<PaymentSuccessPage />} />
+              <Route path="/payment/failure" element={<PaymentFailurePage />} />
+              <Route path="/search" element={<SearchPage />} />
+              <Route path="/notifications" element={<NotificationsPage />} />
+              <Route path="/favorites" element={<FavoritesPage />} />
+              <Route path="/track-order" element={<TrackOrderPage />} />
+              <Route path="/booking-order" element={<BookingOrderDetailPage />} />
+            </Routes>
+          </main>
           <FloatingCart />
         </div>
       </CartProvider>
