@@ -122,6 +122,25 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+.cart-shopping {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #e53935;
+  color: white;
+  border-radius: 50%;
+  min-width: 20px;
+  height: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}
+
 /* Center Section: Search Bar */
 .navbar-center {
   display: flex;
@@ -656,6 +675,7 @@
 @media (max-width: 768px) {
   .navbar-container {
     grid-template-columns: auto 1fr auto;
+    gap: 0.5rem;
   }
 
   .navbar-center {
@@ -669,6 +689,7 @@
 
   .navbar-location-button {
     padding: 0.5rem;
+    min-width: auto;
   }
 
   .navbar-location-button .uae-flag {
@@ -684,12 +705,62 @@
     display: none;
   }
 
+  .navbar-user-button {
+    padding: 0.5rem;
+    min-width: auto;
+  }
+  
+  .navbar-user-button .user-text {
+    display: none;
+  }
+  
+  .navbar-user-button svg {
+    font-size: 1.1rem;
+  }
+
+  /* Ensure cart and favorites are always visible */
+  .navbar-icon-button {
+    display: flex !important;
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+  
+  .cart-button {
+    position: relative;
+  }
+  
+  .cart-shopping {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    background-color: #e53935;
+    color: white;
+    border-radius: 50%;
+    min-width: 18px;
+    height: 18px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
   .mobile-menu-toggle {
     display: flex !important;
+    flex-shrink: 0;
   }
 
   .logo-text {
     font-size: 1.2rem;
+  }
+  
+  .navbar-left {
+    gap: 0.5rem;
+    flex-wrap: nowrap;
   }
 }
 
@@ -703,18 +774,29 @@
   }
 
   .navbar-container {
-    padding: 0 16px;
-    gap: 0.5rem;
+    padding: 0 12px;
+    gap: 0.4rem;
   }
 
   .navbar-left {
-    gap: 0.75rem;
+    gap: 0.4rem;
+    flex-wrap: nowrap;
   }
 
   .navbar-icon-button {
     width: 32px;
     height: 32px;
     font-size: 1rem;
+    display: flex !important;
+    flex-shrink: 0;
+  }
+  
+  .cart-shopping {
+    min-width: 16px;
+    height: 16px;
+    font-size: 0.6rem;
+    top: -2px;
+    right: -2px;
   }
 
   .navbar-right {
@@ -722,11 +804,20 @@
   }
 
   .navbar-user-button {
-    padding: 0.5rem;
+    padding: 0.4rem;
+    min-width: auto;
   }
 
   .navbar-user-button .user-text {
     display: none;
+  }
+  
+  .navbar-user-button svg {
+    font-size: 1rem;
+  }
+  
+  .navbar-location-button {
+    padding: 0.4rem;
   }
 
   .logo-text {
@@ -752,7 +843,8 @@
   }
 
   .navbar-container {
-    padding: 0 12px;
+    padding: 0 8px;
+    gap: 0.3rem;
   }
 
   .logo-text {
@@ -763,5 +855,36 @@
     width: 30px;
     height: 30px;
     font-size: 0.95rem;
+    display: flex !important;
+    flex-shrink: 0;
+  }
+  
+  .cart-shopping {
+    min-width: 14px;
+    height: 14px;
+    font-size: 0.55rem;
+    top: -1px;
+    right: -1px;
+  }
+  
+  .navbar-left {
+    gap: 0.3rem;
+  }
+  
+  .navbar-user-button {
+    padding: 0.3rem;
+  }
+  
+  .navbar-user-button svg {
+    font-size: 0.95rem;
+  }
+  
+  .navbar-location-button {
+    padding: 0.3rem;
+  }
+  
+  .navbar-location-button .uae-flag {
+    width: 20px;
+    height: 15px;
   }
 }

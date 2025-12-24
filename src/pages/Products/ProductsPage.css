@@ -1014,13 +1014,13 @@
 
 .delivery-icon {
   font-size: 0.9rem;
-  color: #333;
+  color: #99cb48;
   width: 16px;
   height: 16px;
 }
 
 .delivery-express {
-  background: #d3dbe4;
+  background: var(--noon-primary);
   color: #0c141d;
   padding: 0.375rem 0.625rem;
   border-radius: 4px;

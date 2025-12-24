@@ -1150,9 +1150,9 @@ const HomePage = () => {
                 Array(20)
                   .fill(0)
                   .map((_, i) => (
-                    <div key={i} className="product-card skeleton">
+                    <div key={i} className="homepage-product-card skeleton">
                       <div className="product-image-container skeleton-image"></div>
-                      <div className="product-details skeleton-content">
+                      <div className="homepage-product-details skeleton-content">
                         <div className="skeleton-text"></div>
                         <div className="skeleton-text short"></div>
                       </div>
@@ -1168,7 +1168,7 @@ const HomePage = () => {
                   return (
                     <div
                       key={service.id}
-                      className="product-card"
+                      className="homepage-product-card"
                       onClick={() => navigate(`/services2/${service.id}`)}
                     >
                       <div className="product-image-container">
@@ -1213,7 +1213,7 @@ const HomePage = () => {
                         </button>
                       </div>
 
-                      <div className="product-details">
+                      <div className="homepage-product-details">
                         <h3 className="product-name">{service.name}</h3>
                         {service.description && (
                           <p className="product-description">
@@ -1253,18 +1253,18 @@ const HomePage = () => {
           <div className="noon-services-grid">
             {loading
               ? // Skeleton loaders
-                Array(8)
+                Array(12)
                   .fill(0)
                   .map((_, i) => (
-                    <div key={i} className="product-card skeleton">
+                    <div key={i} className="homepage-product-card skeleton">
                       <div className="product-image-container skeleton-image"></div>
-                      <div className="product-details skeleton-content">
+                      <div className="homepage-product-details skeleton-content">
                         <div className="skeleton-text"></div>
                         <div className="skeleton-text short"></div>
                       </div>
                     </div>
                   ))
-              : products.slice(0, 8).map((product) => {
+              : products.slice(0, 12).map((product) => {
                   const imageUrl = product.image
                     ? getImageUrl(product.image)
                     : null;
@@ -1295,7 +1295,7 @@ const HomePage = () => {
                   return (
                     <div
                       key={product.id}
-                      className="product-card"
+                      className="homepage-product-card"
                       onClick={() =>
                         navigate(
                           `/products/${product.id}/${slugify(
@@ -1363,7 +1363,7 @@ const HomePage = () => {
                         </button>
                       </div>
 
-                      <div className="product-details">
+                      <div className="homepage-product-details">
                         <h3 className="product-name">
                           {product.name || "منتج بدون اسم"}
                         </h3>
@@ -1487,7 +1487,7 @@ const HomePage = () => {
             </header>
 
             <div className="noon-services-grid">
-              {services.slice(8, 12).map((service) => {
+              {services.slice(0, 12).map((service) => {
                 const serviceImage = getServiceImage(service);
                 const imageUrl = serviceImage
                   ? getImageUrl(serviceImage)
@@ -1497,7 +1497,7 @@ const HomePage = () => {
                 return (
                   <div
                     key={service.id}
-                    className="product-card"
+                    className="homepage-product-card"
                     onClick={() => navigate(`/services2/${service.id}`)}
                   >
                     <div className="product-image-container">
@@ -1530,7 +1530,7 @@ const HomePage = () => {
                       )}
                     </div>
 
-                    <div className="product-details">
+                    <div className="homepage-product-details">
                       <h3 className="product-name">{service.name}</h3>
                       {service.description && (
                         <p className="product-description">
@@ -1601,7 +1601,7 @@ const HomePage = () => {
                 return (
                   <div
                     key={product.id}
-                    className="product-card"
+                    className="homepage-product-card"
                     onClick={() =>
                       navigate(
                         `/products/${product.id}/${slugify(
@@ -1669,7 +1669,7 @@ const HomePage = () => {
                       </button>
                     </div>
 
-                    <div className="product-details">
+                    <div className="homepage-product-details">
                       <h3 className="product-name">
                         {product.name || "منتج بدون اسم"}
                       </h3>

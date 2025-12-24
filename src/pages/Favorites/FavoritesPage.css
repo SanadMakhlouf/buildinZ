@@ -273,7 +273,7 @@
 
 .product-price-section {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 0.5rem;
   margin-top: 0.5rem;
 }
@@ -331,7 +331,7 @@
 }
 
 .delivery-express {
-  color: #6b7280;
+  color: white;
 }
 
 .add-to-cart-btn {
