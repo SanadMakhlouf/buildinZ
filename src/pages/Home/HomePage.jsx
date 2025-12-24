@@ -27,6 +27,7 @@ import {
   faTruck,
   faHeadset,
   faCheckCircle,
+  faPlus,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faApple,
@@ -41,9 +42,14 @@ import {
 import "./HomePage.css";
 import serviceBuilderService from "../../services/serviceBuilderService";
 import config from "../../config/apiConfig";
+import { useCart } from "../../context/CartContext";
 
 const HomePage = () => {
   const navigate = useNavigate();
+  const { addToCart } = useCart();
+  const [productImageIndices, setProductImageIndices] = useState({});
+  const [hoveredProductId, setHoveredProductId] = useState(null);
+  const [autoScrollIntervals, setAutoScrollIntervals] = useState({});
   const [wishlist, setWishlist] = useState(() => {
     try {
       const saved = localStorage.getItem("wishlist");
@@ -541,6 +547,22 @@ const HomePage = () => {
   };
 
   // Format review count (e.g., 30800 -> "30.8K")
+  // Generate consistent random rating between 4.6 and 5.0 based on product ID
+  const getRandomRating = useCallback((productId) => {
+    // Use product ID as seed for consistent random values
+    const seed = productId ? productId.toString().split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) : Math.random() * 1000;
+    const random = (Math.sin(seed) * 10000) % 1;
+    return (random * 0.4 + 4.6).toFixed(1);
+  }, []);
+
+  // Generate consistent random review count between 10 and 500 based on product ID
+  const getRandomReviewCount = useCallback((productId) => {
+    // Use product ID as seed for consistent random values
+    const seed = productId ? productId.toString().split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) : Math.random() * 1000;
+    const random = (Math.sin(seed * 2) * 10000) % 1;
+    return Math.floor(random * 490 + 10);
+  }, []);
+
   const formatReviewCount = (count) => {
     if (!count || count === 0) return "0";
     if (count >= 1000) {
@@ -548,6 +570,106 @@ const HomePage = () => {
     }
     return count.toString();
   };
+
+  // Handle product card hover
+  const handleProductHover = useCallback((productId, images) => {
+    if (!images || images.length <= 1) return;
+    
+    setHoveredProductId(productId);
+    
+    // Initialize image index if not set
+    setProductImageIndices(prev => {
+      if (prev[productId] === undefined) {
+        return { ...prev, [productId]: 0 };
+      }
+      return prev;
+    });
+    
+    // Start auto-scroll
+    const interval = setInterval(() => {
+      setProductImageIndices(prev => {
+        const currentIndex = prev[productId] || 0;
+        const nextIndex = (currentIndex + 1) % images.length;
+        return { ...prev, [productId]: nextIndex };
+      });
+    }, 2000); // Change image every 2 seconds
+    
+    setAutoScrollIntervals(prev => ({ ...prev, [productId]: interval }));
+  }, []);
+
+  // Handle product card leave
+  const handleProductLeave = useCallback((productId) => {
+    setHoveredProductId(prev => prev === productId ? null : prev);
+    
+    // Clear auto-scroll interval
+    setAutoScrollIntervals(prev => {
+      if (prev[productId]) {
+        clearInterval(prev[productId]);
+        const newIntervals = { ...prev };
+        delete newIntervals[productId];
+        return newIntervals;
+      }
+      return prev;
+    });
+    
+    // Reset to first image
+    setProductImageIndices(prev => ({ ...prev, [productId]: 0 }));
+  }, []);
+
+  // Navigate to next image
+  const handleNextImage = useCallback((productId, images, e) => {
+    e.stopPropagation();
+    if (!images || images.length <= 1) return;
+    
+    // Stop auto-scroll when manually navigating
+    setAutoScrollIntervals(prev => {
+      if (prev[productId]) {
+        clearInterval(prev[productId]);
+        const newIntervals = { ...prev };
+        delete newIntervals[productId];
+        return newIntervals;
+      }
+      return prev;
+    });
+    
+    setProductImageIndices(prev => {
+      const currentIndex = prev[productId] || 0;
+      const nextIndex = (currentIndex + 1) % images.length;
+      return { ...prev, [productId]: nextIndex };
+    });
+  }, []);
+
+  // Navigate to previous image
+  const handlePrevImage = useCallback((productId, images, e) => {
+    e.stopPropagation();
+    if (!images || images.length <= 1) return;
+    
+    // Stop auto-scroll when manually navigating
+    setAutoScrollIntervals(prev => {
+      if (prev[productId]) {
+        clearInterval(prev[productId]);
+        const newIntervals = { ...prev };
+        delete newIntervals[productId];
+        return newIntervals;
+      }
+      return prev;
+    });
+    
+    setProductImageIndices(prev => {
+      const currentIndex = prev[productId] || 0;
+      const prevIndex = (currentIndex - 1 + images.length) % images.length;
+      return { ...prev, [productId]: prevIndex };
+    });
+  }, []);
+
+  // Cleanup intervals on unmount
+  useEffect(() => {
+    return () => {
+      Object.values(autoScrollIntervals).forEach(interval => {
+        if (interval) clearInterval(interval);
+      });
+    };
+  }, [autoScrollIntervals]);
 
   // Calculate delivery date
   const getDeliveryDate = () => {
@@ -1211,6 +1333,7 @@ const HomePage = () => {
                         >
                           <FontAwesomeIcon icon={faHeart} />
                         </button>
+
                       </div>
 
                       <div className="homepage-product-details">
@@ -1223,14 +1346,22 @@ const HomePage = () => {
 
                         {/* Rating Section */}
                         <div className="product-rating-section">
-                          <span className="review-count">(0)</span>
                           <span className="rating-value">
-                            {service.rating?.toFixed(1) || "4.8"}
+                            {service.rating && service.rating > 0
+                              ? service.rating.toFixed(1)
+                              : getRandomRating(service.id)}
                           </span>
                           <FontAwesomeIcon
                             icon={faStar}
                             className="rating-star"
                           />
+                          <span className="review-count">
+                            ({formatReviewCount(
+                              service.reviews?.length > 0
+                                ? service.reviews.length
+                                : getRandomReviewCount(service.id)
+                            )})
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -1253,7 +1384,7 @@ const HomePage = () => {
           <div className="noon-services-grid">
             {loading
               ? // Skeleton loaders
-                Array(12)
+                Array(50)
                   .fill(0)
                   .map((_, i) => (
                     <div key={i} className="homepage-product-card skeleton">
@@ -1264,7 +1395,14 @@ const HomePage = () => {
                       </div>
                     </div>
                   ))
-              : products.slice(0, 12).map((product) => {
+              : products
+                  .filter(
+                    (product) =>
+                      product.stockQuantity > 0 &&
+                      product.stockQuantity !== null
+                  )
+                  .slice(0, 60)
+                  .map((product) => {
                   const imageUrl = product.image
                     ? getImageUrl(product.image)
                     : null;
@@ -1292,10 +1430,23 @@ const HomePage = () => {
                     return cleaned || fallback;
                   };
 
+                  // Get all product images
+                  const productImages = product.images && product.images.length > 0
+                    ? product.images.map(img => getImageUrl(img))
+                    : imageUrl ? [imageUrl] : [];
+                  
+                  const currentImageIndex = productImageIndices[product.id] || 0;
+                  const currentImageUrl = productImages.length > 0 
+                    ? productImages[currentImageIndex] 
+                    : imageUrl;
+                  const hasMultipleImages = productImages.length > 1;
+
                   return (
                     <div
                       key={product.id}
                       className="homepage-product-card"
+                      onMouseEnter={() => hasMultipleImages && handleProductHover(product.id, productImages)}
+                      onMouseLeave={() => hasMultipleImages && handleProductLeave(product.id)}
                       onClick={() =>
                         navigate(
                           `/products/${product.id}/${slugify(
@@ -1306,9 +1457,10 @@ const HomePage = () => {
                       }
                     >
                       <div className="product-image-container">
-                        {imageUrl ? (
+                        {currentImageUrl ? (
                           <img
-                            src={imageUrl}
+                            key={`${product.id}-${currentImageIndex}`}
+                            src={currentImageUrl}
                             alt={product.name}
                             className="product-image"
                             onError={(e) => {
@@ -1320,6 +1472,26 @@ const HomePage = () => {
                           <div className="product-image-placeholder">
                             <FontAwesomeIcon icon={faShoppingCart} />
                           </div>
+                        )}
+
+                        {/* Image Navigation Buttons - Show on hover if multiple images */}
+                        {hasMultipleImages && hoveredProductId === product.id && (
+                          <>
+                            <button
+                              className="product-image-nav-btn product-image-nav-prev"
+                              onClick={(e) => handlePrevImage(product.id, productImages, e)}
+                              title="الصورة السابقة"
+                            >
+                              <FontAwesomeIcon icon={faChevronRight} />
+                            </button>
+                            <button
+                              className="product-image-nav-btn product-image-nav-next"
+                              onClick={(e) => handleNextImage(product.id, productImages, e)}
+                              title="الصورة التالية"
+                            >
+                              <FontAwesomeIcon icon={faChevronLeft} />
+                            </button>
+                          </>
                         )}
 
                         {/* Product Label */}
@@ -1361,29 +1533,60 @@ const HomePage = () => {
                         >
                           <FontAwesomeIcon icon={faHeart} />
                         </button>
+
+                        {/* Add to Cart Button - Bottom Left */}
+                        <button
+                          className="homepage-product-add-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const cartProduct = {
+                              id: product.id,
+                              name: product.name,
+                              price: parseFloat(product.price),
+                              image: imageUrl || null,
+                              vendor: product.vendor || '',
+                              stockQuantity: product.stockQuantity || 0,
+                              category: product.category || ''
+                            };
+                            addToCart(cartProduct, 1);
+                            // Trigger animation
+                            const button = e.currentTarget;
+                            if (button) {
+                              button.classList.add('clicked');
+                              setTimeout(() => {
+                                button.classList.remove('clicked');
+                              }, 600);
+                            }
+                          }}
+                          title="إضافة إلى السلة"
+                        >
+                          <FontAwesomeIcon icon={faPlus} />
+                        </button>
                       </div>
 
                       <div className="homepage-product-details">
                         <h3 className="product-name">
                           {product.name || "منتج بدون اسم"}
                         </h3>
-                        {product.description && (
-                          <p className="product-description">
-                            {product.description}
-                          </p>
-                        )}
+                        
 
                         {/* Rating Section */}
                         <div className="product-rating-section">
                           <span className="rating-value">
-                            {(product.rating || 0).toFixed(1)}
+                            {product.reviewCount === 0 || !product.reviewCount
+                              ? getRandomRating(product.id)
+                              : (product.rating || 0).toFixed(1)}
                           </span>
                           <FontAwesomeIcon
                             icon={faStar}
                             className="rating-star"
                           />
                           <span className="review-count">
-                            ({formatReviewCount(product.reviewCount || 0)})
+                            ({formatReviewCount(
+                              product.reviewCount === 0 || !product.reviewCount
+                                ? getRandomReviewCount(product.id)
+                                : product.reviewCount || 0
+                            )})
                           </span>
                         </div>
 
@@ -1528,6 +1731,19 @@ const HomePage = () => {
                       {serviceDiscount > 0 && (
                         <div className="product-deal-banner">Deal</div>
                       )}
+
+                      {/* Wishlist Button */}
+                      <button
+                        className="product-wishlist-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // TODO: Implement wishlist
+                        }}
+                        title="إضافة للمفضلة"
+                      >
+                        <FontAwesomeIcon icon={faHeart} />
+                      </button>
+
                     </div>
 
                     <div className="homepage-product-details">
@@ -1540,14 +1756,22 @@ const HomePage = () => {
 
                       {/* Rating Section */}
                       <div className="product-rating-section">
-                        <span className="review-count">(0)</span>
                         <span className="rating-value">
-                          {service.rating?.toFixed(1) || "4.8"}
+                          {service.rating && service.rating > 0
+                            ? service.rating.toFixed(1)
+                            : getRandomRating(service.id)}
                         </span>
                         <FontAwesomeIcon
                           icon={faStar}
                           className="rating-star"
                         />
+                        <span className="review-count">
+                          ({formatReviewCount(
+                            service.reviews?.length > 0
+                              ? service.reviews.length
+                              : getRandomReviewCount(service.id)
+                          )})
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -1570,7 +1794,14 @@ const HomePage = () => {
             </header>
 
             <div className="noon-services-grid">
-              {products.slice(8, 12).map((product) => {
+              {products
+                  .filter(
+                    (product) =>
+                      product.stockQuantity > 0 &&
+                      product.stockQuantity !== null
+                  )
+                  .slice(8, 12)
+                  .map((product) => {
                 const imageUrl = product.image
                   ? getImageUrl(product.image)
                   : null;
@@ -1598,10 +1829,23 @@ const HomePage = () => {
                   return cleaned || fallback;
                 };
 
+                // Get all product images
+                const productImages = product.images && product.images.length > 0
+                  ? product.images.map(img => getImageUrl(img))
+                  : imageUrl ? [imageUrl] : [];
+                
+                const currentImageIndex = productImageIndices[product.id] || 0;
+                const currentImageUrl = productImages.length > 0 
+                  ? productImages[currentImageIndex] 
+                  : imageUrl;
+                const hasMultipleImages = productImages.length > 1;
+
                 return (
                   <div
                     key={product.id}
                     className="homepage-product-card"
+                    onMouseEnter={() => hasMultipleImages && handleProductHover(product.id, productImages)}
+                    onMouseLeave={() => hasMultipleImages && handleProductLeave(product.id)}
                     onClick={() =>
                       navigate(
                         `/products/${product.id}/${slugify(
@@ -1612,9 +1856,10 @@ const HomePage = () => {
                     }
                   >
                     <div className="product-image-container">
-                      {imageUrl ? (
+                      {currentImageUrl ? (
                         <img
-                          src={imageUrl}
+                          key={`${product.id}-${currentImageIndex}`}
+                          src={currentImageUrl}
                           alt={product.name}
                           className="product-image"
                           onError={(e) => {
@@ -1626,6 +1871,26 @@ const HomePage = () => {
                         <div className="product-image-placeholder">
                           <FontAwesomeIcon icon={faShoppingCart} />
                         </div>
+                      )}
+
+                      {/* Image Navigation Buttons - Show on hover if multiple images */}
+                      {hasMultipleImages && hoveredProductId === product.id && (
+                        <>
+                          <button
+                            className="product-image-nav-btn product-image-nav-prev"
+                            onClick={(e) => handlePrevImage(product.id, productImages, e)}
+                            title="الصورة السابقة"
+                          >
+                            <FontAwesomeIcon icon={faChevronRight} />
+                          </button>
+                          <button
+                            className="product-image-nav-btn product-image-nav-next"
+                            onClick={(e) => handleNextImage(product.id, productImages, e)}
+                            title="الصورة التالية"
+                          >
+                            <FontAwesomeIcon icon={faChevronLeft} />
+                          </button>
+                        </>
                       )}
 
                       {/* Product Label */}
@@ -1666,6 +1931,35 @@ const HomePage = () => {
                         }
                       >
                         <FontAwesomeIcon icon={faHeart} />
+                      </button>
+
+                      {/* Add to Cart Button - Bottom Left */}
+                      <button
+                        className="homepage-product-add-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const cartProduct = {
+                            id: product.id,
+                            name: product.name,
+                            price: parseFloat(product.price),
+                            image: currentImageUrl || null,
+                            vendor: product.vendor || '',
+                            stockQuantity: product.stockQuantity || 0,
+                            category: product.category || ''
+                          };
+                          addToCart(cartProduct, 1);
+                          // Trigger animation
+                          const button = e.currentTarget;
+                          if (button) {
+                            button.classList.add('clicked');
+                            setTimeout(() => {
+                              button.classList.remove('clicked');
+                            }, 600);
+                          }
+                        }}
+                        title="إضافة إلى السلة"
+                      >
+                        <FontAwesomeIcon icon={faPlus} />
                       </button>
                     </div>
 
