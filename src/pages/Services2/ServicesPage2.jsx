@@ -490,20 +490,6 @@ const ServicesPage2 = () => {
                             className="rating-star"
                           />
                         </div>
-
-                        {/* Delivery Information */}
-                        <div className="product-delivery-info">
-                          <div className="delivery-free">
-                            <FontAwesomeIcon
-                              icon={faTruck}
-                              className="delivery-icon"
-                            />
-                            <span>التوصيل مجانا</span>
-                          </div>
-                          <div className="delivery-express">
-                            express Get it by {getDeliveryDate()}
-                          </div>
-                        </div>
                       </div>
                     </div>
                   );

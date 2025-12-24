@@ -8,6 +8,7 @@ import {
   faArrowRight,
   faStar,
   faShoppingCart,
+  faShoppingBag,
   faHeart,
   faPhone,
   faEnvelope,
@@ -151,10 +152,17 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [currentBanner, setCurrentBanner] = useState(0);
   const [email, setEmail] = useState("");
+  const [hoveredCategory, setHoveredCategory] = useState(null);
+  const [categoryDetails, setCategoryDetails] = useState(null);
+  const [loadingCategoryDetails, setLoadingCategoryDetails] = useState(false);
+  const hoverTimeoutRef = useRef(null);
+  const [categoryPage, setCategoryPage] = useState(0);
+  const categoriesPerPage = 12;
 
   // Refs
   const categoryScrollRef = useRef(null);
   const bannerIntervalRef = useRef(null);
+  const megaMenuRef = useRef(null);
 
   // Default category icons mapping
   const categoryIcons = {
@@ -467,13 +475,60 @@ const HomePage = () => {
   // Category scroll
   const scrollCategories = (direction) => {
     if (categoryScrollRef.current) {
-      const scrollAmount = 200;
+      // Calculate scroll amount based on visible items
+      const itemWidth = 140 + 16; // category width + gap
+      const containerWidth = categoryScrollRef.current.offsetWidth;
+      const visibleItems = Math.floor(containerWidth / itemWidth);
+      const scrollAmount = visibleItems * itemWidth;
+      
       categoryScrollRef.current.scrollBy({
         left: direction === "left" ? -scrollAmount : scrollAmount,
         behavior: "smooth",
       });
     }
   };
+
+  // Calculate total pages for categories
+  const totalCategoryPages = Math.ceil(categories.length / categoriesPerPage);
+
+  // Handle category page change
+  const goToCategoryPage = (pageIndex) => {
+    if (categoryScrollRef.current) {
+      const itemWidth = 140 + 16; // category width + gap
+      const containerWidth = categoryScrollRef.current.offsetWidth;
+      const visibleItems = Math.floor(containerWidth / itemWidth);
+      const scrollAmount = pageIndex * visibleItems * itemWidth;
+      
+      categoryScrollRef.current.scrollTo({
+        left: scrollAmount,
+        behavior: "smooth",
+      });
+      setCategoryPage(pageIndex);
+    }
+  };
+
+  // Handle scroll to detect page changes
+  useEffect(() => {
+    const handleCategoryScroll = () => {
+      if (categoryScrollRef.current) {
+        const scrollLeft = categoryScrollRef.current.scrollLeft;
+        const itemWidth = 140 + 16; // category width + gap
+        const containerWidth = categoryScrollRef.current.offsetWidth;
+        const visibleItems = Math.floor(containerWidth / itemWidth);
+        const pageWidth = visibleItems * itemWidth;
+        const currentPage = Math.round(scrollLeft / pageWidth);
+        setCategoryPage(currentPage);
+      }
+    };
+
+    const scrollElement = categoryScrollRef.current;
+    if (scrollElement) {
+      scrollElement.addEventListener("scroll", handleCategoryScroll);
+      return () => {
+        scrollElement.removeEventListener("scroll", handleCategoryScroll);
+      };
+    }
+  }, [categories.length]);
 
   // Get category icon
   const getCategoryIcon = (categoryName) => {
@@ -605,7 +660,64 @@ const HomePage = () => {
       title: "فنيون محترفون",
       description: "خبرة عالية وموثوقة",
     },
+    {
+      icon: faCheckCircle,
+      title: "فنيون محترفون",
+      description: "خبرة عالية وموثوقة",
+    },
   ];
+
+  // Handle category hover
+  const handleCategoryHover = useCallback(async (category) => {
+    // Clear any existing timeout
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+
+    // Set hovered category immediately
+    setHoveredCategory(category);
+
+    // Fetch category details
+    setLoadingCategoryDetails(true);
+    try {
+      const details = await serviceBuilderService.getCategoryById(category.id);
+      setCategoryDetails(details);
+    } catch (error) {
+      console.error('Error fetching category details:', error);
+      setCategoryDetails(null);
+    } finally {
+      setLoadingCategoryDetails(false);
+    }
+  }, []);
+
+  // Handle category leave with delay
+  const handleCategoryLeave = useCallback(() => {
+    hoverTimeoutRef.current = setTimeout(() => {
+      setHoveredCategory(null);
+      setCategoryDetails(null);
+    }, 200); // Small delay to allow moving to mega menu
+  }, []);
+
+  // Keep menu open when hovering over it
+  const handleMegaMenuEnter = useCallback(() => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+  }, []);
+
+  const handleMegaMenuLeave = useCallback(() => {
+    setHoveredCategory(null);
+    setCategoryDetails(null);
+  }, []);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className="noon-homepage" role="document">
@@ -613,18 +725,131 @@ const HomePage = () => {
       {serviceCategoriesNames.length > 0 && (
         <section className="noon-service-names-strip" aria-label="فئات الخدمات">
           <div className="noon-section-container">
-            <div className="noon-service-names-list" dir="rtl">
-              {serviceCategoriesNames.map((cat) => (
-                <Link
-                  key={`svc-cat-${cat.id}`}
-                  to={`/services2/categories/${cat.id}`}
-                  className="service-name-pill"
-                >
-                  {cat.name}
-                </Link>
-              ))}
+            <div className="noon-service-names-wrapper" dir="rtl">
+              {/* Categories List */}
+              <div className="noon-service-names-list">
+                {serviceCategoriesNames.map((cat) => (
+                  <div
+                    key={`svc-cat-${cat.id}`}
+                    className="service-name-link-wrapper"
+                    onMouseEnter={() => handleCategoryHover(cat)}
+                    onMouseLeave={handleCategoryLeave}
+                  >
+                    <Link
+                      to={`/services2/categories/${cat.id}`}
+                      className={`service-name-link ${hoveredCategory?.id === cat.id ? 'active' : ''}`}
+                    >
+                      {cat.name}
+                    </Link>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Scroll Arrow */}
+              <button className="service-scroll-arrow" aria-label="عرض المزيد">
+                <FontAwesomeIcon icon={faChevronLeft} />
+              </button>
+              
+              {/* All Categories Section */}
+              <div className="service-all-section">
+                <div className="service-all-content">
+                 
+                  
+                  {/* Text */}
+                  <span className="service-all-text">على كل شي</span>
+                  
+                  {/* Right Arrow Button */}
+                  <button className="service-nav-arrow service-nav-arrow-left" aria-label="التالي">
+                    <FontAwesomeIcon icon={faChevronRight} />
+                  </button>
+                  
+                  {/* Left Arrow Button */}
+                  <button className="service-nav-arrow service-nav-arrow-right" aria-label="السابق">
+                    <FontAwesomeIcon icon={faChevronLeft} />
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
+          
+          {/* Mega Menu Card */}
+          {hoveredCategory && (
+            <div
+              className="service-mega-menu"
+              ref={megaMenuRef}
+              onMouseEnter={handleMegaMenuEnter}
+              onMouseLeave={handleMegaMenuLeave}
+            >
+              {loadingCategoryDetails ? (
+                <div className="mega-menu-loading">جاري التحميل...</div>
+              ) : categoryDetails?.category ? (
+                <div className="mega-menu-content">
+                  {/* Right Section: Subcategories List */}
+                  <div className="mega-menu-subcategories">
+                    <h2 className="mega-menu-main-title">{hoveredCategory.name}</h2>
+                    {categoryDetails.category.children && categoryDetails.category.children.length > 0 ? (
+                      <ul className="mega-menu-subcategories-list">
+                        {categoryDetails.category.children.map((subcategory) => {
+                          const subcategoryImage = subcategory.preview_image_path || 
+                                                   subcategory.preview_image_url || 
+                                                   subcategory.image_path;
+                          return (
+                            <li key={subcategory.id}>
+                              <Link 
+                                to={`/services2/categories/${categoryDetails.category.id}?subcategory=${subcategory.id}`}
+                                className="mega-menu-subcategory-item"
+                              >
+                                {subcategoryImage && (
+                                  <div className="mega-menu-subcategory-image">
+                                    <img
+                                      src={getImageUrl(subcategoryImage)}
+                                      alt={subcategory.name}
+                                      onError={(e) => {
+                                        e.target.style.display = 'none';
+                                      }}
+                                    />
+                                  </div>
+                                )}
+                                <span className="mega-menu-subcategory-name">{subcategory.name}</span>
+                              </Link>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    ) : categoryDetails.category.services && categoryDetails.category.services.length > 0 ? (
+                      <ul className="mega-menu-subcategories-list">
+                        {categoryDetails.category.services.slice(0, 10).map((service) => (
+                          <li key={service.id}>
+                            <Link 
+                              to={`/services2/${service.id}`}
+                              className="mega-menu-subcategory-item"
+                            >
+                              <span className="mega-menu-subcategory-name">{service.name}</span>
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
+                  </div>
+
+                  {/* Left Section: Promotional Image */}
+                  {categoryDetails.category.image_path && (
+                    <div className="mega-menu-promo">
+                      <div className="mega-menu-image">
+                        <img
+                          src={getImageUrl(categoryDetails.category.image_path)}
+                          alt={hoveredCategory.name}
+                        />
+                        <div className="mega-menu-cta">
+                          ابدأ مشوارك مع {hoveredCategory.name}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : null}
+            </div>
+          )}
         </section>
       )}
 
@@ -772,23 +997,16 @@ const HomePage = () => {
       <section className="noon-categories-section" aria-label="الفئات">
         <div className="noon-section-container">
           <div className="noon-categories-wrapper">
-            {!loading && categories.length > 0 && (
-              <button
-                className="noon-scroll-btn noon-scroll-right"
-                onClick={() => scrollCategories("left")}
-              >
-                <FontAwesomeIcon icon={faChevronRight} />
-              </button>
-            )}
+            
 
             <div className="noon-categories-scroll" ref={categoryScrollRef}>
               {loading ? (
                 // Skeleton loaders
-                Array(8)
+                Array(12)
                   .fill(0)
                   .map((_, i) => (
                     <div key={i} className="noon-category-item skeleton">
-                      <div className="noon-category-icon skeleton-circle"></div>
+                      <div className="noon-category-image skeleton-image"></div>
                       <div className="skeleton-text"></div>
                     </div>
                   ))
@@ -814,7 +1032,7 @@ const HomePage = () => {
                       to={`/products?category=${category.id}`}
                       className="noon-category-item"
                     >
-                      <div className="noon-category-icon">
+                      <div className="noon-category-image">
                         {imageUrl ? (
                           <img
                             key={`img-${categoryKey}-${categoryImage}`}
@@ -848,9 +1066,11 @@ const HomePage = () => {
                           />
                         ) : null}
                         {!imageUrl && (
-                          <FontAwesomeIcon
-                            icon={getCategoryIcon(category.name)}
-                          />
+                          <div className="noon-category-icon-fallback">
+                            <FontAwesomeIcon
+                              icon={getCategoryIcon(category.name)}
+                            />
+                          </div>
                         )}
                       </div>
                       <span className="noon-category-name">
@@ -873,15 +1093,24 @@ const HomePage = () => {
               )}
             </div>
 
-            {!loading && categories.length > 0 && (
-              <button
-                className="noon-scroll-btn noon-scroll-left"
-                onClick={() => scrollCategories("right")}
-              >
-                <FontAwesomeIcon icon={faChevronLeft} />
-              </button>
-            )}
+          
           </div>
+
+          {/* Pagination Dots */}
+          {!loading && categories.length > 0 && totalCategoryPages > 1 && (
+            <div className="noon-categories-pagination">
+              {Array.from({ length: totalCategoryPages }, (_, i) => (
+                <button
+                  key={i}
+                  className={`noon-pagination-dot ${
+                    categoryPage === i ? "active" : ""
+                  }`}
+                  onClick={() => goToCategoryPage(i)}
+                  aria-label={`صفحة ${i + 1}`}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -918,7 +1147,7 @@ const HomePage = () => {
           <div className="noon-services-grid">
             {loading
               ? // Skeleton loaders
-                Array(8)
+                Array(20)
                   .fill(0)
                   .map((_, i) => (
                     <div key={i} className="product-card skeleton">
@@ -929,7 +1158,7 @@ const HomePage = () => {
                       </div>
                     </div>
                   ))
-              : services.slice(0, 8).map((service) => {
+              : services.slice(6, 12).map((service) => {
                   const serviceImage = getServiceImage(service);
                   const imageUrl = serviceImage
                     ? getImageUrl(serviceImage)
@@ -1002,20 +1231,6 @@ const HomePage = () => {
                             icon={faStar}
                             className="rating-star"
                           />
-                        </div>
-
-                        {/* Delivery Information */}
-                        <div className="product-delivery-info">
-                          <div className="delivery-free">
-                            <FontAwesomeIcon
-                              icon={faTruck}
-                              className="delivery-icon"
-                            />
-                            <span>التوصيل مجانا</span>
-                          </div>
-                          <div className="delivery-express">
-                            express Get it by {getDeliveryDate()}
-                          </div>
                         </div>
                       </div>
                     </div>
@@ -1117,13 +1332,8 @@ const HomePage = () => {
                         {/* Discount Badge */}
                         {discount > 0 && (
                           <span className="product-badge discount-badge">
-                            {discount}% OFF
+                            {discount}%
                           </span>
-                        )}
-
-                        {/* Deal Banner */}
-                        {discount > 0 && (
-                          <div className="product-deal-banner">Deal</div>
                         )}
 
                         {/* Out of Stock Badge */}
@@ -1165,9 +1375,6 @@ const HomePage = () => {
 
                         {/* Rating Section */}
                         <div className="product-rating-section">
-                          <span className="review-count">
-                            ({formatReviewCount(product.reviewCount || 0)})
-                          </span>
                           <span className="rating-value">
                             {(product.rating || 0).toFixed(1)}
                           </span>
@@ -1175,15 +1382,13 @@ const HomePage = () => {
                             icon={faStar}
                             className="rating-star"
                           />
+                          <span className="review-count">
+                            ({formatReviewCount(product.reviewCount || 0)})
+                          </span>
                         </div>
 
                         {/* Price Section */}
                         <div className="product-price-section">
-                          {discount > 0 && (
-                            <span className="discount-percentage">
-                              {discount}%
-                            </span>
-                          )}
                           <div className="product-price">
                             {product.originalPrice &&
                               product.price &&
@@ -1205,20 +1410,29 @@ const HomePage = () => {
                                 maximumFractionDigits: 0,
                               })}
                             </span>
+                            {discount > 0 && (
+                              <span className="discount-percentage">
+                                {discount}%
+                              </span>
+                            )}
                           </div>
                         </div>
 
                         {/* Delivery Information */}
                         <div className="product-delivery-info">
-                          <div className="delivery-free">
+                          <div className="delivery-availability">
                             <FontAwesomeIcon
-                              icon={faTruck}
+                              icon={faShoppingBag}
                               className="delivery-icon"
                             />
-                            <span>التوصيل مجانا</span>
+                            <span>بتخلص بسرعة</span>
                           </div>
                           <div className="delivery-express">
-                            express Get it by {getDeliveryDate()}
+                            <FontAwesomeIcon
+                              icon={faBolt}
+                              className="delivery-lightning-icon"
+                            />
+                            <span>يوصلك في {getDeliveryDate()}</span>
                           </div>
                         </div>
                       </div>
@@ -1335,20 +1549,6 @@ const HomePage = () => {
                           className="rating-star"
                         />
                       </div>
-
-                      {/* Delivery Information */}
-                      <div className="product-delivery-info">
-                        <div className="delivery-free">
-                          <FontAwesomeIcon
-                            icon={faTruck}
-                            className="delivery-icon"
-                          />
-                          <span>التوصيل مجانا</span>
-                        </div>
-                        <div className="delivery-express">
-                          express Get it by {getDeliveryDate()}
-                        </div>
-                      </div>
                     </div>
                   </div>
                 );
@@ -1438,13 +1638,8 @@ const HomePage = () => {
                       {/* Discount Badge */}
                       {discount > 0 && (
                         <span className="product-badge discount-badge">
-                          {discount}% OFF
+                          {discount}%
                         </span>
-                      )}
-
-                      {/* Deal Banner */}
-                      {discount > 0 && (
-                        <div className="product-deal-banner">Deal</div>
                       )}
 
                       {/* Out of Stock Badge */}
@@ -1486,9 +1681,6 @@ const HomePage = () => {
 
                       {/* Rating Section */}
                       <div className="product-rating-section">
-                        <span className="review-count">
-                          ({formatReviewCount(product.reviewCount || 0)})
-                        </span>
                         <span className="rating-value">
                           {(product.rating || 0).toFixed(1)}
                         </span>
@@ -1496,15 +1688,13 @@ const HomePage = () => {
                           icon={faStar}
                           className="rating-star"
                         />
+                        <span className="review-count">
+                          ({formatReviewCount(product.reviewCount || 0)})
+                        </span>
                       </div>
 
                       {/* Price Section */}
                       <div className="product-price-section">
-                        {discount > 0 && (
-                          <span className="discount-percentage">
-                            {discount}%
-                          </span>
-                        )}
                         <div className="product-price">
                           {product.originalPrice &&
                             product.price &&
@@ -1523,20 +1713,29 @@ const HomePage = () => {
                               maximumFractionDigits: 0,
                             })}
                           </span>
+                          {discount > 0 && (
+                            <span className="discount-percentage">
+                              {discount}%
+                            </span>
+                          )}
                         </div>
                       </div>
 
                       {/* Delivery Information */}
                       <div className="product-delivery-info">
-                        <div className="delivery-free">
+                        <div className="delivery-availability">
                           <FontAwesomeIcon
-                            icon={faTruck}
+                            icon={faShoppingBag}
                             className="delivery-icon"
                           />
-                          <span>التوصيل مجانا</span>
+                          <span>بتخلص بسرعة</span>
                         </div>
                         <div className="delivery-express">
-                          express Get it by {getDeliveryDate()}
+                          <FontAwesomeIcon
+                            icon={faBolt}
+                            className="delivery-lightning-icon"
+                          />
+                          <span>يوصلك في {getDeliveryDate()}</span>
                         </div>
                       </div>
                     </div>
@@ -1548,59 +1747,7 @@ const HomePage = () => {
         </section>
       )}
 
-      {/* Categories Grid Section */}
-      <section className="noon-categories-grid-section" aria-label="تصفح حسب الفئة">
-        <div className="noon-section-container">
-          <header className="noon-section-header">
-            <h2>تصفح حسب الفئة</h2>
-          </header>
-
-          <div className="noon-categories-grid">
-            {categories.slice(0, 6).map((category) => {
-              const categoryImage = getCategoryImage(category);
-              const imageUrl = categoryImage
-                ? getImageUrl(categoryImage)
-                : null;
-              return (
-                <Link
-                  key={category.id}
-                  to={`/products?category=${category.id}`}
-                  className="noon-category-card"
-                >
-                  <div className="noon-category-card-image">
-                    {imageUrl ? (
-                      <img
-                        src={imageUrl}
-                        alt={category.name}
-                        onError={(e) => {
-                          e.target.style.display = "none";
-                        }}
-                      />
-                    ) : null}
-                    {!imageUrl && (
-                      <div className="noon-category-card-icon">
-                        <FontAwesomeIcon
-                          icon={getCategoryIcon(category.name)}
-                        />
-                      </div>
-                    )}
-                  </div>
-                  <div className="noon-category-card-content">
-                    <h3>{category.name}</h3>
-                    <span className="noon-category-count">
-                      {category.services_count ||
-                        category.products_count ||
-                        category.subcategories?.length ||
-                        0}{" "}
-                      {category.services_count ? "خدمة" : "منتج"}
-                    </span>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+     
 
       {/* App Download Section */}
       <section className="noon-app-section" aria-label="تحميل التطبيق">

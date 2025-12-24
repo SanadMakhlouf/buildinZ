@@ -25,7 +25,12 @@ import {
   faInfoCircle,
   faTag,
   faPlus,
-  faMinus
+  faMinus,
+  faBolt,
+  faClock,
+  faCreditCard,
+  faShieldAlt,
+  faTimesCircle
 } from '@fortawesome/free-solid-svg-icons';
 import { 
   faFacebook, 
@@ -335,9 +340,10 @@ const ProductDetailPage = () => {
         <div className="product-detail-layout">
           {/* Left Column - Images */}
           <div className="product-images-column">
-            <div className="product-image-main">
+            {/* Main Images - Can show 2 stacked images */}
+            <div className="product-main-images">
               {availableImages.length > 0 && availableImages[selectedImage] && !imageError[selectedImage] ? (
-                <>
+                <div className="main-image-wrapper">
                   <img 
                     src={availableImages[selectedImage]} 
                     alt={product.name}
@@ -361,16 +367,16 @@ const ProductDetailPage = () => {
                       </button>
                     </>
                   )}
-                </>
+                </div>
               ) : (
                 <div className="image-placeholder">
                   <FontAwesomeIcon icon={faBox} size="4x" />
                   <p>لا توجد صورة متاحة</p>
                 </div>
               )}
-              
             </div>
 
+            {/* Thumbnail Gallery */}
             {availableImages.length > 1 && (
               <div className="product-image-thumbnails">
                 {availableImages.map((url, index) => (
@@ -396,149 +402,170 @@ const ProductDetailPage = () => {
             )}
           </div>
 
-          {/* Right Column - Product Info */}
+          {/* Middle Column - Product Info */}
           <div className="product-info-column">
-            {/* Product Header */}
-            <div className="product-header-section">
-              <div className="product-title-row">
-                <h1 className="product-title">{product.name}</h1>
+            {/* Seller Section */}
+            {product.vendor_profile?.business_name && (
+              <div className="product-seller-section">
                 <button
-                  className={`wishlist-icon-btn ${isWishlisted ? 'active' : ''}`}
+                  className="seller-favorite-btn"
                   onClick={handleAddToWishlist}
                   title={isWishlisted ? 'إزالة من المفضلة' : 'إضافة إلى المفضلة'}
                 >
-                  <FontAwesomeIcon icon={faHeart} />
+                  <FontAwesomeIcon icon={faHeart} className={isWishlisted ? 'active' : ''} />
                 </button>
+                <span className="seller-name">{product.vendor_profile.business_name}</span>
+                <span className="seller-arrow">›</span>
               </div>
-              
-              {product.description && (
-                <p className="product-description">{product.description}</p>
-              )}
+            )}
+
+            {/* Product Title */}
+            <h1 className="product-title">{product.name}</h1>
+
+            {/* Rating Section */}
+            <div className="product-rating-section">
+              <div className="rating-stars">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <FontAwesomeIcon
+                    key={star}
+                    icon={faStar}
+                    className={`star ${star <= Math.round(averageRating) ? 'filled' : ''}`}
+                  />
+                ))}
+              </div>
+              <span className="rating-value">{averageRating.toFixed(1)}</span>
+              <span className="rating-count">
+                ({product.reviews && Array.isArray(product.reviews) ? product.reviews.length : 0} تقييم)
+              </span>
             </div>
 
             {/* Price Section */}
-            <div className="product-price-display">
+            <div className="product-price-section">
+              {(product.original_price || product.originalPrice) && parseFloat(product.original_price || product.originalPrice) > parseFloat(product.price) && (
+                <div className="price-original-wrapper">
+                  <span className="price-original">
+                    {parseFloat(product.original_price || product.originalPrice).toFixed(2)} درهم
+                  </span>
+                </div>
+              )}
               <div className="price-main">
                 <span className="price-value">{parseFloat(product.price).toFixed(2)}</span>
                 <span className="price-currency">درهم</span>
+                {(product.original_price || product.originalPrice) && parseFloat(product.original_price || product.originalPrice) > parseFloat(product.price) && (
+                  <span className="discount-badge">
+                    {Math.round(((parseFloat(product.original_price || product.originalPrice) - parseFloat(product.price)) / parseFloat(product.original_price || product.originalPrice)) * 100)}% Off
+                  </span>
+                )}
               </div>
-              <div className="price-note">
-                <FontAwesomeIcon icon={faInfoCircle} />
-                السعر شامل ضريبة القيمة المضافة
-              </div>
-            </div>
-
-            {/* Stock status hidden per request */}
-
-            {/* Quick Info */}
-            <div className="product-quick-info">
-              {product.category && (
-                <div className="quick-info-item">
-                  <FontAwesomeIcon icon={faLayerGroup} />
-                  <span>الفئة: <strong>{product.category.name}</strong></span>
-                </div>
-              )}
-              {product.vendor_profile?.business_name && (
-                <div className="quick-info-item">
-                  <FontAwesomeIcon icon={faStore} />
-                  <span>البائع: <strong>{product.vendor_profile.business_name}</strong></span>
-                </div>
-              )}
-              {product.sku && (
-                <div className="quick-info-item">
+              {(product.original_price || product.originalPrice) && parseFloat(product.original_price || product.originalPrice) > parseFloat(product.price) && (
+                <div className="lowest-price-banner">
                   <FontAwesomeIcon icon={faTag} />
-                  <span>رقم المنتج: <strong>{product.sku}</strong></span>
+                  <span>Lowest price in a year</span>
                 </div>
               )}
             </div>
 
-            {/* Quantity & Add to Cart */}
-            {product.stock_quantity > 0 ? (
-              <div className="product-actions">
-                <div className="quantity-section">
-                  <label className="quantity-label">الكمية:</label>
-                  <div className="quantity-controls">
-                    <button
-                      className="quantity-btn decrease"
-                      onClick={decreaseQuantity}
-                      disabled={quantity <= 1}
-                    >
-                      <FontAwesomeIcon icon={faMinus} />
-                    </button>
-                    <input
-                      type="number"
-                      value={quantity}
-                      onChange={handleQuantityChange}
-                      min="1"
-                      max={product.stock_quantity}
-                      className="quantity-input"
-                    />
-                    <button
-                      className="quantity-btn increase"
-                      onClick={increaseQuantity}
-                      disabled={quantity >= product.stock_quantity}
-                    >
-                      <FontAwesomeIcon icon={faPlus} />
-                    </button>
-                  </div>
-                </div>
-
-                <button
-                  className="add-to-cart-button"
-                  onClick={handleAddToCart}
-                >
-                  <FontAwesomeIcon icon={faShoppingCart} />
-                  <span>إضافة إلى السلة</span>
-                </button>
+            {/* Delivery Information */}
+            <div className="product-delivery-section">
+              <div className="delivery-express-info">
+                <FontAwesomeIcon icon={faBolt} className="delivery-icon" />
+                <span className="delivery-text">
+                  express Get it Tomorrow | Order in 9h41m
+                </span>
               </div>
+              <div className="delivery-free-info">
+                <FontAwesomeIcon icon={faTruck} className="delivery-icon" />
+                <span>Get Free delivery Today with noon one</span>
+              </div>
+            </div>
+
+            {/* Payment Options */}
+            <div className="product-payment-options">
+              <div className="payment-option">
+                <FontAwesomeIcon icon={faCreditCard} />
+                <span>Pay in 4 simple, interest free payments of D {((parseFloat(product.price) || 0) / 4).toFixed(2)}</span>
+                <button className="payment-learn-more" onClick={(e) => { e.stopPropagation(); }}>Learn more</button>
+              </div>
+              <div className="payment-option">
+                <FontAwesomeIcon icon={faCreditCard} />
+                <span>Earn 5% cashback Card.</span>
+                <button className="payment-apply" onClick={(e) => { e.stopPropagation(); }}>Apply now</button>
+              </div>
+            </div>
+
+            {/* Variant Selection (if applicable) */}
+            {product.variants && product.variants.length > 0 && (
+              <div className="product-variants-section">
+                <label className="variants-label">اختر اللون/النوع:</label>
+                <div className="variants-list">
+                  {product.variants.map((variant, index) => (
+                    <button
+                      key={index}
+                      className={`variant-option ${index === 0 ? 'selected' : ''}`}
+                    >
+                      {variant.name || variant.color || `خيار ${index + 1}`}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Right Column - Seller Sidebar */}
+          <div className="product-sidebar-column">
+            {/* Sold By Section */}
+            <div className="seller-sidebar-section">
+              <div className="seller-sidebar-header">
+                <FontAwesomeIcon icon={faStore} className="seller-icon" />
+                <span className="seller-label">Sold by</span>
+                <span className="seller-name-link">{product.vendor_profile?.business_name || 'BuildingZ'}</span>
+                <span className="seller-arrow">›</span>
+              </div>
+              <div className="seller-sidebar-info">
+                <div className="seller-info-item">
+                  <span className="seller-info-label">Seller Ratings:</span>
+                  <span className="seller-info-value">Not enough ratings to show</span>
+                </div>
+                <div className="seller-info-item">
+                  <span className="seller-info-label">Partner Since:</span>
+                  <span className="seller-info-value">2+ Y</span>
+                </div>
+                <div className="seller-info-item">
+                  <span className="seller-info-label">Return Policy:</span>
+                  <span className="seller-info-value">Low return seller</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Delivery & Returns */}
+            <div className="delivery-returns-section">
+              <div className="delivery-returns-item">
+                <FontAwesomeIcon icon={faTruck} />
+                <span>Free delivery on Lockers & Pickup Points</span>
+              </div>
+              <div className="delivery-returns-item">
+                <FontAwesomeIcon icon={faTimesCircle} />
+                <span>This item is not eligible for return</span>
+              </div>
+              <div className="delivery-returns-item">
+                <FontAwesomeIcon icon={faShieldAlt} />
+                <span>Secure Payments</span>
+              </div>
+            </div>
+
+            {/* Add to Cart Button */}
+            {product.stock_quantity > 0 ? (
+              <button
+                className="add-to-cart-button-sidebar"
+                onClick={handleAddToCart}
+              >
+                ADD TO CART
+              </button>
             ) : (
-              <button className="add-to-cart-button" disabled>
-                <FontAwesomeIcon icon={faShoppingCart} />
-                <span>غير متوفر</span>
+              <button className="add-to-cart-button-sidebar" disabled>
+                غير متوفر
               </button>
             )}
-
-            {/* Share Section */}
-            <div className="product-share-section">
-              <span className="share-label">مشاركة:</span>
-              <div className="share-buttons">
-                <button
-                  className="share-btn facebook"
-                  onClick={() => handleSocialShare('facebook')}
-                  title="مشاركة على فيسبوك"
-                >
-                  <FontAwesomeIcon icon={faFacebook} />
-                </button>
-                <button
-                  className="share-btn twitter"
-                  onClick={() => handleSocialShare('twitter')}
-                  title="مشاركة على تويتر"
-                >
-                  <FontAwesomeIcon icon={faTwitter} />
-                </button>
-                <button
-                  className="share-btn whatsapp"
-                  onClick={() => handleSocialShare('whatsapp')}
-                  title="مشاركة على واتساب"
-                >
-                  <FontAwesomeIcon icon={faWhatsapp} />
-                </button>
-                <button
-                  className="share-btn telegram"
-                  onClick={() => handleSocialShare('telegram')}
-                  title="مشاركة على تيليجرام"
-                >
-                  <FontAwesomeIcon icon={faTelegram} />
-                </button>
-                <button
-                  className="share-btn copy"
-                  onClick={() => handleSocialShare('copy')}
-                  title="نسخ الرابط"
-                >
-                  <FontAwesomeIcon icon={faCopy} />
-                </button>
-              </div>
-            </div>
           </div>
         </div>
 

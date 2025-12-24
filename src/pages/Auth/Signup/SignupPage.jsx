@@ -179,8 +179,8 @@ const SignupPage = () => {
           // Handle other types of errors (network, server, etc.)
           const errorMessage = errorData?.message || 
                                errorData?.error ||
-                               'حدث خطأ أثناء إنشاء الحساب. يرجى المحاولة مرة أخرى.';
-          setApiError(errorMessage);
+                             'حدث خطأ أثناء إنشاء الحساب. يرجى المحاولة مرة أخرى.';
+        setApiError(errorMessage);
         }
       } finally {
         setIsLoading(false);

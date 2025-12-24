@@ -1,7 +1,7 @@
 /* Product Detail Page - Modern Redesign */
 .product-detail-page {
-  font-family: 'ReadexPro', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: #f6f6f6;
+  font-family: 'Noto Kufi Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #ffffff;
   min-height: 100vh;
   padding-top: 72px;
   direction: rtl;
@@ -90,10 +90,10 @@
   display: inline-block;
 }
 
-/* Main Layout */
+/* Main Layout - 3 Column Design */
 .product-detail-layout {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
+  grid-template-columns: 1fr 1.2fr 0.8fr;
   gap: 2rem;
   margin-bottom: 2.5rem;
 }
@@ -105,7 +105,13 @@
   gap: 1rem;
 }
 
-.product-image-main {
+.product-main-images {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.main-image-wrapper {
   position: relative;
   width: 100%;
   aspect-ratio: 1;
@@ -264,37 +270,63 @@
   color: #d1d5db;
 }
 
-/* Product Info Column */
+/* Product Info Column - Middle */
 .product-info-column {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.25rem;
+  padding: 0 1rem;
 }
 
-.product-header-section {
+/* Seller Section */
+.product-seller-section {
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
-.product-title-row {
+.seller-favorite-btn {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  padding: 0.25rem;
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.seller-favorite-btn:hover {
+  color: #ef4444;
+}
+
+.seller-favorite-btn .active {
+  color: #ef4444;
+}
+
+.seller-name {
+  font-size: 0.95rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.seller-arrow {
+  color: #666;
+  font-size: 0.9rem;
 }
 
 .product-title {
-  font-size: 2rem;
-  font-weight: 700;
+  font-family: 'Noto Kufi Arabic', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
   color: #0A3259;
   margin: 0;
-  line-height: 1.3;
-  flex: 1;
+  line-height: 1.4;
   word-wrap: break-word;
   overflow-wrap: break-word;
   word-break: break-word;
-  white-space: normal;
 }
 
 .wishlist-icon-btn {
@@ -332,155 +364,231 @@
   margin: 0;
 }
 
-.product-rating-display {
+/* Rating Section */
+.product-rating-section {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 1rem;
-  background: #f9fafb;
-  border-radius: 12px;
-  border-right: 4px solid #DAA520;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
 }
 
-.rating-stars-large {
+.rating-stars {
   display: flex;
-  gap: 0.25rem;
+  gap: 0.15rem;
 }
 
-.rating-stars-large .star {
-  font-size: 1.25rem;
+.rating-stars .star {
+  font-size: 1rem;
   color: #e5e7eb;
 }
 
-.rating-stars-large .star.filled {
-  color: #fbbf24;
+.rating-stars .star.filled {
+  color: #ffc107;
 }
 
-.rating-value-large {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #0A3259;
+.rating-value {
+  font-family: 'Noto Kufi Arabic', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
 }
 
-.rating-count-large {
-  font-size: 0.95rem;
-  color: #6b7280;
+.rating-count {
+  font-family: 'Noto Kufi Arabic', sans-serif;
+  font-size: 0.9rem;
+  color: #666;
 }
 
-/* Price Display */
-.product-price-display {
-  background: linear-gradient(135deg, #0A3259 0%, #1a4d80 100%);
-  padding: 2rem;
-  border-radius: 16px;
-  color: #ffffff;
-  box-shadow: 0 8px 24px rgba(10, 50, 89, 0.2);
+/* Price Section */
+.product-price-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.price-original-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.price-original {
+  font-family: 'Noto Kufi Arabic', sans-serif;
+  font-size: 1.1rem;
+  color: #999;
+  text-decoration: line-through;
 }
 
 .price-main {
   display: flex;
   align-items: baseline;
   gap: 0.5rem;
-  margin-bottom: 0.5rem;
-  color: #ffffff;
+  flex-wrap: wrap;
 }
 
 .price-value {
-  font-size: 3rem;
-  font-weight: 800;
+  font-family: 'Noto Kufi Arabic', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0A3259;
   line-height: 1;
-  color: #ffffff !important;
 }
 
 .price-currency {
-  font-size: 1.5rem;
+  font-family: 'Noto Kufi Arabic', sans-serif;
+  font-size: 1.25rem;
   font-weight: 600;
-  opacity: 0.9;
-  color: #ffffff !important;
+  color: #0A3259;
 }
 
-.price-original-wrapper {
-  display: flex;
-  align-items: baseline;
-  gap: 0.25rem;
-  margin-bottom: 1rem;
+.discount-badge {
+  font-family: 'Noto Kufi Arabic', sans-serif;
+  background: #0A3259;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
 }
 
-.price-original {
-  font-size: 1.5rem;
-  text-decoration: line-through;
-  opacity: 0.7;
-}
-
-.price-note {
+.lowest-price-banner {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.9rem;
-  opacity: 0.9;
-  margin-top: 0.5rem;
+  background: #f0f9ff;
+  color: #0369a1;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  width: fit-content;
 }
 
-/* Stock Status */
-.stock-status {
+.lowest-price-banner svg {
+  font-size: 0.9rem;
+}
+
+/* Delivery Section */
+.product-delivery-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.delivery-express-info {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 1rem;
-  border-radius: 12px;
-  font-weight: 600;
+  gap: 0.5rem;
+  font-family: 'Noto Kufi Arabic', sans-serif;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.delivery-express-info .delivery-icon {
+  color: #0A3259;
   font-size: 1rem;
 }
 
-.stock-status.in-stock {
-  background: #ecfdf5;
-  color: #059669;
-  border: 2px solid #10b981;
-}
-
-.stock-status.out-of-stock {
-  background: #fee2e2;
-  color: #dc2626;
-  border: 2px solid #ef4444;
-}
-
-.stock-status svg {
-  font-size: 1.25rem;
-}
-
-/* Quick Info */
-.product-quick-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  padding: 1.25rem;
-  background: #ffffff;
-  border-radius: 12px;
-  border: 2px solid #f3f4f6;
-}
-
-.quick-info-item {
+.delivery-free-info {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  font-size: 0.95rem;
-  color: #374151;
+  gap: 0.5rem;
+  font-family: 'Noto Kufi Arabic', sans-serif;
+  font-size: 0.85rem;
+  color: #666;
 }
 
-.quick-info-item svg {
-  color: #0A3259;
-  font-size: 1.1rem;
+.delivery-free-info .delivery-icon {
+  color: #666;
+  font-size: 0.9rem;
 }
 
-.quick-info-item strong {
-  color: #0A3259;
-  font-weight: 600;
-}
-
-/* Product Actions */
-.product-actions {
+/* Payment Options */
+.product-payment-options {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.75rem;
+  margin: 1rem 0;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.payment-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Noto Kufi Arabic', sans-serif;
+  font-size: 0.85rem;
+  color: #333;
+}
+
+.payment-option svg {
+  color: #0A3259;
+  font-size: 0.9rem;
+}
+
+.payment-learn-more,
+.payment-apply {
+  background: none;
+  border: none;
+  color: #0A3259;
+  font-family: 'Noto Kufi Arabic', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  margin-right: auto;
+}
+
+.payment-learn-more:hover,
+.payment-apply:hover {
+  color: #1a4d80;
+}
+
+/* Variants Section */
+.product-variants-section {
+  margin: 1rem 0;
+}
+
+.variants-label {
+  display: block;
+  font-family: 'Noto Kufi Arabic', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.75rem;
+}
+
+.variants-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.variant-option {
+  padding: 0.5rem 1rem;
+  border: 2px solid #e5e7eb;
+  background: white;
+  border-radius: 6px;
+  font-family: 'Noto Kufi Arabic', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.variant-option:hover {
+  border-color: #0A3259;
+}
+
+.variant-option.selected {
+  border-color: #0A3259;
+  background: #f0f9ff;
+  color: #0A3259;
 }
 
 .quantity-section {
@@ -560,36 +668,139 @@
   outline: none;
 }
 
-.add-to-cart-button {
+/* Right Sidebar Column */
+.product-sidebar-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  height: fit-content;
+  position: sticky;
+  top: 90px;
+}
+
+/* Seller Sidebar Section */
+.seller-sidebar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.seller-sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Noto Kufi Arabic', sans-serif;
+  font-size: 0.9rem;
+}
+
+.seller-icon {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.seller-label {
+  color: #666;
+  font-weight: 500;
+}
+
+.seller-name-link {
+  color: #0A3259;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.seller-name-link:hover {
+  text-decoration: underline;
+}
+
+.seller-arrow {
+  color: #666;
+  font-size: 0.8rem;
+  margin-right: auto;
+}
+
+.seller-sidebar-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.seller-info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Noto Kufi Arabic', sans-serif;
+  font-size: 0.85rem;
+}
+
+.seller-info-label {
+  color: #666;
+}
+
+.seller-info-value {
+  color: #333;
+  font-weight: 500;
+}
+
+/* Delivery & Returns Section */
+.delivery-returns-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.delivery-returns-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-family: 'Noto Kufi Arabic', sans-serif;
+  font-size: 0.85rem;
+  color: #333;
+}
+
+.delivery-returns-item svg {
+  color: #666;
+  font-size: 0.9rem;
+  margin-top: 0.15rem;
+  flex-shrink: 0;
+}
+
+/* Add to Cart Button - Sidebar */
+.add-to-cart-button-sidebar {
   width: 100%;
   padding: 1rem;
-  background: #ffd814;
-  color: #111;
-  border: 1px solid #f0c14b;
-  border-radius: 10px;
+  background: #0A3259;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Noto Kufi Arabic', sans-serif;
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.15s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.65rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.add-to-cart-button:hover:not(:disabled) {
+.add-to-cart-button-sidebar:hover:not(:disabled) {
+  background: #1a4d80;
   transform: translateY(-1px);
-  background: #f7ca00;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 12px rgba(10, 50, 89, 0.3);
 }
 
-.add-to-cart-button:disabled {
+.add-to-cart-button-sidebar:disabled {
   background: #e5e7eb;
   color: #9ca3af;
   cursor: not-allowed;
   transform: none;
-  box-shadow: none;
 }
 
 /* Share Section */
@@ -1033,7 +1244,14 @@
 /* Responsive Design */
 @media (max-width: 1024px) {
   .product-detail-layout {
-    gap: 2rem;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  .product-sidebar-column {
+    grid-column: 1 / -1;
+    position: relative;
+    top: 0;
   }
 
   .details-grid {
@@ -1071,6 +1289,12 @@
 
   .product-info-column {
     gap: 1.5rem;
+    padding: 0;
+  }
+
+  .product-sidebar-column {
+    position: relative;
+    top: 0;
   }
 
   .product-header-section {

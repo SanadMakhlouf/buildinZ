@@ -189,7 +189,7 @@ const Navbar = () => {
             <Link to="/cart" className="navbar-icon-button cart-button" aria-label="سلة التسوق">
               <FontAwesomeIcon icon={faShoppingBag} />
               {cartTotal.items > 0 && (
-                <span className="cart-badge">{cartTotal.items}</span>
+                <span className="cart-shopping">{cartTotal.items}</span>
               )}
             </Link>
 
