@@ -13,6 +13,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import SearchModal from './SearchModal';
 import LocationModal from './LocationModal';
+import AuthModal from './AuthModal';
 import authService from '../services/authService';
 import { useCart } from '../context/CartContext';
 import addressService from '../services/addressService';
@@ -25,6 +26,8 @@ const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchModalOpen, setSearchModalOpen] = useState(false);
   const [locationModalOpen, setLocationModalOpen] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState('login');
   const [currentLocation, setCurrentLocation] = useState("أبو ظبي, الإمارات العربية المتحدة");
   const [searchQuery, setSearchQuery] = useState("");
   const [language, setLanguage] = useState("English");
@@ -171,14 +174,28 @@ const Navbar = () => {
             <div className="navbar-divider"></div>
 
             {/* User Account */}
-            <Link 
-              to={authService.isAuthenticated() ? "/profile" : "/login"} 
-              className="navbar-user-button"
-              aria-label={authService.isAuthenticated() ? "الملف الشخصي" : "تسجيل الدخول"}
-            >
-              <FontAwesomeIcon icon={faUser} />
-              <span className="user-text">تسجيل الدخول</span>
-            </Link>
+            {authService.isAuthenticated() ? (
+              <Link 
+                to="/profile" 
+                className="navbar-user-button"
+                aria-label="الملف الشخصي"
+              >
+                <FontAwesomeIcon icon={faUser} />
+                <span className="user-text">الملف الشخصي</span>
+              </Link>
+            ) : (
+              <button
+                onClick={() => {
+                  setAuthModalMode('login');
+                  setAuthModalOpen(true);
+                }}
+                className="navbar-user-button"
+                aria-label="تسجيل الدخول"
+              >
+                <FontAwesomeIcon icon={faUser} />
+                <span className="user-text">تسجيل الدخول</span>
+              </button>
+            )}
 
             <div className="navbar-divider"></div>
 
@@ -251,6 +268,12 @@ const Navbar = () => {
         isOpen={locationModalOpen}
         onClose={() => setLocationModalOpen(false)}
         onSelectLocation={handleLocationSelect}
+      />
+
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        initialMode={authModalMode}
       />
     </>
   );
