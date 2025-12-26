@@ -3,7 +3,7 @@
 
 /* ===== CSS Variables ===== */
 :root {
-  --noon-primary: #0A3259;
+  --noon-primary: #0a3259;
   --noon-primary-light: #1a4d80;
   --noon-primary-dark: #072441;
   --noon-accent: #daa520;
@@ -11,7 +11,7 @@
   --noon-accent-dark: #b58a1b;
   --noon-bg: #f7f7f7;
   --noon-white: #ffffff;
-  --noon-text:  #0A3259;
+  --noon-text: #0a3259;
   --noon-text-light: #666666;
   --noon-text-muted: #999999;
   --noon-border: #e5e5e5;
@@ -20,28 +20,29 @@
   --noon-radius: 8px;
   --noon-radius-lg: 12px;
   --noon-transition: 0.3s ease;
-  
+
   /* Typography Scale - Noto Kufi Arabic */
-  --font-family-arabic: 'Noto Kufi Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  
+  --font-family-arabic: "Noto Kufi Arabic", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+
   /* Font Sizes - Organized Typography Scale */
-  --font-size-xs: 0.75rem;      /* 12px - Small labels, badges */
-  --font-size-sm: 0.875rem;     /* 14px - Secondary text, descriptions */
-  --font-size-base: 1rem;       /* 16px - Body text, default */
-  --font-size-md: 1.125rem;     /* 18px - Slightly emphasized text */
-  --font-size-lg: 1.25rem;      /* 20px - Subheadings, important text */
-  --font-size-xl: 1.5rem;       /* 24px - Section headings */
-  --font-size-2xl: 1.875rem;   /* 30px - Large headings */
-  --font-size-3xl: 2.25rem;    /* 36px - Hero headings */
-  --font-size-4xl: 3rem;        /* 48px - Display text */
-  
+  --font-size-xs: 0.75rem; /* 12px - Small labels, badges */
+  --font-size-sm: 0.875rem; /* 14px - Secondary text, descriptions */
+  --font-size-base: 1rem; /* 16px - Body text, default */
+  --font-size-md: 1.125rem; /* 18px - Slightly emphasized text */
+  --font-size-lg: 1.25rem; /* 20px - Subheadings, important text */
+  --font-size-xl: 1.5rem; /* 24px - Section headings */
+  --font-size-2xl: 1.875rem; /* 30px - Large headings */
+  --font-size-3xl: 2.25rem; /* 36px - Hero headings */
+  --font-size-4xl: 3rem; /* 48px - Display text */
+
   /* Font Weights */
   --font-weight-normal: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
   --font-weight-extrabold: 800;
-  
+
   /* Line Heights */
   --line-height-tight: 1.2;
   --line-height-normal: 1.5;
@@ -164,7 +165,7 @@
 }
 
 .service-name-link.active::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -2px;
   right: 0;
@@ -206,11 +207,16 @@
   flex-shrink: 0;
   min-width: 300px;
   position: relative;
-  background: linear-gradient(to right, var(--noon-primary), var(--noon-accent-dark), var(--noon-accent));
+  background: linear-gradient(
+    to right,
+    var(--noon-primary),
+    var(--noon-accent-dark),
+    var(--noon-accent)
+  );
 }
 
 .service-all-section::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 3px;
   background: var(--noon-white);
@@ -447,24 +453,24 @@
   .service-mega-menu {
     max-width: 1000px;
   }
-  
+
   .mega-menu-promo {
     width: 35%;
   }
-  
+
   .service-all-section {
     min-width: 250px;
     margin: 0 1rem 0 0;
   }
-  
+
   .service-all-text {
     font-size: var(--font-size-xs);
   }
-  
+
   .service-name-link {
     font-size: var(--font-size-base);
   }
-  
+
   .noon-service-names-list {
     gap: 2rem;
     padding: 0 1rem;
@@ -477,37 +483,37 @@
     height: 45px;
     margin: 0 0.75rem 0 0;
   }
-  
+
   .service-all-content {
     padding: 0 0.75rem;
     gap: 0.5rem;
   }
-  
+
   .service-all-text {
     font-size: var(--font-size-xs);
     padding-right: 0.25rem;
   }
-  
+
   .service-badge {
     font-size: 0.7rem;
     padding: 0.3rem 0.6rem;
   }
-  
+
   .service-nav-arrow {
     width: 24px;
     height: 24px;
     font-size: 0.7rem;
   }
-  
+
   .service-name-link {
     font-size: var(--font-size-sm);
   }
-  
+
   .noon-service-names-list {
     gap: 1.5rem;
     padding: 0 0.75rem;
   }
-  
+
   .service-scroll-arrow {
     padding: 0 0.75rem;
     min-width: 36px;
@@ -539,52 +545,52 @@
   .mega-menu-subcategories {
     padding: 1rem;
   }
-  
+
   .noon-service-names-strip {
     padding: 0;
   }
-  
+
   .noon-service-names-wrapper {
     gap: 0.5rem;
     padding: 0 8px;
   }
-  
+
   .noon-service-names-list {
     gap: 1rem;
     padding: 0 0.5rem;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
   }
-  
+
   .service-name-link {
     font-size: var(--font-size-xs);
     white-space: nowrap;
     scroll-snap-align: start;
     flex-shrink: 0;
   }
-  
+
   .service-name-link-wrapper {
     flex-shrink: 0;
   }
-  
+
   .service-scroll-arrow {
     padding: 0 0.5rem;
     min-width: 32px;
     font-size: 0.9rem;
   }
-  
+
   .service-all-section {
     min-width: 140px;
     height: 40px;
     margin: 0 0.5rem 0 0;
     padding: 2px;
   }
-  
+
   .service-all-content {
     padding: 0 0.5rem;
     gap: 0.4rem;
   }
-  
+
   .service-all-text {
     font-size: 0.7rem;
     padding-right: 0.2rem;
@@ -592,13 +598,13 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  
+
   .service-badge {
     font-size: 0.65rem;
     padding: 0.25rem 0.5rem;
     border-width: 1.5px;
   }
-  
+
   .service-nav-arrow {
     width: 22px;
     height: 22px;
@@ -611,51 +617,51 @@
     gap: 0.25rem;
     padding: 0 4px;
   }
-  
+
   .noon-service-names-list {
     gap: 0.75rem;
     padding: 0 0.25rem;
   }
-  
+
   .service-name-link {
     font-size: 0.7rem;
   }
-  
+
   .service-scroll-arrow {
     padding: 0 0.25rem;
     min-width: 28px;
     font-size: 0.8rem;
   }
-  
+
   .service-all-section {
     min-width: 100px;
     height: 36px;
     margin: 0 0.25rem 0 0;
     padding: 2px;
   }
-  
+
   .service-all-content {
     padding: 0 0.4rem;
     gap: 0.3rem;
   }
-  
+
   .service-all-text {
     font-size: 0.65rem;
     padding-right: 0.15rem;
   }
-  
+
   .service-badge {
     font-size: 0.6rem;
     padding: 0.2rem 0.4rem;
     border-width: 1px;
   }
-  
+
   .service-nav-arrow {
     width: 20px;
     height: 20px;
     font-size: 0.6rem;
   }
-  
+
   .service-badge {
     font-size: 0.55rem;
     padding: 0.15rem 0.35rem;
@@ -1079,7 +1085,8 @@
 .noon-section-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  gap: 12px;
   margin-bottom: 24px;
   padding-top: 0;
 }
@@ -1089,7 +1096,6 @@
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-bold);
   color: var(--noon-text);
-  line-height: var(--line-height-tight);
 }
 
 .noon-view-all {
@@ -1326,7 +1332,7 @@
 }
 
 .homepage-product-add-btn::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   left: 50%;
@@ -1914,6 +1920,7 @@
   font-weight: var(--font-weight-bold);
   margin-bottom: 16px;
   line-height: var(--line-height-tight);
+  text-align: center;
 }
 
 .noon-app-text p {
@@ -1928,6 +1935,8 @@
 .noon-app-buttons {
   display: flex;
   gap: 16px;
+  display: felx;
+  justify-content: center;
 }
 
 .noon-app-btn {
@@ -1948,7 +1957,7 @@
 }
 
 .noon-app-btn svg {
-  font-size: 2rem;
+  font-size: 3rem;
 }
 
 .noon-app-btn span {
@@ -1976,7 +1985,11 @@
 
 /* ===== Footer ===== */
 .noon-footer {
-  background: #1a1a1a;
+  background: linear-gradient(
+    135deg,
+    var(--noon-primary-dark) 0%,
+    var(--noon-primary) 100%
+  );
   color: var(--noon-white);
   padding: 48px 0 24px;
 }
@@ -2204,7 +2217,7 @@
   .noon-section-container {
     padding: 0 20px;
   }
-  
+
   .noon-hero-container {
     padding: 0 20px;
   }
@@ -2214,7 +2227,7 @@
   .noon-section-container {
     padding: 0 16px;
   }
-  
+
   .noon-hero-container {
     grid-template-columns: 1fr 240px;
     padding: 0 16px;
@@ -2228,17 +2241,17 @@
   .noon-categories-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .noon-features-grid {
     grid-template-columns: repeat(3, 1fr);
     gap: 24px;
   }
-  
+
   .noon-category-item {
     min-width: 120px;
     max-width: 120px;
   }
-  
+
   .noon-category-image {
     width: 120px;
     height: 120px;
@@ -2249,7 +2262,7 @@
   .noon-section-container {
     padding: 0 16px;
   }
-  
+
   .noon-hero-container {
     grid-template-columns: 1fr;
     gap: 16px;
@@ -2271,17 +2284,17 @@
   .noon-main-banner {
     height: 350px;
   }
-  
+
   .noon-banner-nav {
     width: 40px;
     height: 40px;
     font-size: 1.1rem;
   }
-  
+
   .noon-banner-prev {
     right: 12px;
   }
-  
+
   .noon-banner-next {
     left: 12px;
   }
@@ -2321,17 +2334,17 @@
   .noon-footer-content {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .noon-category-item {
     min-width: 110px;
     max-width: 110px;
   }
-  
+
   .noon-category-image {
     width: 110px;
     height: 110px;
   }
-  
+
   .noon-categories-wrapper {
     padding: 0 12px;
   }
@@ -2380,25 +2393,25 @@
     font-size: 0.9rem;
     opacity: 0.8;
   }
-  
+
   .noon-banner-prev {
     right: 8px;
   }
-  
+
   .noon-banner-next {
     left: 8px;
   }
-  
+
   .noon-banner-dots {
     bottom: 12px;
     gap: 6px;
   }
-  
+
   .noon-banner-dot {
     width: 6px;
     height: 6px;
   }
-  
+
   .noon-banner-dot.active {
     width: 20px;
   }
@@ -2418,7 +2431,7 @@
     height: 32px;
     font-size: 0.8rem;
   }
-  
+
   .noon-scroll-btn.hidden {
     display: none;
   }
@@ -2427,7 +2440,7 @@
     min-width: 100px;
     max-width: 100px;
   }
-  
+
   .noon-category-image {
     width: 100px;
     height: 100px;
@@ -2441,13 +2454,13 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
   }
-  
+
   .noon-feature-item {
     flex-direction: column;
     text-align: center;
     gap: 8px;
   }
-  
+
   .noon-feature-icon {
     font-size: 1.5rem;
   }
@@ -2457,11 +2470,11 @@
     align-items: flex-start;
     gap: 12px;
   }
-  
+
   .noon-section-header h2 {
     font-size: var(--font-size-lg);
   }
-  
+
   .noon-view-all {
     font-size: var(--font-size-base);
   }
@@ -2487,15 +2500,15 @@
   .noon-service-desc {
     display: none;
   }
-  
+
   .product-card {
     margin-bottom: 8px;
   }
-  
+
   .product-details {
     padding: 0.5rem 0.75rem 0.75rem 0.75rem;
   }
-  
+
   .homepage-product-details {
     padding: 0.5rem 0.75rem 0.75rem 0.75rem;
   }
@@ -2547,7 +2560,7 @@
   .noon-section-container {
     padding: 0 8px;
   }
-  
+
   .noon-hero-container {
     padding: 0 8px;
     gap: 12px;
@@ -2567,7 +2580,7 @@
     flex-direction: column;
     gap: 8px;
   }
-  
+
   .noon-side-banner {
     min-height: 100px;
   }
@@ -2580,7 +2593,7 @@
   .noon-banner-content {
     padding: 16px;
   }
-  
+
   .noon-banner-content h2 {
     font-size: 1.2rem;
   }
@@ -2594,32 +2607,32 @@
     padding: 8px 20px;
     font-size: 0.85rem;
   }
-  
+
   .noon-banner-nav {
     width: 28px;
     height: 28px;
     font-size: 0.8rem;
     opacity: 0.7;
   }
-  
+
   .noon-banner-prev {
     right: 4px;
   }
-  
+
   .noon-banner-next {
     left: 4px;
   }
-  
+
   .noon-banner-dots {
     bottom: 8px;
     gap: 4px;
   }
-  
+
   .noon-banner-dot {
     width: 5px;
     height: 5px;
   }
-  
+
   .noon-banner-dot.active {
     width: 16px;
   }
@@ -2633,7 +2646,7 @@
     gap: 0.25rem;
     padding: 0 4px;
   }
-  
+
   .noon-scroll-btn {
     width: 28px;
     height: 28px;
@@ -2644,7 +2657,7 @@
     min-width: 80px;
     max-width: 80px;
   }
-  
+
   .noon-category-image {
     width: 80px;
     height: 80px;
@@ -2659,20 +2672,20 @@
     grid-template-columns: 1fr;
     gap: 16px;
   }
-  
+
   .noon-feature-item {
     flex-direction: row;
     text-align: right;
   }
-  
+
   .noon-feature-icon {
     font-size: 1.25rem;
   }
-  
+
   .noon-feature-text h4 {
     font-size: var(--font-size-sm);
   }
-  
+
   .noon-feature-text p {
     font-size: var(--font-size-xs);
   }
@@ -2680,7 +2693,7 @@
   .noon-section-header h2 {
     font-size: var(--font-size-base);
   }
-  
+
   .noon-view-all {
     font-size: var(--font-size-sm);
   }
@@ -2727,7 +2740,7 @@
   .noon-promo-content {
     padding: 16px;
   }
-  
+
   .noon-promo-content h2 {
     font-size: 1.2rem;
   }
@@ -2735,12 +2748,12 @@
   .noon-promo-content p {
     font-size: 0.85rem;
   }
-  
+
   .noon-categories-grid {
     grid-template-columns: 1fr;
     gap: 8px;
   }
-  
+
   .noon-category-card {
     height: 140px;
   }

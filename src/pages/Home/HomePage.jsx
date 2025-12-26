@@ -486,7 +486,7 @@ const HomePage = () => {
       const containerWidth = categoryScrollRef.current.offsetWidth;
       const visibleItems = Math.floor(containerWidth / itemWidth);
       const scrollAmount = visibleItems * itemWidth;
-      
+
       categoryScrollRef.current.scrollBy({
         left: direction === "left" ? -scrollAmount : scrollAmount,
         behavior: "smooth",
@@ -504,7 +504,7 @@ const HomePage = () => {
       const containerWidth = categoryScrollRef.current.offsetWidth;
       const visibleItems = Math.floor(containerWidth / itemWidth);
       const scrollAmount = pageIndex * visibleItems * itemWidth;
-      
+
       categoryScrollRef.current.scrollTo({
         left: scrollAmount,
         behavior: "smooth",
@@ -550,7 +550,12 @@ const HomePage = () => {
   // Generate consistent random rating between 4.6 and 5.0 based on product ID
   const getRandomRating = useCallback((productId) => {
     // Use product ID as seed for consistent random values
-    const seed = productId ? productId.toString().split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) : Math.random() * 1000;
+    const seed = productId
+      ? productId
+          .toString()
+          .split("")
+          .reduce((acc, char) => acc + char.charCodeAt(0), 0)
+      : Math.random() * 1000;
     const random = (Math.sin(seed) * 10000) % 1;
     return (random * 0.4 + 4.6).toFixed(1);
   }, []);
@@ -558,7 +563,12 @@ const HomePage = () => {
   // Generate consistent random review count between 10 and 500 based on product ID
   const getRandomReviewCount = useCallback((productId) => {
     // Use product ID as seed for consistent random values
-    const seed = productId ? productId.toString().split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) : Math.random() * 1000;
+    const seed = productId
+      ? productId
+          .toString()
+          .split("")
+          .reduce((acc, char) => acc + char.charCodeAt(0), 0)
+      : Math.random() * 1000;
     const random = (Math.sin(seed * 2) * 10000) % 1;
     return Math.floor(random * 490 + 10);
   }, []);
@@ -574,35 +584,35 @@ const HomePage = () => {
   // Handle product card hover
   const handleProductHover = useCallback((productId, images) => {
     if (!images || images.length <= 1) return;
-    
+
     setHoveredProductId(productId);
-    
+
     // Initialize image index if not set
-    setProductImageIndices(prev => {
+    setProductImageIndices((prev) => {
       if (prev[productId] === undefined) {
         return { ...prev, [productId]: 0 };
       }
       return prev;
     });
-    
+
     // Start auto-scroll
     const interval = setInterval(() => {
-      setProductImageIndices(prev => {
+      setProductImageIndices((prev) => {
         const currentIndex = prev[productId] || 0;
         const nextIndex = (currentIndex + 1) % images.length;
         return { ...prev, [productId]: nextIndex };
       });
     }, 2000); // Change image every 2 seconds
-    
-    setAutoScrollIntervals(prev => ({ ...prev, [productId]: interval }));
+
+    setAutoScrollIntervals((prev) => ({ ...prev, [productId]: interval }));
   }, []);
 
   // Handle product card leave
   const handleProductLeave = useCallback((productId) => {
-    setHoveredProductId(prev => prev === productId ? null : prev);
-    
+    setHoveredProductId((prev) => (prev === productId ? null : prev));
+
     // Clear auto-scroll interval
-    setAutoScrollIntervals(prev => {
+    setAutoScrollIntervals((prev) => {
       if (prev[productId]) {
         clearInterval(prev[productId]);
         const newIntervals = { ...prev };
@@ -611,18 +621,18 @@ const HomePage = () => {
       }
       return prev;
     });
-    
+
     // Reset to first image
-    setProductImageIndices(prev => ({ ...prev, [productId]: 0 }));
+    setProductImageIndices((prev) => ({ ...prev, [productId]: 0 }));
   }, []);
 
   // Navigate to next image
   const handleNextImage = useCallback((productId, images, e) => {
     e.stopPropagation();
     if (!images || images.length <= 1) return;
-    
+
     // Stop auto-scroll when manually navigating
-    setAutoScrollIntervals(prev => {
+    setAutoScrollIntervals((prev) => {
       if (prev[productId]) {
         clearInterval(prev[productId]);
         const newIntervals = { ...prev };
@@ -631,8 +641,8 @@ const HomePage = () => {
       }
       return prev;
     });
-    
-    setProductImageIndices(prev => {
+
+    setProductImageIndices((prev) => {
       const currentIndex = prev[productId] || 0;
       const nextIndex = (currentIndex + 1) % images.length;
       return { ...prev, [productId]: nextIndex };
@@ -643,9 +653,9 @@ const HomePage = () => {
   const handlePrevImage = useCallback((productId, images, e) => {
     e.stopPropagation();
     if (!images || images.length <= 1) return;
-    
+
     // Stop auto-scroll when manually navigating
-    setAutoScrollIntervals(prev => {
+    setAutoScrollIntervals((prev) => {
       if (prev[productId]) {
         clearInterval(prev[productId]);
         const newIntervals = { ...prev };
@@ -654,8 +664,8 @@ const HomePage = () => {
       }
       return prev;
     });
-    
-    setProductImageIndices(prev => {
+
+    setProductImageIndices((prev) => {
       const currentIndex = prev[productId] || 0;
       const prevIndex = (currentIndex - 1 + images.length) % images.length;
       return { ...prev, [productId]: prevIndex };
@@ -665,7 +675,7 @@ const HomePage = () => {
   // Cleanup intervals on unmount
   useEffect(() => {
     return () => {
-      Object.values(autoScrollIntervals).forEach(interval => {
+      Object.values(autoScrollIntervals).forEach((interval) => {
         if (interval) clearInterval(interval);
       });
     };
@@ -805,7 +815,7 @@ const HomePage = () => {
       const details = await serviceBuilderService.getCategoryById(category.id);
       setCategoryDetails(details);
     } catch (error) {
-      console.error('Error fetching category details:', error);
+      console.error("Error fetching category details:", error);
       setCategoryDetails(null);
     } finally {
       setLoadingCategoryDetails(false);
@@ -859,41 +869,47 @@ const HomePage = () => {
                   >
                     <Link
                       to={`/services2/categories/${cat.id}`}
-                      className={`service-name-link ${hoveredCategory?.id === cat.id ? 'active' : ''}`}
+                      className={`service-name-link ${
+                        hoveredCategory?.id === cat.id ? "active" : ""
+                      }`}
                     >
                       {cat.name}
                     </Link>
                   </div>
                 ))}
               </div>
-              
+
               {/* Scroll Arrow */}
               <button className="service-scroll-arrow" aria-label="عرض المزيد">
                 <FontAwesomeIcon icon={faChevronLeft} />
               </button>
-              
+
               {/* All Categories Section */}
               <div className="service-all-section">
                 <div className="service-all-content">
-                 
-                  
                   {/* Text */}
                   <span className="service-all-text">على كل شي</span>
-                  
+
                   {/* Right Arrow Button */}
-                  <button className="service-nav-arrow service-nav-arrow-left" aria-label="التالي">
+                  <button
+                    className="service-nav-arrow service-nav-arrow-left"
+                    aria-label="التالي"
+                  >
                     <FontAwesomeIcon icon={faChevronRight} />
                   </button>
-                  
+
                   {/* Left Arrow Button */}
-                  <button className="service-nav-arrow service-nav-arrow-right" aria-label="السابق">
+                  <button
+                    className="service-nav-arrow service-nav-arrow-right"
+                    aria-label="السابق"
+                  >
                     <FontAwesomeIcon icon={faChevronLeft} />
                   </button>
                 </div>
               </div>
             </div>
           </div>
-          
+
           {/* Mega Menu Card */}
           {hoveredCategory && (
             <div
@@ -908,48 +924,61 @@ const HomePage = () => {
                 <div className="mega-menu-content">
                   {/* Right Section: Subcategories List */}
                   <div className="mega-menu-subcategories">
-                    <h2 className="mega-menu-main-title">{hoveredCategory.name}</h2>
-                    {categoryDetails.category.children && categoryDetails.category.children.length > 0 ? (
+                    <h2 className="mega-menu-main-title">
+                      {hoveredCategory.name}
+                    </h2>
+                    {categoryDetails.category.children &&
+                    categoryDetails.category.children.length > 0 ? (
                       <ul className="mega-menu-subcategories-list">
-                        {categoryDetails.category.children.map((subcategory) => {
-                          const subcategoryImage = subcategory.preview_image_path || 
-                                                   subcategory.preview_image_url || 
-                                                   subcategory.image_path;
-                          return (
-                            <li key={subcategory.id}>
-                              <Link 
-                                to={`/services2/categories/${categoryDetails.category.id}?subcategory=${subcategory.id}`}
+                        {categoryDetails.category.children.map(
+                          (subcategory) => {
+                            const subcategoryImage =
+                              subcategory.preview_image_path ||
+                              subcategory.preview_image_url ||
+                              subcategory.image_path;
+                            return (
+                              <li key={subcategory.id}>
+                                <Link
+                                  to={`/services2/categories/${categoryDetails.category.id}?subcategory=${subcategory.id}`}
+                                  className="mega-menu-subcategory-item"
+                                >
+                                  {subcategoryImage && (
+                                    <div className="mega-menu-subcategory-image">
+                                      <img
+                                        src={getImageUrl(subcategoryImage)}
+                                        alt={subcategory.name}
+                                        onError={(e) => {
+                                          e.target.style.display = "none";
+                                        }}
+                                      />
+                                    </div>
+                                  )}
+                                  <span className="mega-menu-subcategory-name">
+                                    {subcategory.name}
+                                  </span>
+                                </Link>
+                              </li>
+                            );
+                          }
+                        )}
+                      </ul>
+                    ) : categoryDetails.category.services &&
+                      categoryDetails.category.services.length > 0 ? (
+                      <ul className="mega-menu-subcategories-list">
+                        {categoryDetails.category.services
+                          .slice(0, 10)
+                          .map((service) => (
+                            <li key={service.id}>
+                              <Link
+                                to={`/services2/${service.id}`}
                                 className="mega-menu-subcategory-item"
                               >
-                                {subcategoryImage && (
-                                  <div className="mega-menu-subcategory-image">
-                                    <img
-                                      src={getImageUrl(subcategoryImage)}
-                                      alt={subcategory.name}
-                                      onError={(e) => {
-                                        e.target.style.display = 'none';
-                                      }}
-                                    />
-                                  </div>
-                                )}
-                                <span className="mega-menu-subcategory-name">{subcategory.name}</span>
+                                <span className="mega-menu-subcategory-name">
+                                  {service.name}
+                                </span>
                               </Link>
                             </li>
-                          );
-                        })}
-                      </ul>
-                    ) : categoryDetails.category.services && categoryDetails.category.services.length > 0 ? (
-                      <ul className="mega-menu-subcategories-list">
-                        {categoryDetails.category.services.slice(0, 10).map((service) => (
-                          <li key={service.id}>
-                            <Link 
-                              to={`/services2/${service.id}`}
-                              className="mega-menu-subcategory-item"
-                            >
-                              <span className="mega-menu-subcategory-name">{service.name}</span>
-                            </Link>
-                          </li>
-                        ))}
+                          ))}
                       </ul>
                     ) : null}
                   </div>
@@ -983,7 +1012,10 @@ const HomePage = () => {
             <div className="noon-main-banner">
               <div className="noon-banner-wrapper">
                 {banners.map((banner, index) => {
-                  const isExternalLink = banner.link && (banner.link.startsWith('http://') || banner.link.startsWith('https://'));
+                  const isExternalLink =
+                    banner.link &&
+                    (banner.link.startsWith("http://") ||
+                      banner.link.startsWith("https://"));
                   const bannerContent = (
                     <picture>
                       {banner.mobileImage &&
@@ -993,10 +1025,7 @@ const HomePage = () => {
                             srcSet={banner.mobileImage}
                           />
                         )}
-                      <img
-                        src={banner.image}
-                        alt={banner.title || "Banner"}
-                      />
+                      <img src={banner.image} alt={banner.title || "Banner"} />
                     </picture>
                   );
 
@@ -1012,7 +1041,7 @@ const HomePage = () => {
                           <a
                             href={banner.link}
                             className="noon-banner-image"
-                            style={{ display: 'block', textDecoration: 'none' }}
+                            style={{ display: "block", textDecoration: "none" }}
                           >
                             {bannerContent}
                           </a>
@@ -1020,15 +1049,13 @@ const HomePage = () => {
                           <Link
                             to={banner.link}
                             className="noon-banner-image"
-                            style={{ display: 'block', textDecoration: 'none' }}
+                            style={{ display: "block", textDecoration: "none" }}
                           >
                             {bannerContent}
                           </Link>
                         )
                       ) : (
-                        <div className="noon-banner-image">
-                          {bannerContent}
-                        </div>
+                        <div className="noon-banner-image">{bannerContent}</div>
                       )}
                     </div>
                   );
@@ -1068,7 +1095,10 @@ const HomePage = () => {
           {sideBanners.length > 0 && (
             <div className="noon-side-banners">
               {sideBanners.map((banner) => {
-                const isExternalLink = banner.link && (banner.link.startsWith('http://') || banner.link.startsWith('https://'));
+                const isExternalLink =
+                  banner.link &&
+                  (banner.link.startsWith("http://") ||
+                    banner.link.startsWith("https://"));
                 const bannerContent = (
                   <picture>
                     {banner.mobileImage &&
@@ -1091,7 +1121,7 @@ const HomePage = () => {
                       key={banner.id}
                       href={banner.link}
                       className="noon-side-banner"
-                      style={{ textDecoration: 'none' }}
+                      style={{ textDecoration: "none" }}
                     >
                       {bannerContent}
                     </a>
@@ -1119,8 +1149,6 @@ const HomePage = () => {
       <section className="noon-categories-section" aria-label="الفئات">
         <div className="noon-section-container">
           <div className="noon-categories-wrapper">
-            
-
             <div className="noon-categories-scroll" ref={categoryScrollRef}>
               {loading ? (
                 // Skeleton loaders
@@ -1214,8 +1242,6 @@ const HomePage = () => {
                 </div>
               )}
             </div>
-
-          
           </div>
 
           {/* Pagination Dots */}
@@ -1257,7 +1283,10 @@ const HomePage = () => {
       </section>
 
       {/* Popular Services Section */}
-      <section className="noon-services-section" aria-label="الخدمات الأكثر طلباً">
+      <section
+        className="noon-services-section"
+        aria-label="الخدمات الأكثر طلباً"
+      >
         <div className="noon-section-container">
           <header className="noon-section-header">
             <h2>الخدمات الأكثر طلباً</h2>
@@ -1333,7 +1362,6 @@ const HomePage = () => {
                         >
                           <FontAwesomeIcon icon={faHeart} />
                         </button>
-
                       </div>
 
                       <div className="homepage-product-details">
@@ -1356,11 +1384,13 @@ const HomePage = () => {
                             className="rating-star"
                           />
                           <span className="review-count">
-                            ({formatReviewCount(
+                            (
+                            {formatReviewCount(
                               service.reviews?.length > 0
                                 ? service.reviews.length
                                 : getRandomReviewCount(service.id)
-                            )})
+                            )}
+                            )
                           </span>
                         </div>
                       </div>
@@ -1372,7 +1402,10 @@ const HomePage = () => {
       </section>
 
       {/* Popular Products Section */}
-      <section className="noon-services-section" aria-label="المنتجات الأكثر طلباً">
+      <section
+        className="noon-services-section"
+        aria-label="المنتجات الأكثر طلباً"
+      >
         <div className="noon-section-container">
           <header className="noon-section-header">
             <h2>المنتجات الأكثر طلباً</h2>
@@ -1403,245 +1436,270 @@ const HomePage = () => {
                   )
                   .slice(0, 60)
                   .map((product) => {
-                  const imageUrl = product.image
-                    ? getImageUrl(product.image)
-                    : null;
-                  const discount =
-                    product.originalPrice &&
-                    product.price &&
-                    product.originalPrice > product.price
-                      ? Math.round(
-                          ((product.originalPrice - product.price) /
-                            product.originalPrice) *
-                            100
-                        )
-                      : 0;
+                    const imageUrl = product.image
+                      ? getImageUrl(product.image)
+                      : null;
+                    const discount =
+                      product.originalPrice &&
+                      product.price &&
+                      product.originalPrice > product.price
+                        ? Math.round(
+                            ((product.originalPrice - product.price) /
+                              product.originalPrice) *
+                              100
+                          )
+                        : 0;
 
-                  const slugify = (text = "", fallback = "") => {
-                    const base = text && text.toString().trim();
-                    const cleaned = base
-                      ? base
-                          .toLowerCase()
-                          .replace(/\s+/g, "-")
-                          .replace(/[^-\w\u0600-\u06FF]+/g, "")
-                          .replace(/-+/g, "-")
-                          .replace(/^-+|-+$/g, "")
-                      : "";
-                    return cleaned || fallback;
-                  };
+                    const slugify = (text = "", fallback = "") => {
+                      const base = text && text.toString().trim();
+                      const cleaned = base
+                        ? base
+                            .toLowerCase()
+                            .replace(/\s+/g, "-")
+                            .replace(/[^-\w\u0600-\u06FF]+/g, "")
+                            .replace(/-+/g, "-")
+                            .replace(/^-+|-+$/g, "")
+                        : "";
+                      return cleaned || fallback;
+                    };
 
-                  // Get all product images
-                  const productImages = product.images && product.images.length > 0
-                    ? product.images.map(img => getImageUrl(img))
-                    : imageUrl ? [imageUrl] : [];
-                  
-                  const currentImageIndex = productImageIndices[product.id] || 0;
-                  const currentImageUrl = productImages.length > 0 
-                    ? productImages[currentImageIndex] 
-                    : imageUrl;
-                  const hasMultipleImages = productImages.length > 1;
+                    // Get all product images
+                    const productImages =
+                      product.images && product.images.length > 0
+                        ? product.images.map((img) => getImageUrl(img))
+                        : imageUrl
+                        ? [imageUrl]
+                        : [];
 
-                  return (
-                    <div
-                      key={product.id}
-                      className="homepage-product-card"
-                      onMouseEnter={() => hasMultipleImages && handleProductHover(product.id, productImages)}
-                      onMouseLeave={() => hasMultipleImages && handleProductLeave(product.id)}
-                      onClick={() =>
-                        navigate(
-                          `/products/${product.id}/${slugify(
-                            product.name,
-                            `product-${product.id}`
-                          )}`
-                        )
-                      }
-                    >
-                      <div className="product-image-container">
-                        {currentImageUrl ? (
-                          <img
-                            key={`${product.id}-${currentImageIndex}`}
-                            src={currentImageUrl}
-                            alt={product.name}
-                            className="product-image"
-                            onError={(e) => {
-                              e.target.style.display = "none";
+                    const currentImageIndex =
+                      productImageIndices[product.id] || 0;
+                    const currentImageUrl =
+                      productImages.length > 0
+                        ? productImages[currentImageIndex]
+                        : imageUrl;
+                    const hasMultipleImages = productImages.length > 1;
+
+                    return (
+                      <div
+                        key={product.id}
+                        className="homepage-product-card"
+                        onMouseEnter={() =>
+                          hasMultipleImages &&
+                          handleProductHover(product.id, productImages)
+                        }
+                        onMouseLeave={() =>
+                          hasMultipleImages && handleProductLeave(product.id)
+                        }
+                        onClick={() =>
+                          navigate(
+                            `/products/${product.id}/${slugify(
+                              product.name,
+                              `product-${product.id}`
+                            )}`
+                          )
+                        }
+                      >
+                        <div className="product-image-container">
+                          {currentImageUrl ? (
+                            <img
+                              key={`${product.id}-${currentImageIndex}`}
+                              src={currentImageUrl}
+                              alt={product.name}
+                              className="product-image"
+                              onError={(e) => {
+                                e.target.style.display = "none";
+                              }}
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div className="product-image-placeholder">
+                              <FontAwesomeIcon icon={faShoppingCart} />
+                            </div>
+                          )}
+
+                          {/* Image Navigation Buttons - Show on hover if multiple images */}
+                          {hasMultipleImages &&
+                            hoveredProductId === product.id && (
+                              <>
+                                <button
+                                  className="product-image-nav-btn product-image-nav-prev"
+                                  onClick={(e) =>
+                                    handlePrevImage(
+                                      product.id,
+                                      productImages,
+                                      e
+                                    )
+                                  }
+                                  title="الصورة السابقة"
+                                >
+                                  <FontAwesomeIcon icon={faChevronRight} />
+                                </button>
+                                <button
+                                  className="product-image-nav-btn product-image-nav-next"
+                                  onClick={(e) =>
+                                    handleNextImage(
+                                      product.id,
+                                      productImages,
+                                      e
+                                    )
+                                  }
+                                  title="الصورة التالية"
+                                >
+                                  <FontAwesomeIcon icon={faChevronLeft} />
+                                </button>
+                              </>
+                            )}
+
+                          {/* Product Label */}
+                          {product.label && (
+                            <span className="product-badge product-label-badge">
+                              {product.label}
+                            </span>
+                          )}
+
+                          {/* Discount Badge */}
+                          {discount > 0 && (
+                            <span className="product-badge discount-badge">
+                              {discount}%
+                            </span>
+                          )}
+
+                          {/* Out of Stock Badge */}
+                          {(product.stockQuantity === 0 ||
+                            product.stockQuantity === null) && (
+                            <span className="product-badge out-of-stock-badge">
+                              نفذت الكمية
+                            </span>
+                          )}
+
+                          {/* Wishlist Button */}
+                          <button
+                            className={`product-wishlist-btn ${
+                              isInWishlist(product.id) ? "active" : ""
+                            }`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleWishlist(product);
                             }}
-                            loading="lazy"
-                          />
-                        ) : (
-                          <div className="product-image-placeholder">
-                            <FontAwesomeIcon icon={faShoppingCart} />
-                          </div>
-                        )}
-
-                        {/* Image Navigation Buttons - Show on hover if multiple images */}
-                        {hasMultipleImages && hoveredProductId === product.id && (
-                          <>
-                            <button
-                              className="product-image-nav-btn product-image-nav-prev"
-                              onClick={(e) => handlePrevImage(product.id, productImages, e)}
-                              title="الصورة السابقة"
-                            >
-                              <FontAwesomeIcon icon={faChevronRight} />
-                            </button>
-                            <button
-                              className="product-image-nav-btn product-image-nav-next"
-                              onClick={(e) => handleNextImage(product.id, productImages, e)}
-                              title="الصورة التالية"
-                            >
-                              <FontAwesomeIcon icon={faChevronLeft} />
-                            </button>
-                          </>
-                        )}
-
-                        {/* Product Label */}
-                        {product.label && (
-                          <span className="product-badge product-label-badge">
-                            {product.label}
-                          </span>
-                        )}
-
-                        {/* Discount Badge */}
-                        {discount > 0 && (
-                          <span className="product-badge discount-badge">
-                            {discount}%
-                          </span>
-                        )}
-
-                        {/* Out of Stock Badge */}
-                        {(product.stockQuantity === 0 ||
-                          product.stockQuantity === null) && (
-                          <span className="product-badge out-of-stock-badge">
-                            نفذت الكمية
-                          </span>
-                        )}
-
-                        {/* Wishlist Button */}
-                        <button
-                          className={`product-wishlist-btn ${
-                            isInWishlist(product.id) ? "active" : ""
-                          }`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleWishlist(product);
-                          }}
-                          title={
-                            isInWishlist(product.id)
-                              ? "إزالة من المفضلة"
-                              : "إضافة للمفضلة"
-                          }
-                        >
-                          <FontAwesomeIcon icon={faHeart} />
-                        </button>
-
-                        {/* Add to Cart Button - Bottom Left */}
-                        <button
-                          className="homepage-product-add-btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const cartProduct = {
-                              id: product.id,
-                              name: product.name,
-                              price: parseFloat(product.price),
-                              image: imageUrl || null,
-                              vendor: product.vendor || '',
-                              stockQuantity: product.stockQuantity || 0,
-                              category: product.category || ''
-                            };
-                            addToCart(cartProduct, 1);
-                            // Trigger animation
-                            const button = e.currentTarget;
-                            if (button) {
-                              button.classList.add('clicked');
-                              setTimeout(() => {
-                                button.classList.remove('clicked');
-                              }, 600);
+                            title={
+                              isInWishlist(product.id)
+                                ? "إزالة من المفضلة"
+                                : "إضافة للمفضلة"
                             }
-                          }}
-                          title="إضافة إلى السلة"
-                        >
-                          <FontAwesomeIcon icon={faPlus} />
-                        </button>
-                      </div>
+                          >
+                            <FontAwesomeIcon icon={faHeart} />
+                          </button>
 
-                      <div className="homepage-product-details">
-                        <h3 className="product-name">
-                          {product.name || "منتج بدون اسم"}
-                        </h3>
-                        
-
-                        {/* Rating Section */}
-                        <div className="product-rating-section">
-                          <span className="rating-value">
-                            {product.reviewCount === 0 || !product.reviewCount
-                              ? getRandomRating(product.id)
-                              : (product.rating || 0).toFixed(1)}
-                          </span>
-                          <FontAwesomeIcon
-                            icon={faStar}
-                            className="rating-star"
-                          />
-                          <span className="review-count">
-                            ({formatReviewCount(
-                              product.reviewCount === 0 || !product.reviewCount
-                                ? getRandomReviewCount(product.id)
-                                : product.reviewCount || 0
-                            )})
-                          </span>
+                          {/* Add to Cart Button - Bottom Left */}
+                          <button
+                            className="homepage-product-add-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const cartProduct = {
+                                id: product.id,
+                                name: product.name,
+                                price: parseFloat(product.price),
+                                image: imageUrl || null,
+                                vendor: product.vendor || "",
+                                stockQuantity: product.stockQuantity || 0,
+                                category: product.category || "",
+                              };
+                              addToCart(cartProduct, 1);
+                              // Trigger animation
+                              const button = e.currentTarget;
+                              if (button) {
+                                button.classList.add("clicked");
+                                setTimeout(() => {
+                                  button.classList.remove("clicked");
+                                }, 600);
+                              }
+                            }}
+                            title="إضافة إلى السلة"
+                          >
+                            <FontAwesomeIcon icon={faPlus} />
+                          </button>
                         </div>
 
-                        {/* Price Section */}
-                        <div className="product-price-section">
-                          <div className="product-price">
-                            {product.originalPrice &&
-                              product.price &&
-                              product.originalPrice > product.price && (
-                                <span className="product-original-price">
-                                  {product.originalPrice.toLocaleString(
-                                    "en-US",
-                                    {
-                                      minimumFractionDigits: 0,
-                                      maximumFractionDigits: 0,
-                                    }
-                                  )}
+                        <div className="homepage-product-details">
+                          <h3 className="product-name">
+                            {product.name || "منتج بدون اسم"}
+                          </h3>
+
+                          {/* Rating Section */}
+                          <div className="product-rating-section">
+                            <span className="rating-value">
+                              {product.reviewCount === 0 || !product.reviewCount
+                                ? getRandomRating(product.id)
+                                : (product.rating || 0).toFixed(1)}
+                            </span>
+                            <FontAwesomeIcon
+                              icon={faStar}
+                              className="rating-star"
+                            />
+                            <span className="review-count">
+                              (
+                              {formatReviewCount(
+                                product.reviewCount === 0 ||
+                                  !product.reviewCount
+                                  ? getRandomReviewCount(product.id)
+                                  : product.reviewCount || 0
+                              )}
+                              )
+                            </span>
+                          </div>
+
+                          {/* Price Section */}
+                          <div className="product-price-section">
+                            <div className="product-price">
+                              {product.originalPrice &&
+                                product.price &&
+                                product.originalPrice > product.price && (
+                                  <span className="product-original-price">
+                                    {product.originalPrice.toLocaleString(
+                                      "en-US",
+                                      {
+                                        minimumFractionDigits: 0,
+                                        maximumFractionDigits: 0,
+                                      }
+                                    )}
+                                  </span>
+                                )}
+                              <span className="price-currency">درهم</span>
+                              <span className="price-value">
+                                {(product.price || 0).toLocaleString("en-US", {
+                                  minimumFractionDigits: 0,
+                                  maximumFractionDigits: 0,
+                                })}
+                              </span>
+                              {discount > 0 && (
+                                <span className="discount-percentage">
+                                  {discount}%
                                 </span>
                               )}
-                            <span className="price-currency">درهم</span>
-                            <span className="price-value">
-                              {(product.price || 0).toLocaleString("en-US", {
-                                minimumFractionDigits: 0,
-                                maximumFractionDigits: 0,
-                              })}
-                            </span>
-                            {discount > 0 && (
-                              <span className="discount-percentage">
-                                {discount}%
-                              </span>
-                            )}
+                            </div>
                           </div>
-                        </div>
 
-                        {/* Delivery Information */}
-                        <div className="product-delivery-info">
-                          <div className="delivery-availability">
-                            <FontAwesomeIcon
-                              icon={faShoppingBag}
-                              className="delivery-icon"
-                            />
-                            <span>بتخلص بسرعة</span>
-                          </div>
-                          <div className="delivery-express">
-                            <FontAwesomeIcon
-                              icon={faBolt}
-                              className="delivery-lightning-icon"
-                            />
-                            <span>يوصلك في {getDeliveryDate()}</span>
+                          {/* Delivery Information */}
+                          <div className="product-delivery-info">
+                            <div className="delivery-availability">
+                              <FontAwesomeIcon
+                                icon={faShoppingBag}
+                                className="delivery-icon"
+                              />
+                              <span>بتخلص بسرعة</span>
+                            </div>
+                            <div className="delivery-express">
+                              <FontAwesomeIcon
+                                icon={faBolt}
+                                className="delivery-lightning-icon"
+                              />
+                              <span>يوصلك في {getDeliveryDate()}</span>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
           </div>
         </div>
       </section>
@@ -1680,7 +1738,10 @@ const HomePage = () => {
 
       {/* More Services Grid */}
       {services.length > 8 && (
-        <section className="noon-services-section" aria-label="المزيد من الخدمات">
+        <section
+          className="noon-services-section"
+          aria-label="المزيد من الخدمات"
+        >
           <div className="noon-section-container">
             <header className="noon-section-header">
               <h2>المزيد من الخدمات</h2>
@@ -1743,7 +1804,6 @@ const HomePage = () => {
                       >
                         <FontAwesomeIcon icon={faHeart} />
                       </button>
-
                     </div>
 
                     <div className="homepage-product-details">
@@ -1766,11 +1826,13 @@ const HomePage = () => {
                           className="rating-star"
                         />
                         <span className="review-count">
-                          ({formatReviewCount(
+                          (
+                          {formatReviewCount(
                             service.reviews?.length > 0
                               ? service.reviews.length
                               : getRandomReviewCount(service.id)
-                          )})
+                          )}
+                          )
                         </span>
                       </div>
                     </div>
@@ -1784,7 +1846,10 @@ const HomePage = () => {
 
       {/* More Products Grid */}
       {products.length > 8 && (
-        <section className="noon-services-section" aria-label="المزيد من المنتجات">
+        <section
+          className="noon-services-section"
+          aria-label="المزيد من المنتجات"
+        >
           <div className="noon-section-container">
             <header className="noon-section-header">
               <h2>المزيد من المنتجات</h2>
@@ -1795,253 +1860,268 @@ const HomePage = () => {
 
             <div className="noon-services-grid">
               {products
-                  .filter(
-                    (product) =>
-                      product.stockQuantity > 0 &&
-                      product.stockQuantity !== null
-                  )
-                  .slice(8, 12)
-                  .map((product) => {
-                const imageUrl = product.image
-                  ? getImageUrl(product.image)
-                  : null;
-                const discount =
-                  product.originalPrice &&
-                  product.price &&
-                  product.originalPrice > product.price
-                    ? Math.round(
-                        ((product.originalPrice - product.price) /
-                          product.originalPrice) *
-                          100
-                      )
-                    : 0;
+                .filter(
+                  (product) =>
+                    product.stockQuantity > 0 && product.stockQuantity !== null
+                )
+                .slice(8, 20)
+                .map((product) => {
+                  const imageUrl = product.image
+                    ? getImageUrl(product.image)
+                    : null;
+                  const discount =
+                    product.originalPrice &&
+                    product.price &&
+                    product.originalPrice > product.price
+                      ? Math.round(
+                          ((product.originalPrice - product.price) /
+                            product.originalPrice) *
+                            100
+                        )
+                      : 0;
 
-                const slugify = (text = "", fallback = "") => {
-                  const base = text && text.toString().trim();
-                  const cleaned = base
-                    ? base
-                        .toLowerCase()
-                        .replace(/\s+/g, "-")
-                        .replace(/[^-\w\u0600-\u06FF]+/g, "")
-                        .replace(/-+/g, "-")
-                        .replace(/^-+|-+$/g, "")
-                    : "";
-                  return cleaned || fallback;
-                };
+                  const slugify = (text = "", fallback = "") => {
+                    const base = text && text.toString().trim();
+                    const cleaned = base
+                      ? base
+                          .toLowerCase()
+                          .replace(/\s+/g, "-")
+                          .replace(/[^-\w\u0600-\u06FF]+/g, "")
+                          .replace(/-+/g, "-")
+                          .replace(/^-+|-+$/g, "")
+                      : "";
+                    return cleaned || fallback;
+                  };
 
-                // Get all product images
-                const productImages = product.images && product.images.length > 0
-                  ? product.images.map(img => getImageUrl(img))
-                  : imageUrl ? [imageUrl] : [];
-                
-                const currentImageIndex = productImageIndices[product.id] || 0;
-                const currentImageUrl = productImages.length > 0 
-                  ? productImages[currentImageIndex] 
-                  : imageUrl;
-                const hasMultipleImages = productImages.length > 1;
+                  // Get all product images
+                  const productImages =
+                    product.images && product.images.length > 0
+                      ? product.images.map((img) => getImageUrl(img))
+                      : imageUrl
+                      ? [imageUrl]
+                      : [];
 
-                return (
-                  <div
-                    key={product.id}
-                    className="homepage-product-card"
-                    onMouseEnter={() => hasMultipleImages && handleProductHover(product.id, productImages)}
-                    onMouseLeave={() => hasMultipleImages && handleProductLeave(product.id)}
-                    onClick={() =>
-                      navigate(
-                        `/products/${product.id}/${slugify(
-                          product.name,
-                          `product-${product.id}`
-                        )}`
-                      )
-                    }
-                  >
-                    <div className="product-image-container">
-                      {currentImageUrl ? (
-                        <img
-                          key={`${product.id}-${currentImageIndex}`}
-                          src={currentImageUrl}
-                          alt={product.name}
-                          className="product-image"
-                          onError={(e) => {
-                            e.target.style.display = "none";
+                  const currentImageIndex =
+                    productImageIndices[product.id] || 0;
+                  const currentImageUrl =
+                    productImages.length > 0
+                      ? productImages[currentImageIndex]
+                      : imageUrl;
+                  const hasMultipleImages = productImages.length > 1;
+
+                  return (
+                    <div
+                      key={product.id}
+                      className="homepage-product-card"
+                      onMouseEnter={() =>
+                        hasMultipleImages &&
+                        handleProductHover(product.id, productImages)
+                      }
+                      onMouseLeave={() =>
+                        hasMultipleImages && handleProductLeave(product.id)
+                      }
+                      onClick={() =>
+                        navigate(
+                          `/products/${product.id}/${slugify(
+                            product.name,
+                            `product-${product.id}`
+                          )}`
+                        )
+                      }
+                    >
+                      <div className="product-image-container">
+                        {currentImageUrl ? (
+                          <img
+                            key={`${product.id}-${currentImageIndex}`}
+                            src={currentImageUrl}
+                            alt={product.name}
+                            className="product-image"
+                            onError={(e) => {
+                              e.target.style.display = "none";
+                            }}
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="product-image-placeholder">
+                            <FontAwesomeIcon icon={faShoppingCart} />
+                          </div>
+                        )}
+
+                        {/* Image Navigation Buttons - Show on hover if multiple images */}
+                        {hasMultipleImages &&
+                          hoveredProductId === product.id && (
+                            <>
+                              <button
+                                className="product-image-nav-btn product-image-nav-prev"
+                                onClick={(e) =>
+                                  handlePrevImage(product.id, productImages, e)
+                                }
+                                title="الصورة السابقة"
+                              >
+                                <FontAwesomeIcon icon={faChevronRight} />
+                              </button>
+                              <button
+                                className="product-image-nav-btn product-image-nav-next"
+                                onClick={(e) =>
+                                  handleNextImage(product.id, productImages, e)
+                                }
+                                title="الصورة التالية"
+                              >
+                                <FontAwesomeIcon icon={faChevronLeft} />
+                              </button>
+                            </>
+                          )}
+
+                        {/* Product Label */}
+                        {product.label && (
+                          <span className="product-badge product-label-badge">
+                            {product.label}
+                          </span>
+                        )}
+
+                        {/* Discount Badge */}
+                        {discount > 0 && (
+                          <span className="product-badge discount-badge">
+                            {discount}%
+                          </span>
+                        )}
+
+                        {/* Out of Stock Badge */}
+                        {(product.stockQuantity === 0 ||
+                          product.stockQuantity === null) && (
+                          <span className="product-badge out-of-stock-badge">
+                            نفذت الكمية
+                          </span>
+                        )}
+
+                        {/* Wishlist Button */}
+                        <button
+                          className={`product-wishlist-btn ${
+                            isInWishlist(product.id) ? "active" : ""
+                          }`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleWishlist(product);
                           }}
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className="product-image-placeholder">
-                          <FontAwesomeIcon icon={faShoppingCart} />
-                        </div>
-                      )}
-
-                      {/* Image Navigation Buttons - Show on hover if multiple images */}
-                      {hasMultipleImages && hoveredProductId === product.id && (
-                        <>
-                          <button
-                            className="product-image-nav-btn product-image-nav-prev"
-                            onClick={(e) => handlePrevImage(product.id, productImages, e)}
-                            title="الصورة السابقة"
-                          >
-                            <FontAwesomeIcon icon={faChevronRight} />
-                          </button>
-                          <button
-                            className="product-image-nav-btn product-image-nav-next"
-                            onClick={(e) => handleNextImage(product.id, productImages, e)}
-                            title="الصورة التالية"
-                          >
-                            <FontAwesomeIcon icon={faChevronLeft} />
-                          </button>
-                        </>
-                      )}
-
-                      {/* Product Label */}
-                      {product.label && (
-                        <span className="product-badge product-label-badge">
-                          {product.label}
-                        </span>
-                      )}
-
-                      {/* Discount Badge */}
-                      {discount > 0 && (
-                        <span className="product-badge discount-badge">
-                          {discount}%
-                        </span>
-                      )}
-
-                      {/* Out of Stock Badge */}
-                      {(product.stockQuantity === 0 ||
-                        product.stockQuantity === null) && (
-                        <span className="product-badge out-of-stock-badge">
-                          نفذت الكمية
-                        </span>
-                      )}
-
-                      {/* Wishlist Button */}
-                      <button
-                        className={`product-wishlist-btn ${
-                          isInWishlist(product.id) ? "active" : ""
-                        }`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleWishlist(product);
-                        }}
-                        title={
-                          isInWishlist(product.id)
-                            ? "إزالة من المفضلة"
-                            : "إضافة للمفضلة"
-                        }
-                      >
-                        <FontAwesomeIcon icon={faHeart} />
-                      </button>
-
-                      {/* Add to Cart Button - Bottom Left */}
-                      <button
-                        className="homepage-product-add-btn"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const cartProduct = {
-                            id: product.id,
-                            name: product.name,
-                            price: parseFloat(product.price),
-                            image: currentImageUrl || null,
-                            vendor: product.vendor || '',
-                            stockQuantity: product.stockQuantity || 0,
-                            category: product.category || ''
-                          };
-                          addToCart(cartProduct, 1);
-                          // Trigger animation
-                          const button = e.currentTarget;
-                          if (button) {
-                            button.classList.add('clicked');
-                            setTimeout(() => {
-                              button.classList.remove('clicked');
-                            }, 600);
+                          title={
+                            isInWishlist(product.id)
+                              ? "إزالة من المفضلة"
+                              : "إضافة للمفضلة"
                           }
-                        }}
-                        title="إضافة إلى السلة"
-                      >
-                        <FontAwesomeIcon icon={faPlus} />
-                      </button>
-                    </div>
+                        >
+                          <FontAwesomeIcon icon={faHeart} />
+                        </button>
 
-                    <div className="homepage-product-details">
-                      <h3 className="product-name">
-                        {product.name || "منتج بدون اسم"}
-                      </h3>
-                      {product.description && (
-                        <p className="product-description">
-                          {product.description}
-                        </p>
-                      )}
-
-                      {/* Rating Section */}
-                      <div className="product-rating-section">
-                        <span className="rating-value">
-                          {(product.rating || 0).toFixed(1)}
-                        </span>
-                        <FontAwesomeIcon
-                          icon={faStar}
-                          className="rating-star"
-                        />
-                        <span className="review-count">
-                          ({formatReviewCount(product.reviewCount || 0)})
-                        </span>
+                        {/* Add to Cart Button - Bottom Left */}
+                        <button
+                          className="homepage-product-add-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const cartProduct = {
+                              id: product.id,
+                              name: product.name,
+                              price: parseFloat(product.price),
+                              image: currentImageUrl || null,
+                              vendor: product.vendor || "",
+                              stockQuantity: product.stockQuantity || 0,
+                              category: product.category || "",
+                            };
+                            addToCart(cartProduct, 1);
+                            // Trigger animation
+                            const button = e.currentTarget;
+                            if (button) {
+                              button.classList.add("clicked");
+                              setTimeout(() => {
+                                button.classList.remove("clicked");
+                              }, 600);
+                            }
+                          }}
+                          title="إضافة إلى السلة"
+                        >
+                          <FontAwesomeIcon icon={faPlus} />
+                        </button>
                       </div>
 
-                      {/* Price Section */}
-                      <div className="product-price-section">
-                        <div className="product-price">
-                          {product.originalPrice &&
-                            product.price &&
-                            product.originalPrice > product.price && (
-                              <span className="product-original-price">
-                                {product.originalPrice.toLocaleString("en-US", {
-                                  minimumFractionDigits: 0,
-                                  maximumFractionDigits: 0,
-                                })}
+                      <div className="homepage-product-details">
+                        <h3 className="product-name">
+                          {product.name || "منتج بدون اسم"}
+                        </h3>
+                        {product.description && (
+                          <p className="product-description">
+                            {product.description}
+                          </p>
+                        )}
+
+                        {/* Rating Section */}
+                        <div className="product-rating-section">
+                          <span className="rating-value">
+                            {(product.rating || 0).toFixed(1)}
+                          </span>
+                          <FontAwesomeIcon
+                            icon={faStar}
+                            className="rating-star"
+                          />
+                          <span className="review-count">
+                            ({formatReviewCount(product.reviewCount || 0)})
+                          </span>
+                        </div>
+
+                        {/* Price Section */}
+                        <div className="product-price-section">
+                          <div className="product-price">
+                            {product.originalPrice &&
+                              product.price &&
+                              product.originalPrice > product.price && (
+                                <span className="product-original-price">
+                                  {product.originalPrice.toLocaleString(
+                                    "en-US",
+                                    {
+                                      minimumFractionDigits: 0,
+                                      maximumFractionDigits: 0,
+                                    }
+                                  )}
+                                </span>
+                              )}
+                            <span className="price-currency">درهم</span>
+                            <span className="price-value">
+                              {(product.price || 0).toLocaleString("en-US", {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0,
+                              })}
+                            </span>
+                            {discount > 0 && (
+                              <span className="discount-percentage">
+                                {discount}%
                               </span>
                             )}
-                          <span className="price-currency">درهم</span>
-                          <span className="price-value">
-                            {(product.price || 0).toLocaleString("en-US", {
-                              minimumFractionDigits: 0,
-                              maximumFractionDigits: 0,
-                            })}
-                          </span>
-                          {discount > 0 && (
-                            <span className="discount-percentage">
-                              {discount}%
-                            </span>
-                          )}
+                          </div>
                         </div>
-                      </div>
 
-                      {/* Delivery Information */}
-                      <div className="product-delivery-info">
-                        <div className="delivery-availability">
-                          <FontAwesomeIcon
-                            icon={faShoppingBag}
-                            className="delivery-icon"
-                          />
-                          <span>بتخلص بسرعة</span>
-                        </div>
-                        <div className="delivery-express">
-                          <FontAwesomeIcon
-                            icon={faBolt}
-                            className="delivery-lightning-icon"
-                          />
-                          <span>يوصلك في {getDeliveryDate()}</span>
+                        {/* Delivery Information */}
+                        <div className="product-delivery-info">
+                          <div className="delivery-availability">
+                            <FontAwesomeIcon
+                              icon={faShoppingBag}
+                              className="delivery-icon"
+                            />
+                            <span>بتخلص بسرعة</span>
+                          </div>
+                          <div className="delivery-express">
+                            <FontAwesomeIcon
+                              icon={faBolt}
+                              className="delivery-lightning-icon"
+                            />
+                            <span>يوصلك في {getDeliveryDate()}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
             </div>
           </div>
         </section>
       )}
-
-     
 
       {/* App Download Section */}
       <section className="noon-app-section" aria-label="تحميل التطبيق">
@@ -2067,18 +2147,16 @@ const HomePage = () => {
                 </a>
               </div>
             </div>
-            <div className="noon-app-image">
-              <img
-                src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=400"
-                alt="تطبيق Buildinz"
-              />
-            </div>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="noon-footer" role="contentinfo" aria-label="تذييل الموقع">
+      <footer
+        className="noon-footer"
+        role="contentinfo"
+        aria-label="تذييل الموقع"
+      >
         <div className="noon-footer-container">
           <div className="noon-footer-content">
             {/* About Section */}
@@ -2092,20 +2170,38 @@ const HomePage = () => {
                 دولة الإمارات العربية المتحدة.
               </p>
               <div className="noon-footer-social">
-                <a href="https://www.facebook.com/buildingzuae" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                <a
+                  href="https://www.facebook.com/buildingzuae"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                >
                   <FontAwesomeIcon icon={faFacebookF} />
                 </a>
-                <a href="https://www.instagram.com/buildingzuae/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                <a
+                  href="https://www.instagram.com/buildingzuae/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                >
                   <FontAwesomeIcon icon={faInstagram} />
                 </a>
-                <a href="https://www.tiktok.com/@buildingzuae" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+                <a
+                  href="https://www.tiktok.com/@buildingzuae"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="TikTok"
+                >
                   <FontAwesomeIcon icon={faTiktok} />
                 </a>
               </div>
             </div>
 
             {/* Quick Links */}
-            <nav className="noon-footer-section noon-footer-links" aria-label="روابط سريعة">
+            <nav
+              className="noon-footer-section noon-footer-links"
+              aria-label="روابط سريعة"
+            >
               <h3>روابط سريعة</h3>
               <ul>
                 <li>
@@ -2124,7 +2220,10 @@ const HomePage = () => {
             </nav>
 
             {/* Support */}
-            <nav className="noon-footer-section noon-footer-links" aria-label="الدعم">
+            <nav
+              className="noon-footer-section noon-footer-links"
+              aria-label="الدعم"
+            >
               <h3>الدعم</h3>
               <ul>
                 <li>
@@ -2153,20 +2252,6 @@ const HomePage = () => {
               <div className="noon-contact-info">
                 <FontAwesomeIcon icon={faMapMarkerAlt} />
                 <span> ابو ظبي</span>
-              </div>
-
-              <div className="noon-newsletter">
-                <h4>النشرة الإخبارية</h4>
-                <form onSubmit={handleNewsletterSubmit} aria-label="النشرة الإخبارية">
-                  <input
-                    type="email"
-                    placeholder="بريدك الإلكتروني"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                  <button type="submit">اشتراك</button>
-                </form>
               </div>
             </div>
           </div>
