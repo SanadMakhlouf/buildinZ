@@ -66,6 +66,7 @@
   box-shadow: var(--shadow-sm);
   margin-bottom: 40px;
   position: relative;
+  padding-top: 40px;
 }
 
 .service-header::before {
@@ -82,9 +83,17 @@
   );
 }
 
+.service-header-top {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
 .btn-back {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   padding: 10px 20px;
   background: var(--gray-100);
@@ -95,7 +104,23 @@
   font-weight: 500;
   cursor: pointer;
   transition: var(--transition);
-  margin-bottom: 24px;
+  margin-bottom: 0;
+  width: 100px;
+  line-height: 1;
+}
+
+.btn-back svg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 15px;
+}
+
+.btn-back span {
+  display: flex;
+  align-items: center;
+  line-height: 1;
 }
 
 .btn-back:hover {
@@ -144,6 +169,7 @@
   border-radius: 12px;
   font-size: 14px;
   font-weight: 600;
+  width: 190px;
 }
 
 .service-price-section {
