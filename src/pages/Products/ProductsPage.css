@@ -15,7 +15,7 @@
 }
 
 .popular-section-container {
-  max-width: 1400px;
+  max-width: 100%;
   margin: 0 auto;
   padding: 0 1.5rem;
 }
@@ -23,25 +23,29 @@
 .popular-section-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  gap: 12px;
   margin-bottom: 24px;
+  padding-top: 0;
 }
 
 .popular-section-header h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #0c141d;
+  font-family: var(--font-family-arabic);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--noon-text);
 }
 
 .popular-view-all {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #0a3259;
+  color: var(--noon-primary);
   text-decoration: none;
-  font-weight: 600;
-  font-size: 0.95rem;
-  transition: all 0.3s ease;
+  font-family: var(--font-family-arabic);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-xl);
+  transition: var(--noon-transition);
 }
 
 .popular-view-all:hover {
