@@ -44,6 +44,20 @@ const Navbar = () => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+      // Scroll to top when menu opens
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
+
   // Load default location on mount
   useEffect(() => {
     const loadDefaultLocation = async () => {

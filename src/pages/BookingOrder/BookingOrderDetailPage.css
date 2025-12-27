@@ -3,7 +3,8 @@
   background: #f6f6f6;
   padding: 100px 0 40px;
   direction: rtl;
-  font-family: 'ReadexPro', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: "ReadexPro", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
 }
 
 .booking-order-page .container {
@@ -16,7 +17,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 20px;
+  padding: 5px 10px;
   background: white;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
@@ -53,7 +54,7 @@
 }
 
 .order-number-badge {
-  background: #0A3259;
+  background: #0a3259;
   color: white;
   padding: 10px 20px;
   border-radius: 8px;
@@ -109,7 +110,7 @@
 }
 
 .info-card h2 svg {
-  color: #0A3259;
+  color: #0a3259;
 }
 
 .service-info {
@@ -125,7 +126,6 @@
 }
 
 .service-image {
-  width: 150px;
   height: 150px;
   object-fit: cover;
   border-radius: 8px;
@@ -150,7 +150,7 @@
 }
 
 .service-details .category {
-  color: #0A3259;
+  color: #0a3259;
   font-weight: 500;
 }
 
@@ -170,7 +170,7 @@
 }
 
 .info-item svg {
-  color: #0A3259;
+  color: #0a3259;
   font-size: 1.25rem;
   margin-top: 4px;
   flex-shrink: 0;
@@ -230,7 +230,7 @@
 }
 
 .price-adjustment {
-  color: #0A3259;
+  color: #0a3259;
   font-weight: 600;
   font-size: 0.9rem;
 }
@@ -276,7 +276,7 @@
 
 .product-total {
   font-weight: 600;
-  color: #0A3259 !important;
+  color: #0a3259 !important;
   margin-top: 8px !important;
 }
 
@@ -301,12 +301,12 @@
 
 .file-item:hover {
   background: #f3f4f6;
-  border-color: #0A3259;
-  color: #0A3259;
+  border-color: #0a3259;
+  color: #0a3259;
 }
 
 .file-item svg:first-child {
-  color: #0A3259;
+  color: #0a3259;
 }
 
 .file-item span {
@@ -314,7 +314,7 @@
 }
 
 .pricing-card {
-  background: linear-gradient(135deg, #0A3259 0%, #1a4d80 100%);
+  background: linear-gradient(135deg, #0a3259 0%, #1a4d80 100%);
   color: white;
 }
 
@@ -323,7 +323,7 @@
 }
 
 .pricing-card h2 svg {
-  color: #DAA520;
+  color: #daa520;
 }
 
 .pricing-breakdown {
@@ -345,7 +345,7 @@
 }
 
 .pricing-row.discount {
-  color: #DAA520;
+  color: #daa520;
 }
 
 .pricing-row.total {
@@ -368,7 +368,7 @@
 }
 
 .coming-soon-message svg {
-  color: #DAA520;
+  color: #daa520;
   margin-bottom: 20px;
 }
 
@@ -402,7 +402,7 @@
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background: #0A3259;
+  background: #0a3259;
   color: white;
   border: none;
   border-radius: 8px;
@@ -433,7 +433,7 @@
 
 .address-item h4 {
   margin: 0 0 12px 0;
-  color: #0A3259;
+  color: #0a3259;
   font-size: 1rem;
 }
 
@@ -473,7 +473,7 @@
 }
 
 .date-item svg {
-  color: #0A3259;
+  color: #0a3259;
   font-size: 1.25rem;
   margin-top: 4px;
   flex-shrink: 0;
@@ -505,7 +505,7 @@
 }
 
 .loading-container svg {
-  color: #0A3259;
+  color: #0a3259;
 }
 
 .error-container svg {
@@ -537,7 +537,7 @@
 }
 
 .btn-primary {
-  background: #0A3259;
+  background: #0a3259;
   color: white;
 }
 
@@ -582,7 +582,6 @@
   }
 
   .service-image {
-    width: 120px;
     height: 120px;
   }
 

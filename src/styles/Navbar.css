@@ -53,6 +53,7 @@
 
 .navbar-container {
   width: 100%;
+  max-width: 100%;
   margin: 0 auto;
   padding: 0 16px;
   height: 100%;
@@ -62,6 +63,7 @@
   gap: 1.5rem;
   line-height: 1;
   vertical-align: middle;
+  overflow: hidden;
 }
 
 /* Right Section: Logo (appears on right side in RTL) */
@@ -71,6 +73,8 @@
   height: 100%;
   line-height: 1;
   vertical-align: middle;
+  flex-shrink: 0;
+  min-width: 0;
 }
 
 /* Left Section: Location, Language, User, Cart & Favorites (appears on left side in RTL) */
@@ -81,6 +85,8 @@
   height: 100%;
   line-height: 1;
   vertical-align: middle;
+  overflow: visible;
+  min-width: 0;
 }
 
 .navbar-icon-button {
@@ -153,6 +159,8 @@
   height: 100%;
   line-height: 1;
   vertical-align: middle;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .navbar-search-form {
@@ -424,6 +432,10 @@
   align-items: center;
   height: 100%;
   vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .logo-image {
@@ -448,11 +460,14 @@
   align-items: center;
   justify-content: center;
   line-height: 1;
+  position: relative;
+  z-index: 1001;
+  flex-shrink: 0;
 }
 
 @media (max-width: 768px) {
   .mobile-menu-toggle {
-    display: flex;
+    display: flex !important;
   }
 }
 
@@ -464,6 +479,17 @@
   opacity: 0.8;
 }
 
+/* Ensure mobile menu toggle is always visible on mobile */
+@media (max-width: 768px) {
+  .navbar .mobile-menu-toggle,
+  .navbar-scrolled .mobile-menu-toggle {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    z-index: 1001;
+  }
+}
+
 /* Mobile Menu */
 .mobile-menu {
   position: fixed;
@@ -472,12 +498,13 @@
   right: 0;
   bottom: 0;
   background-color: var(--primary);
-  z-index: 999;
+  z-index: 1002;
   transform: translateY(-100%);
   opacity: 0;
   visibility: hidden;
   transition: transform 0.3s ease, opacity 0.2s ease, visibility 0s 0.3s;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .navbar-scrolled .mobile-menu {
@@ -485,10 +512,17 @@
 }
 
 .mobile-menu.open {
-  transform: translateY(0);
-  opacity: 1;
-  visibility: visible;
+  transform: translateY(0) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
   transition: transform 0.3s ease, opacity 0.2s ease;
+  position: fixed !important;
+  z-index: 1002 !important;
+  top: 70px !important;
+}
+
+.navbar-scrolled .mobile-menu.open {
+  top: 60px !important;
 }
 
 .mobile-menu-container {
@@ -619,66 +653,86 @@
 
   .navbar-container {
     grid-template-columns: auto 1fr auto;
-    padding: 0 16px;
-    gap: 0.75rem;
+    padding: 0 12px;
+    gap: 0.5rem;
   }
 
   .navbar-left {
-    gap: 1rem;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
   }
 
   .navbar-icon-button {
     width: 36px;
     height: 36px;
     font-size: 1.1rem;
+    flex-shrink: 0;
   }
 
   .navbar-search-form {
     max-width: 100%;
+    min-width: 0;
   }
 
   .navbar-search-wrapper {
-    height: 40px;
+    height: 38px;
+    min-width: 0;
   }
 
   .search-category-toggle {
-    padding: 0 0.75rem;
-    font-size: 0.85rem;
+    padding: 0 0.5rem;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .search-category-toggle span {
+    display: none;
   }
 
   .navbar-search-input {
-    font-size: 0.9rem;
-    padding: 0 0.75rem;
+    font-size: 0.85rem;
+    padding: 0 0.5rem;
+    min-width: 0;
   }
 
   .navbar-right {
-    gap: 0.75rem;
+    gap: 0.5rem;
+    flex-shrink: 0;
   }
 
   .navbar-location-button {
     padding: 0.25rem 0.25rem;
+    max-width: 120px;
   }
 
   .location-label {
-    font-size: 0.7rem;
+    display: none;
   }
 
   .location-text {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
+    max-width: 90px;
   }
 
   .navbar-language-button,
   .navbar-user-button {
-    padding: 0.5rem;
-    font-size: 0.85rem;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+
+  .user-text {
+    display: none;
   }
 
   .logo-text {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
+    white-space: nowrap;
   }
 
   .navbar-scrolled .logo-text {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
 }
 
@@ -686,17 +740,50 @@
   .navbar-container {
     grid-template-columns: auto 1fr auto;
     gap: 0.5rem;
+    padding: 0 12px;
+  }
+
+  .navbar-search-form {
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .navbar-search-wrapper {
+    height: 40px;
+  }
+
+  .search-category-toggle {
+    padding: 0 0.6rem;
+    font-size: 0.82rem;
+  }
+
+  .navbar-search-input {
+    font-size: 0.88rem;
+    padding: 0 0.6rem;
+  }
+
+  .location-text {
+    font-size: 0.78rem;
+    max-width: 100px;
   }
 }
 
 @media (max-width: 768px) {
   .navbar-container {
-    grid-template-columns: auto 1fr auto;
-    gap: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 0.4rem;
+    padding: 0 10px;
   }
 
   .navbar-center {
     display: none;
+  }
+
+  .navbar-location-button {
+    padding: 0.4rem;
+    min-width: auto;
+    max-width: none;
   }
 
   .navbar-location-button .location-label,
@@ -704,14 +791,9 @@
     display: none;
   }
 
-  .navbar-location-button {
-    padding: 0.5rem;
-    min-width: auto;
-  }
-
   .navbar-location-button .uae-flag {
-    width: 24px;
-    height: 18px;
+    width: 22px;
+    height: 16px;
   }
 
   .navbar-language-button {
@@ -723,7 +805,7 @@
   }
 
   .navbar-user-button {
-    padding: 0.5rem;
+    padding: 0.4rem;
     min-width: auto;
   }
 
@@ -764,40 +846,71 @@
     justify-content: center;
     padding: 0 4px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 10;
   }
 
   .mobile-menu-toggle {
     display: flex !important;
     flex-shrink: 0;
+    width: 36px;
+    height: 36px;
   }
 
   .logo-text {
-    font-size: 1.2rem;
+    font-size: 1.15rem;
+    white-space: nowrap;
   }
 
   .navbar-left {
-    gap: 0.5rem;
+    gap: 0.4rem;
     flex-wrap: nowrap;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    overflow: visible;
+  }
+
+  .navbar-right {
+    flex-shrink: 0;
+    min-width: 0;
+  }
+
+  .mobile-menu-toggle {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 }
 
 @media (max-width: 640px) {
   .navbar {
-    height: 70px;
-  }
-
-  .navbar-scrolled {
     height: 65px;
   }
 
+  .navbar-scrolled {
+    height: 60px;
+  }
+
   .navbar-container {
-    padding: 0 12px;
-    gap: 0.4rem;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 8px;
+    gap: 0.3rem;
   }
 
   .navbar-left {
-    gap: 0.4rem;
+    gap: 0.3rem;
     flex-wrap: nowrap;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    overflow: visible;
+  }
+
+  .mobile-menu-toggle {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 
   .navbar-icon-button {
@@ -817,11 +930,13 @@
   }
 
   .navbar-right {
-    gap: 0.5rem;
+    gap: 0.3rem;
+    flex-shrink: 0;
+    min-width: 0;
   }
 
   .navbar-user-button {
-    padding: 0.4rem;
+    padding: 0.35rem;
     min-width: auto;
   }
 
@@ -834,38 +949,65 @@
   }
 
   .navbar-location-button {
-    padding: 0.4rem;
+    padding: 0.35rem;
+  }
+
+  .navbar-location-button .uae-flag {
+    width: 20px;
+    height: 15px;
   }
 
   .logo-text {
-    font-size: 1.1rem;
+    font-size: 1rem;
+    white-space: nowrap;
+  }
+
+  .mobile-menu-toggle {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
   }
 
   .mobile-menu {
-    top: 70px;
+    top: 65px;
+  }
+
+  .mobile-menu.open {
+    top: 65px !important;
+    position: fixed !important;
+    z-index: 1002 !important;
   }
 
   .navbar-scrolled .mobile-menu {
-    top: 65px;
+    top: 60px;
+  }
+
+  .navbar-scrolled .mobile-menu.open {
+    top: 60px !important;
+    position: fixed !important;
+    z-index: 1002 !important;
   }
 }
 
 @media (max-width: 480px) {
   .navbar {
-    height: 70px;
+    height: 60px;
   }
 
   .navbar-scrolled {
-    height: 65px;
+    height: 58px;
   }
 
   .navbar-container {
-    padding: 0 8px;
-    gap: 0.3rem;
+    display: flex;
+    padding: 0 6px;
+    gap: 0.25rem;
+    justify-content: space-between;
   }
 
   .logo-text {
-    font-size: 1rem;
+    font-size: 0.95rem;
+    white-space: nowrap;
   }
 
   .navbar-icon-button {
@@ -885,7 +1027,17 @@
   }
 
   .navbar-left {
-    gap: 0.3rem;
+    gap: 0.25rem;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    overflow: visible;
+  }
+
+  .mobile-menu-toggle {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 
   .navbar-user-button {
@@ -901,7 +1053,29 @@
   }
 
   .navbar-location-button .uae-flag {
-    width: 20px;
-    height: 15px;
+    width: 18px;
+    height: 13px;
+  }
+
+  .mobile-menu-toggle {
+    width: 30px;
+    height: 30px;
+    font-size: 0.95rem;
+  }
+
+  .mobile-menu {
+    top: 60px;
+  }
+
+  .mobile-menu.open {
+    top: 60px !important;
+  }
+
+  .navbar-scrolled .mobile-menu {
+    top: 58px;
+  }
+
+  .navbar-scrolled .mobile-menu.open {
+    top: 58px !important;
   }
 }

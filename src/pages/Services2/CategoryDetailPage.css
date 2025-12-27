@@ -4,8 +4,10 @@
   min-height: 100vh;
   background: linear-gradient(135deg, #f9fafb 0%, #e2e8f0 100%);
   direction: rtl;
-  font-family: 'ReadexPro', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: "ReadexPro", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
   animation: fadeIn 0.6s ease-out;
+  padding-top: 0px;
 }
 
 @keyframes fadeIn {
@@ -27,20 +29,19 @@
 
 /* Hero Banner */
 .hero-banner {
-  padding: 80px 0 60px;
+  padding: 46px 0 60px;
   background-size: cover;
   background-position: center;
-  margin-top: -100px;
   position: relative;
   z-index: 1;
   color: white;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
   position: relative;
   text-align: center;
 }
 
 .hero-banner h1 {
-  font-size: 3rem;
+  font-size: 2rem;
   font-weight: 700;
   margin: 0 0 20px;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
@@ -81,7 +82,7 @@
 }
 
 .back-button.secondary {
-  background-color: #0A3259;
+  background-color: #0a3259;
   color: white;
   position: relative;
   top: auto;
@@ -139,23 +140,23 @@
 }
 
 .tab-button.active {
-  color: #0A3259;
+  color: #0a3259;
   font-weight: 600;
   background-color: white;
 }
 
 .tab-button.active::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
   height: 3px;
-  background: linear-gradient(to right, #DAA520, #e6c478);
+  background: linear-gradient(to right, #daa520, #e6c478);
 }
 
 .tab-button:hover {
-  color: #0A3259;
+  color: #0a3259;
   background-color: rgba(255, 255, 255, 0.7);
 }
 
@@ -180,16 +181,16 @@
 
 .view-button:hover {
   background-color: rgba(10, 50, 89, 0.05);
-  color: #0A3259;
+  color: #0a3259;
 }
 
 .view-button.active {
   background-color: rgba(10, 50, 89, 0.1);
-  color: #0A3259;
+  color: #0a3259;
 }
 
 /* Grid View */
-.subcategories-grid, 
+.subcategories-grid,
 .services-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -197,7 +198,7 @@
   padding: 24px;
 }
 
-.subcategory-item.card, 
+.subcategory-item.card,
 .service-item.card {
   position: relative;
   border-radius: 6px;
@@ -212,14 +213,14 @@
   border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.subcategory-item.card:hover, 
+.subcategory-item.card:hover,
 .service-item.card:hover {
   transform: translateY(-6px);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
   border-color: rgba(218, 165, 32, 0.2);
 }
 
-.subcategory-image, 
+.subcategory-image,
 .service-image {
   width: 100%;
   height: 220px;
@@ -231,7 +232,7 @@
   overflow: hidden;
 }
 
-.subcategory-image img, 
+.subcategory-image img,
 .service-image img {
   width: 100%;
   height: 100%;
@@ -240,7 +241,7 @@
   display: block;
 }
 
-.subcategory-item.card:hover .subcategory-image img, 
+.subcategory-item.card:hover .subcategory-image img,
 .service-item.card:hover .service-image img {
   transform: scale(1.05);
 }
@@ -248,7 +249,14 @@
 .service-gradient-bg {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+  background: linear-gradient(
+    135deg,
+    #667eea 0%,
+    #764ba2 25%,
+    #f093fb 50%,
+    #f5576c 75%,
+    #4facfe 100%
+  );
   background-size: 400% 400%;
   animation: gradientShift 8s ease-in-out infinite;
   display: flex;
@@ -259,7 +267,8 @@
 }
 
 @keyframes gradientShift {
-  0%, 100% {
+  0%,
+  100% {
     background-position: 0% 50%;
   }
   50% {
@@ -277,7 +286,8 @@
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px);
   }
   50% {
@@ -291,10 +301,21 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: 
-    radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 0%, transparent 50%),
-    radial-gradient(circle at 40% 80%, rgba(255,255,255,0.1) 0%, transparent 50%);
+  background: radial-gradient(
+      circle at 20% 50%,
+      rgba(255, 255, 255, 0.1) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 20%,
+      rgba(255, 255, 255, 0.1) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 40% 80%,
+      rgba(255, 255, 255, 0.1) 0%,
+      transparent 50%
+    );
   z-index: 1;
 }
 
@@ -311,12 +332,12 @@
   font-size: 1.3rem;
   margin: 0 0 10px;
   font-weight: 600;
-  color: #0A3259;
+  color: #0a3259;
   transition: color 0.3s ease;
 }
 
 .service-item.card:hover .service-content h3 {
-  color: #DAA520;
+  color: #daa520;
 }
 
 .service-content p {
@@ -342,12 +363,12 @@
 
 .service-price {
   font-size: 1.1rem;
-  color: #DAA520;
+  color: #daa520;
   font-weight: 600;
 }
 
 .service-action-btn {
-  background-color: #0A3259;
+  background-color: #0a3259;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -360,7 +381,7 @@
 }
 
 .service-action-btn:hover {
-  background-color: #DAA520;
+  background-color: #daa520;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(218, 165, 32, 0.3);
 }
@@ -378,12 +399,12 @@
   font-size: 1.3rem;
   margin: 0 0 8px;
   font-weight: 600;
-  color: #0A3259;
+  color: #0a3259;
   transition: color 0.3s ease;
 }
 
 .subcategory-item.card:hover .subcategory-content h3 {
-  color: #DAA520;
+  color: #daa520;
 }
 
 .subcategory-content p {
@@ -412,10 +433,10 @@
   gap: 8px;
 }
 
-.subcategory-count, 
+.subcategory-count,
 .service-count {
   background-color: #f0f8ff;
-  color: #0A3259;
+  color: #0a3259;
   padding: 6px 12px;
   border-radius: 12px;
   font-size: 0.85rem;
@@ -424,7 +445,7 @@
 }
 
 .subcategory-action-btn {
-  background-color: #0A3259;
+  background-color: #0a3259;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -438,13 +459,13 @@
 }
 
 .subcategory-action-btn:hover {
-  background-color: #DAA520;
+  background-color: #daa520;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(218, 165, 32, 0.3);
 }
 
 /* List View */
-.subcategories-list, 
+.subcategories-list,
 .services-list {
   display: flex;
   flex-direction: column;
@@ -452,7 +473,7 @@
   padding: 20px;
 }
 
-.subcategory-item.row, 
+.subcategory-item.row,
 .service-item.row {
   display: flex;
   background-color: white;
@@ -464,21 +485,21 @@
   border: 1px solid rgba(0, 0, 0, 0.03);
 }
 
-.subcategory-item.row:hover, 
+.subcategory-item.row:hover,
 .service-item.row:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
   border-color: rgba(10, 50, 89, 0.1);
 }
 
-.subcategory-item.row .subcategory-image, 
+.subcategory-item.row .subcategory-image,
 .service-item.row .service-image {
   width: 180px;
   height: 140px;
   flex-shrink: 0;
 }
 
-.subcategory-details, 
+.subcategory-details,
 .service-details {
   flex: 1;
   padding: 20px;
@@ -486,21 +507,21 @@
   flex-direction: column;
 }
 
-.subcategory-details h3, 
+.subcategory-details h3,
 .service-details h3 {
   font-size: 1.3rem;
-  color: #0A3259;
+  color: #0a3259;
   margin: 0 0 10px;
   font-weight: 600;
   transition: color 0.3s;
 }
 
-.subcategory-item.row:hover .subcategory-details h3, 
+.subcategory-item.row:hover .subcategory-details h3,
 .service-item.row:hover .service-details h3 {
-  color: #DAA520;
+  color: #daa520;
 }
 
-.subcategory-details p, 
+.subcategory-details p,
 .service-details p {
   font-size: 0.95rem;
   color: #666;
@@ -514,7 +535,7 @@
   flex-grow: 1;
 }
 
-.subcategory-meta, 
+.subcategory-meta,
 .service-meta {
   display: flex;
   align-items: center;
@@ -522,10 +543,10 @@
   margin-top: auto;
 }
 
-.subcategory-count, 
+.subcategory-count,
 .service-count {
   background-color: #f0f8ff;
-  color: #0A3259;
+  color: #0a3259;
   padding: 5px 12px;
   border-radius: 12px;
   font-size: 0.85rem;
@@ -534,12 +555,12 @@
 
 .service-price {
   font-size: 1.1rem;
-  color: #DAA520;
+  color: #daa520;
   font-weight: 600;
 }
 
 .view-service-btn {
-  background-color: #0A3259;
+  background-color: #0a3259;
   color: white;
   border: none;
   padding: 8px 15px;
@@ -550,7 +571,7 @@
 }
 
 .view-service-btn:hover {
-  background-color: #DAA520;
+  background-color: #daa520;
   transform: translateY(-2px);
 }
 
@@ -576,7 +597,7 @@
 }
 
 .switch-tab-button {
-  background-color: #0A3259;
+  background-color: #0a3259;
   color: white;
   border: none;
   border-radius: 6px;
@@ -618,7 +639,7 @@
 
 .loading-container svg,
 .error-container svg {
-  color: #DAA520;
+  color: #daa520;
   margin-bottom: 25px;
   font-size: 3rem;
 }
@@ -632,7 +653,7 @@
 }
 
 .retry-button {
-  background-color: #DAA520;
+  background-color: #daa520;
   color: white;
   border: none;
   border-radius: 6px;
@@ -661,34 +682,34 @@
   .hero-banner {
     padding: 100px 0 50px;
   }
-  
+
   .hero-banner h1 {
     font-size: 2.5rem;
   }
-  
+
   .back-button {
     top: 110px;
     right: 20px;
   }
-  
+
   .subcategories-grid,
   .services-grid {
     padding: 25px;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   }
-  
+
   .subcategory-item.card {
     height: 230px;
   }
-  
+
   .service-item.card {
     height: auto;
   }
-  
+
   .service-image {
     height: 180px;
   }
-  
+
   .subcategory-item.row .subcategory-image,
   .service-item.row .service-image {
     width: 150px;
@@ -698,83 +719,84 @@
 @media (max-width: 768px) {
   .hero-banner {
     padding: 90px 0 40px;
+    margin-top: -10px;
   }
-  
+
   .hero-banner h1 {
     font-size: 2rem;
   }
-  
+
   .category-description {
     font-size: 1.1rem;
   }
-  
+
   .back-button {
     padding: 10px 15px;
     font-size: 0.9rem;
   }
-  
+
   .subcategories-grid,
   .services-grid {
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     padding: 20px;
     gap: 20px;
   }
-  
+
   .subcategory-item.card {
     height: 200px;
   }
-  
+
   .service-item.card {
     height: auto;
   }
-  
+
   .service-image {
     height: 160px;
   }
-  
+
   .service-content {
     padding: 15px;
   }
-  
+
   .service-content h3 {
     font-size: 1.2rem;
   }
-  
+
   .service-action-btn {
     padding: 8px 15px;
     font-size: 0.9rem;
   }
-  
+
   .subcategory-content {
     padding: 15px;
   }
-  
+
   .subcategory-content h3 {
     font-size: 1.2rem;
     margin-bottom: 8px;
   }
-  
+
   .subcategory-action-btn {
     padding: 8px 15px;
     font-size: 0.9rem;
   }
-  
+
   .tab-button {
     padding: 15px 10px;
     font-size: 1rem;
   }
-  
+
   .subcategory-item.row,
   .service-item.row {
     flex-direction: column;
   }
-  
+
   .subcategory-item.row .subcategory-image,
   .service-item.row .service-image {
     width: 100%;
     height: 180px;
   }
-  
+
   .view-button {
     width: 35px;
     height: 35px;
@@ -784,101 +806,102 @@
 @media (max-width: 576px) {
   .hero-banner {
     padding: 80px 0 30px;
+    margin-top: -10px;
   }
-  
+
   .hero-banner h1 {
     font-size: 1.8rem;
     margin-bottom: 15px;
   }
-  
+
   .category-description {
     font-size: 1rem;
   }
-  
+
   .content-container {
     margin-top: -40px;
   }
-  
+
   .subcategories-grid,
   .services-grid {
     grid-template-columns: 1fr;
     gap: 15px;
   }
-  
+
   .subcategory-item.card {
     height: 180px;
   }
-  
+
   .service-item.card {
     height: auto;
   }
-  
+
   .service-image {
     height: 150px;
   }
-  
+
   .service-content {
     padding: 12px;
   }
-  
+
   .service-content h3 {
     font-size: 1.1rem;
     margin-bottom: 8px;
   }
-  
+
   .service-content p {
     font-size: 0.85rem;
     margin-bottom: 10px;
   }
-  
+
   .service-footer {
     flex-direction: column;
     align-items: stretch;
     gap: 8px;
   }
-  
+
   .service-action-btn {
     width: 100%;
     padding: 8px;
     font-size: 0.85rem;
   }
-  
+
   .subcategory-content h3 {
     font-size: 1.1rem;
     margin-bottom: 8px;
   }
-  
+
   .subcategory-content p {
     font-size: 0.85rem;
     margin-bottom: 10px;
   }
-  
+
   .subcategory-footer {
     gap: 10px;
   }
-  
+
   .subcategory-action-btn {
     width: 100%;
     padding: 8px;
     font-size: 0.85rem;
   }
-  
+
   .category-header {
     flex-direction: column;
   }
-  
+
   .category-tabs {
     width: 100%;
   }
-  
+
   .tab-button {
     max-width: none;
   }
-  
+
   .view-toggle {
     padding: 10px 0;
     width: 100%;
     justify-content: center;
     border-top: 1px solid #eee;
   }
-} 
+}
