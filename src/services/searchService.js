@@ -64,27 +64,140 @@ const searchService = {
   async search(query, options = {}) {
     try {
       if (!query || query.trim() === '') {
-        throw new Error('Search query is required');
+        return {
+          success: false,
+          results: { services: [], categories: [], products: [] },
+          total_results: 0,
+          message: 'Search query is required'
+        };
       }
 
-      const params = new URLSearchParams();
-      params.append('q', query);
-      
-      // Add type parameter (all, services, categories, products)
+      const searchQuery = query.trim();
       const type = options.type || 'all';
-      params.append('type', type);
-      
-      // Add limit parameter (1-100)
-      const limit = options.limit || 10;
-      if (limit >= 1 && limit <= 100) {
-        params.append('limit', limit);
+      const limit = options.limit || 20;
+
+      // Try global search endpoint first
+      try {
+        const params = new URLSearchParams();
+        params.append('q', searchQuery);
+        params.append('type', type);
+        if (limit >= 1 && limit <= 100) {
+          params.append('limit', limit);
+        }
+        
+        console.log('Search API call:', `/search?${params.toString()}`);
+        const response = await axiosInstance.get(`/search?${params.toString()}`);
+        console.log('Search API response:', response.data);
+        
+        // Handle different response formats
+        if (response.data) {
+          // If response already has the expected format
+          if (response.data.success !== undefined && response.data.success) {
+            return response.data;
+          }
+          // If response is the data directly
+          if (response.data.results || response.data.services || response.data.categories || response.data.products) {
+            return {
+              success: true,
+              results: response.data.results || response.data,
+              total_results: response.data.total_results || response.data.total || 0
+            };
+          }
+        }
+      } catch (globalSearchError) {
+        // If global search fails (500 error), fallback to individual endpoints
+        console.warn('Global search failed, using fallback method:', globalSearchError.response?.status);
       }
-      
-      const response = await axiosInstance.get(`/search?${params.toString()}`);
-      return response.data;
+
+      // Fallback: Search individual endpoints
+      console.log('Using fallback search method');
+      const results = {
+        services: [],
+        categories: [],
+        products: []
+      };
+
+      // Search products
+      if (type === 'all' || type === 'products') {
+        try {
+          const productsParams = new URLSearchParams();
+          productsParams.append('search', searchQuery);
+          productsParams.append('limit', limit);
+          const productsResponse = await axiosInstance.get(`/products?${productsParams.toString()}`);
+          if (productsResponse.data && productsResponse.data.success && productsResponse.data.data) {
+            results.products = Array.isArray(productsResponse.data.data.products) 
+              ? productsResponse.data.data.products 
+              : (Array.isArray(productsResponse.data.data) ? productsResponse.data.data : []);
+          }
+        } catch (err) {
+          console.error('Error searching products:', err);
+        }
+      }
+
+      // Search services
+      if (type === 'all' || type === 'services') {
+        try {
+          const servicesParams = new URLSearchParams();
+          servicesParams.append('search', searchQuery);
+          servicesParams.append('limit', limit);
+          const servicesResponse = await axiosInstance.get(`/services?${servicesParams.toString()}`);
+          if (servicesResponse.data && servicesResponse.data.success && servicesResponse.data.data) {
+            results.services = Array.isArray(servicesResponse.data.data.services)
+              ? servicesResponse.data.data.services
+              : (Array.isArray(servicesResponse.data.data) ? servicesResponse.data.data : []);
+          }
+        } catch (err) {
+          console.error('Error searching services:', err);
+        }
+      }
+
+      // Search categories (filter client-side since there's no search param)
+      if (type === 'all' || type === 'categories') {
+        try {
+          const categoriesResponse = await axiosInstance.get('/categories');
+          if (categoriesResponse.data && categoriesResponse.data.success && categoriesResponse.data.data) {
+            const allCategories = Array.isArray(categoriesResponse.data.data.categories)
+              ? categoriesResponse.data.data.categories
+              : (Array.isArray(categoriesResponse.data.data) ? categoriesResponse.data.data : []);
+            
+            // Filter categories by search query (case-insensitive)
+            const searchLower = searchQuery.toLowerCase();
+            results.categories = allCategories.filter(cat => {
+              const name = (cat.name || '').toLowerCase();
+              const description = (cat.description || '').toLowerCase();
+              return name.includes(searchLower) || description.includes(searchLower);
+            }).slice(0, limit);
+          }
+        } catch (err) {
+          console.error('Error searching categories:', err);
+        }
+      }
+
+      const total = results.services.length + results.categories.length + results.products.length;
+      console.log('Fallback search results:', results);
+
+      return {
+        success: true,
+        results: results,
+        total_results: total
+      };
     } catch (error) {
       console.error('Error performing search:', error);
-      throw error;
+      console.error('Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        url: error.config?.url
+      });
+      
+      // Return empty results instead of throwing
+      return {
+        success: false,
+        results: { services: [], categories: [], products: [] },
+        total_results: 0,
+        error: error.message,
+        status: error.response?.status
+      };
     }
   },
 

@@ -84,9 +84,21 @@ const Navbar = () => {
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
+    e.stopPropagation();
     if (searchQuery.trim()) {
       navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery("");
+    }
+  };
+
+  const handleSearchKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      e.stopPropagation();
+      if (searchQuery.trim()) {
+        navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+        setSearchQuery("");
+      }
     }
   };
 
@@ -130,6 +142,11 @@ const Navbar = () => {
                   type="button" 
                   className="search-category-toggle"
                   aria-label="اختر الفئة"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    // TODO: Add category dropdown functionality
+                  }}
                 >
                   <span>الكل</span>
                   <FontAwesomeIcon icon={faChevronDown} />
@@ -141,12 +158,14 @@ const Navbar = () => {
                   placeholder="ما الذي تبحث عنه؟"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyPress={handleSearchKeyPress}
                   aria-label="البحث"
                 />
                 <button 
                   type="submit" 
                   className="search-submit-button"
                   aria-label="ابحث"
+                  onClick={handleSearchSubmit}
                 >
                   <FontAwesomeIcon icon={faSearch} />
                 </button>
