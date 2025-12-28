@@ -2027,9 +2027,20 @@
   font-weight: var(--font-weight-bold);
   color: var(--noon-accent);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
   margin-bottom: 16px;
+  line-height: 1;
+}
+
+.noon-footer-logo img {
+  height: auto;
+  max-height: 200px;
+  width: auto;
+  max-width: 350px;
+  object-fit: contain;
+  vertical-align: top;
+  flex-shrink: 0;
 }
 
 .noon-footer-about p {
@@ -2063,6 +2074,10 @@
   color: var(--noon-primary-dark);
 }
 
+.noon-footer-links {
+  margin-top: 80px;
+}
+
 .noon-footer-links ul {
   list-style: none;
   padding: 0;
@@ -2085,6 +2100,10 @@
 .noon-footer-links a:hover {
   color: var(--noon-accent);
   padding-right: 4px;
+}
+
+.noon-footer-contact {
+  margin-top: 80px;
 }
 
 .noon-contact-info {

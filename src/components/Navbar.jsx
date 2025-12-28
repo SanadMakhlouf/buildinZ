@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "../styles/Navbar.css";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faSearch, 
-  faBars, 
-  faShoppingBag, 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faSearch,
+  faBars,
+  faShoppingBag,
   faUser,
   faTimes,
   faHeart,
-  faChevronDown
-} from '@fortawesome/free-solid-svg-icons';
-import SearchModal from './SearchModal';
-import LocationModal from './LocationModal';
-import AuthModal from './AuthModal';
-import authService from '../services/authService';
-import { useCart } from '../context/CartContext';
-import addressService from '../services/addressService';
+  faChevronDown,
+} from "@fortawesome/free-solid-svg-icons";
+import SearchModal from "./SearchModal";
+import LocationModal from "./LocationModal";
+import AuthModal from "./AuthModal";
+import authService from "../services/authService";
+import { useCart } from "../context/CartContext";
+import addressService from "../services/addressService";
 
 const Navbar = () => {
   const location = useLocation();
@@ -27,8 +27,10 @@ const Navbar = () => {
   const [searchModalOpen, setSearchModalOpen] = useState(false);
   const [locationModalOpen, setLocationModalOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [authModalMode, setAuthModalMode] = useState('login');
-  const [currentLocation, setCurrentLocation] = useState("أبو ظبي, الإمارات العربية المتحدة");
+  const [authModalMode, setAuthModalMode] = useState("login");
+  const [currentLocation, setCurrentLocation] = useState(
+    "أبو ظبي, الإمارات العربية المتحدة"
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const [language, setLanguage] = useState("English");
 
@@ -36,8 +38,8 @@ const Navbar = () => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   useEffect(() => {
@@ -47,14 +49,14 @@ const Navbar = () => {
   // Prevent body scroll when mobile menu is open
   useEffect(() => {
     if (mobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
       // Scroll to top when menu opens
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     }
     return () => {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     };
   }, [mobileMenuOpen]);
 
@@ -65,14 +67,16 @@ const Navbar = () => {
         if (authService.isAuthenticated()) {
           const defaultAddr = await addressService.getOrCreateDefaultAddress();
           if (defaultAddr) {
-            const locationText = defaultAddr.city 
-              ? `${defaultAddr.city}, ${defaultAddr.country || 'الإمارات العربية المتحدة'}`
+            const locationText = defaultAddr.city
+              ? `${defaultAddr.city}, ${
+                  defaultAddr.country || "الإمارات العربية المتحدة"
+                }`
               : "أبو ظبي, الإمارات العربية المتحدة";
             setCurrentLocation(locationText);
           }
         }
       } catch (error) {
-        console.error('Error loading default location:', error);
+        console.error("Error loading default location:", error);
       }
     };
     loadDefaultLocation();
@@ -92,7 +96,7 @@ const Navbar = () => {
   };
 
   const handleSearchKeyPress = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       e.preventDefault();
       e.stopPropagation();
       if (searchQuery.trim()) {
@@ -105,12 +109,14 @@ const Navbar = () => {
   const handleLocationSelect = (selectedLocation) => {
     // Format the location text
     let locationText = selectedLocation;
-    if (typeof selectedLocation === 'string') {
+    if (typeof selectedLocation === "string") {
       // If it's already a formatted string, use it
       locationText = selectedLocation;
     } else if (selectedLocation.city) {
       // If it's an object with city property
-      locationText = `${selectedLocation.city}, ${selectedLocation.country || 'الإمارات العربية المتحدة'}`;
+      locationText = `${selectedLocation.city}, ${
+        selectedLocation.country || "الإمارات العربية المتحدة"
+      }`;
     }
     setCurrentLocation(locationText);
     setLocationModalOpen(false);
@@ -123,34 +129,39 @@ const Navbar = () => {
 
   return (
     <>
-      <header className={`navbar ${scrolled ? 'navbar-scrolled' : ''}`} dir="rtl" role="banner">
+      <header
+        className={`navbar ${scrolled ? "navbar-scrolled" : ""}`}
+        dir="rtl"
+        role="banner"
+      >
         <div className="navbar-container">
           {/* Right Section: Logo */}
           <div className="navbar-right">
             <div className="navbar-logo">
-              <Link to="/" className="logo-link" aria-label="BuildingZ - الصفحة الرئيسية">
+              <Link
+                to="/"
+                className="logo-link"
+                aria-label="BuildingZ - الصفحة الرئيسية"
+              >
                 <span className="logo-text">BuildingZ</span>
               </Link>
             </div>
+          </div>
+
+          {/* Links between logo and search */}
+          <div className="navbar-center-links">
+            <Link to="/services2" className="navbar-center-link">
+              خدمات
+            </Link>
+            <Link to="/products" className="navbar-center-link">
+              متجر
+            </Link>
           </div>
 
           {/* Center Section: Search Bar */}
           <div className="navbar-center">
             <form className="navbar-search-form" onSubmit={handleSearchSubmit}>
               <div className="navbar-search-wrapper">
-                <button 
-                  type="button" 
-                  className="search-category-toggle"
-                  aria-label="اختر الفئة"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    // TODO: Add category dropdown functionality
-                  }}
-                >
-                  <span>الكل</span>
-                  <FontAwesomeIcon icon={faChevronDown} />
-                </button>
                 <div className="search-divider"></div>
                 <input
                   type="text"
@@ -161,8 +172,8 @@ const Navbar = () => {
                   onKeyPress={handleSearchKeyPress}
                   aria-label="البحث"
                 />
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   className="search-submit-button"
                   aria-label="ابحث"
                   onClick={handleSearchSubmit}
@@ -176,27 +187,30 @@ const Navbar = () => {
           {/* Left Section: Location, Language, User, Cart & Favorites */}
           <div className="navbar-left">
             {/* Location Selector */}
-            <button 
+            <button
               className="navbar-location-button"
               onClick={toggleLocationModal}
               aria-label="اختر موقع التوصيل"
             >
               <span className="location-label">توصيل إلى</span>
               <div className="location-info">
-                <img 
-                  src="https://flagcdn.com/w40/ae.png" 
-                  alt="UAE Flag" 
+                <img
+                  src="https://flagcdn.com/w40/ae.png"
+                  alt="UAE Flag"
                   className="uae-flag"
                 />
                 <span className="location-text">{currentLocation}</span>
-                <FontAwesomeIcon icon={faChevronDown} className="location-chevron" />
+                <FontAwesomeIcon
+                  icon={faChevronDown}
+                  className="location-chevron"
+                />
               </div>
             </button>
 
             <div className="navbar-divider"></div>
 
             {/* Language Selector */}
-            <button 
+            <button
               className="navbar-language-button"
               onClick={handleLanguageToggle}
               aria-label="اختر اللغة"
@@ -208,8 +222,8 @@ const Navbar = () => {
 
             {/* User Account */}
             {authService.isAuthenticated() ? (
-              <Link 
-                to="/profile" 
+              <Link
+                to="/profile"
                 className="navbar-user-button"
                 aria-label="الملف الشخصي"
               >
@@ -219,7 +233,7 @@ const Navbar = () => {
             ) : (
               <button
                 onClick={() => {
-                  setAuthModalMode('login');
+                  setAuthModalMode("login");
                   setAuthModalOpen(true);
                 }}
                 className="navbar-user-button"
@@ -233,10 +247,18 @@ const Navbar = () => {
             <div className="navbar-divider"></div>
 
             {/* Cart & Favorites Icons */}
-            <Link to="/favorites" className="navbar-icon-button" aria-label="المفضلة">
+            <Link
+              to="/favorites"
+              className="navbar-icon-button"
+              aria-label="المفضلة"
+            >
               <FontAwesomeIcon icon={faHeart} />
             </Link>
-            <Link to="/cart" className="navbar-icon-button cart-button" aria-label="سلة التسوق">
+            <Link
+              to="/cart"
+              className="navbar-icon-button cart-button"
+              aria-label="سلة التسوق"
+            >
               <FontAwesomeIcon icon={faShoppingBag} />
               {cartTotal.items > 0 && (
                 <span className="cart-shopping">{cartTotal.items}</span>
@@ -244,8 +266,8 @@ const Navbar = () => {
             </Link>
 
             {/* Mobile Menu Toggle */}
-            <button 
-              className={`mobile-menu-toggle ${mobileMenuOpen ? 'active' : ''}`}
+            <button
+              className={`mobile-menu-toggle ${mobileMenuOpen ? "active" : ""}`}
               onClick={toggleMobileMenu}
               aria-label="القائمة"
             >
@@ -254,12 +276,16 @@ const Navbar = () => {
           </div>
         </div>
 
-        <div className={`mobile-menu ${mobileMenuOpen ? 'open' : ''}`} role="navigation" aria-label="القائمة المحمولة">
+        <div
+          className={`mobile-menu ${mobileMenuOpen ? "open" : ""}`}
+          role="navigation"
+          aria-label="القائمة المحمولة"
+        >
           <div className="mobile-menu-container">
             <div className="mobile-search">
-              <input 
-                type="text" 
-                placeholder="ابحث..." 
+              <input
+                type="text"
+                placeholder="ابحث..."
                 className="mobile-search-input"
                 onClick={() => {
                   setMobileMenuOpen(false);
@@ -268,7 +294,7 @@ const Navbar = () => {
                 readOnly
                 aria-label="البحث"
               />
-              <button 
+              <button
                 className="mobile-search-button"
                 onClick={() => {
                   setMobileMenuOpen(false);
@@ -280,19 +306,35 @@ const Navbar = () => {
               </button>
             </div>
 
-            <nav className="mobile-nav" role="navigation" aria-label="القائمة المحمولة">
-              <Link to="/" className="mobile-nav-link">الرئيسية</Link>
-              <Link to="/services" className="mobile-nav-link">الخدمات</Link>
-              <Link to="/products" className="mobile-nav-link">المتجر</Link>
-              <Link to="/track-order" className="mobile-nav-link">تتبع الطلب</Link>
-              <Link to="/about" className="mobile-nav-link">من نحن</Link>
-              <Link to="/favorites" className="mobile-nav-link">المفضلة</Link>
+            <nav
+              className="mobile-nav"
+              role="navigation"
+              aria-label="القائمة المحمولة"
+            >
+              <Link to="/" className="mobile-nav-link">
+                الرئيسية
+              </Link>
+              <Link to="/services" className="mobile-nav-link">
+                الخدمات
+              </Link>
+              <Link to="/products" className="mobile-nav-link">
+                المتجر
+              </Link>
+              <Link to="/track-order" className="mobile-nav-link">
+                تتبع الطلب
+              </Link>
+              <Link to="/about" className="mobile-nav-link">
+                من نحن
+              </Link>
+              <Link to="/favorites" className="mobile-nav-link">
+                المفضلة
+              </Link>
             </nav>
           </div>
         </div>
       </header>
 
-      <SearchModal 
+      <SearchModal
         isOpen={searchModalOpen}
         onClose={() => setSearchModalOpen(false)}
       />

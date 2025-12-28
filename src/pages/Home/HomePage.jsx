@@ -2162,8 +2162,7 @@ const HomePage = () => {
             {/* About Section */}
             <div className="noon-footer-section noon-footer-about">
               <div className="noon-footer-logo">
-                <FontAwesomeIcon icon={faTools} />
-                Buildinz
+                <img src="/assets/logo.png" alt="Buildinz" />
               </div>
               <p>
                 منصة شاملة تربط بين العملاء ومقدمي الخدمات المنزلية والمهنية في
@@ -2257,7 +2256,7 @@ const HomePage = () => {
           </div>
 
           <div className="noon-footer-bottom">
-            <p>&copy; 2024 Buildinz. جميع الحقوق محفوظة.</p>
+            <p>&copy; 2026 Buildinz. جميع الحقوق محفوظة.</p>
           </div>
         </div>
       </footer>
