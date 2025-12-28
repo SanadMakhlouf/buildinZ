@@ -500,7 +500,6 @@ const ProductsPage = () => {
   // Product Card Component
   const ProductCard = ({ product }) => {
     const [imageError, setImageError] = useState(false);
-    const [isHovered, setIsHovered] = useState(false);
 
     if (!product || !product.id) {
       return null;
@@ -541,8 +540,6 @@ const ProductsPage = () => {
             )}`
           )
         }
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
       >
         <div className="product-image-container">
           {product.image && !imageError ? (
@@ -909,23 +906,6 @@ const ProductsPage = () => {
             </div>
 
             <div className="toolbar-right">
-              <div className="view-mode-toggle">
-                <button
-                  className={`view-btn ${viewMode === "grid" ? "active" : ""}`}
-                  onClick={() => setViewMode("grid")}
-                  title="عرض الشبكة"
-                >
-                  <FontAwesomeIcon icon={faThLarge} />
-                </button>
-                <button
-                  className={`view-btn ${viewMode === "list" ? "active" : ""}`}
-                  onClick={() => setViewMode("list")}
-                  title="عرض القائمة"
-                >
-                  <FontAwesomeIcon icon={faList} />
-                </button>
-              </div>
-
               <div className="sort-selector">
                 <FontAwesomeIcon icon={faSort} />
                 <select

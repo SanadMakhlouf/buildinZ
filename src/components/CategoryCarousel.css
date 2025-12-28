@@ -41,11 +41,11 @@
 }
 
 .category-scroll-right {
-  right: 0;
+  right: 16px;
 }
 
 .category-scroll-left {
-  left: 0;
+  left: 16px;
 }
 
 .category-carousel-scroll {
@@ -127,12 +127,7 @@
 }
 
 .skeleton-circle {
-  background: linear-gradient(
-    90deg,
-    #f0f0f0 25%,
-    #e0e0e0 50%,
-    #f0f0f0 75%
-  );
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200% 100%;
   animation: loading 1.5s infinite;
   border-radius: 50%;
@@ -141,12 +136,7 @@
 .skeleton-text {
   width: 60px;
   height: 12px;
-  background: linear-gradient(
-    90deg,
-    #f0f0f0 25%,
-    #e0e0e0 50%,
-    #f0f0f0 75%
-  );
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200% 100%;
   animation: loading 1.5s infinite;
   border-radius: 4px;
@@ -191,4 +181,3 @@
     font-size: 0.8rem;
   }
 }
-
