@@ -1930,6 +1930,7 @@
   opacity: 0.9;
   margin-bottom: 24px;
   line-height: var(--line-height-relaxed);
+  text-align: center;
 }
 
 .noon-app-buttons {
