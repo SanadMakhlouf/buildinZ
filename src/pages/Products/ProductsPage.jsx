@@ -21,6 +21,7 @@ import {
   faTruck,
   faArrowLeft,
   faTools,
+  faBolt,
 } from "@fortawesome/free-solid-svg-icons";
 import { useCart } from "../../context/CartContext";
 import config from "../../config/apiConfig";
@@ -647,7 +648,11 @@ const ProductsPage = () => {
               <span>التوصيل مجانا</span>
             </div>
             <div className="delivery-express">
-              express Get it by {getDeliveryDate()}
+              <FontAwesomeIcon
+                icon={faBolt}
+                className="delivery-lightning-icon"
+              />
+              <span>يوصلك في {getDeliveryDate()}</span>
             </div>
           </div>
         </div>
@@ -1080,20 +1085,6 @@ const ProductsPage = () => {
                           className="rating-star"
                         />
                       </div>
-
-                      {/* Delivery Information */}
-                      <div className="product-delivery-info">
-                        <div className="delivery-free">
-                          <FontAwesomeIcon
-                            icon={faTruck}
-                            className="delivery-icon"
-                          />
-                          <span>التوصيل مجانا</span>
-                        </div>
-                        <div className="delivery-express">
-                          express Get it by {getDeliveryDate()}
-                        </div>
-                      </div>
                     </div>
                   </div>
                 );
@@ -1268,7 +1259,11 @@ const ProductsPage = () => {
                           <span>التوصيل مجانا</span>
                         </div>
                         <div className="delivery-express">
-                          express Get it by {getDeliveryDate()}
+                          <FontAwesomeIcon
+                            icon={faBolt}
+                            className="delivery-lightning-icon"
+                          />
+                          <span>يوصلك في {getDeliveryDate()}</span>
                         </div>
                       </div>
                     </div>

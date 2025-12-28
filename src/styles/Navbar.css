@@ -646,7 +646,7 @@
   .navbar {
     height: 70px;
   }
-
+  
   .navbar-scrolled {
     height: 60px;
   }
@@ -808,11 +808,11 @@
     padding: 0.4rem;
     min-width: auto;
   }
-
+  
   .navbar-user-button .user-text {
     display: none;
   }
-
+  
   .navbar-user-button svg {
     font-size: 1.1rem;
   }
@@ -825,11 +825,11 @@
     font-size: 1.1rem;
     flex-shrink: 0;
   }
-
+  
   .cart-button {
     position: relative;
   }
-
+  
   .cart-shopping {
     position: absolute;
     top: -2px;
@@ -860,7 +860,7 @@
     font-size: 1.15rem;
     white-space: nowrap;
   }
-
+  
   .navbar-left {
     gap: 0.4rem;
     flex-wrap: nowrap;
@@ -886,7 +886,7 @@
   .navbar {
     height: 65px;
   }
-
+  
   .navbar-scrolled {
     height: 60px;
   }
@@ -920,7 +920,7 @@
     display: flex !important;
     flex-shrink: 0;
   }
-
+  
   .cart-shopping {
     min-width: 16px;
     height: 16px;
@@ -943,11 +943,11 @@
   .navbar-user-button .user-text {
     display: none;
   }
-
+  
   .navbar-user-button svg {
     font-size: 1rem;
   }
-
+  
   .navbar-location-button {
     padding: 0.35rem;
   }
@@ -977,7 +977,7 @@
     position: fixed !important;
     z-index: 1002 !important;
   }
-
+  
   .navbar-scrolled .mobile-menu {
     top: 60px;
   }
@@ -993,7 +993,7 @@
   .navbar {
     height: 60px;
   }
-
+  
   .navbar-scrolled {
     height: 58px;
   }
@@ -1017,7 +1017,7 @@
     display: flex !important;
     flex-shrink: 0;
   }
-
+  
   .cart-shopping {
     min-width: 14px;
     height: 14px;
@@ -1025,7 +1025,7 @@
     top: -1px;
     right: -1px;
   }
-
+  
   .navbar-left {
     gap: 0.25rem;
     min-width: 0;
@@ -1039,19 +1039,19 @@
     visibility: visible !important;
     opacity: 1 !important;
   }
-
+  
   .navbar-user-button {
     padding: 0.3rem;
   }
-
+  
   .navbar-user-button svg {
     font-size: 0.95rem;
   }
-
+  
   .navbar-location-button {
     padding: 0.3rem;
   }
-
+  
   .navbar-location-button .uae-flag {
     width: 18px;
     height: 13px;

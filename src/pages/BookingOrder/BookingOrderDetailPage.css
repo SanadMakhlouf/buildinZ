@@ -123,13 +123,15 @@
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
+  align-items: flex-start;
 }
 
 .service-image {
-  height: 150px;
-  object-fit: cover;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  width: 100%;
+  height: 300px;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  position: relative;
 }
 
 .service-details {
@@ -582,7 +584,8 @@
   }
 
   .service-image {
-    height: 120px;
+    width: 120px;
+    aspect-ratio: 1 / 1;
   }
 
   .customer-info-grid,
