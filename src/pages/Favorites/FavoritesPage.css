@@ -387,6 +387,14 @@
   .product-name {
     font-size: 0.9rem;
   }
+
+  .price-currency {
+    font-size: 0.85rem;
+  }
+
+  .price-value {
+    font-size: 1rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -400,5 +408,13 @@
 
   .empty-icon {
     font-size: 4rem;
+  }
+
+  .price-currency {
+    font-size: 0.75rem;
+  }
+
+  .price-value {
+    font-size: 0.9rem;
   }
 }
