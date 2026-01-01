@@ -1,6 +1,7 @@
 /* Cart Page Styles */
 .cart-page {
-  font-family: 'Noto Kufi Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: "Noto Kufi Arabic", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
   background-color: #ffffff;
   min-height: 100vh;
   padding-bottom: 50px;
@@ -55,7 +56,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.875rem 1.75rem;
-  background: #0A3259;
+  background: #0a3259;
   color: white;
   border: none;
   border-radius: 8px;
@@ -399,18 +400,18 @@
   border: 1.5px solid #dee2e6;
   border-radius: 8px;
   font-size: 0.875rem;
-  font-family: 'Noto Kufi Arabic', sans-serif;
+  font-family: "Noto Kufi Arabic", sans-serif;
 }
 
 .promo-input:focus {
   outline: none;
-  border-color: #0A3259;
+  border-color: #0a3259;
   box-shadow: 0 0 0 3px rgba(10, 50, 89, 0.1);
 }
 
 .apply-promo-btn {
   padding: 0.75rem 1.5rem;
-  background: #0A3259;
+  background: #0a3259;
   color: white;
   border: none;
   border-radius: 8px;
@@ -429,7 +430,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  color: #0A3259;
+  color: #0a3259;
   text-decoration: none;
   font-size: 0.875rem;
   font-weight: 500;
@@ -492,7 +493,7 @@
 .total-row .summary-value {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #0A3259;
+  color: #0a3259;
 }
 
 .payment-plans {
@@ -525,7 +526,7 @@
 .checkout-btn {
   width: 100%;
   padding: 1rem;
-  background: #0A3259;
+  background: #0a3259;
   color: white;
   border: none;
   border-radius: 10px;
@@ -533,7 +534,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-family: 'Noto Kufi Arabic', sans-serif;
+  font-family: "Noto Kufi Arabic", sans-serif;
 }
 
 .checkout-btn:hover {
@@ -580,7 +581,7 @@
     grid-template-columns: 1fr 360px;
     padding: 0 12px;
   }
-  
+
   .cart-item-card {
     grid-template-columns: 140px 1fr 260px;
   }
@@ -590,18 +591,19 @@
   .cart-page-content {
     grid-template-columns: 1fr;
     gap: 1.5rem;
+    padding: 0 12px;
   }
 
   .cart-summary {
     order: -1;
     position: static;
   }
-  
+
   .cart-item-card {
     grid-template-columns: 120px 1fr;
     gap: 1rem;
   }
-  
+
   .cart-item-pricing {
     grid-column: 1 / -1;
     flex-direction: row;
@@ -610,46 +612,286 @@
     padding-top: 1rem;
     border-top: 1px solid #e9ecef;
   }
+
+  .cart-page-header {
+    padding: 0 12px;
+  }
+
+  .cart-page-header h1 {
+    font-size: 1.5rem;
+  }
 }
 
 @media (max-width: 768px) {
+  .container {
+    padding: 1rem 12px;
+  }
+
+  .cart-page-header {
+    padding: 0 12px;
+    margin-bottom: 1.5rem;
+  }
+
+  .cart-page-header h1 {
+    font-size: 1.25rem;
+    margin-top: 10px;
+  }
+
+  .cart-page-content {
+    padding: 0 12px;
+    gap: 1.5rem;
+  }
+
   .cart-item-card {
     grid-template-columns: 100px 1fr;
     padding: 1rem;
+    gap: 1rem;
   }
-  
+
   .cart-item-image {
     width: 100px;
     height: 100px;
   }
-  
+
+  .cart-item-name {
+    font-size: 0.9rem;
+  }
+
+  .cart-item-seller,
+  .delivery-time {
+    font-size: 0.8rem;
+  }
+
+  .current-price {
+    font-size: 1.25rem;
+  }
+
+  .original-price {
+    font-size: 0.8rem;
+  }
+
   .cart-item-pricing {
     flex-wrap: wrap;
     gap: 1rem;
   }
-  
+
   .price-section {
     width: 100%;
+  }
+
+  .cart-summary {
+    padding: 1.25rem;
+  }
+
+  .cart-summary h2 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+
+  .summary-row {
+    font-size: 0.875rem;
+  }
+
+  .total-row {
+    font-size: 0.95rem;
+  }
+
+  .total-row .summary-value {
+    font-size: 1.1rem;
+  }
+
+  .checkout-btn {
+    padding: 0.875rem;
+    font-size: 0.95rem;
+  }
+
+  .promo-input,
+  .apply-promo-btn {
+    font-size: 0.8rem;
+    padding: 0.625rem;
+  }
+
+  .cart-related-products {
+    padding: 0 12px;
+    margin-top: 2rem;
+  }
+
+  .cart-related-products-header h2 {
+    font-size: 1.25rem;
   }
 }
 
 @media (max-width: 480px) {
   .container {
-    padding: 1rem 12px;
+    padding: 0.75rem 8px;
   }
-  
+
+  .cart-page-header {
+    padding: 0 8px;
+    margin-bottom: 1rem;
+  }
+
+  .cart-page-header h1 {
+    font-size: 1.1rem;
+    margin-top: 8px;
+  }
+
+  .cart-page-content {
+    padding: 0 8px;
+    gap: 1rem;
+  }
+
   .cart-item-card {
     grid-template-columns: 1fr;
+    padding: 0.875rem;
+    gap: 0.875rem;
   }
-  
+
   .cart-item-image {
     width: 100%;
     height: 200px;
     margin: 0 auto;
   }
-  
+
+  .cart-item-name {
+    font-size: 0.85rem;
+  }
+
+  .cart-item-seller,
+  .delivery-time {
+    font-size: 0.75rem;
+  }
+
+  .return-policy-badge {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.6rem;
+  }
+
+  .action-btn {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.6rem;
+  }
+
+  .current-price {
+    font-size: 1.1rem;
+  }
+
+  .original-price {
+    font-size: 0.75rem;
+  }
+
+  .discount-badge {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.4rem;
+  }
+
   .cart-item-pricing {
     flex-direction: column;
     align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .quantity-controls {
+    gap: 0.75rem;
+    padding: 0.4rem;
+  }
+
+  .quantity-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .quantity {
+    font-size: 0.9rem;
+    min-width: 40px;
+  }
+
+  .cart-summary {
+    padding: 1rem;
+  }
+
+  .cart-summary h2 {
+    font-size: 1rem;
+    margin-bottom: 0.875rem;
+  }
+
+  .summary-row {
+    font-size: 0.8rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .total-row {
+    font-size: 0.875rem;
+    padding-top: 0.75rem;
+    margin-top: 0.75rem;
+  }
+
+  .total-row .summary-value {
+    font-size: 1rem;
+  }
+
+  .checkout-btn {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .promo-input-wrapper {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .promo-input,
+  .apply-promo-btn {
+    font-size: 0.75rem;
+    padding: 0.625rem;
+    width: 100%;
+  }
+
+  .view-offers-link {
+    font-size: 0.75rem;
+  }
+
+  .payment-plans-header,
+  .payment-plans-link {
+    font-size: 0.75rem;
+  }
+
+  .credit-card-offer p {
+    font-size: 0.75rem;
+  }
+
+  .empty-cart-message {
+    padding: 2rem 1.5rem;
+  }
+
+  .empty-cart-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+  }
+
+  .empty-cart-message h2 {
+    font-size: 1.25rem;
+  }
+
+  .empty-cart-message p {
+    font-size: 0.9rem;
+  }
+
+  .continue-shopping-btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  .cart-related-products {
+    padding: 0 8px;
+    margin-top: 1.5rem;
+  }
+
+  .cart-related-products-header {
+    margin-bottom: 1rem;
+  }
+
+  .cart-related-products-header h2 {
+    font-size: 1.1rem;
   }
 }
