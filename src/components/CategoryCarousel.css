@@ -50,7 +50,7 @@
 
 .category-carousel-scroll {
   display: flex;
-  gap: 24px;
+  gap: 0px;
   overflow-x: auto;
   scroll-behavior: smooth;
   padding: 16px 50px;
