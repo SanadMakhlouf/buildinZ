@@ -681,6 +681,7 @@
 @media (max-width: 992px) {
   .hero-banner {
     padding: 100px 0 50px;
+    padding-top: 140px;
   }
 
   .hero-banner h1 {
@@ -688,7 +689,7 @@
   }
 
   .back-button {
-    top: 110px;
+    top: 20px;
     right: 20px;
   }
 
@@ -719,7 +720,8 @@
 
 @media (max-width: 768px) {
   .hero-banner {
-    padding: 90px 0 40px;
+    padding: 40px 0px 80px;
+    padding-top: 120px;
     margin-top: -10px;
   }
 
@@ -732,6 +734,8 @@
   }
 
   .back-button {
+    top: 15px;
+    right: 15px;
     padding: 10px 15px;
     font-size: 0.9rem;
   }
@@ -806,7 +810,8 @@
 
 @media (max-width: 576px) {
   .hero-banner {
-    padding: 80px 0 30px;
+    padding: 40px 0px 80px;
+    padding-top: 100px;
     margin-top: -10px;
   }
 
@@ -817,6 +822,13 @@
 
   .category-description {
     font-size: 1rem;
+  }
+
+  .back-button {
+    top: 10px;
+    right: 10px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
   }
 
   .content-container {

@@ -729,6 +729,8 @@
   .services-grid,
   .categories-grid {
     grid-template-columns: 1fr;
+    padding-right: 0px;
+    padding-left: 0px;
   }
 
   .products-grid {

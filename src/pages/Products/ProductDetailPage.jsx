@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
+import React, { useState, useEffect, useCallback } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
   faSpinner,
   faExclamationTriangle,
   faShoppingCart,
@@ -30,24 +30,24 @@ import {
   faClock,
   faCreditCard,
   faShieldAlt,
-  faTimesCircle
-} from '@fortawesome/free-solid-svg-icons';
-import { 
-  faFacebook, 
-  faTwitter, 
+  faTimesCircle,
+} from "@fortawesome/free-solid-svg-icons";
+import {
+  faFacebook,
+  faTwitter,
   faInstagram,
   faWhatsapp,
-  faTelegram
-} from '@fortawesome/free-brands-svg-icons';
-import { useCart } from '../../context/CartContext';
-import productService from '../../services/productService';
-import './ProductDetailPage.css';
+  faTelegram,
+} from "@fortawesome/free-brands-svg-icons";
+import { useCart } from "../../context/CartContext";
+import productService from "../../services/productService";
+import "./ProductDetailPage.css";
 
 const ProductDetailPage = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  
+
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -58,16 +58,16 @@ const ProductDetailPage = () => {
   const showVendorSection = false;
   const showReviewsSection = false;
 
-  const slugify = (text = '', fallback = '') => {
+  const slugify = (text = "", fallback = "") => {
     const base = text && text.toString().trim();
     const cleaned = base
       ? base
           .toLowerCase()
-          .replace(/\s+/g, '-')
-          .replace(/[^-\w\u0600-\u06FF]+/g, '')
-          .replace(/-+/g, '-')
-          .replace(/^-+|-+$/g, '')
-      : '';
+          .replace(/\s+/g, "-")
+          .replace(/[^-\w\u0600-\u06FF]+/g, "")
+          .replace(/-+/g, "-")
+          .replace(/^-+|-+$/g, "")
+      : "";
     return cleaned || fallback;
   };
 
@@ -77,18 +77,21 @@ const ProductDetailPage = () => {
         setLoading(true);
         setError(null);
         const response = await productService.getProductById(productId);
-        
+
         if (response.data && response.data.success) {
           setProduct(response.data.data.product);
-          if (response.data.data.product.image_urls && response.data.data.product.image_urls.length > 0) {
+          if (
+            response.data.data.product.image_urls &&
+            response.data.data.product.image_urls.length > 0
+          ) {
             setSelectedImage(0);
           }
         } else {
-          throw new Error('Failed to fetch product details');
+          throw new Error("Failed to fetch product details");
         }
       } catch (err) {
-        console.error('Error fetching product details:', err);
-        setError(err.message || 'فشل في تحميل تفاصيل المنتج');
+        console.error("Error fetching product details:", err);
+        setError(err.message || "فشل في تحميل تفاصيل المنتج");
       } finally {
         setLoading(false);
       }
@@ -98,11 +101,15 @@ const ProductDetailPage = () => {
   }, [productId]);
 
   const handleImageError = (index) => {
-    setImageError(prev => ({ ...prev, [index]: true }));
+    setImageError((prev) => ({ ...prev, [index]: true }));
   };
 
   const increaseQuantity = () => {
-    if (product && product.stock_quantity && quantity < product.stock_quantity) {
+    if (
+      product &&
+      product.stock_quantity &&
+      quantity < product.stock_quantity
+    ) {
       setQuantity(quantity + 1);
     }
   };
@@ -130,13 +137,16 @@ const ProductDetailPage = () => {
         id: product.id,
         name: product.name,
         price: parseFloat(product.price),
-        image: product.primary_image_url || 
-              (product.image_urls && product.image_urls.length > 0 ? product.image_urls[0] : null),
-        vendor: product.vendor_profile?.business_name || '',
+        image:
+          product.primary_image_url ||
+          (product.image_urls && product.image_urls.length > 0
+            ? product.image_urls[0]
+            : null),
+        vendor: product.vendor_profile?.business_name || "",
         stockQuantity: product.stock_quantity || 0,
-        category: product.category?.name || ''
+        category: product.category?.name || "",
       };
-      
+
       addToCart(cartProduct, quantity);
     }
   };
@@ -148,7 +158,10 @@ const ProductDetailPage = () => {
 
   const calculateAverageRating = useCallback(() => {
     if (!product || !product.reviews || product.reviews.length === 0) return 0;
-    const sum = product.reviews.reduce((acc, review) => acc + (review.rating || 0), 0);
+    const sum = product.reviews.reduce(
+      (acc, review) => acc + (review.rating || 0),
+      0
+    );
     return sum / product.reviews.length;
   }, [product]);
 
@@ -157,47 +170,55 @@ const ProductDetailPage = () => {
   const handleSocialShare = (platform) => {
     const productUrl = window.location.href;
     const productTitle = product.name;
-    const productDescription = product.description || '';
+    const productDescription = product.description || "";
 
-    let shareUrl = '';
-    
+    let shareUrl = "";
+
     switch (platform) {
-      case 'facebook':
-        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(productUrl)}`;
+      case "facebook":
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+          productUrl
+        )}`;
         break;
-      case 'twitter':
-        shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(productUrl)}&text=${encodeURIComponent(productTitle)}`;
+      case "twitter":
+        shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(
+          productUrl
+        )}&text=${encodeURIComponent(productTitle)}`;
         break;
-      case 'whatsapp':
-        shareUrl = `https://wa.me/?text=${encodeURIComponent(`${productTitle} - ${productUrl}`)}`;
+      case "whatsapp":
+        shareUrl = `https://wa.me/?text=${encodeURIComponent(
+          `${productTitle} - ${productUrl}`
+        )}`;
         break;
-      case 'telegram':
-        shareUrl = `https://t.me/share/url?url=${encodeURIComponent(productUrl)}&text=${encodeURIComponent(productTitle)}`;
+      case "telegram":
+        shareUrl = `https://t.me/share/url?url=${encodeURIComponent(
+          productUrl
+        )}&text=${encodeURIComponent(productTitle)}`;
         break;
-      case 'instagram':
+      case "instagram":
         navigator.clipboard.writeText(`${productTitle} - ${productUrl}`);
-        alert('تم نسخ رابط المنتج! يمكنك مشاركته على Instagram');
+        alert("تم نسخ رابط المنتج! يمكنك مشاركته على Instagram");
         return;
-      case 'copy':
+      case "copy":
         navigator.clipboard.writeText(productUrl);
-        alert('تم نسخ رابط المنتج!');
+        alert("تم نسخ رابط المنتج!");
         return;
       default:
         return;
     }
 
     if (shareUrl) {
-      window.open(shareUrl, '_blank', 'width=600,height=400');
+      window.open(shareUrl, "_blank", "width=600,height=400");
     }
   };
 
   const formatDimensions = (dimensions) => {
-    if (!dimensions) return '';
-    if (typeof dimensions === 'object') {
+    if (!dimensions) return "";
+    if (typeof dimensions === "object") {
       const { length, width, height } = dimensions;
       return `${length || 0} × ${width || 0} × ${height || 0} سم`;
     }
-    if (typeof dimensions === 'string') {
+    if (typeof dimensions === "string") {
       return dimensions;
     }
     return String(dimensions);
@@ -205,7 +226,7 @@ const ProductDetailPage = () => {
 
   const formatSpecifications = (specs) => {
     if (!specs) return null;
-    if (typeof specs === 'object') {
+    if (typeof specs === "object") {
       return (
         <div className="specs-grid">
           {Object.entries(specs).map(([key, value]) => (
@@ -228,13 +249,15 @@ const ProductDetailPage = () => {
 
   const prevImage = () => {
     if (product && availableImages.length > 0) {
-      setSelectedImage((prev) => (prev - 1 + availableImages.length) % availableImages.length);
+      setSelectedImage(
+        (prev) => (prev - 1 + availableImages.length) % availableImages.length
+      );
     }
   };
 
   if (loading) {
     return (
-      <div className="product-detail-page">
+      <div className="product-detail-page" style={{ paddingTop: "20px" }}>
         <div className="product-loading">
           <FontAwesomeIcon icon={faSpinner} spin size="3x" />
           <p>جاري تحميل تفاصيل المنتج...</p>
@@ -249,8 +272,11 @@ const ProductDetailPage = () => {
         <div className="product-error">
           <FontAwesomeIcon icon={faExclamationTriangle} size="3x" />
           <h2>فشل في تحميل تفاصيل المنتج</h2>
-          <p>{error || 'لم يتم العثور على المنتج'}</p>
-          <button className="retry-button" onClick={() => navigate('/products')}>
+          <p>{error || "لم يتم العثور على المنتج"}</p>
+          <button
+            className="retry-button"
+            onClick={() => navigate("/products")}
+          >
             العودة إلى المنتجات
           </button>
         </div>
@@ -258,15 +284,19 @@ const ProductDetailPage = () => {
     );
   }
 
-  const availableImages = product.image_urls && product.image_urls.length > 0 
-    ? product.image_urls 
-    : product.primary_image_url 
-      ? [product.primary_image_url] 
+  const availableImages =
+    product.image_urls && product.image_urls.length > 0
+      ? product.image_urls
+      : product.primary_image_url
+      ? [product.primary_image_url]
       : [];
 
   // SEO Data
-  const pageTitle = `${product.name} - ${product.category?.name || 'منتج'} - BuildingZ`;
-  const pageDescription = product.description || `اشتري ${product.name} من BuildingZ`;
+  const pageTitle = `${product.name} - ${
+    product.category?.name || "منتج"
+  } - BuildingZ`;
+  const pageDescription =
+    product.description || `اشتري ${product.name} من BuildingZ`;
   const pageUrl = `${window.location.origin}/products/${product.id}/${slugify(
     product.name,
     `product-${product.id}`
@@ -278,37 +308,45 @@ const ProductDetailPage = () => {
       <Helmet>
         <title>{pageTitle}</title>
         <meta name="description" content={pageDescription} />
-        <meta name="keywords" content={`${product.name}, ${product.category?.name || ''}, BuildingZ, منتجات`} />
-        
+        <meta
+          name="keywords"
+          content={`${product.name}, ${
+            product.category?.name || ""
+          }, BuildingZ, منتجات`}
+        />
+
         <meta property="og:title" content={pageTitle} />
         <meta property="og:description" content={pageDescription} />
         <meta property="og:type" content="product" />
         <meta property="og:url" content={pageUrl} />
         {productImage && <meta property="og:image" content={productImage} />}
-        
+
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={pageTitle} />
         <meta name="twitter:description" content={pageDescription} />
         {productImage && <meta name="twitter:image" content={productImage} />}
-        
+
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org/",
             "@type": "Product",
-            "name": product.name,
-            "description": product.description,
-            "image": availableImages,
-            "sku": product.sku,
-            "offers": {
+            name: product.name,
+            description: product.description,
+            image: availableImages,
+            sku: product.sku,
+            offers: {
               "@type": "Offer",
-              "url": pageUrl,
-              "priceCurrency": "AED",
-              "price": product.price,
-              "availability": product.stock_quantity > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-              "itemCondition": "https://schema.org/NewCondition"
+              url: pageUrl,
+              priceCurrency: "AED",
+              price: product.price,
+              availability:
+                product.stock_quantity > 0
+                  ? "https://schema.org/InStock"
+                  : "https://schema.org/OutOfStock",
+              itemCondition: "https://schema.org/NewCondition",
             },
-            "brand": product.vendor_profile?.business_name || "BuildingZ",
-            "category": product.category?.name
+            brand: product.vendor_profile?.business_name || "BuildingZ",
+            category: product.category?.name,
           })}
         </script>
       </Helmet>
@@ -321,7 +359,10 @@ const ProductDetailPage = () => {
               <FontAwesomeIcon icon={faArrowLeft} />
               <span>العودة</span>
             </button>
-            <button className="breadcrumb-link" onClick={() => navigate('/products')}>
+            <button
+              className="breadcrumb-link"
+              onClick={() => navigate("/products")}
+            >
               المنتجات
             </button>
             {product.category && (
@@ -331,7 +372,9 @@ const ProductDetailPage = () => {
               </>
             )}
             <span className="breadcrumb-separator">›</span>
-            <span className="breadcrumb-current" title={product.name}>{product.name}</span>
+            <span className="breadcrumb-current" title={product.name}>
+              {product.name}
+            </span>
           </nav>
         </div>
       </div>
@@ -342,23 +385,25 @@ const ProductDetailPage = () => {
           <div className="product-images-column">
             {/* Main Images - Can show 2 stacked images */}
             <div className="product-main-images">
-              {availableImages.length > 0 && availableImages[selectedImage] && !imageError[selectedImage] ? (
+              {availableImages.length > 0 &&
+              availableImages[selectedImage] &&
+              !imageError[selectedImage] ? (
                 <div className="main-image-wrapper">
-                  <img 
-                    src={availableImages[selectedImage]} 
+                  <img
+                    src={availableImages[selectedImage]}
                     alt={product.name}
                     className="main-product-image"
                   />
                   {availableImages.length > 1 && (
                     <>
-                      <button 
+                      <button
                         className="image-nav-button prev"
                         onClick={prevImage}
                         aria-label="Previous image"
                       >
                         <FontAwesomeIcon icon={faChevronRight} />
                       </button>
-                      <button 
+                      <button
                         className="image-nav-button next"
                         onClick={nextImage}
                         aria-label="Next image"
@@ -382,12 +427,14 @@ const ProductDetailPage = () => {
                 {availableImages.map((url, index) => (
                   <div
                     key={index}
-                    className={`thumbnail ${selectedImage === index ? 'active' : ''} ${imageError[index] ? 'error' : ''}`}
+                    className={`thumbnail ${
+                      selectedImage === index ? "active" : ""
+                    } ${imageError[index] ? "error" : ""}`}
                     onClick={() => setSelectedImage(index)}
                   >
                     {!imageError[index] && url ? (
-                      <img 
-                        src={url} 
+                      <img
+                        src={url}
                         alt={`${product.name} - عرض ${index + 1}`}
                         onError={() => handleImageError(index)}
                       />
@@ -410,11 +457,18 @@ const ProductDetailPage = () => {
                 <button
                   className="seller-favorite-btn"
                   onClick={handleAddToWishlist}
-                  title={isWishlisted ? 'إزالة من المفضلة' : 'إضافة إلى المفضلة'}
+                  title={
+                    isWishlisted ? "إزالة من المفضلة" : "إضافة إلى المفضلة"
+                  }
                 >
-                  <FontAwesomeIcon icon={faHeart} className={isWishlisted ? 'active' : ''} />
+                  <FontAwesomeIcon
+                    icon={faHeart}
+                    className={isWishlisted ? "active" : ""}
+                  />
                 </button>
-                <span className="seller-name">{product.vendor_profile.business_name}</span>
+                <span className="seller-name">
+                  {product.vendor_profile.business_name}
+                </span>
                 <span className="seller-arrow">›</span>
               </div>
             )}
@@ -429,40 +483,67 @@ const ProductDetailPage = () => {
                   <FontAwesomeIcon
                     key={star}
                     icon={faStar}
-                    className={`star ${star <= Math.round(averageRating) ? 'filled' : ''}`}
+                    className={`star ${
+                      star <= Math.round(averageRating) ? "filled" : ""
+                    }`}
                   />
                 ))}
               </div>
               <span className="rating-value">{averageRating.toFixed(1)}</span>
               <span className="rating-count">
-                ({product.reviews && Array.isArray(product.reviews) ? product.reviews.length : 0} تقييم)
+                (
+                {product.reviews && Array.isArray(product.reviews)
+                  ? product.reviews.length
+                  : 0}{" "}
+                تقييم)
               </span>
             </div>
 
             {/* Price Section */}
             <div className="product-price-section">
-              {(product.original_price || product.originalPrice) && parseFloat(product.original_price || product.originalPrice) > parseFloat(product.price) && (
-                <div className="price-original-wrapper">
-                  <span className="price-original">
-                    {parseFloat(product.original_price || product.originalPrice).toFixed(2)} درهم
-                  </span>
-                </div>
-              )}
-              <div className="price-main">
-                <span className="price-value">{parseFloat(product.price).toFixed(2)}</span>
-                <span className="price-currency">درهم</span>
-                {(product.original_price || product.originalPrice) && parseFloat(product.original_price || product.originalPrice) > parseFloat(product.price) && (
-                  <span className="discount-badge">
-                    {Math.round(((parseFloat(product.original_price || product.originalPrice) - parseFloat(product.price)) / parseFloat(product.original_price || product.originalPrice)) * 100)}% Off
-                  </span>
+              {(product.original_price || product.originalPrice) &&
+                parseFloat(product.original_price || product.originalPrice) >
+                  parseFloat(product.price) && (
+                  <div className="price-original-wrapper">
+                    <span className="price-original">
+                      {parseFloat(
+                        product.original_price || product.originalPrice
+                      ).toFixed(2)}{" "}
+                      درهم
+                    </span>
+                  </div>
                 )}
+              <div className="price-main">
+                <span className="price-value">
+                  {parseFloat(product.price).toFixed(2)}
+                </span>
+                <span className="price-currency">درهم</span>
+                {(product.original_price || product.originalPrice) &&
+                  parseFloat(product.original_price || product.originalPrice) >
+                    parseFloat(product.price) && (
+                    <span className="discount-badge">
+                      {Math.round(
+                        ((parseFloat(
+                          product.original_price || product.originalPrice
+                        ) -
+                          parseFloat(product.price)) /
+                          parseFloat(
+                            product.original_price || product.originalPrice
+                          )) *
+                          100
+                      )}
+                      % Off
+                    </span>
+                  )}
               </div>
-              {(product.original_price || product.originalPrice) && parseFloat(product.original_price || product.originalPrice) > parseFloat(product.price) && (
-                <div className="lowest-price-banner">
-                  <FontAwesomeIcon icon={faTag} />
-                  <span>Lowest price in a year</span>
-                </div>
-              )}
+              {(product.original_price || product.originalPrice) &&
+                parseFloat(product.original_price || product.originalPrice) >
+                  parseFloat(product.price) && (
+                  <div className="lowest-price-banner">
+                    <FontAwesomeIcon icon={faTag} />
+                    <span>Lowest price in a year</span>
+                  </div>
+                )}
             </div>
 
             {/* Delivery Information */}
@@ -483,13 +564,30 @@ const ProductDetailPage = () => {
             <div className="product-payment-options">
               <div className="payment-option">
                 <FontAwesomeIcon icon={faCreditCard} />
-                <span>Pay in 4 simple, interest free payments of D {((parseFloat(product.price) || 0) / 4).toFixed(2)}</span>
-                <button className="payment-learn-more" onClick={(e) => { e.stopPropagation(); }}>Learn more</button>
+                <span>
+                  Pay in 4 simple, interest free payments of D{" "}
+                  {((parseFloat(product.price) || 0) / 4).toFixed(2)}
+                </span>
+                <button
+                  className="payment-learn-more"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                >
+                  Learn more
+                </button>
               </div>
               <div className="payment-option">
                 <FontAwesomeIcon icon={faCreditCard} />
                 <span>Earn 5% cashback Card.</span>
-                <button className="payment-apply" onClick={(e) => { e.stopPropagation(); }}>Apply now</button>
+                <button
+                  className="payment-apply"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                >
+                  Apply now
+                </button>
               </div>
             </div>
 
@@ -501,7 +599,9 @@ const ProductDetailPage = () => {
                   {product.variants.map((variant, index) => (
                     <button
                       key={index}
-                      className={`variant-option ${index === 0 ? 'selected' : ''}`}
+                      className={`variant-option ${
+                        index === 0 ? "selected" : ""
+                      }`}
                     >
                       {variant.name || variant.color || `خيار ${index + 1}`}
                     </button>
@@ -518,13 +618,17 @@ const ProductDetailPage = () => {
               <div className="seller-sidebar-header">
                 <FontAwesomeIcon icon={faStore} className="seller-icon" />
                 <span className="seller-label">Sold by</span>
-                <span className="seller-name-link">{product.vendor_profile?.business_name || 'BuildingZ'}</span>
+                <span className="seller-name-link">
+                  {product.vendor_profile?.business_name || "BuildingZ"}
+                </span>
                 <span className="seller-arrow">›</span>
               </div>
               <div className="seller-sidebar-info">
                 <div className="seller-info-item">
                   <span className="seller-info-label">Seller Ratings:</span>
-                  <span className="seller-info-value">Not enough ratings to show</span>
+                  <span className="seller-info-value">
+                    Not enough ratings to show
+                  </span>
                 </div>
                 <div className="seller-info-item">
                   <span className="seller-info-label">Partner Since:</span>
@@ -574,7 +678,13 @@ const ProductDetailPage = () => {
           <div className="details-tabs">
             <button className="tab-button active">تفاصيل المنتج</button>
             <button className="tab-button">المواصفات</button>
-            <button className="tab-button">التقييمات ({product.reviews && Array.isArray(product.reviews) ? product.reviews.length : 0})</button>
+            <button className="tab-button">
+              التقييمات (
+              {product.reviews && Array.isArray(product.reviews)
+                ? product.reviews.length
+                : 0}
+              )
+            </button>
           </div>
 
           <div className="details-content">
@@ -589,19 +699,28 @@ const ProductDetailPage = () => {
                   </div>
                 </div>
               )}
-              
-              {product.stock_quantity !== null && product.stock_quantity !== undefined && (
-                <div className="detail-card">
-                  <FontAwesomeIcon icon={faTruck} className="detail-icon" />
-                  <div className="detail-text">
-                    <span className="detail-label">المخزون</span>
-                    <span className={`detail-value ${product.stock_quantity > 0 ? 'in-stock' : 'out-of-stock'}`}>
-                      {product.stock_quantity > 0 ? `${product.stock_quantity} قطعة` : 'غير متوفر'}
-                    </span>
+
+              {product.stock_quantity !== null &&
+                product.stock_quantity !== undefined && (
+                  <div className="detail-card">
+                    <FontAwesomeIcon icon={faTruck} className="detail-icon" />
+                    <div className="detail-text">
+                      <span className="detail-label">المخزون</span>
+                      <span
+                        className={`detail-value ${
+                          product.stock_quantity > 0
+                            ? "in-stock"
+                            : "out-of-stock"
+                        }`}
+                      >
+                        {product.stock_quantity > 0
+                          ? `${product.stock_quantity} قطعة`
+                          : "غير متوفر"}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              )}
-              
+                )}
+
               {product.weight && (
                 <div className="detail-card">
                   <FontAwesomeIcon icon={faWeight} className="detail-icon" />
@@ -611,23 +730,30 @@ const ProductDetailPage = () => {
                   </div>
                 </div>
               )}
-              
+
               {product.dimensions && (
                 <div className="detail-card">
                   <FontAwesomeIcon icon={faRuler} className="detail-icon" />
                   <div className="detail-text">
                     <span className="detail-label">الأبعاد</span>
-                    <span className="detail-value">{formatDimensions(product.dimensions)}</span>
+                    <span className="detail-value">
+                      {formatDimensions(product.dimensions)}
+                    </span>
                   </div>
                 </div>
               )}
-              
+
               {product.category && (
                 <div className="detail-card">
-                  <FontAwesomeIcon icon={faLayerGroup} className="detail-icon" />
+                  <FontAwesomeIcon
+                    icon={faLayerGroup}
+                    className="detail-icon"
+                  />
                   <div className="detail-text">
                     <span className="detail-label">الفئة</span>
-                    <span className="detail-value">{product.category.name}</span>
+                    <span className="detail-value">
+                      {product.category.name}
+                    </span>
                   </div>
                 </div>
               )}
@@ -640,7 +766,7 @@ const ProductDetailPage = () => {
                 {formatSpecifications(product.specifications)}
               </div>
             )}
-            
+
             {!product.specifications && product.description && (
               <div className="specifications-box">
                 <h3 className="specs-title">الوصف</h3>
@@ -668,10 +794,12 @@ const ProductDetailPage = () => {
                   )}
                 </h3>
                 {product.vendor_profile.business_description && (
-                  <p className="vendor-description">{product.vendor_profile.business_description}</p>
+                  <p className="vendor-description">
+                    {product.vendor_profile.business_description}
+                  </p>
                 )}
               </div>
-              
+
               <div className="vendor-info-grid">
                 {product.vendor_profile.business_address && (
                   <div className="vendor-info-item">
@@ -679,7 +807,7 @@ const ProductDetailPage = () => {
                     <span>{product.vendor_profile.business_address}</span>
                   </div>
                 )}
-                
+
                 {product.vendor_profile.business_phone && (
                   <div className="vendor-info-item">
                     <FontAwesomeIcon icon={faPhone} />
@@ -688,50 +816,77 @@ const ProductDetailPage = () => {
                     </a>
                   </div>
                 )}
-                
-              {product.vendor_profile.user?.email && (
-                <div className="vendor-info-item">
-                  <FontAwesomeIcon icon={faEnvelope} />
-                  <a href={`mailto:${product.vendor_profile.user.email}`}>
-                    {product.vendor_profile.user.email}
-                  </a>
-                </div>
-              )}
-              
-              {product.vendor_profile.license_number && (
-                <div className="vendor-info-item">
-                  <FontAwesomeIcon icon={faInfoCircle} />
-                  <span>رقم الترخيص: <strong>{product.vendor_profile.license_number}</strong></span>
-                </div>
-              )}
-              
-              {product.vendor_profile.tax_id && (
-                <div className="vendor-info-item">
-                  <FontAwesomeIcon icon={faInfoCircle} />
-                  <span>الرقم الضريبي: <strong>{product.vendor_profile.tax_id}</strong></span>
-                </div>
-              )}
-              
-              {product.vendor_profile.services_offered && product.vendor_profile.services_offered.length > 0 && (
-                <div className="vendor-info-item full-width">
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', width: '100%' }}>
-                    <span style={{ fontWeight: 600, color: '#0A3259' }}>الخدمات المقدمة:</span>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                      {product.vendor_profile.services_offered.map((service, index) => (
-                        <span key={index} style={{ 
-                          background: '#f9fafb', 
-                          padding: '0.5rem 1rem', 
-                          borderRadius: '8px', 
-                          fontSize: '0.9rem',
-                          border: '1px solid #e5e7eb'
-                        }}>
-                          {service}
-                        </span>
-                      ))}
-                    </div>
+
+                {product.vendor_profile.user?.email && (
+                  <div className="vendor-info-item">
+                    <FontAwesomeIcon icon={faEnvelope} />
+                    <a href={`mailto:${product.vendor_profile.user.email}`}>
+                      {product.vendor_profile.user.email}
+                    </a>
                   </div>
-                </div>
-              )}
+                )}
+
+                {product.vendor_profile.license_number && (
+                  <div className="vendor-info-item">
+                    <FontAwesomeIcon icon={faInfoCircle} />
+                    <span>
+                      رقم الترخيص:{" "}
+                      <strong>{product.vendor_profile.license_number}</strong>
+                    </span>
+                  </div>
+                )}
+
+                {product.vendor_profile.tax_id && (
+                  <div className="vendor-info-item">
+                    <FontAwesomeIcon icon={faInfoCircle} />
+                    <span>
+                      الرقم الضريبي:{" "}
+                      <strong>{product.vendor_profile.tax_id}</strong>
+                    </span>
+                  </div>
+                )}
+
+                {product.vendor_profile.services_offered &&
+                  product.vendor_profile.services_offered.length > 0 && (
+                    <div className="vendor-info-item full-width">
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: "0.5rem",
+                          width: "100%",
+                        }}
+                      >
+                        <span style={{ fontWeight: 600, color: "#0A3259" }}>
+                          الخدمات المقدمة:
+                        </span>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            gap: "0.5rem",
+                          }}
+                        >
+                          {product.vendor_profile.services_offered.map(
+                            (service, index) => (
+                              <span
+                                key={index}
+                                style={{
+                                  background: "#f9fafb",
+                                  padding: "0.5rem 1rem",
+                                  borderRadius: "8px",
+                                  fontSize: "0.9rem",
+                                  border: "1px solid #e5e7eb",
+                                }}
+                              >
+                                {service}
+                              </span>
+                            )
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
               </div>
             </div>
           </div>

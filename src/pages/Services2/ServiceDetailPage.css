@@ -69,20 +69,6 @@
   padding-top: 40px;
 }
 
-.service-header::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(
-    90deg,
-    var(--primary) 0%,
-    var(--primary-light) 100%
-  );
-}
-
 .service-header-top {
   display: flex;
   flex-direction: column;
@@ -1746,7 +1732,7 @@
 
 @media (max-width: 768px) {
   .service-header {
-    padding: 80px 0 30px;
+    padding: 25px 0 30px;
   }
 
   .service-title-section h1 {

@@ -5,7 +5,8 @@
   right: 20px;
   z-index: 1000;
   direction: rtl;
-  font-family: 'ReadexPro', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: "ReadexPro", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
 }
 
 /* Cart Toggle Button */
@@ -14,7 +15,7 @@
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background: var(--gradient-accent, linear-gradient(135deg, #DAA520, #f0c14b));
+  background: var(--gradient-accent, linear-gradient(135deg, #daa520, #f0c14b));
   color: var(--primary-dark, #072441);
   display: flex;
   align-items: center;
@@ -243,7 +244,8 @@
   gap: 10px;
 }
 
-.view-cart-btn, .checkout-btn {
+.view-cart-btn,
+.checkout-btn {
   padding: 8px 15px;
   border-radius: 5px;
   text-align: center;
@@ -257,8 +259,8 @@
 
 .view-cart-btn {
   background-color: white;
-  border: 1px solid #DAA520;
-  color: #DAA520;
+  border: 1px solid #daa520;
+  color: #daa520;
 }
 
 .view-cart-btn:hover {
@@ -266,13 +268,16 @@
 }
 
 .checkout-btn {
-  background: var(--gradient-accent, linear-gradient(135deg, #DAA520, #f0c14b));
+  background: var(--gradient-accent, linear-gradient(135deg, #daa520, #f0c14b));
   color: var(--primary-dark, #072441);
   border: none;
 }
 
 .checkout-btn:hover {
-  background: var(--gradient-accent-hover, linear-gradient(135deg, #c99100, #e0b347));
+  background: var(
+    --gradient-accent-hover,
+    linear-gradient(135deg, #c99100, #e0b347)
+  );
 }
 
 /* Responsive Styles */
@@ -281,13 +286,14 @@
     width: 300px;
     right: -10px;
   }
-  
+
   .cart-toggle {
     width: 50px;
     height: 50px;
     font-size: 1.3rem;
+    display: none;
   }
-  
+
   .cart-count {
     width: 22px;
     height: 22px;
@@ -299,9 +305,9 @@
   .cart-content {
     width: 280px;
   }
-  
+
   .item-image {
     width: 50px;
     height: 50px;
   }
-} 
+}
