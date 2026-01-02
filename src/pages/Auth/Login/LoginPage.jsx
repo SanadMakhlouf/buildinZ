@@ -135,9 +135,7 @@ const LoginPage = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <Link to="/" className="auth-logo">
-          <span className="logo-text">BuildingZ</span>
-        </Link>
+        
         <Link to="/" className="back-link">
           العودة للرئيسية
         </Link>
