@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faTrash, 
@@ -31,6 +32,12 @@ const CartPage = () => {
   if (cart.length === 0) {
     return (
       <div className="cart-page" dir="rtl">
+        <Helmet>
+          <title>سلة التسوق | BuildingZ</title>
+          <meta name="description" content="سلة التسوق الخاصة بك في BuildingZ - تسوق مواد البناء والديكور" />
+          <meta name="robots" content="noindex, nofollow" />
+          <link rel="canonical" href="https://buildingzuae.com/cart" />
+        </Helmet>
         <div className="cart-container">
           <div className="cart-empty">
             <div className="cart-empty-icon">
@@ -54,12 +61,17 @@ const CartPage = () => {
 
   return (
     <div className="cart-page" dir="rtl">
+      <Helmet>
+        <title>{`سلة التسوق (${cartTotal.items} منتج) | BuildingZ`}</title>
+        <meta name="description" content={`سلة التسوق الخاصة بك تحتوي على ${cartTotal.items} منتج - BuildingZ`} />
+        <meta name="robots" content="noindex, nofollow" />
+        <link rel="canonical" href="https://buildingzuae.com/cart" />
+      </Helmet>
       <div className="cart-container">
         {/* Header */}
         <div className="cart-header">
           <h1>سلة التسوق</h1>
-          <span className="cart-count">{cartTotal.items} منتج</span>
-        </div>
+=        </div>
         
         <div className="cart-main-content">
           {/* Cart Items */}
@@ -89,11 +101,7 @@ const CartPage = () => {
                     {item.name}
                   </h3>
                   
-                  {item.vendor && (
-                    <span className="cart-item-vendor">
-                      البائع: {item.vendor}
-                    </span>
-                  )}
+                  
                   
                   {item.stockQuantity && item.stockQuantity <= 5 && (
                     <span className="cart-item-stock-warning">

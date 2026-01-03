@@ -258,20 +258,118 @@ const ProductDetailPage = () => {
 
   // SEO Data
   const pageTitle = `${product.name} - ${product.category?.name || "منتج"} | BuildingZ`;
-  const pageDescription = product.description || `اشتري ${product.name} من BuildingZ`;
-  const pageUrl = `${window.location.origin}/products/${product.id}/${slugify(product.name, `product-${product.id}`)}`;
-  const productImage = availableImages.length > 0 ? availableImages[0] : null;
+  const pageDescription = product.description 
+    ? product.description.substring(0, 160) 
+    : `اشتري ${product.name} من BuildingZ. أفضل الأسعار مع توصيل سريع في الإمارات.`;
+  const pageUrl = `https://buildingzuae.com/products/${product.id}/${slugify(product.name, `product-${product.id}`)}`;
+  const productImage = availableImages.length > 0 ? availableImages[0] : 'https://buildingzuae.com/og-image.jpg';
+  const keywords = `${product.name}, ${product.category?.name || ''}, شراء ${product.name}, ${product.vendor?.name || ''}, مواد بناء, BuildingZ`;
+
+  // JSON-LD Product Schema
+  const productSchema = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": product.name,
+    "description": product.description || `${product.name} - متوفر في BuildingZ`,
+    "image": availableImages,
+    "sku": product.sku || product.id.toString(),
+    "brand": {
+      "@type": "Brand",
+      "name": product.vendor?.name || "BuildingZ"
+    },
+    "offers": {
+      "@type": "Offer",
+      "url": pageUrl,
+      "priceCurrency": "AED",
+      "price": parseFloat(product.price),
+      "priceValidUntil": new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      "availability": product.stock_quantity > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      "seller": {
+        "@type": "Organization",
+        "name": product.vendor?.name || "BuildingZ UAE"
+      }
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": displayRating,
+      "reviewCount": displayReviewCount,
+      "bestRating": "5",
+      "worstRating": "1"
+    }
+  };
+
+  // JSON-LD Breadcrumb Schema
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "الرئيسية",
+        "item": "https://buildingzuae.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "المنتجات",
+        "item": "https://buildingzuae.com/products"
+      },
+      ...(product.category ? [{
+        "@type": "ListItem",
+        "position": 3,
+        "name": product.category.name,
+        "item": `https://buildingzuae.com/products?category=${product.category.id}`
+      }] : []),
+      {
+        "@type": "ListItem",
+        "position": product.category ? 4 : 3,
+        "name": product.name
+      }
+    ]
+  };
 
   return (
     <div className="pdp-page" dir="rtl">
       <Helmet>
+        {/* Primary Meta Tags */}
         <title>{pageTitle}</title>
+        <meta name="title" content={pageTitle} />
         <meta name="description" content={pageDescription} />
-        <meta property="og:title" content={pageTitle} />
-        <meta property="og:description" content={pageDescription} />
+        <meta name="keywords" content={keywords} />
+        <meta name="robots" content="index, follow, max-image-preview:large" />
+        
+        {/* Canonical */}
+        <link rel="canonical" href={pageUrl} />
+        
+        {/* Open Graph / Facebook */}
         <meta property="og:type" content="product" />
         <meta property="og:url" content={pageUrl} />
-        {productImage && <meta property="og:image" content={productImage} />}
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDescription} />
+        <meta property="og:image" content={productImage} />
+        <meta property="og:site_name" content="BuildingZ UAE" />
+        <meta property="og:locale" content="ar_AE" />
+        
+        {/* Product OG Tags */}
+        <meta property="product:price:amount" content={product.price} />
+        <meta property="product:price:currency" content="AED" />
+        <meta property="product:availability" content={product.stock_quantity > 0 ? "in stock" : "out of stock"} />
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content={pageUrl} />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={pageDescription} />
+        <meta name="twitter:image" content={productImage} />
+        
+        {/* JSON-LD Structured Data */}
+        <script type="application/ld+json">
+          {JSON.stringify(productSchema)}
+        </script>
+        <script type="application/ld+json">
+          {JSON.stringify(breadcrumbSchema)}
+        </script>
       </Helmet>
 
       {/* Breadcrumbs */}
@@ -364,16 +462,7 @@ const ProductDetailPage = () => {
 
           {/* Product Info Section */}
           <div className="pdp-info-section">
-            {/* Vendor */}
-            {product.vendor_profile?.business_name && (
-              <div className="pdp-vendor">
-                <FontAwesomeIcon icon={faStore} />
-                <span>{product.vendor_profile.business_name}</span>
-                {product.vendor_profile.is_verified && (
-                  <FontAwesomeIcon icon={faCheckCircle} className="verified" />
-                )}
-              </div>
-            )}
+           
 
             {/* Title */}
             <h1 className="pdp-title">{product.name}</h1>
@@ -435,14 +524,7 @@ const ProductDetailPage = () => {
 
             {/* Delivery Info */}
             <div className="pdp-delivery-info">
-              <div className="pdp-delivery-item pdp-express">
-                <FontAwesomeIcon icon={faBolt} />
-                <div>
-                  <strong>توصيل سريع</strong>
-                  <span>استلمه {getDeliveryDate()}</span>
-                </div>
-              </div>
-             
+              
             </div>
 
             {/* Quantity & Add to Cart */}
@@ -558,12 +640,7 @@ const ProductDetailPage = () => {
                       <span className="pdp-info-value">{product.category.name}</span>
                     </div>
                   )}
-                  {product.vendor_profile?.business_name && (
-                    <div className="pdp-info-item">
-                      <span className="pdp-info-label">البائع</span>
-                      <span className="pdp-info-value">{product.vendor_profile.business_name}</span>
-                    </div>
-                  )}
+                  
                   <div className="pdp-info-item">
                     <span className="pdp-info-label">التوفر</span>
                     <span className={`pdp-info-value ${product.stock_quantity > 0 ? 'stock-available' : 'stock-unavailable'}`}>

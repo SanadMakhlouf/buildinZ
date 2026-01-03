@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSpinner,
@@ -28,6 +29,7 @@ import config from "../../config/apiConfig";
 import CategoryCarousel from "../../components/CategoryCarousel";
 import serviceBuilderService from "../../services/serviceBuilderService";
 import "./ProductsPage.css";
+import "../Home/HomePage.css"; // For category carousel styles
 
 const ProductsPage = () => {
   const navigate = useNavigate();
@@ -281,7 +283,18 @@ const ProductsPage = () => {
   // Get random products and services
   const popularProducts = useMemo(() => {
     if (products.length === 0) return [];
-    return shuffleArray(products).slice(0, 8);
+    // Filter out sold out or unavailable products
+    const availableProducts = products.filter((p) => {
+      if (!p) return false;
+      // Exclude products with stockQuantity === 0 or null (sold out/not available)
+      if (p.stockQuantity !== undefined && p.stockQuantity !== null) {
+        return p.stockQuantity > 0;
+      }
+      // If stockQuantity is undefined, we might want to show it (assuming it's available)
+      // But if it's explicitly null, hide it
+      return p.stockQuantity !== null;
+    });
+    return shuffleArray(availableProducts).slice(0, 8);
   }, [products]);
 
   const popularServices = useMemo(() => {
@@ -328,6 +341,18 @@ const ProductsPage = () => {
       }
 
       let filtered = [...products];
+
+      // Filter out sold out or unavailable products
+      filtered = filtered.filter((p) => {
+        if (!p) return false;
+        // Exclude products with stockQuantity === 0 or null (sold out/not available)
+        if (p.stockQuantity !== undefined && p.stockQuantity !== null) {
+          return p.stockQuantity > 0;
+        }
+        // If stockQuantity is undefined, we might want to show it (assuming it's available)
+        // But if it's explicitly null, hide it
+        return p.stockQuantity !== null;
+      });
 
       // Search filter
       if (searchTerm && typeof searchTerm === "string") {
@@ -645,7 +670,6 @@ const ProductsPage = () => {
           <div className="product-delivery-info">
             <div className="delivery-free">
               <FontAwesomeIcon icon={faTruck} className="delivery-icon" />
-              <span>التوصيل مجانا</span>
             </div>
             <div className="delivery-express">
               <FontAwesomeIcon
@@ -698,8 +722,40 @@ const ProductsPage = () => {
     });
   };
 
+  // SEO variables
+  const categoryName = categories.find(c => c.id?.toString() === selectedCategory)?.name;
+  const seoTitle = categoryName 
+    ? `${categoryName} - تسوق أونلاين` 
+    : searchTerm 
+    ? `نتائج البحث: ${searchTerm}` 
+    : 'جميع المنتجات';
+  const seoDescription = categoryName
+    ? `تسوق ${categoryName} من BuildingZ. أفضل الأسعار مع توصيل سريع في الإمارات.`
+    : 'تسوق جميع المنتجات من BuildingZ - أكبر متجر لمواد البناء والديكور في الإمارات.';
+  const seoUrl = `https://buildingzuae.com/products${selectedCategory ? `?category=${selectedCategory}` : ''}`;
+
   return (
     <div className="products-page">
+      <Helmet>
+        <title>{seoTitle} | BuildingZ</title>
+        <meta name="title" content={`${seoTitle} | BuildingZ`} />
+        <meta name="description" content={seoDescription} />
+        <meta name="keywords" content={`${categoryName || 'منتجات'}, مواد بناء, ديكور, تسوق أونلاين, BuildingZ, الإمارات`} />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href={seoUrl} />
+        
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={seoUrl} />
+        <meta property="og:title" content={`${seoTitle} | BuildingZ`} />
+        <meta property="og:description" content={seoDescription} />
+        <meta property="og:site_name" content="BuildingZ UAE" />
+        <meta property="og:locale" content="ar_AE" />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${seoTitle} | BuildingZ`} />
+        <meta name="twitter:description" content={seoDescription} />
+      </Helmet>
+
       {/* Breadcrumb */}
 
       {/* Page Header */}
@@ -1256,7 +1312,6 @@ const ProductsPage = () => {
                             icon={faTruck}
                             className="delivery-icon"
                           />
-                          <span>التوصيل مجانا</span>
                         </div>
                         <div className="delivery-express">
                           <FontAwesomeIcon

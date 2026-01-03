@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import SEO from "../../components/SEO/SEO";
 import {
   faChevronLeft,
   faChevronRight,
@@ -153,8 +154,9 @@ const HomePage = () => {
   const [serviceCategoriesNames, setServiceCategoriesNames] = useState([]);
   const [services, setServices] = useState([]);
   const [products, setProducts] = useState([]);
-  const [banners, setBanners] = useState(defaultBanners); // Ad banners from API
-  const [sideBanners, setSideBanners] = useState(defaultSideBanners); // Sidebar ads from API
+  const [banners, setBanners] = useState([]); // Ad banners from API - start empty
+  const [sideBanners, setSideBanners] = useState([]); // Sidebar ads from API - start empty
+  const [bannersLoading, setBannersLoading] = useState(true); // Separate loading state for banners
   const [loading, setLoading] = useState(true);
   const [currentBanner, setCurrentBanner] = useState(0);
   const [email, setEmail] = useState("");
@@ -188,6 +190,7 @@ const HomePage = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
+        setBannersLoading(true);
 
         // Fetch home banner advertisements
         try {
@@ -226,6 +229,8 @@ const HomePage = () => {
         } catch (error) {
           console.error("Error fetching advertisements:", error);
           setBanners(defaultBanners);
+        } finally {
+          setBannersLoading(false);
         }
 
         // Fetch sidebar advertisements
@@ -853,6 +858,12 @@ const HomePage = () => {
 
   return (
     <div className="noon-homepage" role="document">
+      <SEO 
+        title="الصفحة الرئيسية"
+        description="BuildingZ أكبر متجر إلكتروني لمواد البناء والديكور في الإمارات. تسوق الأثاث، الأدوات، مواد البناء والمزيد مع توصيل سريع لجميع أنحاء الإمارات."
+        keywords="مواد بناء, ديكور, أثاث, أدوات منزلية, تسوق أونلاين, الإمارات"
+        url="/"
+      />
       {/* Service Categories Names (no images) */}
       {serviceCategoriesNames.length > 0 && (
         <section className="noon-service-names-strip" aria-label="فئات الخدمات">
@@ -1008,7 +1019,14 @@ const HomePage = () => {
       <section className="noon-hero-section">
         <div className="noon-hero-container">
           {/* Main Banner Carousel */}
-          {banners.length > 0 && (
+          {bannersLoading ? (
+            // Skeleton loader for banner
+            <div className="noon-main-banner">
+              <div className="noon-banner-wrapper skeleton">
+                <div className="noon-banner-skeleton skeleton-image"></div>
+              </div>
+            </div>
+          ) : banners.length > 0 ? (
             <div className="noon-main-banner">
               <div className="noon-banner-wrapper">
                 {banners.map((banner, index) => {
@@ -1089,10 +1107,20 @@ const HomePage = () => {
                 ))}
               </div>
             </div>
-          )}
+          ) : null}
 
           {/* Side Banners */}
-          {sideBanners.length > 0 && (
+          {bannersLoading ? (
+            // Skeleton loader for side banners
+            <div className="noon-side-banners">
+              <div className="noon-side-banner skeleton">
+                <div className="skeleton-image"></div>
+              </div>
+              <div className="noon-side-banner skeleton">
+                <div className="skeleton-image"></div>
+              </div>
+            </div>
+          ) : sideBanners.length > 0 ? (
             <div className="noon-side-banners">
               {sideBanners.map((banner) => {
                 const isExternalLink =
@@ -1141,7 +1169,7 @@ const HomePage = () => {
                 );
               })}
             </div>
-          )}
+          ) : null}
         </div>
       </section>
 

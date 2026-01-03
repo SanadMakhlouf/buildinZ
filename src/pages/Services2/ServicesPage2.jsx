@@ -6,6 +6,7 @@ import {
   useLocation,
   Link,
 } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSpinner,
@@ -267,20 +268,74 @@ const ServicesPage2 = () => {
     [handleCategorySelect]
   );
 
-  // Filter categories based on search term (must be before conditional returns)
+  // Filter categories and services based on search term (must be before conditional returns)
   const filteredCategories = useMemo(() => {
     if (!searchTerm.trim()) {
       return categories;
     }
     const term = searchTerm.toLowerCase();
     return categories.filter((category) => {
+      // Check category name and description
       const nameMatch = category.name?.toLowerCase().includes(term);
       const descriptionMatch = category.description
         ?.toLowerCase()
         .includes(term);
-      return nameMatch || descriptionMatch;
+      
+      if (nameMatch || descriptionMatch) {
+        return true;
+      }
+
+      // Check if any direct service in category matches
+      const hasMatchingDirectService =
+        category.services &&
+        category.services.some((service) =>
+          service.name?.toLowerCase().includes(term) ||
+          service.description?.toLowerCase().includes(term)
+        );
+
+      if (hasMatchingDirectService) {
+        return true;
+      }
+
+      // Check if any subcategory matches
+      const hasMatchingSubcategory =
+        category.children &&
+        category.children.some((subcategory) => {
+          // Check subcategory name
+          if (
+            subcategory.name?.toLowerCase().includes(term) ||
+            subcategory.description?.toLowerCase().includes(term)
+          ) {
+            return true;
+          }
+
+          // Check if any service in subcategory matches
+          return (
+            subcategory.services &&
+            subcategory.services.some((service) =>
+              service.name?.toLowerCase().includes(term) ||
+              service.description?.toLowerCase().includes(term)
+            )
+          );
+        });
+
+      return hasMatchingSubcategory;
     });
   }, [categories, searchTerm]);
+
+  // Filter services based on search term
+  const filteredServices = useMemo(() => {
+    if (!searchTerm.trim()) {
+      return [];
+    }
+    const term = searchTerm.toLowerCase();
+    return services.filter((service) => {
+      return (
+        service.name?.toLowerCase().includes(term) ||
+        service.description?.toLowerCase().includes(term)
+      );
+    });
+  }, [services, searchTerm]);
 
   // Helper functions
   const getImageUrl = (imagePath) => {
@@ -363,6 +418,26 @@ const ServicesPage2 = () => {
 
   return (
     <div className="services-page2">
+      <Helmet>
+        <title>خدمات البناء والصيانة | BuildingZ</title>
+        <meta name="title" content="خدمات البناء والصيانة | BuildingZ" />
+        <meta name="description" content="اكتشف خدمات البناء والصيانة المتميزة في BuildingZ. خدمات كهرباء، سباكة، تكييف، دهان، نجارة وأكثر في الإمارات." />
+        <meta name="keywords" content="خدمات بناء, صيانة, كهرباء, سباكة, تكييف, دهان, نجارة, الإمارات, BuildingZ" />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href="https://buildingzuae.com/services2" />
+        
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://buildingzuae.com/services2" />
+        <meta property="og:title" content="خدمات البناء والصيانة | BuildingZ" />
+        <meta property="og:description" content="اكتشف خدمات البناء والصيانة المتميزة في BuildingZ. خدمات متنوعة في الإمارات." />
+        <meta property="og:site_name" content="BuildingZ UAE" />
+        <meta property="og:locale" content="ar_AE" />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="خدمات البناء والصيانة | BuildingZ" />
+        <meta name="twitter:description" content="اكتشف خدمات البناء والصيانة المتميزة في BuildingZ." />
+      </Helmet>
+
       {/* Search Bar */}
       <div className="services-search-bar-container">
         <div className="services-search-bar-wrapper">
@@ -390,7 +465,89 @@ const ServicesPage2 = () => {
 
       <div className="container">
         <div className="categories-section">
-          <h2>تصفح الخدمات </h2>
+          {/* Show search results for services if searching */}
+          {searchTerm.trim() && filteredServices.length > 0 && (
+            <div className="search-results-section">
+              <h2 className="search-results-title">
+                نتائج البحث للخدمات ({filteredServices.length})
+              </h2>
+              <div className="services-grid">
+                {filteredServices.map((service) => {
+                  const serviceImage = getServiceImage(service);
+                  const imageUrl = serviceImage
+                    ? getImageUrl(serviceImage)
+                    : null;
+                  const serviceDiscount = service.discount || 0;
+
+                  return (
+                    <div
+                      key={service.id}
+                      className="product-card"
+                      onClick={() => navigate(`/services2/${service.id}`)}
+                    >
+                      <div className="product-image-container">
+                        {imageUrl ? (
+                          <img
+                            src={imageUrl}
+                            alt={service.name}
+                            className="product-image"
+                            onError={(e) => {
+                              e.target.style.display = "none";
+                            }}
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="product-image-placeholder">
+                            <FontAwesomeIcon icon={faTools} />
+                          </div>
+                        )}
+
+                        {/* Discount Badge */}
+                        {serviceDiscount > 0 && (
+                          <span className="product-badge discount-badge">
+                            {serviceDiscount}% OFF
+                          </span>
+                        )}
+
+                        {/* Deal Banner */}
+                        {serviceDiscount > 0 && (
+                          <div className="product-deal-banner">Deal</div>
+                        )}
+                      </div>
+
+                      <div className="product-details">
+                        <h3 className="product-name">{service.name}</h3>
+                        {service.description && (
+                          <p className="product-description">
+                            {service.description}
+                          </p>
+                        )}
+
+                        {/* Rating Section */}
+                        <div className="product-rating-section">
+                          <span className="review-count">(0)</span>
+                          <span className="rating-value">
+                            {service.rating?.toFixed(1) || "4.8"}
+                          </span>
+                          <FontAwesomeIcon
+                            icon={faStar}
+                            className="rating-star"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Show categories */}
+          {searchTerm.trim() && (filteredCategories.length > 0 || filteredServices.length > 0) && (
+            <h2 className="search-results-title">
+              الفئات المطابقة ({filteredCategories.length})
+            </h2>
+          )}
           <div className="categories-grid">
             {loading ? (
               // Show skeleton loaders while loading
@@ -407,11 +564,11 @@ const ServicesPage2 = () => {
                   onSelect={handleCategorySelectMemo}
                 />
               ))
-            ) : (
+            ) : searchTerm.trim() ? (
               <div className="no-results">
                 <p>لم يتم العثور على نتائج للبحث "{searchTerm}"</p>
               </div>
-            )}
+            ) : null}
           </div>
         </div>
 

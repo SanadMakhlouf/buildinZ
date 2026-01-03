@@ -161,7 +161,7 @@
 }
 
 .products-search-bar-wrapper {
-  max-width: 1400px;
+  max-width: 100%;
   margin: 0 auto;
   padding: 0px 8px;
 }
@@ -317,7 +317,7 @@
 
 /* Main Container */
 .products-main-container {
-  max-width: 1400px;
+  max-width: 100%;
   margin: 0 auto;
   padding: 2rem 1.5rem;
   display: grid;

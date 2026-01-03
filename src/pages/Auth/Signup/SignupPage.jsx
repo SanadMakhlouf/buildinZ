@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import { motion, AnimatePresence } from 'framer-motion';
 import authService from '../../../services/authService';
 import './SignupPage.css';
@@ -223,6 +224,13 @@ const SignupPage = () => {
 
   return (
     <div className="auth-page">
+      <Helmet>
+        <title>إنشاء حساب جديد | BuildingZ</title>
+        <meta name="description" content="أنشئ حساباً جديداً في BuildingZ للتسوق ومتابعة طلباتك" />
+        <meta name="robots" content="noindex, nofollow" />
+        <link rel="canonical" href="https://buildingzuae.com/signup" />
+      </Helmet>
+      
       {/* Simple Background */}
       <div className="auth-bg"></div>
 
@@ -233,9 +241,7 @@ const SignupPage = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <Link to="/" className="auth-logo">
-          <span className="logo-text">BuildingZ</span>
-        </Link>
+       
         <Link to="/" className="back-link">
           العودة للرئيسية
         </Link>

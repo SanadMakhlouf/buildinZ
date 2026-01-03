@@ -15,7 +15,6 @@ import {
   faLeaf,
 } from "@fortawesome/free-solid-svg-icons";
 import config from "../config/apiConfig";
-import "./CategoryCarousel.css";
 
 const CategoryCarousel = ({
   categories = [],
@@ -110,114 +109,96 @@ const CategoryCarousel = ({
   };
 
   return (
-    <div className="category-carousel-container">
-      <div className="category-carousel-wrapper">
-        {!loading && categories.length > 0 && (
-          <button
-            className="category-scroll-btn category-scroll-right"
-            onClick={() => scrollCategories("left")}
-            aria-label="Scroll right"
-          >
-            <FontAwesomeIcon icon={faChevronRight} />
-          </button>
-        )}
-
-        <div className="category-carousel-scroll" ref={categoryScrollRef}>
-          {loading ? (
-            // Skeleton loaders
-            Array(8)
-              .fill(0)
-              .map((_, i) => (
-                <div key={i} className="category-item skeleton">
-                  <div className="category-icon skeleton-circle"></div>
-                  <div className="skeleton-text"></div>
-                </div>
-              ))
-          ) : categories.length > 0 ? (
-            categories.map((category) => {
-              const categoryImage = getCategoryImage(category);
-              const cacheBust = category.updated_at
-                ? new Date(category.updated_at).getTime()
-                : category.created_at
-                ? new Date(category.created_at).getTime()
-                : null;
-              const imageUrl = categoryImage
-                ? getImageUrl(categoryImage, cacheBust)
-                : null;
-              const categoryKey = `${category.id}-${
-                category.updated_at || category.created_at || ""
-              }`;
-
-              return (
-                <Link
-                  key={categoryKey}
-                  to={`/products?category=${category.id}`}
-                  className="category-item"
-                  onClick={() => handleCategoryClick(category)}
-                >
-                  <div className="category-icon">
-                    {imageUrl ? (
-                      <img
-                        key={`img-${categoryKey}-${categoryImage}`}
-                        src={imageUrl}
-                        alt={category.name}
-                        loading="lazy"
-                        style={{
-                          display: "block",
-                          opacity: 0,
-                          transition: "opacity 0.3s",
-                        }}
-                        onLoad={(e) => {
-                          e.target.style.opacity = "1";
-                        }}
-                        onError={(e) => {
-                          e.target.style.display = "none";
-                          const parent = e.target.parentElement;
-                          const existingIcon = parent.querySelector("svg");
-                          if (
-                            !existingIcon ||
-                            !existingIcon.classList.contains("fa-icon")
-                          ) {
-                            const nonFaIcons =
-                              parent.querySelectorAll("svg:not(.fa-icon)");
-                            nonFaIcons.forEach((icon) => icon.remove());
-                          }
-                        }}
-                      />
-                    ) : null}
-                    {!imageUrl && (
-                      <FontAwesomeIcon icon={getCategoryIcon(category.name)} />
-                    )}
+    <section className="noon-categories-section" aria-label="الفئات">
+      <div className="noon-section-container">
+        <div className="noon-categories-wrapper">
+          <div className="noon-categories-scroll" ref={categoryScrollRef}>
+            {loading ? (
+              // Skeleton loaders - same as homepage
+              Array(12)
+                .fill(0)
+                .map((_, i) => (
+                  <div key={i} className="noon-category-item skeleton">
+                    <div className="noon-category-image skeleton-image"></div>
+                    <div className="skeleton-text"></div>
                   </div>
-                  <span className="category-name">{category.name}</span>
-                </Link>
-              );
-            })
-          ) : (
-            <div
-              style={{
-                width: "100%",
-                textAlign: "center",
-                padding: "40px 20px",
-                color: "#666",
-              }}
-            >
-              <p>لا توجد فئات متاحة حالياً</p>
-            </div>
-          )}
-        </div>
+                ))
+            ) : categories.length > 0 ? (
+              categories.map((category) => {
+                const categoryImage = getCategoryImage(category);
+                const cacheBust = category.updated_at
+                  ? new Date(category.updated_at).getTime()
+                  : category.created_at
+                  ? new Date(category.created_at).getTime()
+                  : null;
+                const imageUrl = categoryImage
+                  ? getImageUrl(categoryImage, cacheBust)
+                  : null;
+                const categoryKey = `${category.id}-${
+                  category.updated_at || category.created_at || ""
+                }`;
 
-        {!loading && categories.length > 0 && (
-          <button
-            className="category-scroll-btn category-scroll-left"
-            onClick={() => scrollCategories("right")}
-            aria-label="Scroll left"
-          >
-            <FontAwesomeIcon icon={faChevronLeft} />
-          </button>
-        )}
+                return (
+                  <Link
+                    key={categoryKey}
+                    to={`/products?category=${category.id}`}
+                    className="noon-category-item"
+                    onClick={() => handleCategoryClick(category)}
+                  >
+                    <div className="noon-category-image">
+                      {imageUrl ? (
+                        <img
+                          key={`img-${categoryKey}-${categoryImage}`}
+                          src={imageUrl}
+                          alt={category.name}
+                          loading="lazy"
+                          style={{
+                            display: "block",
+                            opacity: 0,
+                            transition: "opacity 0.3s",
+                          }}
+                          onLoad={(e) => {
+                            e.target.style.opacity = "1";
+                          }}
+                          onError={(e) => {
+                            e.target.style.display = "none";
+                            const parent = e.target.parentElement;
+                            const existingIcon = parent.querySelector("svg");
+                            if (
+                              !existingIcon ||
+                              !existingIcon.classList.contains("fa-icon")
+                            ) {
+                              const nonFaIcons =
+                                parent.querySelectorAll("svg:not(.fa-icon)");
+                              nonFaIcons.forEach((icon) => icon.remove());
+                            }
+                          }}
+                        />
+                      ) : null}
+                      {!imageUrl && (
+                        <FontAwesomeIcon icon={getCategoryIcon(category.name)} />
+                      )}
+                    </div>
+                    <span className="noon-category-name">{category.name}</span>
+                  </Link>
+                );
+              })
+            ) : (
+              <div
+                style={{
+                  width: "100%",
+                  textAlign: "center",
+                  padding: "40px 20px",
+                  color: "#666",
+                }}
+              >
+                <p>لا توجد فئات متاحة حالياً</p>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
   );
 };
 

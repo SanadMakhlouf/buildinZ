@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  
+  <!-- Homepage -->
+  <url>
+    <loc>https://buildingzuae.com/</loc>
+    <lastmod>2026-01-02</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://buildingzuae.com/"/>
+  </url>
+  
+  <!-- Products Page -->
+  <url>
+    <loc>https://buildingzuae.com/products</loc>
+    <lastmod>2026-01-02</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- Services Page -->
+  <url>
+    <loc>https://buildingzuae.com/services2</loc>
+    <lastmod>2026-01-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- Categories -->
+  <url>
+    <loc>https://buildingzuae.com/categories</loc>
+    <lastmod>2026-01-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Cart -->
+  <url>
+    <loc>https://buildingzuae.com/cart</loc>
+    <lastmod>2026-01-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <!-- Favorites -->
+  <url>
+    <loc>https://buildingzuae.com/favorites</loc>
+    <lastmod>2026-01-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <!-- About (if exists) -->
+  <url>
+    <loc>https://buildingzuae.com/about</loc>
+    <lastmod>2026-01-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <!-- Contact (if exists) -->
+  <url>
+    <loc>https://buildingzuae.com/contact</loc>
+    <lastmod>2026-01-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+</urlset>
+

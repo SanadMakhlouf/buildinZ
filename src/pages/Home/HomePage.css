@@ -775,6 +775,20 @@
   border-radius: 4px;
 }
 
+/* Banner Skeleton */
+.noon-banner-wrapper.skeleton {
+  display: flex;
+  align-items: stretch;
+}
+
+.noon-banner-skeleton {
+  width: 100%;
+  height: 100%;
+  min-height: 420px;
+  background: var(--noon-border);
+  border-radius: var(--noon-radius-sm);
+}
+
 /* Side Banners */
 .noon-side-banners {
   display: flex;
@@ -2210,6 +2224,18 @@
 .skeleton-image {
   height: 180px;
   background: var(--noon-border);
+  border-radius: var(--noon-radius-sm);
+}
+
+.noon-side-banner.skeleton {
+  min-height: 200px;
+  display: flex;
+}
+
+.noon-side-banner.skeleton .skeleton-image {
+  width: 100%;
+  height: 100%;
+  min-height: 200px;
 }
 
 .skeleton-content {

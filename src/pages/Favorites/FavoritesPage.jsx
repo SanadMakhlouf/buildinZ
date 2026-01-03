@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faHeart,
@@ -138,16 +139,14 @@ const FavoritesPage = () => {
 
   return (
     <div className="favorites-page">
+      <Helmet>
+        <title>{`المفضلة (${wishlist.length} منتج) | BuildingZ`}</title>
+        <meta name="description" content="قائمة المنتجات المفضلة لديك في BuildingZ" />
+        <meta name="robots" content="noindex, nofollow" />
+        <link rel="canonical" href="https://buildingzuae.com/favorites" />
+      </Helmet>
       <div className="favorites-container">
-        <div className="favorites-header">
-          <h1>
-            <FontAwesomeIcon icon={faHeart} className="header-icon" />
-            المفضلة
-          </h1>
-          <p className="favorites-count">
-            {wishlist.length} {wishlist.length === 1 ? "منتج" : "منتجات"}
-          </p>
-        </div>
+       
 
         {wishlist.length === 0 ? (
           <div className="empty-favorites">
@@ -283,11 +282,8 @@ const FavoritesPage = () => {
                     <div className="product-delivery-info">
                       <div className="delivery-free">
                         <FontAwesomeIcon icon={faTruck} className="delivery-icon" />
-                        <span>التوصيل مجانا</span>
                       </div>
-                      <div className="delivery-express">
-                        express Get it by {getDeliveryDate()}
-                      </div>
+                      
                     </div>
 
                     {/* Add to Cart Button */}

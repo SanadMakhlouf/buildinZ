@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import { motion, AnimatePresence } from 'framer-motion';
 import authService from '../../../services/authService';
 import './LoginPage.css';
@@ -125,6 +126,13 @@ const LoginPage = () => {
 
   return (
     <div className="auth-page">
+      <Helmet>
+        <title>تسجيل الدخول | BuildingZ</title>
+        <meta name="description" content="سجل دخولك إلى حسابك في BuildingZ للتسوق والوصول إلى طلباتك" />
+        <meta name="robots" content="noindex, nofollow" />
+        <link rel="canonical" href="https://buildingzuae.com/login" />
+      </Helmet>
+      
       {/* Simple Background */}
       <div className="auth-bg"></div>
 

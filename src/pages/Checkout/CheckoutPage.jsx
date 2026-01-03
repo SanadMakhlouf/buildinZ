@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import config from '../../config/apiConfig';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
@@ -13,7 +14,10 @@ import {
   faShoppingBag,
   faLock,
   faExternalLinkAlt,
-  faTimes
+  faTimes,
+  faArrowRight,
+  faShieldAlt,
+  faTruck
 } from '@fortawesome/free-solid-svg-icons';
 import { useCart } from '../../context/CartContext';
 import AddressManager from '../../components/Profile/AddressManager';
@@ -34,7 +38,7 @@ const CheckoutPage = () => {
   const [orderData, setOrderData] = useState(null);
   const [paymentLink, setPaymentLink] = useState(null);
   const [redirectingToPayment, setRedirectingToPayment] = useState(false);
-  const [paymentStatus, setPaymentStatus] = useState(null); // 'success', 'failure', null
+  const [paymentStatus, setPaymentStatus] = useState(null);
   const [secondsToRedirect, setSecondsToRedirect] = useState(3);
   const [existingOrderId, setExistingOrderId] = useState(null);
   const [loadingExistingOrder, setLoadingExistingOrder] = useState(false);
@@ -71,14 +75,7 @@ const CheckoutPage = () => {
       const data = await response.json();
       
       if (response.ok && data.success) {
-        // Set order data
         setOrderData(data.data.order);
-        
-        // Pre-fill form with order data
-        if (data.data.order.shipping_address) {
-          // Find matching address in address manager
-          // This will be handled by the AddressManager component
-        }
         
         if (data.data.order.payment_method) {
           setPaymentMethod(data.data.order.payment_method);
@@ -105,15 +102,10 @@ const CheckoutPage = () => {
     
     if (location.pathname === '/payment/success' && sessionId) {
       setPaymentStatus('success');
-      // Fetch order details by session ID if needed
-      // For now, we'll just show a success message
     } else if (location.pathname === '/payment/failure' && sessionId) {
       setPaymentStatus('failure');
     }
   }, [location]);
-  
-  // Don't redirect automatically - show auth prompt instead
-  // useEffect removed - we'll show auth prompt in the UI
   
   // Redirect to cart if cart is empty
   useEffect(() => {
@@ -136,21 +128,18 @@ const CheckoutPage = () => {
     return () => clearTimeout(timer);
   }, [redirectingToPayment, secondsToRedirect, paymentLink]);
   
-  // Handle address selection from AddressManager
   const handleAddressSelect = (address) => {
     setSelectedAddress(address);
+    setError(null);
   };
   
-  // Handle payment method selection
   const handlePaymentMethodChange = (method) => {
     setPaymentMethod(method);
   };
   
-  // Handle order submission
   const handleSubmitOrder = async (e) => {
     e.preventDefault();
     
-    // Check authentication again
     if (!authService.isAuthenticated()) {
       setError('يرجى تسجيل الدخول لإتمام الطلب');
       navigate('/login?redirect=/checkout');
@@ -166,7 +155,6 @@ const CheckoutPage = () => {
     setError(null);
     
     try {
-      // Format order items
       const orderItems = cart.map(item => ({
         product_id: item.id,
         quantity: item.quantity,
@@ -174,7 +162,6 @@ const CheckoutPage = () => {
         name: item.name
       }));
       
-      // Format shipping address
       const shippingAddress = {
         street: selectedAddress.street || selectedAddress.address_line1,
         city: selectedAddress.city,
@@ -185,7 +172,6 @@ const CheckoutPage = () => {
         name: selectedAddress.name
       };
       
-      // Create order payload
       const orderPayload = {
         items: orderItems,
         total_amount: cartTotal.price,
@@ -194,15 +180,10 @@ const CheckoutPage = () => {
         notes: notes.trim() || undefined
       };
       
-      // If we have an existing order ID, add it to the payload
       if (existingOrderId) {
         orderPayload.order_id = existingOrderId;
       }
       
-      console.log('Sending order with token:', localStorage.getItem('token'));
-      console.log('Order payload:', orderPayload);
-      
-      // Send order to API
       const response = await fetch(`${config.BACKEND_URL}/api/orders`, {
         method: 'POST',
         headers: {
@@ -218,29 +199,19 @@ const CheckoutPage = () => {
         throw new Error(data.message || 'فشل في إنشاء الطلب');
       }
       
-      // Set order data first for both payment methods
       setOrderData(data.data.order);
       setOrderSuccess(true);
-      
-      // Store order data in localStorage for the success page to access
       localStorage.setItem('lastOrderData', JSON.stringify(data.data.order));
       
-      // Check if payment link is returned (for credit card payments)
       if (paymentMethod === 'credit_card' && (data.data.payment_link || data.data.order.payment_link)) {
         const paymentUrl = data.data.payment_link || data.data.order.payment_link;
         setPaymentLink(paymentUrl);
-        
-        // Show payment redirection message
         setRedirectingToPayment(true);
-        
-        // Clear cart after successful order
         clearCart();
-        
         return;
       }
       
-      // For non-credit card payments, show success directly
-      clearCart(); // Clear the cart after successful order
+      clearCart();
       
     } catch (err) {
       console.error('Error creating order:', err);
@@ -258,7 +229,6 @@ const CheckoutPage = () => {
     }
   };
   
-  // Handle manual redirect to payment
   const handleManualRedirect = () => {
     if (paymentLink) {
       window.location.href = paymentLink;
@@ -268,28 +238,19 @@ const CheckoutPage = () => {
   // Payment Success Page
   if (paymentStatus === 'success') {
     return (
-      <div className="checkout-page">
-        <div className="container">
-          <div className="payment-result payment-success">
-            <div className="payment-icon success-icon">
+      <div className="checkout-page" dir="rtl">
+        <div className="checkout-container">
+          <div className="checkout-result checkout-success">
+            <div className="result-icon success">
               <FontAwesomeIcon icon={faCheck} />
             </div>
             <h1>تم الدفع بنجاح!</h1>
             <p>تم استلام الدفع الخاص بك وتأكيد طلبك.</p>
-            <p>سيتم إرسال تأكيد الطلب إلى بريدك الإلكتروني.</p>
-            
-            <div className="payment-actions">
-              <button 
-                className="view-orders-btn" 
-                onClick={() => navigate('/profile')}
-              >
+            <div className="result-actions">
+              <button className="btn-primary" onClick={() => navigate('/profile')}>
                 عرض طلباتي
               </button>
-              
-              <button 
-                className="continue-shopping" 
-                onClick={() => navigate('/products')}
-              >
+              <button className="btn-secondary" onClick={() => navigate('/products')}>
                 <FontAwesomeIcon icon={faShoppingBag} />
                 مواصلة التسوق
               </button>
@@ -303,29 +264,20 @@ const CheckoutPage = () => {
   // Payment Failure Page
   if (paymentStatus === 'failure') {
     return (
-      <div className="checkout-page">
-        <div className="container">
-          <div className="payment-result payment-failure">
-            <div className="payment-icon failure-icon">
+      <div className="checkout-page" dir="rtl">
+        <div className="checkout-container">
+          <div className="checkout-result checkout-failure">
+            <div className="result-icon failure">
               <FontAwesomeIcon icon={faTimes} />
             </div>
             <h1>فشل عملية الدفع</h1>
-            <p>لم يتم استكمال عملية الدفع بنجاح.</p>
-            <p>يمكنك المحاولة مرة أخرى أو اختيار طريقة دفع أخرى.</p>
-            
-            <div className="payment-actions">
-              <button 
-                className="retry-payment-btn" 
-                onClick={() => navigate('/checkout')}
-              >
+            <p>لم يتم استكمال عملية الدفع. يمكنك المحاولة مرة أخرى.</p>
+            <div className="result-actions">
+              <button className="btn-primary" onClick={() => navigate('/checkout')}>
                 <FontAwesomeIcon icon={faCreditCard} />
                 إعادة المحاولة
               </button>
-              
-              <button 
-                className="view-orders-btn" 
-                onClick={() => navigate('/profile')}
-              >
+              <button className="btn-secondary" onClick={() => navigate('/profile')}>
                 عرض طلباتي
               </button>
             </div>
@@ -335,81 +287,64 @@ const CheckoutPage = () => {
     );
   }
   
-  // If redirecting to payment
+  // Payment Redirect
   if (redirectingToPayment && paymentLink) {
     return (
-      <div className="checkout-page">
-        <div className="container">
-          <div className="payment-redirect">
-            <div className="payment-icon">
+      <div className="checkout-page" dir="rtl">
+        <div className="checkout-container">
+          <div className="checkout-redirect">
+            <div className="result-icon processing">
               <FontAwesomeIcon icon={faCreditCard} />
             </div>
             <h1>تم إنشاء الطلب بنجاح!</h1>
             <p>رقم الطلب: <strong>{orderData.order_number}</strong></p>
             <p>سيتم تحويلك إلى صفحة الدفع خلال <strong>{secondsToRedirect}</strong> ثواني...</p>
-            
             <div className="redirect-spinner">
               <FontAwesomeIcon icon={faSpinner} spin />
             </div>
-            
-            <div className="manual-redirect">
-              <button 
-                className="payment-link-btn" 
-                onClick={handleManualRedirect}
-              >
-                <FontAwesomeIcon icon={faExternalLinkAlt} />
-                الدفع الآن
-              </button>
-            </div>
+            <button className="btn-primary" onClick={handleManualRedirect}>
+              <FontAwesomeIcon icon={faExternalLinkAlt} />
+              الدفع الآن
+            </button>
           </div>
         </div>
       </div>
     );
   }
   
-  // If order was successful, show success page
+  // Order Success
   if (orderSuccess && orderData) {
     return (
-      <div className="checkout-page">
-        <div className="container">
-          <div className="order-success">
-            <div className="success-icon">
+      <div className="checkout-page" dir="rtl">
+        <div className="checkout-container">
+          <div className="checkout-result checkout-success">
+            <div className="result-icon success">
               <FontAwesomeIcon icon={faCheck} />
             </div>
             <h1>تم إنشاء الطلب بنجاح!</h1>
             <p>رقم الطلب: <strong>{orderData.order_number}</strong></p>
-            <p>تم إرسال تأكيد الطلب إلى بريدك الإلكتروني.</p>
             
-            <div className="order-summary">
-              <h2>ملخص الطلب</h2>
-              <div className="order-details">
-                <div className="detail-row">
-                  <span>حالة الطلب:</span>
-                  <span className="status">{orderData.status === 'pending' ? 'قيد الانتظار' : orderData.status}</span>
-                </div>
-                <div className="detail-row">
-                  <span>المبلغ الإجمالي:</span>
-                  <span className="amount">{orderData.total_amount} درهم</span>
-                </div>
-                <div className="detail-row">
-                  <span>طريقة الدفع:</span>
-                  <span>{paymentMethod === 'cash_on_delivery' ? 'الدفع عند الاستلام' : 
-                         paymentMethod === 'credit_card' ? 'بطاقة ائتمان' : 
-                         paymentMethod === 'bank_transfer' ? 'تحويل بنكي' : 
-                         'الدفع عند الاستلام'}</span>
-                </div>
-                <div className="detail-row">
-                  <span>حالة الدفع:</span>
-                  <span>{orderData.payment_status === 'pending' ? 'قيد الانتظار' : orderData.payment_status}</span>
-                </div>
+            <div className="order-details-card">
+              <div className="detail-row">
+                <span>حالة الطلب</span>
+                <span className="status-badge pending">قيد الانتظار</span>
+              </div>
+              <div className="detail-row">
+                <span>المبلغ الإجمالي</span>
+                <span className="amount">{orderData.total_amount} درهم</span>
+              </div>
+              <div className="detail-row">
+                <span>طريقة الدفع</span>
+                <span>
+                  {paymentMethod === 'cash_on_delivery' ? 'الدفع عند الاستلام' : 
+                   paymentMethod === 'credit_card' ? 'بطاقة ائتمان' : 
+                   paymentMethod === 'bank_transfer' ? 'تحويل بنكي' : 'الدفع عند الاستلام'}
+                </span>
               </div>
             </div>
             
-            <div className="success-actions">
-              <button 
-                className="continue-shopping" 
-                onClick={() => navigate('/products')}
-              >
+            <div className="result-actions">
+              <button className="btn-primary" onClick={() => navigate('/products')}>
                 <FontAwesomeIcon icon={faShoppingBag} />
                 مواصلة التسوق
               </button>
@@ -420,98 +355,36 @@ const CheckoutPage = () => {
     );
   }
   
-  // Show authentication prompt if not logged in
+  // Auth Required
   if (!authService.isAuthenticated()) {
     return (
-      <div className="checkout-page">
-        <div className="container">
-          <div className="checkout-auth-required">
-            <div className="auth-prompt-card">
-              <div className="auth-icon-large">
-                <FontAwesomeIcon icon={faLock} />
-              </div>
-              
-              <h1>تسجيل الدخول مطلوب</h1>
-              
-              <div className="auth-info-box">
-                <div className="info-item">
-                  <FontAwesomeIcon icon={faShoppingBag} />
-                  <div className="info-text">
-                    <strong>لإتمام عملية الشراء</strong>
-                    <p>يجب تسجيل الدخول لإنشاء الطلب ومعالجة الدفع</p>
-                  </div>
-                </div>
-                
-                <div className="info-item">
-                  <FontAwesomeIcon icon={faCheck} />
-                  <div className="info-text">
-                    <strong>عربة التسوق الخاصة بك آمنة</strong>
-                    <p>لا تقلق، لن نفقد أي منتجات من سلة التسوق الخاصة بك</p>
-                  </div>
-                </div>
-                
-                <div className="info-item">
-                  <FontAwesomeIcon icon={faShoppingBag} />
-                  <div className="info-text">
-                    <strong>عملية سريعة وسهلة</strong>
-                    <p>سجل الدخول أو أنشئ حساباً جديداً في ثوانٍ</p>
-                  </div>
-                </div>
-              </div>
-
-              {cart.length > 0 && (
-                <div className="cart-preview">
-                  <h3>سلة التسوق الخاصة بك ({cartTotal.items} منتج)</h3>
-                  <div className="cart-items-preview">
-                    {cart.slice(0, 3).map(item => (
-                      <div key={item.id} className="cart-preview-item">
-                        <div className="preview-item-image">
-                          {item.image ? (
-                            <img src={item.image} alt={item.name} />
-                          ) : (
-                            <FontAwesomeIcon icon={faShoppingBag} />
-                          )}
-                        </div>
-                        <div className="preview-item-info">
-                          <span className="preview-item-name">{item.name}</span>
-                          <span className="preview-item-quantity">{item.quantity} × {item.price.toFixed(0)} درهم</span>
-                        </div>
-                      </div>
-                    ))}
-                    {cart.length > 3 && (
-                      <div className="more-items">
-                        + {cart.length - 3} منتج آخر
-                      </div>
-                    )}
-                  </div>
-                  <div className="cart-total-preview">
-                    <span>المجموع الكلي:</span>
-                    <span className="total-amount">{(cartTotal.price * 1.05).toFixed(0)} درهم</span>
-                  </div>
-                </div>
-              )}
-              
-              <div className="auth-actions">
-                <button 
-                  className="login-btn-primary" 
-                  onClick={() => navigate('/login?redirect=/checkout')}
-                >
-                  <FontAwesomeIcon icon={faLock} />
-                  تسجيل الدخول
-                </button>
-                
-                <button 
-                  className="signup-btn-secondary" 
-                  onClick={() => navigate('/signup?redirect=/checkout')}
-                >
-                  إنشاء حساب جديد
-                </button>
-              </div>
-              
-              <div className="auth-footer">
-                <p>لا تقلق، سلة التسوق الخاصة بك آمنة وسيتم حفظها تلقائياً</p>
-              </div>
+      <div className="checkout-page" dir="rtl">
+        <div className="checkout-container">
+          <div className="checkout-auth">
+            <div className="auth-icon">
+              <FontAwesomeIcon icon={faLock} />
             </div>
+            <h1>تسجيل الدخول مطلوب</h1>
+            <p>يجب تسجيل الدخول لإتمام عملية الشراء</p>
+            
+            {cart.length > 0 && (
+              <div className="auth-cart-preview">
+                <span className="cart-badge">{cartTotal.items} منتج</span>
+                <span className="cart-total">{cartTotal.price.toFixed(0)} درهم</span>
+              </div>
+            )}
+            
+            <div className="auth-buttons">
+              <button className="btn-primary" onClick={() => navigate('/login?redirect=/checkout')}>
+                <FontAwesomeIcon icon={faLock} />
+                تسجيل الدخول
+              </button>
+              <button className="btn-secondary" onClick={() => navigate('/signup?redirect=/checkout')}>
+                إنشاء حساب جديد
+              </button>
+            </div>
+            
+            <p className="auth-note">سلة التسوق محفوظة ولن تفقد منتجاتك</p>
           </div>
         </div>
       </div>
@@ -519,174 +392,180 @@ const CheckoutPage = () => {
   }
   
   return (
-    <div className="checkout-page">
-      <div className="container">
+    <div className="checkout-page" dir="rtl">
+      <Helmet>
+        <title>إتمام الشراء | BuildingZ</title>
+        <meta name="description" content="أكمل عملية الشراء في BuildingZ - دفع آمن وتوصيل سريع" />
+        <meta name="robots" content="noindex, nofollow" />
+        <link rel="canonical" href="https://buildingzuae.com/checkout" />
+      </Helmet>
+      <div className="checkout-container">
+        {/* Header */}
         <div className="checkout-header">
+          <button className="back-btn" onClick={() => navigate('/cart')}>
+            <FontAwesomeIcon icon={faArrowRight} />
+            رجوع
+          </button>
           <h1>إتمام الشراء</h1>
         </div>
         
-        <div className="checkout-content">
-          <div className="checkout-main">
-            {/* Address Selection Section */}
-            <div className="checkout-section">
-              <h2 className="section-title">
-                <FontAwesomeIcon icon={faMapMarkerAlt} />
-                عنوان الشحن
-              </h2>
-              
-              <div className="address-selection">
+        <div className="checkout-layout">
+          {/* Main Form */}
+          <div className="checkout-form">
+            {/* Step 1: Address */}
+            <div className="checkout-step">
+              <div className="step-header">
+                <div className="step-number">1</div>
+                <h2>
+                  <FontAwesomeIcon icon={faMapMarkerAlt} />
+                  عنوان الشحن
+                </h2>
+              </div>
+              <div className="step-content">
                 <AddressManager 
                   onAddressSelect={handleAddressSelect} 
                   selectedAddressId={selectedAddress?.id}
                   checkoutMode={true}
                 />
               </div>
-              
-              {error && error.includes('عنوان') && (
-                <div className="error-message">
-                  <FontAwesomeIcon icon={faExclamationTriangle} />
-                  {error}
-                </div>
-              )}
             </div>
             
-            {/* Payment Method Section */}
-            <div className="checkout-section">
-              <h2 className="section-title">
-                <FontAwesomeIcon icon={faCreditCard} />
-                طريقة الدفع
-              </h2>
-              
-              <div className="payment-methods">
-                <div className="payment-method">
-                  <input 
-                    type="radio" 
-                    id="cash_on_delivery" 
-                    name="payment_method" 
-                    value="cash_on_delivery"
-                    checked={paymentMethod === 'cash_on_delivery'}
-                    onChange={() => handlePaymentMethodChange('cash_on_delivery')}
-                  />
-                  <label htmlFor="cash_on_delivery">
+            {/* Step 2: Payment */}
+            <div className="checkout-step">
+              <div className="step-header">
+                <div className="step-number">2</div>
+                <h2>
+                  <FontAwesomeIcon icon={faCreditCard} />
+                  طريقة الدفع
+                </h2>
+              </div>
+              <div className="step-content">
+                <div className="payment-options">
+                  <label className={`payment-option ${paymentMethod === 'cash_on_delivery' ? 'selected' : ''}`}>
+                    <input 
+                      type="radio" 
+                      name="payment" 
+                      value="cash_on_delivery"
+                      checked={paymentMethod === 'cash_on_delivery'}
+                      onChange={() => handlePaymentMethodChange('cash_on_delivery')}
+                    />
                     <FontAwesomeIcon icon={faMoneyBill} />
-                    الدفع عند الاستلام
+                    <span>الدفع عند الاستلام</span>
                   </label>
-                </div>
-                
-                <div className="payment-method">
-                  <input 
-                    type="radio" 
-                    id="credit_card" 
-                    name="payment_method" 
-                    value="credit_card"
-                    checked={paymentMethod === 'credit_card'}
-                    onChange={() => handlePaymentMethodChange('credit_card')}
-                  />
-                  <label htmlFor="credit_card">
+                  
+                  <label className={`payment-option ${paymentMethod === 'credit_card' ? 'selected' : ''}`}>
+                    <input 
+                      type="radio" 
+                      name="payment" 
+                      value="credit_card"
+                      checked={paymentMethod === 'credit_card'}
+                      onChange={() => handlePaymentMethodChange('credit_card')}
+                    />
                     <FontAwesomeIcon icon={faCreditCard} />
-                    بطاقة ائتمان
-                    <span className="payment-note">
-                      (سيتم تحويلك إلى صفحة الدفع الآمنة)
-                    </span>
+                    <div>
+                      <span>بطاقة ائتمان</span>
+                      <small>سيتم تحويلك لصفحة الدفع الآمنة</small>
+                    </div>
                   </label>
-                </div>
-                
-                <div className="payment-method">
-                  <input 
-                    type="radio" 
-                    id="bank_transfer" 
-                    name="payment_method" 
-                    value="bank_transfer"
-                    checked={paymentMethod === 'bank_transfer'}
-                    onChange={() => handlePaymentMethodChange('bank_transfer')}
-                  />
-                  <label htmlFor="bank_transfer">
+                  
+                  <label className={`payment-option ${paymentMethod === 'bank_transfer' ? 'selected' : ''}`}>
+                    <input 
+                      type="radio" 
+                      name="payment" 
+                      value="bank_transfer"
+                      checked={paymentMethod === 'bank_transfer'}
+                      onChange={() => handlePaymentMethodChange('bank_transfer')}
+                    />
                     <FontAwesomeIcon icon={faUniversity} />
-                    تحويل بنكي
+                    <span>تحويل بنكي</span>
                   </label>
                 </div>
               </div>
             </div>
             
-            {/* Order Notes Section */}
-            <div className="checkout-section">
-              <h2 className="section-title">ملاحظات الطلب</h2>
-              
-              <div className="order-notes">
+            {/* Step 3: Notes (Optional) */}
+            <div className="checkout-step">
+              <div className="step-header">
+                <div className="step-number">3</div>
+                <h2>ملاحظات (اختياري)</h2>
+              </div>
+              <div className="step-content">
                 <textarea
-                  placeholder="أضف أي ملاحظات خاصة بالطلب هنا (اختياري)"
+                  className="notes-input"
+                  placeholder="أضف أي ملاحظات خاصة بالطلب..."
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   maxLength={500}
-                  rows={4}
+                  rows={3}
                 />
-                <div className="notes-counter">{notes.length}/500</div>
               </div>
             </div>
           </div>
           
-          {/* Order Summary */}
-          <div className="checkout-sidebar">
-            <div className="order-summary">
-              <h2>ملخص الطلب</h2>
-              
-              <div className="summary-items">
-                {cart.map(item => (
-                  <div className="summary-item" key={item.id}>
-                    <div className="item-info">
-                      <span className="item-quantity">{item.quantity} x</span>
-                      <span className="item-name">{item.name}</span>
-                    </div>
-                    <div className="item-price">
-                      {(item.price * item.quantity).toFixed(0)} درهم
-                    </div>
-                  </div>
-                ))}
+          {/* Summary Sidebar */}
+          <div className="checkout-summary">
+            <h2>ملخص الطلب</h2>
+            
+            <div className="summary-items">
+              {cart.map(item => (
+                <div className="summary-item" key={item.id}>
+                  <span className="item-qty">{item.quantity}×</span>
+                  <span className="item-name">{item.name}</span>
+                  <span className="item-price">{(item.price * item.quantity).toFixed(0)} د.إ</span>
+                </div>
+              ))}
+            </div>
+            
+            <div className="summary-totals">
+              <div className="total-row">
+                <span>المجموع الفرعي</span>
+                <span>{cartTotal.price.toFixed(0)} درهم</span>
               </div>
-              
-              <div className="summary-totals">
-                <div className="total-row">
-                  <span>المجموع الفرعي:</span>
-                  <span>{cartTotal.price.toFixed(0)} درهم</span>
-                </div>
-                
-                <div className="total-row">
-                  <span>الشحن:</span>
-                  <span>مجاني</span>
-                </div>
-                
-                <div className="total-row">
-                  <span>الضريبة (5%):</span>
-                  <span>{(cartTotal.price * 0.05).toFixed(0)} درهم</span>
-                </div>
-                
-                <div className="total-row grand-total">
-                  <span>المجموع الكلي:</span>
-                  <span>{(cartTotal.price * 1.05).toFixed(0)} درهم</span>
-                </div>
+              <div className="total-row">
+                <span>الشحن</span>
+                <span className="free">مجاني</span>
               </div>
-              
-              <button 
-                className="place-order-btn" 
-                onClick={handleSubmitOrder}
-                disabled={loading || !selectedAddress}
-              >
-                {loading ? (
-                  <>
-                    <FontAwesomeIcon icon={faSpinner} spin />
-                    جاري إنشاء الطلب...
-                  </>
-                ) : (
-                  'إتمام الطلب'
-                )}
-              </button>
-              
-              {error && !error.includes('عنوان') && (
-                <div className="error-message">
-                  <FontAwesomeIcon icon={faExclamationTriangle} />
-                  {error}
-                </div>
+              <div className="total-row grand">
+                <span>الإجمالي</span>
+                <span>{cartTotal.price.toFixed(0)} درهم</span>
+              </div>
+            </div>
+            
+            {error && (
+              <div className="checkout-error">
+                <FontAwesomeIcon icon={faExclamationTriangle} />
+                {error}
+              </div>
+            )}
+            
+            <button 
+              className="submit-order-btn"
+              onClick={handleSubmitOrder}
+              disabled={loading || !selectedAddress}
+            >
+              {loading ? (
+                <>
+                  <FontAwesomeIcon icon={faSpinner} spin />
+                  جاري الإرسال...
+                </>
+              ) : (
+                'تأكيد الطلب'
               )}
+            </button>
+            
+            {!selectedAddress && (
+              <p className="select-address-hint">يرجى اختيار عنوان الشحن أولاً</p>
+            )}
+            
+            <div className="trust-badges">
+              <div className="badge">
+                <FontAwesomeIcon icon={faShieldAlt} />
+                <span>دفع آمن</span>
+              </div>
+              <div className="badge">
+                <FontAwesomeIcon icon={faTruck} />
+                <span>شحن سريع</span>
+              </div>
             </div>
           </div>
         </div>
@@ -695,4 +574,4 @@ const CheckoutPage = () => {
   );
 };
 
-export default CheckoutPage; 
+export default CheckoutPage;
