@@ -20,6 +20,7 @@ const CategoryCarousel = ({
   categories = [],
   loading = false,
   onCategoryClick,
+  selectedCategory = null,
 }) => {
   const categoryScrollRef = useRef(null);
 
@@ -138,11 +139,15 @@ const CategoryCarousel = ({
                   category.updated_at || category.created_at || ""
                 }`;
 
+                const isActive =
+                  selectedCategory &&
+                  selectedCategory === category.id.toString();
+
                 return (
                   <Link
                     key={categoryKey}
                     to={`/products?category=${category.id}`}
-                    className="noon-category-item"
+                    className={`noon-category-item ${isActive ? "active" : ""}`}
                     onClick={() => handleCategoryClick(category)}
                   >
                     <div className="noon-category-image">
@@ -176,7 +181,9 @@ const CategoryCarousel = ({
                         />
                       ) : null}
                       {!imageUrl && (
-                        <FontAwesomeIcon icon={getCategoryIcon(category.name)} />
+                        <FontAwesomeIcon
+                          icon={getCategoryIcon(category.name)}
+                        />
                       )}
                     </div>
                     <span className="noon-category-name">{category.name}</span>

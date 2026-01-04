@@ -1,13 +1,14 @@
 .contact-page {
   min-height: 100vh;
   background: #f7f7f7;
-  padding-top: 70px;
+  padding-top: 0px;
   direction: rtl;
-  font-family: 'Noto Kufi Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: "Noto Kufi Arabic", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
 }
 
 .contact-hero {
-  background: linear-gradient(135deg, #1B2632 0%, #2a3a4a 100%);
+  background: linear-gradient(135deg, #1b2632 0%, #2a3a4a 100%);
   padding: 3rem 0;
   color: white;
   text-align: center;
@@ -55,17 +56,17 @@
   width: 60px;
   height: 60px;
   margin: 0 auto 1rem;
-  background: linear-gradient(135deg, #1B2632 0%, #2a3a4a 100%);
+  background: linear-gradient(135deg, #1b2632 0%, #2a3a4a 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #FFB162;
+  color: #ffb162;
   font-size: 1.5rem;
 }
 
 .contact-info-card h3 {
-  color: #1B2632;
+  color: #1b2632;
   font-size: 1.2rem;
   margin-bottom: 0.5rem;
 }
@@ -92,7 +93,7 @@
 
 .contact-form-wrapper h2,
 .contact-map-wrapper h2 {
-  color: #1B2632;
+  color: #1b2632;
   font-size: 1.5rem;
   margin-bottom: 1.5rem;
 }
@@ -132,11 +133,11 @@
 .form-group input:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #FFB162;
+  border-color: #ffb162;
 }
 
 .contact-submit-btn {
-  background: #1B2632;
+  background: #1b2632;
   color: white;
   padding: 1rem 2rem;
   border: none;
@@ -167,7 +168,7 @@
 }
 
 .contact-social h3 {
-  color: #1B2632;
+  color: #1b2632;
   font-size: 1.5rem;
   margin-bottom: 1.5rem;
 }
@@ -186,14 +187,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #1B2632;
+  color: #1b2632;
   font-size: 1.5rem;
   transition: all 0.3s ease;
 }
 
 .social-links a:hover {
-  background: #1B2632;
-  color: #FFB162;
+  background: #1b2632;
+  color: #ffb162;
   transform: translateY(-4px);
 }
 
@@ -201,7 +202,7 @@
   .contact-form-section {
     grid-template-columns: 1fr;
   }
-  
+
   .form-row {
     grid-template-columns: 1fr;
   }
@@ -211,7 +212,7 @@
   .contact-hero-content h1 {
     font-size: 2rem;
   }
-  
+
   .contact-info-grid {
     grid-template-columns: 1fr;
   }

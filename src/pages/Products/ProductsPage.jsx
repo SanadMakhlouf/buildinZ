@@ -723,16 +723,20 @@ const ProductsPage = () => {
   };
 
   // SEO variables
-  const categoryName = categories.find(c => c.id?.toString() === selectedCategory)?.name;
-  const seoTitle = categoryName 
-    ? `${categoryName} - تسوق أونلاين` 
-    : searchTerm 
-    ? `نتائج البحث: ${searchTerm}` 
-    : 'جميع المنتجات';
+  const categoryName = categories.find(
+    (c) => c.id?.toString() === selectedCategory
+  )?.name;
+  const seoTitle = categoryName
+    ? `${categoryName} - تسوق أونلاين`
+    : searchTerm
+    ? `نتائج البحث: ${searchTerm}`
+    : "جميع المنتجات";
   const seoDescription = categoryName
     ? `تسوق ${categoryName} من BuildingZ. أفضل الأسعار مع توصيل سريع في الإمارات.`
-    : 'تسوق جميع المنتجات من BuildingZ - أكبر متجر لمواد البناء والديكور في الإمارات.';
-  const seoUrl = `https://buildingzuae.com/products${selectedCategory ? `?category=${selectedCategory}` : ''}`;
+    : "تسوق جميع المنتجات من BuildingZ - أكبر متجر لمواد البناء والديكور في الإمارات.";
+  const seoUrl = `https://buildingzuae.com/products${
+    selectedCategory ? `?category=${selectedCategory}` : ""
+  }`;
 
   return (
     <div className="products-page">
@@ -740,17 +744,22 @@ const ProductsPage = () => {
         <title>{seoTitle} | BuildingZ</title>
         <meta name="title" content={`${seoTitle} | BuildingZ`} />
         <meta name="description" content={seoDescription} />
-        <meta name="keywords" content={`${categoryName || 'منتجات'}, مواد بناء, ديكور, تسوق أونلاين, BuildingZ, الإمارات`} />
+        <meta
+          name="keywords"
+          content={`${
+            categoryName || "منتجات"
+          }, مواد بناء, ديكور, تسوق أونلاين, BuildingZ, الإمارات`}
+        />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href={seoUrl} />
-        
+
         <meta property="og:type" content="website" />
         <meta property="og:url" content={seoUrl} />
         <meta property="og:title" content={`${seoTitle} | BuildingZ`} />
         <meta property="og:description" content={seoDescription} />
         <meta property="og:site_name" content="BuildingZ UAE" />
         <meta property="og:locale" content="ar_AE" />
-        
+
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={`${seoTitle} | BuildingZ`} />
         <meta name="twitter:description" content={seoDescription} />
@@ -789,6 +798,7 @@ const ProductsPage = () => {
       <CategoryCarousel
         categories={categories}
         loading={loading}
+        selectedCategory={selectedCategory}
         onCategoryClick={(category) => {
           setSelectedCategory(category.id.toString());
         }}
@@ -1090,7 +1100,7 @@ const ProductsPage = () => {
                   <div
                     key={service.id}
                     className="product-card"
-                    onClick={() => navigate(`/services2/service/${service.id}`)}
+                    onClick={() => navigate(`/services2/${service.id}`)}
                   >
                     <div className="product-image-container">
                       {imageUrl ? (

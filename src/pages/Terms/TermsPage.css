@@ -1,13 +1,14 @@
 .terms-page {
   min-height: 100vh;
   background: #f7f7f7;
-  padding-top: 70px;
+  padding-top: 0px;
   direction: rtl;
-  font-family: 'Noto Kufi Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: "Noto Kufi Arabic", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
 }
 
 .terms-hero {
-  background: linear-gradient(135deg, #1B2632 0%, #2a3a4a 100%);
+  background: linear-gradient(135deg, #1b2632 0%, #2a3a4a 100%);
   padding: 3rem 0;
   color: white;
   text-align: center;
@@ -79,7 +80,7 @@
 .section-number {
   width: 40px;
   height: 40px;
-  background: #1B2632;
+  background: #1b2632;
   color: white;
   border-radius: 50%;
   display: flex;
@@ -91,7 +92,7 @@
 
 .terms-section-header h2 {
   flex: 1;
-  color: #1B2632;
+  color: #1b2632;
   font-size: 1.3rem;
   margin: 0;
 }
@@ -127,24 +128,24 @@
 }
 
 .terms-footer a {
-  color: #1B2632;
+  color: #1b2632;
   text-decoration: none;
   font-weight: 600;
 }
 
 .terms-footer a:hover {
-  color: #FFB162;
+  color: #ffb162;
 }
 
 @media (max-width: 768px) {
   .terms-hero-content h1 {
     font-size: 2rem;
   }
-  
+
   .terms-section-header {
     padding: 1rem;
   }
-  
+
   .terms-section-header h2 {
     font-size: 1.1rem;
   }

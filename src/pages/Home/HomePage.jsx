@@ -99,6 +99,29 @@ const HomePage = () => {
     [wishlist]
   );
 
+  // Service all section rotating texts
+  const serviceAllTexts = [
+    "ضمان الجودة",
+    "خدمات مضمونة 100%",
+    "خدمة سريعة",
+    "سرعة قصوى للوصول",
+    "دعم 24/7",
+    "خدمة عملاء متواصلة",
+    "فنيون محترفون",
+    "خبرة عالية وموثوقة",
+  ];
+  const [currentServiceTextIndex, setCurrentServiceTextIndex] = useState(0);
+
+  const handleServiceTextNext = () => {
+    setCurrentServiceTextIndex((prev) => (prev + 1) % serviceAllTexts.length);
+  };
+
+  const handleServiceTextPrev = () => {
+    setCurrentServiceTextIndex(
+      (prev) => (prev - 1 + serviceAllTexts.length) % serviceAllTexts.length
+    );
+  };
+
   // Default banner data - fallback if no ads
   const defaultBanners = [
     {
@@ -858,7 +881,7 @@ const HomePage = () => {
 
   return (
     <div className="noon-homepage" role="document">
-      <SEO 
+      <SEO
         title="الصفحة الرئيسية"
         description="BuildingZ أكبر متجر إلكتروني لمواد البناء والديكور في الإمارات. تسوق الأثاث، الأدوات، مواد البناء والمزيد مع توصيل سريع لجميع أنحاء الإمارات."
         keywords="مواد بناء, ديكور, أثاث, أدوات منزلية, تسوق أونلاين, الإمارات"
@@ -899,12 +922,15 @@ const HomePage = () => {
               <div className="service-all-section">
                 <div className="service-all-content">
                   {/* Text */}
-                  <span className="service-all-text">على كل شي</span>
+                  <span className="service-all-text">
+                    {serviceAllTexts[currentServiceTextIndex]}
+                  </span>
 
                   {/* Right Arrow Button */}
                   <button
                     className="service-nav-arrow service-nav-arrow-left"
                     aria-label="التالي"
+                    onClick={handleServiceTextNext}
                   >
                     <FontAwesomeIcon icon={faChevronRight} />
                   </button>
@@ -913,6 +939,7 @@ const HomePage = () => {
                   <button
                     className="service-nav-arrow service-nav-arrow-right"
                     aria-label="السابق"
+                    onClick={handleServiceTextPrev}
                   >
                     <FontAwesomeIcon icon={faChevronLeft} />
                   </button>
@@ -2232,7 +2259,7 @@ const HomePage = () => {
               <h3>روابط سريعة</h3>
               <ul>
                 <li>
-                  <Link to="/services2/categories">الخدمات</Link>
+                  <Link to="/services">الخدمات</Link>
                 </li>
                 <li>
                   <Link to="/about">من نحن</Link>
