@@ -55,8 +55,7 @@ const ContactPage = () => {
                 <FontAwesomeIcon icon={faPhone} />
               </div>
               <h3>الهاتف</h3>
-              <p>+971 XX XXX XXXX</p>
-              <p>+971 XX XXX XXXX</p>
+              <p>+971 58 569 6336</p>
             </div>
 
             <div className="contact-info-card">

@@ -2297,7 +2297,7 @@ const HomePage = () => {
               <h3>تواصل معنا</h3>
               <div className="noon-contact-info">
                 <FontAwesomeIcon icon={faPhone} />
-                <span>+971 XX XXX XXXX</span>
+                <span>+971 58 569 6336</span>
               </div>
               <div className="noon-contact-info">
                 <FontAwesomeIcon icon={faEnvelope} />
