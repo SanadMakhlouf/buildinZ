@@ -299,7 +299,7 @@
 
 .product-title,
 .product-name {
-  font-family: var(--font-family-arabic, "Cairo", sans-serif);
+  font-family: var(--font-family-arabic, "Noto Kufi Arabic", sans-serif);
   font-size: var(--font-size-sm, 0.875rem);
   font-weight: var(--font-weight-semibold, 600);
   color: #0c141d;
@@ -314,7 +314,7 @@
 }
 
 .product-description {
-  font-family: var(--font-family-arabic, "Cairo", sans-serif);
+  font-family: var(--font-family-arabic, "Noto Kufi Arabic", sans-serif);
   font-size: var(--font-size-xs, 0.75rem);
   color: #6b7280;
   margin: 0;
@@ -345,7 +345,7 @@
 }
 
 .price-value {
-  font-family: var(--font-family-arabic, "Cairo", sans-serif);
+  font-family: var(--font-family-arabic, "Noto Kufi Arabic", sans-serif);
   font-size: var(--font-size-lg, 1.125rem);
   font-weight: var(--font-weight-bold, 700);
   color: #0c141d !important;
@@ -354,7 +354,7 @@
 }
 
 .price-currency {
-  font-family: var(--font-family-arabic, "Cairo", sans-serif);
+  font-family: var(--font-family-arabic, "Noto Kufi Arabic", sans-serif);
   font-size: var(--font-size-md, 1rem);
   font-weight: var(--font-weight-semibold, 600);
   color: #111 !important;
@@ -366,7 +366,7 @@
 }
 
 .product-original-price {
-  font-family: var(--font-family-arabic, "Cairo", sans-serif);
+  font-family: var(--font-family-arabic, "Noto Kufi Arabic", sans-serif);
   font-size: var(--font-size-sm, 0.875rem);
   color: #999 !important;
   text-decoration: line-through;
@@ -381,7 +381,7 @@
 }
 
 .rating-value {
-  font-family: var(--font-family-arabic, "Cairo", sans-serif);
+  font-family: var(--font-family-arabic, "Noto Kufi Arabic", sans-serif);
   font-size: var(--font-size-sm, 0.875rem);
   font-weight: var(--font-weight-semibold, 600);
   color: #333;
@@ -393,7 +393,7 @@
 }
 
 .review-count {
-  font-family: var(--font-family-arabic, "Cairo", sans-serif);
+  font-family: var(--font-family-arabic, "Noto Kufi Arabic", sans-serif);
   font-size: var(--font-size-sm, 0.875rem);
   color: #666;
   font-weight: var(--font-weight-normal, 400);
@@ -411,7 +411,7 @@
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  font-family: var(--font-family-arabic, "Cairo", sans-serif);
+  font-family: var(--font-family-arabic, "Noto Kufi Arabic", sans-serif);
   font-size: var(--font-size-xs, 0.75rem);
   color: #666;
   font-weight: var(--font-weight-normal, 400);
@@ -436,7 +436,7 @@
   color: white;
   padding: 0.4rem 0.75rem;
   border-radius: 4px;
-  font-family: var(--font-family-arabic, "Cairo", sans-serif);
+  font-family: var(--font-family-arabic, "Noto Kufi Arabic", sans-serif);
   font-size: var(--font-size-xs, 0.75rem);
   font-weight: var(--font-weight-semibold, 600);
   text-align: center;
@@ -451,7 +451,7 @@
   position: absolute;
   padding: 0.4rem 0.75rem;
   border-radius: 6px;
-  font-family: var(--font-family-arabic, "Cairo", sans-serif);
+  font-family: var(--font-family-arabic, "Noto Kufi Arabic", sans-serif);
   font-size: var(--font-size-sm, 0.875rem);
   font-weight: var(--font-weight-bold, 700);
   z-index: 2;

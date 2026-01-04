@@ -110,18 +110,8 @@ const HelpPage = () => {
       <div className="help-hero">
         <div className="help-hero-content">
           <h1>مركز المساعدة</h1>
-          <p>ابحث عن إجابات لأسئلتك أو تواصل معنا</p>
           
-          <div className="help-search-wrapper">
-            <FontAwesomeIcon icon={faSearch} className="help-search-icon" />
-            <input
-              type="text"
-              placeholder="ابحث عن مساعدة..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="help-search-input"
-            />
-          </div>
+          
         </div>
       </div>
 

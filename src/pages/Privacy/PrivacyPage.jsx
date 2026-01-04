@@ -302,7 +302,6 @@ const PrivacyPage = () => {
             <div className="contact-card">
               <div className="contact-header">
                 <FontAwesomeIcon icon={faLock} />
-                <h3>أسئلة أو استفسارات؟</h3>
               </div>
               <p>
                 إذا كان لديك أي أسئلة حول هذه السياسة أو ممارساتنا المتعلقة بالبيانات، 
