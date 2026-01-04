@@ -32,7 +32,7 @@
 }
 
 .address-card.default {
-  border-color: #DAA520;
+  border-color: #FFB162;
   background-color: #fffbf0;
 }
 
@@ -46,7 +46,7 @@
 }
 
 .checkout-mode .address-card.selected {
-  border-color: #DAA520;
+  border-color: #FFB162;
   background-color: #fffbf0;
   box-shadow: 0 0 0 2px rgba(218, 165, 32, 0.3);
 }
@@ -92,7 +92,7 @@
 }
 
 .default-badge {
-  background-color: #DAA520;
+  background-color: #FFB162;
   color: white;
   font-size: 0.7rem;
   padding: 0.15rem 0.5rem;
@@ -121,7 +121,7 @@
 }
 
 .address-phone svg {
-  color: #DAA520;
+  color: #FFB162;
 }
 
 .delivery-instructions {
@@ -184,7 +184,7 @@
 }
 
 .select-indicator.selected {
-  color: #DAA520;
+  color: #FFB162;
 }
 
 /* Add Address Button */
@@ -206,8 +206,8 @@
 }
 
 .add-address-btn:hover {
-  border-color: #DAA520;
-  color: #DAA520;
+  border-color: #FFB162;
+  color: #FFB162;
   background-color: #fffbf0;
 }
 
@@ -234,7 +234,7 @@
 
 .addresses-loading svg, .addresses-error svg, .no-addresses svg {
   font-size: 2rem;
-  color: #DAA520;
+  color: #FFB162;
 }
 
 .retry-button {
@@ -314,7 +314,7 @@
 
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
   outline: none;
-  border-color: #DAA520;
+  border-color: #FFB162;
 }
 
 .form-group input.error, .form-group select.error, .form-group textarea.error {
@@ -406,13 +406,13 @@
 }
 
 .save-btn {
-  background-color: #DAA520;
+  background-color: #FFB162;
   color: white;
   border: none;
 }
 
 .save-btn:hover:not(:disabled) {
-  background-color: #c99100;
+  background-color: #e6993f;
 }
 
 .save-btn:disabled {

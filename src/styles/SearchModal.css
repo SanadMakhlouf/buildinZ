@@ -1,16 +1,16 @@
 /* Search Modal Styles */
 :root {
-  --primary: #0A3259;
-  --primary-light: #1a4275;
-  --primary-dark: #072142;
-  --secondary: #DAA520;
-  --secondary-light: #e6b937;
-  --secondary-dark: #c79618;
+  --primary: #1B2632;
+  --primary-light: #2a3a4a;
+  --primary-dark: #0f1419;
+  --secondary: #FFB162;
+  --secondary-light: #ffc085;
+  --secondary-dark: #e6993f;
   --text-dark: #1e293b;
   --text-light: #f8fafc;
   --white: #ffffff;
   --light-bg: #f8fafc;
-  --dark-bg: #0A3259;
+  --dark-bg: #1B2632;
   --border-color: rgba(0, 0, 0, 0.1);
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
@@ -109,7 +109,7 @@
 
 .search-modal-form:focus-within {
   background-color: #e2e8f0;
-  box-shadow: 0 0 0 2px rgba(10, 50, 89, 0.2);
+  box-shadow: 0 0 0 2px rgba(27, 38, 50, 0.2);
 }
 
 .search-modal-icon {

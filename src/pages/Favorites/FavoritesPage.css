@@ -85,7 +85,7 @@
 
 .browse-products-btn {
   padding: 0.75rem 2rem;
-  background: #0a3259;
+  background: #1B2632;
   color: white;
   border: none;
   border-radius: 8px;
@@ -98,7 +98,7 @@
 .browse-products-btn:hover {
   background: #0c4a7a;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(10, 50, 89, 0.3);
+  box-shadow: 0 4px 12px rgba(27, 38, 50, 0.3);
 }
 
 .favorites-grid {
@@ -206,18 +206,18 @@
 
 .product-wishlist-btn:hover {
   background: white;
-  color: #e8b63a;
+  color: #FFB162;
   transform: scale(1.15);
   box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
 }
 
 .product-wishlist-btn.active {
-  background: #e8b63a;
+  background: #FFB162;
   color: white;
 }
 
 .product-wishlist-btn.active:hover {
-  background: #e8b63a;
+  background: #FFB162;
   transform: scale(1.15);
   box-shadow: 0 4px 16px rgba(239, 68, 68, 0.4);
 }
@@ -308,7 +308,7 @@
 }
 
 .price-currency {
-  color: #0a3259;
+  color: #1B2632;
   font-weight: 700;
   font-size: 1rem;
 }
@@ -345,7 +345,7 @@
 .add-to-cart-btn {
   margin-top: 0.75rem;
   padding: 0.75rem;
-  background: #0a3259;
+  background: #1B2632;
   color: white;
   border: none;
   border-radius: 8px;
@@ -362,7 +362,7 @@
 .add-to-cart-btn:hover {
   background: #0c4a7a;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(10, 50, 89, 0.3);
+  box-shadow: 0 4px 12px rgba(27, 38, 50, 0.3);
 }
 
 .add-to-cart-btn:active {

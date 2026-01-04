@@ -7,7 +7,7 @@
 }
 
 .contact-hero {
-  background: linear-gradient(135deg, #0A3259 0%, #1a4d80 100%);
+  background: linear-gradient(135deg, #1B2632 0%, #2a3a4a 100%);
   padding: 3rem 0;
   color: white;
   text-align: center;
@@ -55,17 +55,17 @@
   width: 60px;
   height: 60px;
   margin: 0 auto 1rem;
-  background: linear-gradient(135deg, #0A3259 0%, #1a4d80 100%);
+  background: linear-gradient(135deg, #1B2632 0%, #2a3a4a 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #DAA520;
+  color: #FFB162;
   font-size: 1.5rem;
 }
 
 .contact-info-card h3 {
-  color: #0A3259;
+  color: #1B2632;
   font-size: 1.2rem;
   margin-bottom: 0.5rem;
 }
@@ -92,7 +92,7 @@
 
 .contact-form-wrapper h2,
 .contact-map-wrapper h2 {
-  color: #0A3259;
+  color: #1B2632;
   font-size: 1.5rem;
   margin-bottom: 1.5rem;
 }
@@ -132,11 +132,11 @@
 .form-group input:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #DAA520;
+  border-color: #FFB162;
 }
 
 .contact-submit-btn {
-  background: #0A3259;
+  background: #1B2632;
   color: white;
   padding: 1rem 2rem;
   border: none;
@@ -149,7 +149,7 @@
 }
 
 .contact-submit-btn:hover {
-  background: #1a4d80;
+  background: #2a3a4a;
 }
 
 .contact-map {
@@ -167,7 +167,7 @@
 }
 
 .contact-social h3 {
-  color: #0A3259;
+  color: #1B2632;
   font-size: 1.5rem;
   margin-bottom: 1.5rem;
 }
@@ -186,14 +186,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #0A3259;
+  color: #1B2632;
   font-size: 1.5rem;
   transition: all 0.3s ease;
 }
 
 .social-links a:hover {
-  background: #0A3259;
-  color: #DAA520;
+  background: #1B2632;
+  color: #FFB162;
   transform: translateY(-4px);
 }
 

@@ -75,7 +75,7 @@
 }
 
 .form-group label svg {
-  color: #0A3259;
+  color: #1B2632;
 }
 
 .form-input {
@@ -90,8 +90,8 @@
 
 .form-input:focus {
   outline: none;
-  border-color: #0A3259;
-  box-shadow: 0 0 0 3px rgba(10, 50, 89, 0.1);
+  border-color: #1B2632;
+  box-shadow: 0 0 0 3px rgba(27, 38, 50, 0.1);
 }
 
 .form-input::placeholder {
@@ -101,7 +101,7 @@
 .track-button {
   width: 100%;
   padding: 16px;
-  background: #0A3259;
+  background: #1B2632;
   color: white;
   border: none;
   border-radius: 8px;
@@ -117,9 +117,9 @@
 }
 
 .track-button:hover:not(:disabled) {
-  background: #072441;
+  background: #0f1419;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(10, 50, 89, 0.3);
+  box-shadow: 0 4px 12px rgba(27, 38, 50, 0.3);
 }
 
 .track-button:disabled {
@@ -160,7 +160,7 @@
 
 .track-order-help li::before {
   content: '•';
-  color: #0A3259;
+  color: #1B2632;
   font-weight: bold;
   position: absolute;
   right: -15px;

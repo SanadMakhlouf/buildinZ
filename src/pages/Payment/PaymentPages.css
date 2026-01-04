@@ -119,12 +119,12 @@
 }
 
 .action-button.primary {
-  background: var(--gradient-accent, linear-gradient(135deg, #DAA520, #f0c14b));
-  color: var(--primary-dark, #072441);
+  background: var(--gradient-accent, linear-gradient(135deg, #FFB162, #ffc085));
+  color: var(--primary-dark, #0f1419);
 }
 
 .action-button.primary:hover {
-  background: var(--gradient-accent-hover, linear-gradient(135deg, #c99100, #e0b347));
+  background: var(--gradient-accent-hover, linear-gradient(135deg, #e6993f, #e0b347));
   transform: translateY(-2px);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
@@ -152,7 +152,7 @@
 /* Loading spinner */
 .loading-spinner {
   font-size: 3rem;
-  color: #DAA520;
+  color: #FFB162;
   margin: 2rem auto;
   display: flex;
   justify-content: center;

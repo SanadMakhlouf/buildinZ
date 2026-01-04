@@ -143,7 +143,7 @@ const Navbar = () => {
                 className="logo-link"
                 aria-label="BuildingZ - الصفحة الرئيسية"
               >
-                <span className="logo-text">BuildingZ</span>
+                <img src="/assets/logo.png" alt="BuildingZ" className="navbar-logo-img" />
               </Link>
             </div>
           </div>

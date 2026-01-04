@@ -32,7 +32,7 @@
 .auth-logo .logo-text {
   font-size: 28px;
   font-weight: 700;
-  color: #0A3259;
+  color: #1B2632;
   text-decoration: none;
 }
 
@@ -44,7 +44,7 @@
 }
 
 .back-link:hover {
-  color: #0A3259;
+  color: #1B2632;
 }
 
 /* Main Content */
@@ -106,10 +106,10 @@
 }
 
 .social-btn:hover {
-  border-color: #0A3259;
-  color: #0A3259;
+  border-color: #1B2632;
+  color: #1B2632;
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(10, 50, 89, 0.1);
+  box-shadow: 0 2px 8px rgba(27, 38, 50, 0.1);
 }
 
 .social-btn i {
@@ -163,9 +163,9 @@
 
 .input-group input:focus {
   outline: none;
-  border-color: #0A3259;
+  border-color: #1B2632;
   background: white;
-  box-shadow: 0 0 0 3px rgba(10, 50, 89, 0.08);
+  box-shadow: 0 0 0 3px rgba(27, 38, 50, 0.08);
 }
 
 .input-group input.error {
@@ -263,11 +263,11 @@
   margin-left: 8px;
   width: 16px;
   height: 16px;
-  accent-color: #0A3259;
+  accent-color: #1B2632;
 }
 
 .forgot-link {
-  color: #0A3259;
+  color: #1B2632;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.2s ease;
@@ -281,7 +281,7 @@
 .submit-btn {
   width: 100%;
   padding: 16px 24px;
-  background: #0A3259;
+  background: #1B2632;
   color: white;
   border: none;
   border-radius: 12px;
@@ -318,7 +318,7 @@
 }
 
 .switch-link {
-  color: #0A3259;
+  color: #1B2632;
   text-decoration: none;
   font-weight: 600;
   margin-right: 6px;

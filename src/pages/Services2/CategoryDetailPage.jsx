@@ -224,7 +224,7 @@ const CategoryDetailPage = () => {
       <div
         className="hero-banner"
         style={{
-          backgroundImage: `linear-gradient(rgba(10, 50, 89, 0.7), rgba(10, 50, 89, 0.85)), url(${categoryImage})`,
+          backgroundImage: `linear-gradient(rgba(27, 38, 50, 0.7), rgba(27, 38, 50, 0.85)), url(${categoryImage})`,
         }}
       >
         <div className="container">

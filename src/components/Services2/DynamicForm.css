@@ -30,7 +30,7 @@
 
 .progress-fill {
   height: 100%;
-  background-color: #0A3259;
+  background-color: #1B2632;
   border-radius: 4px;
   transition: width 0.3s ease;
 }
@@ -54,9 +54,9 @@
 }
 
 .progress-step.active {
-  background-color: #0A3259;
+  background-color: #1B2632;
   color: white;
-  box-shadow: 0 0 0 3px rgba(10, 50, 89, 0.2);
+  box-shadow: 0 0 0 3px rgba(27, 38, 50, 0.2);
 }
 
 .progress-step.completed {
@@ -112,8 +112,8 @@
 }
 
 .image-option.selected {
-  border-color: #0A3259;
-  box-shadow: 0 5px 15px rgba(10, 50, 89, 0.15);
+  border-color: #1B2632;
+  box-shadow: 0 5px 15px rgba(27, 38, 50, 0.15);
 }
 
 .image-container {
@@ -177,8 +177,8 @@
 
 .number-field input:focus {
   outline: none;
-  border-color: #0A3259;
-  box-shadow: 0 0 0 3px rgba(10, 50, 89, 0.1);
+  border-color: #1B2632;
+  box-shadow: 0 0 0 3px rgba(27, 38, 50, 0.1);
 }
 
 .input-unit {
@@ -225,9 +225,9 @@
 }
 
 .toggle-option.selected {
-  background: #0A3259;
+  background: #1B2632;
   color: white;
-  border-color: #0A3259;
+  border-color: #1B2632;
 }
 
 /* Select Field */
@@ -258,8 +258,8 @@
 
 .select-field select:focus {
   outline: none;
-  border-color: #0A3259;
-  box-shadow: 0 0 0 3px rgba(10, 50, 89, 0.1);
+  border-color: #1B2632;
+  box-shadow: 0 0 0 3px rgba(27, 38, 50, 0.1);
 }
 
 /* Color Field */
@@ -305,7 +305,7 @@
 }
 
 .price-header {
-  background: #0A3259;
+  background: #1B2632;
   padding: 1rem;
   color: white;
   text-align: center;
@@ -358,7 +358,7 @@
 }
 
 .total-price span:last-child {
-  color: #0A3259;
+  color: #1B2632;
 }
 
 /* Form Actions */
@@ -391,7 +391,7 @@
 }
 
 .next-button {
-  background-color: #0A3259;
+  background-color: #1B2632;
   color: white;
 }
 
@@ -456,7 +456,7 @@
 }
 
 .back-to-services {
-  background-color: #0A3259;
+  background-color: #1B2632;
   color: white;
   margin: 0 auto;
   display: inline-block;

@@ -27,7 +27,7 @@
 
 /* Hero Section */
 .hero-section {
-  background: linear-gradient(rgba(10, 50, 89, 0.85), rgba(10, 50, 89, 0.9)), url('../../assets/images/hero-bg.png');
+  background: linear-gradient(rgba(27, 38, 50, 0.85), rgba(27, 38, 50, 0.9)), url('../../assets/images/hero-bg.png');
   background-size: cover;
   background-position: center;
   color: white;
@@ -153,7 +153,7 @@
 .category-action {
   display: inline-block;
   background: white;
-  color: #0A3259;
+  color: #1B2632;
   padding: 10px 24px;
   border-radius: 8px;
   font-weight: 600;
@@ -163,7 +163,7 @@
 }
 
 .category-card:hover .category-action {
-  background: #DAA520;
+  background: #FFB162;
   color: white;
   transform: translateX(-5px);
 }
@@ -185,7 +185,7 @@
 
 .loading-container svg,
 .error-container svg {
-  color: #DAA520;
+  color: #FFB162;
   margin-bottom: 25px;
   font-size: 3rem;
 }
@@ -200,7 +200,7 @@
 }
 
 .retry-button {
-  background-color: #DAA520;
+  background-color: #FFB162;
   color: white;
   border: none;
   border-radius: 50px;
@@ -213,7 +213,7 @@
 }
 
 .retry-button:hover {
-  background-color: #c99100;
+  background-color: #e6993f;
   transform: translateY(-3px);
   box-shadow: 0 8px 20px rgba(218, 165, 32, 0.3);
 }

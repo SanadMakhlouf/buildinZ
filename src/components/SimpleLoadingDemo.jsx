@@ -33,7 +33,7 @@ const SimpleLoadingDemo = () => {
             onClick={() => handleShowLoading('جاري تحميل البيانات...')}
             style={{
               padding: '0.75rem 1.5rem',
-              background: '#0A3259',
+              background: '#1B2632',
               color: 'white',
               border: 'none',
               borderRadius: '6px',
@@ -48,7 +48,7 @@ const SimpleLoadingDemo = () => {
             onClick={() => handleShowLoading('جاري معالجة الطلب...')}
             style={{
               padding: '0.75rem 1.5rem',
-              background: '#DAA520',
+              background: '#FFB162',
               color: 'white',
               border: 'none',
               borderRadius: '6px',

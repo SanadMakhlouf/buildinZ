@@ -108,7 +108,7 @@ const HomePage = () => {
       image:
         "https://images.unsplash.com/photo-1631545806609-34facf43f1f0?w=1200",
       link: "/services2/categories",
-      bgColor: "#0A3259",
+      bgColor: "#1B2632",
     },
     {
       id: 2,
@@ -117,7 +117,7 @@ const HomePage = () => {
       image:
         "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1200",
       link: "/services2/categories",
-      bgColor: "#1a4d80",
+      bgColor: "#2a3a4a",
     },
     {
       id: 3,
@@ -126,7 +126,7 @@ const HomePage = () => {
       image:
         "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=1200",
       link: "/services2/categories",
-      bgColor: "#072441",
+      bgColor: "#0f1419",
     },
   ];
 
@@ -1773,7 +1773,7 @@ const HomePage = () => {
           <div className="noon-section-container">
             <header className="noon-section-header">
               <h2>المزيد من الخدمات</h2>
-              <Link to="/services2/categories" className="noon-view-all">
+              <Link to="/services" className="noon-view-all">
                 عرض الكل <FontAwesomeIcon icon={faArrowLeft} />
               </Link>
             </header>

@@ -98,7 +98,7 @@ const ProfilePage = () => {
     return (
       <div className="auth-required-container">
         <div className="auth-required">
-          <FontAwesomeIcon icon={icons.lock} style={{ fontSize: '3rem', color: '#DAA520', marginBottom: '1rem' }} />
+          <FontAwesomeIcon icon={icons.lock} style={{ fontSize: '3rem', color: '#FFB162', marginBottom: '1rem' }} />
           <h2>تسجيل الدخول مطلوب</h2>
           <p>يجب تسجيل الدخول لعرض الملف الشخصي</p>
           <button 
@@ -555,7 +555,7 @@ const ProfilePage = () => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
         >
-          <FontAwesomeIcon icon={icons.basket} style={{ fontSize: '3rem', color: '#DAA520', marginBottom: '1rem' }} />
+          <FontAwesomeIcon icon={icons.basket} style={{ fontSize: '3rem', color: '#FFB162', marginBottom: '1rem' }} />
           <p>لا توجد طلبات حتى الآن</p>
           <button 
             className="edit-btn" 
@@ -690,7 +690,7 @@ const ProfilePage = () => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
         >
-          <i className="fas fa-tools" style={{ fontSize: '3rem', color: '#DAA520', marginBottom: '1rem' }}></i>
+          <i className="fas fa-tools" style={{ fontSize: '3rem', color: '#FFB162', marginBottom: '1rem' }}></i>
           <p>لا توجد طلبات خدمة حتى الآن</p>
           <button 
             className="edit-btn" 
@@ -740,7 +740,7 @@ const ProfilePage = () => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
         >
-          <i className="fas fa-hammer" style={{ fontSize: '3rem', color: '#DAA520', marginBottom: '1rem' }}></i>
+          <i className="fas fa-hammer" style={{ fontSize: '3rem', color: '#FFB162', marginBottom: '1rem' }}></i>
           <p>لا توجد طلبات خدم حتى الآن</p>
           <button 
             className="edit-btn" 
@@ -978,7 +978,7 @@ const ProfilePage = () => {
     <div className="notifications-section">
       <h2>الإشعارات</h2>
       <div className="empty-state">
-        <i className="fas fa-bell" style={{ fontSize: '3rem', color: '#DAA520', marginBottom: '1rem' }}></i>
+        <i className="fas fa-bell" style={{ fontSize: '3rem', color: '#FFB162', marginBottom: '1rem' }}></i>
         <p>لا توجد إشعارات جديدة</p>
       </div>
     </div>

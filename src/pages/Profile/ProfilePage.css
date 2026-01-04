@@ -19,7 +19,7 @@
 
 .profile-sidebar {
   width: 280px;
-  background-color: #0A3259;
+  background-color: #1B2632;
   padding: 2rem 1rem;
   color: white;
 }
@@ -36,7 +36,7 @@
 
 .sidebar-item i {
   margin-left: 12px;
-  color: #DAA520;
+  color: #FFB162;
   font-size: 1.2rem;
 }
 
@@ -50,12 +50,12 @@
 }
 
 .sidebar-item.active {
-  background-color: #DAA520;
-  color: #0A3259;
+  background-color: #FFB162;
+  color: #1B2632;
 }
 
 .sidebar-item.active i {
-  color: #0A3259;
+  color: #1B2632;
 }
 
 .profile-content {
@@ -74,8 +74,8 @@
 .orders-section h2,
 .service-requests-section h2 {
   margin-bottom: 1.8rem;
-  color: #0A3259;
-  border-bottom: 2px solid #DAA520;
+  color: #1B2632;
+  border-bottom: 2px solid #FFB162;
   padding-bottom: 12px;
   font-size: 1.8rem;
   font-weight: 600;
@@ -100,7 +100,7 @@
 }
 
 .profile-details p strong {
-  color: #0A3259;
+  color: #1B2632;
   margin-left: 10px;
   min-width: 120px;
   display: inline-block;
@@ -113,7 +113,7 @@
 .input-group label {
   display: block;
   margin-bottom: 0.8rem;
-  color: #0A3259;
+  color: #1B2632;
   font-weight: 500;
   font-size: 1rem;
 }
@@ -129,7 +129,7 @@
 
 .input-group input:focus {
   outline: none;
-  border-color: #DAA520;
+  border-color: #FFB162;
   box-shadow: 0 0 0 3px rgba(218, 165, 32, 0.2);
 }
 
@@ -158,16 +158,16 @@
 }
 
 .save-btn {
-  background-color: #DAA520;
-  color: #0A3259;
+  background-color: #FFB162;
+  color: #1B2632;
 }
 
 .save-btn:hover {
-  background-color: #c79618;
+  background-color: #e6993f;
 }
 
 .edit-btn {
-  background-color: #0A3259;
+  background-color: #1B2632;
   color: white;
 }
 
@@ -287,7 +287,7 @@
 
 .spinner {
   border: 4px solid rgba(218, 165, 32, 0.2);
-  border-top: 4px solid #DAA520;
+  border-top: 4px solid #FFB162;
   border-radius: 50%;
   width: 60px;
   height: 60px;
@@ -307,7 +307,7 @@
 }
 
 .error-container button {
-  background-color: #0A3259;
+  background-color: #1B2632;
   color: white;
   border: none;
   padding: 12px 20px;
@@ -392,8 +392,8 @@
 .notifications-section h2,
 .settings-section h2 {
   margin-bottom: 1.8rem;
-  color: #0A3259;
-  border-bottom: 2px solid #DAA520;
+  color: #1B2632;
+  border-bottom: 2px solid #FFB162;
   padding-bottom: 12px;
   font-size: 1.8rem;
   font-weight: 600;
@@ -437,7 +437,7 @@
 }
 
 .settings-group h3 {
-  color: #0A3259;
+  color: #1B2632;
   font-size: 1.3rem;
   margin-bottom: 1rem;
   font-weight: 500;
@@ -459,7 +459,7 @@
   margin-left: 10px;
   width: 18px;
   height: 18px;
-  accent-color: #DAA520;
+  accent-color: #FFB162;
 }
 
 /* Animation for hover effects */
@@ -552,8 +552,8 @@
 
 .addresses-section h2 {
   margin-bottom: 1.8rem;
-  color: #0A3259;
-  border-bottom: 2px solid #DAA520;
+  color: #1B2632;
+  border-bottom: 2px solid #FFB162;
   padding-bottom: 12px;
   font-size: 1.8rem;
   font-weight: 600;
@@ -718,7 +718,7 @@
 }
 
 .auth-required h2 {
-  color: #0A3259;
+  color: #1B2632;
   margin-bottom: 1rem;
   font-size: 1.8rem;
 }
@@ -730,7 +730,7 @@
 }
 
 .login-btn {
-  background-color: #DAA520;
+  background-color: #FFB162;
   color: white;
   border: none;
   border-radius: 8px;
@@ -742,7 +742,7 @@
 }
 
 .login-btn:hover {
-  background-color: #c99100;
+  background-color: #e6993f;
   transform: translateY(-2px);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
@@ -768,10 +768,10 @@
 }
 
 .service-builder-order-details-expanded h4 {
-  color: #0A3259;
+  color: #1B2632;
   font-size: 1.4rem;
   margin-bottom: 1.5rem;
-  border-bottom: 1px solid #DAA520;
+  border-bottom: 1px solid #FFB162;
   padding-bottom: 8px;
 }
 
@@ -787,7 +787,7 @@
 }
 
 .order-details-section h5 {
-  color: #0A3259;
+  color: #1B2632;
   font-size: 1.2rem;
   margin-bottom: 1rem;
   border-bottom: 1px dashed #e0e0e0;
@@ -812,8 +812,8 @@
   background-color: #f1f1f1;
   padding: 10px;
   text-align: right;
-  border-bottom: 2px solid #DAA520;
-  color: #0A3259;
+  border-bottom: 2px solid #FFB162;
+  color: #1B2632;
 }
 
 .field-values-table td,
@@ -836,10 +836,10 @@
 }
 
 .order-summary h5 {
-  color: #0A3259;
+  color: #1B2632;
   font-size: 1.2rem;
   margin-bottom: 1rem;
-  border-bottom: 1px solid #DAA520;
+  border-bottom: 1px solid #FFB162;
   padding-bottom: 8px;
 }
 
@@ -857,9 +857,9 @@
 .summary-row.total {
   font-weight: bold;
   font-size: 1.1rem;
-  color: #0A3259;
+  color: #1B2632;
   margin-top: 10px;
-  border-top: 2px solid #DAA520;
+  border-top: 2px solid #FFB162;
   border-bottom: none;
   padding-top: 12px;
 }
@@ -889,12 +889,12 @@
 
 .details-btn {
   background-color: #f8f9fa;
-  color: #0A3259;
-  border: 1px solid #0A3259;
+  color: #1B2632;
+  border: 1px solid #1B2632;
 }
 
 .details-btn:hover {
-  background-color: #0A3259;
+  background-color: #1B2632;
   color: white;
 }
 

@@ -82,7 +82,7 @@
 }
 
 .back-button.secondary {
-  background-color: #0a3259;
+  background-color: #1B2632;
   color: white;
   position: relative;
   top: auto;
@@ -92,7 +92,7 @@
 }
 
 .back-button.secondary:hover {
-  background-color: #072441;
+  background-color: #0f1419;
 }
 
 .content-container {
@@ -140,7 +140,7 @@
 }
 
 .tab-button.active {
-  color: #0a3259;
+  color: #1B2632;
   font-weight: 600;
   background-color: white;
 }
@@ -152,11 +152,11 @@
   left: 0;
   width: 100%;
   height: 3px;
-  background: linear-gradient(to right, #daa520, #e6c478);
+  background: linear-gradient(to right, #FFB162, #e6c478);
 }
 
 .tab-button:hover {
-  color: #0a3259;
+  color: #1B2632;
   background-color: rgba(255, 255, 255, 0.7);
 }
 
@@ -180,13 +180,13 @@
 }
 
 .view-button:hover {
-  background-color: rgba(10, 50, 89, 0.05);
-  color: #0a3259;
+  background-color: rgba(27, 38, 50, 0.05);
+  color: #1B2632;
 }
 
 .view-button.active {
-  background-color: rgba(10, 50, 89, 0.1);
-  color: #0a3259;
+  background-color: rgba(27, 38, 50, 0.1);
+  color: #1B2632;
 }
 
 /* Grid View */
@@ -332,12 +332,12 @@
   font-size: 1.3rem;
   margin: 0 0 10px;
   font-weight: 600;
-  color: #0a3259;
+  color: #1B2632;
   transition: color 0.3s ease;
 }
 
 .service-item.card:hover .service-content h3 {
-  color: #daa520;
+  color: #FFB162;
 }
 
 .service-content p {
@@ -363,12 +363,12 @@
 
 .service-price {
   font-size: 1.1rem;
-  color: #daa520;
+  color: #FFB162;
   font-weight: 600;
 }
 
 .service-action-btn {
-  background-color: #0a3259;
+  background-color: #1B2632;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -381,7 +381,7 @@
 }
 
 .service-action-btn:hover {
-  background-color: #daa520;
+  background-color: #FFB162;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(218, 165, 32, 0.3);
 }
@@ -399,12 +399,12 @@
   font-size: 1.3rem;
   margin: 0 0 8px;
   font-weight: 600;
-  color: #0a3259;
+  color: #1B2632;
   transition: color 0.3s ease;
 }
 
 .subcategory-item.card:hover .subcategory-content h3 {
-  color: #daa520;
+  color: #FFB162;
 }
 
 .subcategory-content p {
@@ -436,16 +436,16 @@
 .subcategory-count,
 .service-count {
   background-color: #f0f8ff;
-  color: #0a3259;
+  color: #1B2632;
   padding: 6px 12px;
   border-radius: 12px;
   font-size: 0.85rem;
   font-weight: 500;
-  border: 1px solid rgba(10, 50, 89, 0.1);
+  border: 1px solid rgba(27, 38, 50, 0.1);
 }
 
 .subcategory-action-btn {
-  background-color: #0a3259;
+  background-color: #1B2632;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -459,7 +459,7 @@
 }
 
 .subcategory-action-btn:hover {
-  background-color: #daa520;
+  background-color: #FFB162;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(218, 165, 32, 0.3);
 }
@@ -489,7 +489,7 @@
 .service-item.row:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-  border-color: rgba(10, 50, 89, 0.1);
+  border-color: rgba(27, 38, 50, 0.1);
 }
 
 .subcategory-item.row .subcategory-image,
@@ -510,7 +510,7 @@
 .subcategory-details h3,
 .service-details h3 {
   font-size: 1.3rem;
-  color: #0a3259;
+  color: #1B2632;
   margin: 0 0 10px;
   font-weight: 600;
   transition: color 0.3s;
@@ -518,7 +518,7 @@
 
 .subcategory-item.row:hover .subcategory-details h3,
 .service-item.row:hover .service-details h3 {
-  color: #daa520;
+  color: #FFB162;
 }
 
 .subcategory-details p,
@@ -546,21 +546,21 @@
 .subcategory-count,
 .service-count {
   background-color: #f0f8ff;
-  color: #0a3259;
+  color: #1B2632;
   padding: 5px 12px;
   border-radius: 12px;
   font-size: 0.85rem;
-  border: 1px solid rgba(10, 50, 89, 0.1);
+  border: 1px solid rgba(27, 38, 50, 0.1);
 }
 
 .service-price {
   font-size: 1.1rem;
-  color: #daa520;
+  color: #FFB162;
   font-weight: 600;
 }
 
 .view-service-btn {
-  background-color: #0a3259;
+  background-color: #1B2632;
   color: white;
   border: none;
   padding: 8px 15px;
@@ -571,7 +571,7 @@
 }
 
 .view-service-btn:hover {
-  background-color: #daa520;
+  background-color: #FFB162;
   transform: translateY(-2px);
 }
 
@@ -597,7 +597,7 @@
 }
 
 .switch-tab-button {
-  background-color: #0a3259;
+  background-color: #1B2632;
   color: white;
   border: none;
   border-radius: 6px;
@@ -606,18 +606,18 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
-  box-shadow: 0 4px 10px rgba(10, 50, 89, 0.2);
+  box-shadow: 0 4px 10px rgba(27, 38, 50, 0.2);
 }
 
 .switch-tab-button:hover {
-  background-color: #072441;
+  background-color: #0f1419;
   transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(10, 50, 89, 0.3);
+  box-shadow: 0 8px 20px rgba(27, 38, 50, 0.3);
 }
 
 .switch-tab-button:active {
   transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(10, 50, 89, 0.2);
+  box-shadow: 0 4px 10px rgba(27, 38, 50, 0.2);
 }
 
 /* Loading and Error States */
@@ -639,7 +639,7 @@
 
 .loading-container svg,
 .error-container svg {
-  color: #daa520;
+  color: #FFB162;
   margin-bottom: 25px;
   font-size: 3rem;
 }
@@ -653,7 +653,7 @@
 }
 
 .retry-button {
-  background-color: #daa520;
+  background-color: #FFB162;
   color: white;
   border: none;
   border-radius: 6px;
@@ -667,7 +667,7 @@
 }
 
 .retry-button:hover {
-  background-color: #c99100;
+  background-color: #e6993f;
   transform: translateY(-3px);
   box-shadow: 0 8px 20px rgba(218, 165, 32, 0.3);
 }

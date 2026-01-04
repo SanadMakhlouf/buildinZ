@@ -14,7 +14,7 @@
 
 /* Header */
 .privacy-hero {
-  background: linear-gradient(135deg, #0A3259 0%, #1a4d80 100%);
+  background: linear-gradient(135deg, #1B2632 0%, #2a3a4a 100%);
   padding: 3rem 0;
   color: white;
   text-align: center;
@@ -24,7 +24,7 @@
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 1rem;
-  color: #DAA520;
+  color: #FFB162;
 }
 
 .privacy-hero-content p {
@@ -66,13 +66,13 @@
 
 .nav-tab:hover {
   background: #f8f9fa;
-  color: #0A3259;
+  color: #1B2632;
 }
 
 .nav-tab.active {
-  color: #0A3259;
+  color: #1B2632;
   background: #f8f9fa;
-  border-bottom-color: #DAA520;
+  border-bottom-color: #FFB162;
 }
 
 .nav-tab svg {
@@ -99,23 +99,23 @@
 .header-icon {
   width: 60px;
   height: 60px;
-  background: linear-gradient(135deg, #0A3259, #1a4d80);
+  background: linear-gradient(135deg, #1B2632, #2a3a4a);
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #DAA520;
+  color: #FFB162;
   font-size: 1.8rem;
   flex-shrink: 0;
 }
 
 .header-icon svg {
-  color: #DAA520;
+  color: #FFB162;
 }
 
 .privacy-header-info h2 {
   font-size: 1.8rem;
-  color: #0A3259;
+  color: #1B2632;
   margin: 0 0 0.5rem 0;
   font-weight: 700;
 }
@@ -154,7 +154,7 @@
 
 .section-header h3 {
   font-size: 1.5rem;
-  color: #0A3259;
+  color: #1B2632;
   margin: 0;
   font-weight: 600;
 }
@@ -178,9 +178,9 @@
 }
 
 .expand-toggle:hover {
-  background: #0A3259;
+  background: #1B2632;
   color: white;
-  border-color: #0A3259;
+  border-color: #1B2632;
 }
 
 .section-content p {
@@ -222,7 +222,7 @@
 }
 
 .check-icon {
-  color: #DAA520 !important;
+  color: #FFB162 !important;
   margin-top: 0.2rem;
   flex-shrink: 0;
   font-size: 1rem;
@@ -234,7 +234,7 @@
 }
 
 .contact-card {
-  background: linear-gradient(135deg, #0A3259 0%, #1a4d80 100%);
+  background: linear-gradient(135deg, #1B2632 0%, #2a3a4a 100%);
   color: white;
   padding: 2.5rem;
   border-radius: 12px;
@@ -252,7 +252,7 @@
 
 .contact-header svg {
   font-size: 2rem;
-  color: #DAA520;
+  color: #FFB162;
 }
 
 .contact-header {
@@ -295,7 +295,7 @@
 .contact-method strong {
   display: block;
   margin-bottom: 0.5rem;
-  color: #DAA520;
+  color: #FFB162;
   font-size: 1rem;
 }
 

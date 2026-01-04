@@ -366,7 +366,7 @@ const notificationService = {
    */
   getNotificationColor(type) {
     const colorMap = {
-      'info': '#0A3259',
+      'info': '#1B2632',
       'success': '#28a745',
       'warning': '#ffc107',
       'error': '#dc3545',

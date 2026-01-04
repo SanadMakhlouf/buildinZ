@@ -16,7 +16,7 @@
 }
 
 .terms-link {
-  color: #0A3259;
+  color: #1B2632;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.2s ease;
@@ -109,7 +109,7 @@
 
 .benefit-item i {
   font-size: 1.8rem;
-  color: #DAA520;
+  color: #FFB162;
   margin-bottom: 10px;
 }
 
@@ -181,7 +181,7 @@
 }
 
 .terms-link {
-  color: #0A3259;
+  color: #1B2632;
   text-decoration: none;
   font-weight: 600;
   margin: 0 2px;
@@ -209,12 +209,12 @@
 }
 
 .auth-form-section .form-container::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #DAA520, #B8860B);
+  background: linear-gradient(180deg, #FFB162, #B8860B);
   border-radius: 10px;
 }
 
 .auth-form-section .form-container::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #FFD700, #DAA520);
+  background: linear-gradient(180deg, #FFB162, #ffc085);
 }
 
 /* Enhanced Button for Signup */
@@ -372,7 +372,7 @@
 /* Focus Enhancement */
 .form-group input:focus {
   transform: translateY(-1px);
-  box-shadow: 0 0 0 3px rgba(10, 50, 89, 0.1), 0 8px 25px rgba(10, 50, 89, 0.08);
+  box-shadow: 0 0 0 3px rgba(27, 38, 50, 0.1), 0 8px 25px rgba(27, 38, 50, 0.08);
 }
 
 /* Improved Error States */
@@ -399,7 +399,7 @@
 }
 
 .welcome-feature:hover .feature-icon i {
-  color: #FFD700;
+  color: #FFB162;
 }
 
 /* Accessibility Improvements */

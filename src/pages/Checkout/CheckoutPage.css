@@ -2,9 +2,9 @@
 
 /* ========== Variables ========== */
 :root {
-  --checkout-primary: #0A3259;
-  --checkout-primary-light: #1a4d80;
-  --checkout-accent: #DAA520;
+  --checkout-primary: #1B2632;
+  --checkout-primary-light: #2a3a4a;
+  --checkout-accent: #FFB162;
   --checkout-success: #10B981;
   --checkout-danger: #EF4444;
   --checkout-text: #1F2937;

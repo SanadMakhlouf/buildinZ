@@ -15,8 +15,8 @@
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background: var(--gradient-accent, linear-gradient(135deg, #daa520, #f0c14b));
-  color: var(--primary-dark, #072441);
+  background: var(--gradient-accent, linear-gradient(135deg, #FFB162, #ffc085));
+  color: var(--primary-dark, #0f1419);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -260,8 +260,8 @@
 
 .view-cart-btn {
   background-color: white;
-  border: 1px solid #daa520;
-  color: #daa520;
+  border: 1px solid #FFB162;
+  color: #FFB162;
 }
 
 .view-cart-btn:hover {
@@ -269,15 +269,15 @@
 }
 
 .checkout-btn {
-  background: var(--gradient-accent, linear-gradient(135deg, #daa520, #f0c14b));
-  color: var(--primary-dark, #072441);
+  background: var(--gradient-accent, linear-gradient(135deg, #FFB162, #ffc085));
+  color: var(--primary-dark, #0f1419);
   border: none;
 }
 
 .checkout-btn:hover {
   background: var(
     --gradient-accent-hover,
-    linear-gradient(135deg, #c99100, #e0b347)
+    linear-gradient(135deg, #e6993f, #e0b347)
   );
 }
 

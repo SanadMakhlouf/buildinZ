@@ -6,7 +6,7 @@
 }
 
 .help-hero {
-  background: linear-gradient(135deg, #0A3259 0%, #1a4d80 100%);
+  background: linear-gradient(135deg, #1B2632 0%, #2a3a4a 100%);
   padding: 3rem 0;
   color: white;
   text-align: center;
@@ -85,12 +85,12 @@
 }
 
 .category-title svg {
-  color: #DAA520;
+  color: #FFB162;
   font-size: 1.5rem;
 }
 
 .category-title h2 {
-  color: #0A3259;
+  color: #1B2632;
   font-size: 1.3rem;
   margin: 0;
 }
@@ -110,7 +110,7 @@
 }
 
 .article-item h3 {
-  color: #0A3259;
+  color: #1B2632;
   font-size: 1.1rem;
   margin-bottom: 0.5rem;
 }
@@ -121,7 +121,7 @@
 }
 
 .search-results h2 {
-  color: #0A3259;
+  color: #1B2632;
   font-size: 1.8rem;
   margin-bottom: 1.5rem;
 }
@@ -139,7 +139,7 @@
 }
 
 .article-card h3 {
-  color: #0A3259;
+  color: #1B2632;
   font-size: 1.2rem;
   margin-bottom: 0.75rem;
 }
@@ -165,7 +165,7 @@
 }
 
 .help-contact h2 {
-  color: #0A3259;
+  color: #1B2632;
   font-size: 1.8rem;
   margin-bottom: 0.5rem;
 }
@@ -187,7 +187,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background: #0A3259;
+  background: #1B2632;
   color: white;
   text-decoration: none;
   border-radius: 8px;
@@ -196,7 +196,7 @@
 }
 
 .help-contact-btn:hover {
-  background: #1a4d80;
+  background: #2a3a4a;
 }
 
 @media (max-width: 768px) {

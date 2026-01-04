@@ -1,16 +1,16 @@
 /* Modern Navbar Styling - Redesigned to match reference */
 :root {
-  --primary: #0a3259;
-  --primary-light: #1a4275;
-  --primary-dark: #072142;
-  --secondary: #daa520;
-  --secondary-light: #e6b937;
-  --secondary-dark: #c79618;
+  --primary: #1B2632;
+  --primary-light: #2a3a4a;
+  --primary-dark: #0f1419;
+  --secondary: #FFB162;
+  --secondary-light: #ffc085;
+  --secondary-dark: #e6993f;
   --text-dark: #1e293b;
   --text-light: #f8fafc;
   --white: #ffffff;
   --light-bg: #f8fafc;
-  --dark-bg: #0a3259;
+  --dark-bg: #1B2632;
   --border-color: rgba(255, 255, 255, 0.1);
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.2),
@@ -48,7 +48,7 @@
   box-shadow: var(--shadow-md);
   height: 60px;
   backdrop-filter: blur(10px);
-  background-color: rgba(10, 50, 89, 0.98);
+  background-color: rgba(27, 38, 50, 0.98);
 }
 
 .navbar-container {
@@ -477,29 +477,23 @@
 }
 
 .logo-text {
-  font-family: "Noo Kufi Arabic", var(--font-family-arabic);
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--white);
+  display: none; /* Hide text logo, use image */
+}
+
+.navbar-logo-img {
+  height: auto;
+  max-height: 50px;
+  width: 100px;
+  padding-bottom: 3px;
+  max-width: 150px;
+  object-fit: contain;
   transition: var(--transition);
-  letter-spacing: -0.5px;
-  line-height: 1.2;
-  display: flex;
-  align-items: center;
-  height: 100%;
-  vertical-align: middle;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
+  display: block;
 }
 
-.logo-image {
-  display: none; /* Hide image logo, use text */
-}
-
-.navbar-scrolled .logo-text {
-  font-size: 1.15rem;
+.navbar-scrolled .navbar-logo-img {
+  max-height: 45px;
+  max-width: 140px;
 }
 
 /* Mobile Menu Toggle */

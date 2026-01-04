@@ -54,7 +54,7 @@
 }
 
 .order-number-badge {
-  background: #0a3259;
+  background: #1B2632;
   color: white;
   padding: 10px 20px;
   border-radius: 8px;
@@ -110,7 +110,7 @@
 }
 
 .info-card h2 svg {
-  color: #0a3259;
+  color: #1B2632;
 }
 
 .service-info {
@@ -152,7 +152,7 @@
 }
 
 .service-details .category {
-  color: #0a3259;
+  color: #1B2632;
   font-weight: 500;
 }
 
@@ -172,7 +172,7 @@
 }
 
 .info-item svg {
-  color: #0a3259;
+  color: #1B2632;
   font-size: 1.25rem;
   margin-top: 4px;
   flex-shrink: 0;
@@ -232,7 +232,7 @@
 }
 
 .price-adjustment {
-  color: #0a3259;
+  color: #1B2632;
   font-weight: 600;
   font-size: 0.9rem;
 }
@@ -278,7 +278,7 @@
 
 .product-total {
   font-weight: 600;
-  color: #0a3259 !important;
+  color: #1B2632 !important;
   margin-top: 8px !important;
 }
 
@@ -303,12 +303,12 @@
 
 .file-item:hover {
   background: #f3f4f6;
-  border-color: #0a3259;
-  color: #0a3259;
+  border-color: #1B2632;
+  color: #1B2632;
 }
 
 .file-item svg:first-child {
-  color: #0a3259;
+  color: #1B2632;
 }
 
 .file-item span {
@@ -316,7 +316,7 @@
 }
 
 .pricing-card {
-  background: linear-gradient(135deg, #0a3259 0%, #1a4d80 100%);
+  background: linear-gradient(135deg, #1B2632 0%, #2a3a4a 100%);
   color: white;
 }
 
@@ -325,7 +325,7 @@
 }
 
 .pricing-card h2 svg {
-  color: #daa520;
+  color: #FFB162;
 }
 
 .pricing-breakdown {
@@ -347,7 +347,7 @@
 }
 
 .pricing-row.discount {
-  color: #daa520;
+  color: #FFB162;
 }
 
 .pricing-row.total {
@@ -370,7 +370,7 @@
 }
 
 .coming-soon-message svg {
-  color: #daa520;
+  color: #FFB162;
   margin-bottom: 20px;
 }
 
@@ -404,7 +404,7 @@
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background: #0a3259;
+  background: #1B2632;
   color: white;
   border: none;
   border-radius: 8px;
@@ -415,7 +415,7 @@
 }
 
 .payment-link-btn:hover {
-  background: #072441;
+  background: #0f1419;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
@@ -435,7 +435,7 @@
 
 .address-item h4 {
   margin: 0 0 12px 0;
-  color: #0a3259;
+  color: #1B2632;
   font-size: 1rem;
 }
 
@@ -475,7 +475,7 @@
 }
 
 .date-item svg {
-  color: #0a3259;
+  color: #1B2632;
   font-size: 1.25rem;
   margin-top: 4px;
   flex-shrink: 0;
@@ -507,7 +507,7 @@
 }
 
 .loading-container svg {
-  color: #0a3259;
+  color: #1B2632;
 }
 
 .error-container svg {
@@ -539,12 +539,12 @@
 }
 
 .btn-primary {
-  background: #0a3259;
+  background: #1B2632;
   color: white;
 }
 
 .btn-primary:hover {
-  background: #072441;
+  background: #0f1419;
 }
 
 .btn-secondary {

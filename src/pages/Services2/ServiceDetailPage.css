@@ -3,12 +3,12 @@
    ============================================ */
 
 :root {
-  --primary: #0a3259;
-  --primary-dark: #072441;
-  --primary-light: #1a4d80;
+  --primary: #1B2632;
+  --primary-dark: #0f1419;
+  --primary-light: #2a3a4a;
   --primary-lighter: #e8f0f5;
-  --accent: #daa520;
-  --accent-light: #f0c14b;
+  --accent: #FFB162;
+  --accent-light: #ffc085;
   --gray-50: #f9fafb;
   --gray-100: #f3f4f6;
   --gray-200: #e5e7eb;

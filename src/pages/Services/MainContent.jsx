@@ -304,10 +304,10 @@ const MainContent = ({ selectedService }) => {
       <div className="no-service-selected">
         <div className="empty-state-icon">
           <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M70 20H10C6.68629 20 4 22.6863 4 26V64C4 67.3137 6.68629 70 10 70H70C73.3137 70 76 67.3137 76 64V26C76 22.6863 73.3137 20 70 20Z" stroke="#0A3259" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M25 20V13.3333C25 11.5652 25.7024 9.86953 26.9526 8.61929C28.2029 7.36905 29.8986 6.66666 31.6667 6.66666H48.3333C50.1014 6.66666 51.7971 7.36905 53.0474 8.61929C54.2976 9.86953 55 11.5652 55 13.3333V20" stroke="#0A3259" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M40 36.6667V53.3334" stroke="#0A3259" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M31.6667 45H48.3334" stroke="#0A3259" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M70 20H10C6.68629 20 4 22.6863 4 26V64C4 67.3137 6.68629 70 10 70H70C73.3137 70 76 67.3137 76 64V26C76 22.6863 73.3137 20 70 20Z" stroke="#1B2632" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M25 20V13.3333C25 11.5652 25.7024 9.86953 26.9526 8.61929C28.2029 7.36905 29.8986 6.66666 31.6667 6.66666H48.3333C50.1014 6.66666 51.7971 7.36905 53.0474 8.61929C54.2976 9.86953 55 11.5652 55 13.3333V20" stroke="#1B2632" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M40 36.6667V53.3334" stroke="#1B2632" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M31.6667 45H48.3334" stroke="#1B2632" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </div>
         
@@ -316,8 +316,8 @@ const MainContent = ({ selectedService }) => {
         
         <div className="sidebar-arrow">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M5 12H19" stroke="#0A3259" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M12 5L19 12L12 19" stroke="#0A3259" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M5 12H19" stroke="#1B2632" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M12 5L19 12L12 19" stroke="#1B2632" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </div>
       </div>

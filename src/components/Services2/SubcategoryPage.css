@@ -52,7 +52,7 @@
 
 .section-title {
   font-size: 1.8rem;
-  color: #0A3259;
+  color: #1B2632;
   margin-bottom: 1.5rem;
   font-weight: 600;
   text-align: right;
@@ -115,7 +115,7 @@
 
 .subcategory-content h3 {
   font-size: 1.4rem;
-  color: #0A3259;
+  color: #1B2632;
   margin: 0 0 0.8rem;
   font-weight: 600;
 }
@@ -139,7 +139,7 @@
   justify-content: center;
   gap: 0.5rem;
   width: 100%;
-  background-color: #0A3259;
+  background-color: #1B2632;
   color: white;
   border: none;
   border-radius: 8px;
