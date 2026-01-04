@@ -282,29 +282,27 @@ const Navbar = () => {
           aria-label="القائمة المحمولة"
         >
           <div className="mobile-menu-container">
-            <div className="mobile-search">
-              <input
-                type="text"
-                placeholder="ابحث..."
-                className="mobile-search-input"
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  setSearchModalOpen(true);
-                }}
-                readOnly
-                aria-label="البحث"
-              />
-              <button
-                className="mobile-search-button"
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  setSearchModalOpen(true);
-                }}
-                aria-label="فتح البحث"
-              >
-                <FontAwesomeIcon icon={faSearch} />
-              </button>
-            </div>
+            <form className="mobile-search-form" onSubmit={handleSearchSubmit}>
+              <div className="mobile-search">
+                <input
+                  type="text"
+                  placeholder="ما الذي تبحث عنه؟"
+                  className="mobile-search-input"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyPress={handleSearchKeyPress}
+                  aria-label="البحث"
+                />
+                <button
+                  type="submit"
+                  className="mobile-search-button"
+                  aria-label="ابحث"
+                  onClick={handleSearchSubmit}
+                >
+                  <FontAwesomeIcon icon={faSearch} />
+                </button>
+              </div>
+            </form>
 
             <nav
               className="mobile-nav"
