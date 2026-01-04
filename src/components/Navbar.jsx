@@ -12,11 +12,9 @@ import {
   faChevronDown,
 } from "@fortawesome/free-solid-svg-icons";
 import SearchModal from "./SearchModal";
-import LocationModal from "./LocationModal";
 import AuthModal from "./AuthModal";
 import authService from "../services/authService";
 import { useCart } from "../context/CartContext";
-import addressService from "../services/addressService";
 
 const Navbar = () => {
   const location = useLocation();
@@ -25,14 +23,11 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchModalOpen, setSearchModalOpen] = useState(false);
-  const [locationModalOpen, setLocationModalOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState("login");
-  const [currentLocation, setCurrentLocation] = useState(
-    "أبو ظبي, الإمارات العربية المتحدة"
-  );
   const [searchQuery, setSearchQuery] = useState("");
-  const [language, setLanguage] = useState("English");
+  const [language, setLanguage] = useState("ar"); // "ar" for Arabic (UAE), "en" for English (USA)
+  const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -60,31 +55,8 @@ const Navbar = () => {
     };
   }, [mobileMenuOpen]);
 
-  // Load default location on mount
-  useEffect(() => {
-    const loadDefaultLocation = async () => {
-      try {
-        if (authService.isAuthenticated()) {
-          const defaultAddr = await addressService.getOrCreateDefaultAddress();
-          if (defaultAddr) {
-            const locationText = defaultAddr.city
-              ? `${defaultAddr.city}, ${
-                  defaultAddr.country || "الإمارات العربية المتحدة"
-                }`
-              : "أبو ظبي, الإمارات العربية المتحدة";
-            setCurrentLocation(locationText);
-          }
-        }
-      } catch (error) {
-        console.error("Error loading default location:", error);
-      }
-    };
-    loadDefaultLocation();
-  }, []);
-
   const toggleSearch = () => setSearchModalOpen(true);
   const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
-  const toggleLocationModal = () => setLocationModalOpen(!locationModalOpen);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -106,26 +78,27 @@ const Navbar = () => {
     }
   };
 
-  const handleLocationSelect = (selectedLocation) => {
-    // Format the location text
-    let locationText = selectedLocation;
-    if (typeof selectedLocation === "string") {
-      // If it's already a formatted string, use it
-      locationText = selectedLocation;
-    } else if (selectedLocation.city) {
-      // If it's an object with city property
-      locationText = `${selectedLocation.city}, ${
-        selectedLocation.country || "الإمارات العربية المتحدة"
-      }`;
-    }
-    setCurrentLocation(locationText);
-    setLocationModalOpen(false);
-  };
-
-  const handleLanguageToggle = () => {
-    setLanguage(language === "English" ? "العربية" : "English");
+  const handleLanguageSelect = (lang) => {
+    setLanguage(lang);
+    setLanguageMenuOpen(false);
     // TODO: Implement language switching logic
   };
+
+  // Close language menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        languageMenuOpen &&
+        !event.target.closest(".navbar-language-dropdown")
+      ) {
+        setLanguageMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [languageMenuOpen]);
 
   return (
     <>
@@ -143,7 +116,11 @@ const Navbar = () => {
                 className="logo-link"
                 aria-label="BuildingZ - الصفحة الرئيسية"
               >
-                <img src="/assets/logo.png" alt="BuildingZ" className="navbar-logo-img" />
+                <img
+                  src="/assets/logo.png"
+                  alt="BuildingZ"
+                  className="navbar-logo-img"
+                />
               </Link>
             </div>
           </div>
@@ -184,39 +161,62 @@ const Navbar = () => {
             </form>
           </div>
 
-          {/* Left Section: Location, Language, User, Cart & Favorites */}
+          {/* Left Section: Language Flag, User, Cart & Favorites */}
           <div className="navbar-left">
-            {/* Location Selector */}
-            <button
-              className="navbar-location-button"
-              onClick={toggleLocationModal}
-              aria-label="اختر موقع التوصيل"
-            >
-              <span className="location-label">توصيل إلى</span>
-              <div className="location-info">
+            {/* Language Flag Selector */}
+            <div className="navbar-language-dropdown">
+              <button
+                className="navbar-language-flag-button"
+                onClick={() => setLanguageMenuOpen(!languageMenuOpen)}
+                aria-label="اختر اللغة"
+              >
                 <img
-                  src="https://flagcdn.com/w40/ae.png"
-                  alt="UAE Flag"
-                  className="uae-flag"
+                  src={
+                    language === "ar"
+                      ? "https://flagcdn.com/w40/ae.png"
+                      : "https://flagcdn.com/w40/us.png"
+                  }
+                  alt={language === "ar" ? "UAE Flag" : "USA Flag"}
+                  className="language-flag"
                 />
-                <span className="location-text">{currentLocation}</span>
                 <FontAwesomeIcon
                   icon={faChevronDown}
-                  className="location-chevron"
+                  className={`language-chevron ${
+                    languageMenuOpen ? "open" : ""
+                  }`}
                 />
-              </div>
-            </button>
-
-            <div className="navbar-divider"></div>
-
-            {/* Language Selector */}
-            <button
-              className="navbar-language-button"
-              onClick={handleLanguageToggle}
-              aria-label="اختر اللغة"
-            >
-              {language}
-            </button>
+              </button>
+              {languageMenuOpen && (
+                <div className="language-dropdown-menu">
+                  <button
+                    className={`language-option ${
+                      language === "ar" ? "active" : ""
+                    }`}
+                    onClick={() => handleLanguageSelect("ar")}
+                  >
+                    <img
+                      src="https://flagcdn.com/w40/ae.png"
+                      alt="UAE Flag"
+                      className="language-flag-small"
+                    />
+                    <span>العربية</span>
+                  </button>
+                  <button
+                    className={`language-option ${
+                      language === "en" ? "active" : ""
+                    }`}
+                    onClick={() => handleLanguageSelect("en")}
+                  >
+                    <img
+                      src="https://flagcdn.com/w40/us.png"
+                      alt="USA Flag"
+                      className="language-flag-small"
+                    />
+                    <span>English</span>
+                  </button>
+                </div>
+              )}
+            </div>
 
             <div className="navbar-divider"></div>
 
@@ -304,6 +304,45 @@ const Navbar = () => {
               </div>
             </form>
 
+            {/* Language Selector in Mobile Menu */}
+            <div className="mobile-language-selector">
+              <div className="mobile-language-label">اختر اللغة</div>
+              <div className="mobile-language-options">
+                <button
+                  className={`mobile-language-option ${
+                    language === "ar" ? "active" : ""
+                  }`}
+                  onClick={() => {
+                    handleLanguageSelect("ar");
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <img
+                    src="https://flagcdn.com/w40/ae.png"
+                    alt="UAE Flag"
+                    className="mobile-language-flag"
+                  />
+                  <span>العربية</span>
+                </button>
+                <button
+                  className={`mobile-language-option ${
+                    language === "en" ? "active" : ""
+                  }`}
+                  onClick={() => {
+                    handleLanguageSelect("en");
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <img
+                    src="https://flagcdn.com/w40/us.png"
+                    alt="USA Flag"
+                    className="mobile-language-flag"
+                  />
+                  <span>English</span>
+                </button>
+              </div>
+            </div>
+
             <nav
               className="mobile-nav"
               role="navigation"
@@ -335,12 +374,6 @@ const Navbar = () => {
       <SearchModal
         isOpen={searchModalOpen}
         onClose={() => setSearchModalOpen(false)}
-      />
-
-      <LocationModal
-        isOpen={locationModalOpen}
-        onClose={() => setLocationModalOpen(false)}
-        onSelectLocation={handleLocationSelect}
       />
 
       <AuthModal

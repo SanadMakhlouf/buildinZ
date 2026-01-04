@@ -63,7 +63,8 @@
   gap: 1rem;
   line-height: 1;
   vertical-align: middle;
-  overflow: hidden;
+  overflow: visible;
+  position: relative;
 }
 
 /* Right Section: Logo (appears on right side in RTL) */
@@ -87,6 +88,7 @@
   vertical-align: middle;
   overflow: visible;
   min-width: 0;
+  position: relative;
 }
 
 .navbar-icon-button {
@@ -326,74 +328,6 @@
   transform: scale(1.1);
 }
 
-.navbar-location-button {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  border: none;
-  color: var(--white);
-  cursor: pointer;
-  padding: 0.25rem 0.5rem;
-  transition: var(--transition);
-  text-align: right;
-  height: 100%;
-  line-height: 1.2;
-  max-width: 180px;
-  min-width: auto;
-}
-
-.navbar-location-button:hover {
-  opacity: 0.9;
-}
-
-.location-label {
-  font-family: var(--font-family-arabic);
-  font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.8);
-  margin-bottom: 0;
-  margin-left: 0.25rem;
-  line-height: 1.2;
-  white-space: nowrap;
-  display: none;
-}
-
-.location-info {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  line-height: 1;
-}
-
-.uae-flag {
-  width: 18px;
-  height: 13px;
-  object-fit: cover;
-  border-radius: 2px;
-  flex-shrink: 0;
-}
-
-.location-text {
-  font-family: var(--font-family-arabic);
-  font-size: 0.8rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 140px;
-  font-weight: 500;
-  color: var(--white);
-  line-height: 1.2;
-  white-space: nowrap;
-  display: inline-block;
-}
-
-.location-chevron {
-  font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.7);
-  margin-right: 0.25rem;
-}
-
 .navbar-divider {
   width: 1px;
   height: 24px;
@@ -402,26 +336,112 @@
   flex-shrink: 0;
 }
 
-.navbar-language-button {
+/* Language Flag Dropdown */
+.navbar-language-dropdown {
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  z-index: 1002;
+}
+
+.navbar-language-flag-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   background: none;
   border: none;
   color: var(--white);
-  font-family: var(--font-family-arabic);
-  font-size: 0.8rem;
-  font-weight: 500;
   cursor: pointer;
   padding: 0.4rem 0.65rem;
   transition: var(--transition);
   height: 100%;
-  display: flex;
-  align-items: center;
   line-height: 1.2;
-  white-space: nowrap;
-  vertical-align: middle;
 }
 
-.navbar-language-button:hover {
+.navbar-language-flag-button:hover {
   opacity: 0.9;
+}
+
+.language-flag {
+  width: 24px;
+  height: 18px;
+  object-fit: cover;
+  border-radius: 3px;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.language-chevron {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.7);
+  transition: transform 0.3s ease;
+}
+
+.language-chevron.open {
+  transform: rotate(180deg);
+}
+
+.language-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--white);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  min-width: 160px;
+  z-index: 1003;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  animation: fadeInDown 0.2s ease-out;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.language-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  text-align: right;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font-family-arabic);
+  font-size: 0.9rem;
+  color: var(--text-dark);
+}
+
+.language-option:hover {
+  background-color: var(--light-bg);
+}
+
+.language-option.active {
+  background-color: rgba(255, 177, 98, 0.1);
+  color: var(--secondary-dark);
+  font-weight: 600;
+}
+
+.language-flag-small {
+  width: 20px;
+  height: 15px;
+  object-fit: cover;
+  border-radius: 2px;
+  flex-shrink: 0;
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .navbar-user-button {
@@ -666,6 +686,65 @@
   transform: scale(1.1);
 }
 
+/* Mobile Language Selector */
+.mobile-language-selector {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-md);
+}
+
+.mobile-language-label {
+  font-family: var(--font-family-arabic);
+  font-size: 0.9rem;
+  color: var(--white);
+  margin-bottom: 0.75rem;
+  font-weight: 500;
+}
+
+.mobile-language-options {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.mobile-language-option {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  color: var(--white);
+  font-family: var(--font-family-arabic);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.mobile-language-option:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.mobile-language-option.active {
+  background-color: rgba(255, 177, 98, 0.2);
+  border-color: var(--secondary);
+  color: var(--secondary);
+  font-weight: 600;
+}
+
+.mobile-language-flag {
+  width: 24px;
+  height: 18px;
+  object-fit: cover;
+  border-radius: 3px;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
 /* Mobile Navigation */
 .mobile-nav {
   display: flex;
@@ -764,9 +843,6 @@
     padding: 0.35rem 0.6rem;
   }
 
-  .location-text {
-    font-size: 0.85rem;
-  }
 
   .user-text {
     display: none;
@@ -857,21 +933,19 @@
     flex-shrink: 0;
   }
 
-  .navbar-location-button {
-    padding: 0.25rem 0.25rem;
-    max-width: 120px;
+  .navbar-language-flag-button {
+    padding: 0.35rem 0.5rem;
   }
 
-  .location-label {
-    display: none;
+  .language-flag {
+    width: 20px;
+    height: 15px;
   }
 
-  .location-text {
-    font-size: 0.75rem;
-    max-width: 90px;
+  .language-chevron {
+    font-size: 0.65rem;
   }
 
-  .navbar-language-button,
   .navbar-user-button {
     padding: 0.4rem 0.5rem;
     font-size: 0.8rem;
@@ -937,10 +1011,6 @@
     padding: 0 1rem;
   }
 
-  .location-text {
-    font-size: 0.78rem;
-    max-width: 100px;
-  }
 }
 
 @media (max-width: 768px) {
@@ -955,24 +1025,18 @@
     display: none;
   }
 
-  .navbar-location-button {
-    padding: 0.4rem;
-    min-width: auto;
-    max-width: none;
+  .navbar-language-flag-button {
+    padding: 0.35rem;
   }
 
-  .navbar-location-button .location-label,
-  .navbar-location-button .location-text {
-    display: none;
-  }
-
-  .navbar-location-button .uae-flag {
+  .language-flag {
     width: 22px;
     height: 16px;
   }
 
-  .navbar-language-button {
-    display: none;
+  .language-dropdown-menu {
+    right: 0;
+    min-width: 140px;
   }
 
   .navbar-divider {
@@ -1123,11 +1187,11 @@
     font-size: 1rem;
   }
 
-  .navbar-location-button {
+  .navbar-language-flag-button {
     padding: 0.35rem;
   }
 
-  .navbar-location-button .uae-flag {
+  .language-flag {
     width: 20px;
     height: 15px;
   }
@@ -1223,11 +1287,11 @@
     font-size: 0.95rem;
   }
 
-  .navbar-location-button {
+  .navbar-language-flag-button {
     padding: 0.3rem;
   }
 
-  .navbar-location-button .uae-flag {
+  .language-flag {
     width: 18px;
     height: 13px;
   }
@@ -1236,6 +1300,13 @@
     width: 30px;
     height: 30px;
     font-size: 0.95rem;
+  }
+}
+
+/* Hide language selector in header on very small screens */
+@media (max-width: 390px) {
+  .navbar-language-dropdown {
+    display: none;
   }
 
   .mobile-menu {
