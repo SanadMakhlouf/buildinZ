@@ -63,8 +63,8 @@ const ContactPage = () => {
                 <FontAwesomeIcon icon={faEnvelope} />
               </div>
               <h3>البريد الإلكتروني</h3>
-              <p>info@buildinz.com</p>
-              <p>support@buildinz.com</p>
+              <p>info@buildingzuae.com</p>
+              <p>support@buildingzuae.com</p>
             </div>
 
             <div className="contact-info-card">

@@ -2301,7 +2301,7 @@ const HomePage = () => {
               </div>
               <div className="noon-contact-info">
                 <FontAwesomeIcon icon={faEnvelope} />
-                <span>info@buildinz.com</span>
+                <span>info@buildingzuae.com</span>
               </div>
               <div className="noon-contact-info">
                 <FontAwesomeIcon icon={faMapMarkerAlt} />
