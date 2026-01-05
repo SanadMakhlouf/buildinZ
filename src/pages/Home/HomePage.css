@@ -2473,13 +2473,38 @@
 
 @media (max-width: 768px) {
   .noon-main-banner {
-    height: 320px;
+    height: auto;
+    min-height: unset;
+    aspect-ratio: unset;
     border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .noon-banner-wrapper {
+    height: auto;
+    position: relative;
+  }
+
+  .noon-banner-slide {
+    position: relative;
+    display: none;
+    width: 100%;
+  }
+
+  .noon-banner-slide.active {
+    display: block;
+  }
+
+  .noon-banner-image {
+    height: auto;
+    width: 100%;
   }
 
   .noon-banner-image img {
-    object-fit: cover;
-    object-position: center;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    display: block;
   }
 
   .noon-side-banners {
@@ -2727,13 +2752,17 @@
   }
 
   .noon-main-banner {
-    height: 280px;
+    height: auto;
+    min-height: unset;
+    aspect-ratio: unset;
     border-radius: 6px;
   }
 
   .noon-banner-image img {
-    object-fit: cover;
-    object-position: center;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    display: block;
   }
 
   .noon-side-banners {
