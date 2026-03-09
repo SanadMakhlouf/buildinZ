@@ -441,6 +441,42 @@
   color: var(--pdp-text-secondary);
 }
 
+/* ========== Variants ========== */
+.pdp-variants {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.pdp-variant-btn {
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--pdp-border);
+  border-radius: var(--pdp-radius-sm);
+  background: white;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--pdp-text-primary);
+  cursor: pointer;
+  transition: var(--pdp-transition);
+}
+
+.pdp-variant-btn:hover:not(:disabled) {
+  border-color: var(--pdp-primary);
+  color: var(--pdp-primary);
+}
+
+.pdp-variant-btn.active {
+  border-color: var(--pdp-primary);
+  background: var(--pdp-primary);
+  color: white;
+}
+
+.pdp-variant-btn.out-of-stock,
+.pdp-variant-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* ========== Price Section ========== */
 .pdp-price-section {
   background: linear-gradient(135deg, var(--pdp-primary) 0%, var(--pdp-primary-light) 100%);
@@ -516,6 +552,13 @@
   color: var(--pdp-danger);
 }
 
+.pdp-stock-quantity {
+  color: var(--pdp-text-secondary);
+  font-weight: 500;
+  margin-right: 0.5rem;
+  font-size: 0.95rem;
+}
+
 .pdp-low-stock {
   color: var(--pdp-warning);
   font-weight: 500;
@@ -562,6 +605,25 @@
 .pdp-delivery-item span {
   font-size: 0.85rem;
   color: var(--pdp-text-secondary);
+}
+
+.pdp-delivery-lead,
+.pdp-delivery-date,
+.pdp-free-delivery {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  color: var(--pdp-text-primary);
+}
+
+.pdp-delivery-date svg,
+.pdp-free-delivery svg {
+  color: var(--pdp-success);
+}
+
+.pdp-free-delivery {
+  font-weight: 600;
 }
 
 /* ========== Actions ========== */
@@ -817,6 +879,27 @@
 }
 
 /* ========== Specs ========== */
+.pdp-specs-content {
+  padding: 0;
+}
+
+.pdp-specs-section {
+  margin-bottom: 2rem;
+}
+
+.pdp-specs-section:last-child {
+  margin-bottom: 0;
+}
+
+.pdp-specs-section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--pdp-primary);
+  margin: 0 0 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--pdp-border);
+}
+
 .pdp-specs-grid {
   display: grid;
   gap: 0.75rem;

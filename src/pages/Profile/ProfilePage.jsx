@@ -75,6 +75,7 @@ const ProfilePage = () => {
   const [validationErrors, setValidationErrors] = useState({});
   const [formTouched, setFormTouched] = useState({});
   const [cancellingOrderId, setCancellingOrderId] = useState(null);
+  const [orderToCancel, setOrderToCancel] = useState(null); // Order ID pending cancellation confirmation
   const [showOrderDetails, setShowOrderDetails] = useState(null);
   const [showServiceBuilderOrderDetails, setShowServiceBuilderOrderDetails] = useState(null);
   const [selectedServiceBuilderOrder, setSelectedServiceBuilderOrder] = useState(null);
@@ -156,16 +157,23 @@ const ProfilePage = () => {
     }
   };
 
-  // Handle order cancellation
-  const handleCancelOrder = async (orderId) => {
+  // Show confirmation modal for order cancellation
+  const handleCancelOrder = (orderId) => {
+    setOrderToCancel(orderId);
+  };
+
+  // Confirm and proceed with order cancellation
+  const confirmCancelOrder = async () => {
+    if (!orderToCancel) return;
+
     try {
-      setCancellingOrderId(orderId);
-      await profileService.cancelOrder(orderId);
+      setCancellingOrderId(orderToCancel);
+      await profileService.cancelOrder(orderToCancel);
       
       // Update orders list after cancellation
       setOrders(prevOrders => 
         prevOrders.map(order => 
-          order.id === orderId 
+          order.id === orderToCancel 
             ? { ...order, status: 'cancelled', status_label: 'ملغي' } 
             : order
         )
@@ -173,6 +181,9 @@ const ProfilePage = () => {
       
       // Show success message
       alert('تم إلغاء الطلب بنجاح');
+      
+      // Close confirmation modal
+      setOrderToCancel(null);
     } catch (err) {
       // Handle authentication errors
       if (err.code === 'UNAUTHENTICATED' || err.error === 'Authentication required') {
@@ -191,6 +202,11 @@ const ProfilePage = () => {
     } finally {
       setCancellingOrderId(null);
     }
+  };
+
+  // Cancel the cancellation (close modal)
+  const cancelCancelOrder = () => {
+    setOrderToCancel(null);
   };
 
   // Toggle order details view
@@ -682,7 +698,7 @@ const ProfilePage = () => {
   const renderServiceRequestsTab = () => (
     <div className="service-requests-section">
       {/* Regular Service Requests */}
-      <h2>طلبات الخدمة</h2>
+      <h2>طلبات الخدمات</h2>
       {serviceRequests.length === 0 ? (
         <motion.div 
           className="empty-state"
@@ -1095,7 +1111,7 @@ const ProfilePage = () => {
             onClick={() => setActiveTab('services')}
           >
             <i className={icons.services}></i>
-            <span>طلبات الخدمة</span>
+            <span>طلبات الخدمات</span>
           </div>
           <div 
             className={`sidebar-item ${activeTab === 'notifications' ? 'active' : ''}`}
@@ -1123,6 +1139,52 @@ const ProfilePage = () => {
           {renderContent()}
         </div>
       </div>
+
+      {/* Order Cancellation Confirmation Modal */}
+      {orderToCancel && (
+        <div className="cancel-order-modal-overlay" onClick={cancelCancelOrder}>
+          <div className="cancel-order-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="cancel-order-modal-header">
+              <h3>تأكيد إلغاء الطلب</h3>
+              <button className="cancel-order-modal-close" onClick={cancelCancelOrder}>
+                <FontAwesomeIcon icon={icons.cancel} />
+              </button>
+            </div>
+            <div className="cancel-order-modal-body">
+              <div className="cancel-order-modal-icon">
+                <FontAwesomeIcon icon={icons.error} />
+              </div>
+              <p>هل أنت متأكد من إلغاء هذا الطلب؟</p>
+              <p className="cancel-order-modal-warning">
+                لا يمكن التراجع عن هذه العملية بعد التأكيد.
+              </p>
+            </div>
+            <div className="cancel-order-modal-actions">
+              <button 
+                className="cancel-order-modal-btn cancel-order-modal-btn-cancel"
+                onClick={cancelCancelOrder}
+                disabled={cancellingOrderId === orderToCancel}
+              >
+                إلغاء
+              </button>
+              <button 
+                className="cancel-order-modal-btn cancel-order-modal-btn-confirm"
+                onClick={confirmCancelOrder}
+                disabled={cancellingOrderId === orderToCancel}
+              >
+                {cancellingOrderId === orderToCancel ? (
+                  <>
+                    <FontAwesomeIcon icon={icons.spinner} spin />
+                    جاري الإلغاء...
+                  </>
+                ) : (
+                  'تأكيد الإلغاء'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 };

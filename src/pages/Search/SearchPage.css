@@ -107,12 +107,15 @@
 
 .services-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(100px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 25px;
+  padding: 20px 0;
 }
 
 .service-with-products {
-  margin-bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  grid-column: span 1;
 }
 
 .service-products-section {
@@ -261,6 +264,20 @@
   font-weight: 600;
 }
 
+.product-deal-banner {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #22c55e;
+  color: white;
+  padding: 0.5rem;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  z-index: 2;
+}
+
 .service-content {
   padding: 20px;
   flex: 1;
@@ -407,6 +424,7 @@
 }
 
 .delivery-free,
+.delivery-lead,
 .delivery-availability {
   display: flex;
   align-items: center;

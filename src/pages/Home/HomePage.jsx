@@ -45,6 +45,18 @@ import serviceBuilderService from "../../services/serviceBuilderService";
 import config from "../../config/apiConfig";
 import { useCart } from "../../context/CartContext";
 
+/** Build expected delivery text from lead days when API doesn't return expected_delivery_text */
+function buildDeliveryText(min, max) {
+  if (min == null || min === undefined) return null;
+  const minNum = parseInt(min, 10);
+  if (Number.isNaN(minNum) || minNum < 0) return null;
+  const maxNum = max != null && max !== "" ? parseInt(max, 10) : null;
+  if (maxNum != null && !Number.isNaN(maxNum) && maxNum > minNum) {
+    return `${minNum}-${maxNum} days`;
+  }
+  return minNum === 1 ? "1 day" : `${minNum} days`;
+}
+
 const HomePage = () => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
@@ -189,6 +201,8 @@ const HomePage = () => {
   const hoverTimeoutRef = useRef(null);
   const [categoryPage, setCategoryPage] = useState(0);
   const categoriesPerPage = 12;
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
 
   // Refs
   const categoryScrollRef = useRef(null);
@@ -419,8 +433,17 @@ const HomePage = () => {
 
         // Fetch products
         try {
+          // Add cache busting to ensure fresh data
+          const timestamp = new Date().getTime();
           const productsResponse = await fetch(
-            `${config.BACKEND_URL}/api/products`
+            `${config.BACKEND_URL}/api/products?t=${timestamp}`,
+            {
+              cache: 'no-cache',
+              headers: {
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache'
+              }
+            }
           );
           if (productsResponse.ok) {
             const productsData = await productsResponse.json();
@@ -453,11 +476,16 @@ const HomePage = () => {
                         ) / product.reviews.length
                       : 0,
                   reviewCount: product.reviews?.length || 0,
-                  stockQuantity: product.stock_quantity || 0,
+                  stockQuantity: product.stock_quantity !== undefined && product.stock_quantity !== null
+                    ? product.stock_quantity
+                    : null,
                   label: product.label || null,
+                  isFreeDelivery: !!product.is_free_delivery,
+                  expectedDeliveryText: product.expected_delivery_text || buildDeliveryText(product.delivery_lead_days, product.delivery_lead_days_max) || null,
                 })
               );
               setProducts(formattedProducts);
+              console.log("Formatted products with stock:", formattedProducts.map(p => ({ id: p.id, name: p.name, stock: p.stockQuantity })));
             }
           }
         } catch (error) {
@@ -541,25 +569,38 @@ const HomePage = () => {
     }
   };
 
-  // Handle scroll to detect page changes
+  // Handle scroll to detect page changes and arrow visibility
   useEffect(() => {
     const handleCategoryScroll = () => {
       if (categoryScrollRef.current) {
         const scrollLeft = categoryScrollRef.current.scrollLeft;
+        const scrollWidth = categoryScrollRef.current.scrollWidth;
+        const clientWidth = categoryScrollRef.current.clientWidth;
         const itemWidth = 140 + 16; // category width + gap
         const containerWidth = categoryScrollRef.current.offsetWidth;
         const visibleItems = Math.floor(containerWidth / itemWidth);
         const pageWidth = visibleItems * itemWidth;
         const currentPage = Math.round(scrollLeft / pageWidth);
         setCategoryPage(currentPage);
+        
+        // Check if we can scroll left or right
+        setCanScrollLeft(scrollLeft > 0);
+        setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10); // 10px threshold
       }
     };
 
     const scrollElement = categoryScrollRef.current;
     if (scrollElement) {
+      // Check initial state
+      handleCategoryScroll();
+      
       scrollElement.addEventListener("scroll", handleCategoryScroll);
+      // Also check on resize
+      window.addEventListener("resize", handleCategoryScroll);
+      
       return () => {
         scrollElement.removeEventListener("scroll", handleCategoryScroll);
+        window.removeEventListener("resize", handleCategoryScroll);
       };
     }
   }, [categories.length]);
@@ -575,32 +616,6 @@ const HomePage = () => {
   };
 
   // Format review count (e.g., 30800 -> "30.8K")
-  // Generate consistent random rating between 4.6 and 5.0 based on product ID
-  const getRandomRating = useCallback((productId) => {
-    // Use product ID as seed for consistent random values
-    const seed = productId
-      ? productId
-          .toString()
-          .split("")
-          .reduce((acc, char) => acc + char.charCodeAt(0), 0)
-      : Math.random() * 1000;
-    const random = (Math.sin(seed) * 10000) % 1;
-    return (random * 0.4 + 4.6).toFixed(1);
-  }, []);
-
-  // Generate consistent random review count between 10 and 500 based on product ID
-  const getRandomReviewCount = useCallback((productId) => {
-    // Use product ID as seed for consistent random values
-    const seed = productId
-      ? productId
-          .toString()
-          .split("")
-          .reduce((acc, char) => acc + char.charCodeAt(0), 0)
-      : Math.random() * 1000;
-    const random = (Math.sin(seed * 2) * 10000) % 1;
-    return Math.floor(random * 490 + 10);
-  }, []);
-
   const formatReviewCount = (count) => {
     if (!count || count === 0) return "0";
     if (count >= 1000) {
@@ -656,7 +671,7 @@ const HomePage = () => {
 
   // Navigate to next image
   const handleNextImage = useCallback((productId, images, e) => {
-    e.stopPropagation();
+    e?.stopPropagation();
     if (!images || images.length <= 1) return;
 
     // Stop auto-scroll when manually navigating
@@ -679,7 +694,7 @@ const HomePage = () => {
 
   // Navigate to previous image
   const handlePrevImage = useCallback((productId, images, e) => {
-    e.stopPropagation();
+    e?.stopPropagation();
     if (!images || images.length <= 1) return;
 
     // Stop auto-scroll when manually navigating
@@ -699,6 +714,27 @@ const HomePage = () => {
       return { ...prev, [productId]: prevIndex };
     });
   }, []);
+
+  // Touch swipe for mobile - swipe to change images without arrows
+  const touchStartXRef = useRef(null);
+  const handleImageTouchStart = useCallback((e) => {
+    touchStartXRef.current = e.touches[0].clientX;
+  }, []);
+  const handleImageTouchEnd = useCallback(
+    (e, productId, images) => {
+      if (!images || images.length <= 1 || touchStartXRef.current === null) return;
+      const diff = touchStartXRef.current - e.changedTouches[0].clientX;
+      touchStartXRef.current = null;
+      if (Math.abs(diff) > 50) {
+        if (diff > 0) {
+          handleNextImage(productId, images, { stopPropagation: () => {} });
+        } else {
+          handlePrevImage(productId, images, { stopPropagation: () => {} });
+        }
+      }
+    },
+    [handleNextImage, handlePrevImage]
+  );
 
   // Cleanup intervals on unmount
   useEffect(() => {
@@ -822,8 +858,8 @@ const HomePage = () => {
     },
     {
       icon: faCheckCircle,
-      title: "فنيون محترفون",
-      description: "خبرة عالية وموثوقة",
+      title: "ثقة وأمان",
+      description: "فنيون موثوقون بخبرة حقيقية",
     },
   ];
 
@@ -1204,6 +1240,17 @@ const HomePage = () => {
       <section className="noon-categories-section" aria-label="الفئات">
         <div className="noon-section-container">
           <div className="noon-categories-wrapper">
+            {/* Left Arrow Button */}
+            {canScrollLeft && (
+              <button
+                className="noon-scroll-btn noon-scroll-left"
+                onClick={() => scrollCategories("left")}
+                aria-label="السابق"
+              >
+                <FontAwesomeIcon icon={faChevronRight} />
+              </button>
+            )}
+            
             <div className="noon-categories-scroll" ref={categoryScrollRef}>
               {loading ? (
                 // Skeleton loaders
@@ -1297,6 +1344,17 @@ const HomePage = () => {
                 </div>
               )}
             </div>
+            
+            {/* Right Arrow Button */}
+            {canScrollRight && (
+              <button
+                className="noon-scroll-btn noon-scroll-right"
+                onClick={() => scrollCategories("right")}
+                aria-label="التالي"
+              >
+                <FontAwesomeIcon icon={faChevronLeft} />
+              </button>
+            )}
           </div>
 
           {/* Pagination Dots */}
@@ -1430,22 +1488,14 @@ const HomePage = () => {
                         {/* Rating Section */}
                         <div className="product-rating-section">
                           <span className="rating-value">
-                            {service.rating && service.rating > 0
-                              ? service.rating.toFixed(1)
-                              : getRandomRating(service.id)}
+                            {(service.rating || 0).toFixed(1)}
                           </span>
                           <FontAwesomeIcon
                             icon={faStar}
                             className="rating-star"
                           />
                           <span className="review-count">
-                            (
-                            {formatReviewCount(
-                              service.reviews?.length > 0
-                                ? service.reviews.length
-                                : getRandomReviewCount(service.id)
-                            )}
-                            )
+                            ({formatReviewCount(service.reviews?.length || 0)})
                           </span>
                         </div>
                       </div>
@@ -1683,23 +1733,14 @@ const HomePage = () => {
                           {/* Rating Section */}
                           <div className="product-rating-section">
                             <span className="rating-value">
-                              {product.reviewCount === 0 || !product.reviewCount
-                                ? getRandomRating(product.id)
-                                : (product.rating || 0).toFixed(1)}
+                              {(product.rating || 0).toFixed(1)}
                             </span>
                             <FontAwesomeIcon
                               icon={faStar}
                               className="rating-star"
                             />
                             <span className="review-count">
-                              (
-                              {formatReviewCount(
-                                product.reviewCount === 0 ||
-                                  !product.reviewCount
-                                  ? getRandomReviewCount(product.id)
-                                  : product.reviewCount || 0
-                              )}
-                              )
+                              ({formatReviewCount(product.reviewCount || 0)})
                             </span>
                           </div>
 
@@ -1736,19 +1777,18 @@ const HomePage = () => {
 
                           {/* Delivery Information */}
                           <div className="product-delivery-info">
-                            <div className="delivery-availability">
-                              <FontAwesomeIcon
-                                icon={faShoppingBag}
-                                className="delivery-icon"
-                              />
-                              <span>بتخلص بسرعة</span>
-                            </div>
-                            <div className="delivery-express">
-                              <FontAwesomeIcon
-                                icon={faBolt}
-                                className="delivery-lightning-icon"
-                              />
-                              <span>يوصلك في {getDeliveryDate()}</span>
+                            {product.isFreeDelivery && (
+                              <div className="delivery-free" title="توصيل مجاني">
+                                <FontAwesomeIcon
+                                  icon={faTruck}
+                                  className="delivery-icon"
+                                />
+                                <span>توصيل مجاني</span>
+                              </div>
+                            )}
+                            <div className="delivery-express delivery-timeline" title={`التوصيل خلال ${(product.expectedDeliveryText || "3-4 days").replace(/\bday\b/gi, "يوم").replace(/\bdays\b/gi, "أيام")}`}>
+                              <FontAwesomeIcon icon={faTruck} className="delivery-lightning-icon" />
+                              <span>{(product.expectedDeliveryText || "3-4 days").replace(/\bday\b/gi, "يوم").replace(/\bdays\b/gi, "أيام")}</span>
                             </div>
                           </div>
                         </div>
@@ -1872,22 +1912,14 @@ const HomePage = () => {
                       {/* Rating Section */}
                       <div className="product-rating-section">
                         <span className="rating-value">
-                          {service.rating && service.rating > 0
-                            ? service.rating.toFixed(1)
-                            : getRandomRating(service.id)}
+                          {(service.rating || 0).toFixed(1)}
                         </span>
                         <FontAwesomeIcon
                           icon={faStar}
                           className="rating-star"
                         />
                         <span className="review-count">
-                          (
-                          {formatReviewCount(
-                            service.reviews?.length > 0
-                              ? service.reviews.length
-                              : getRandomReviewCount(service.id)
-                          )}
-                          )
+                          ({formatReviewCount(service.reviews?.length || 0)})
                         </span>
                       </div>
                     </div>
@@ -1984,7 +2016,15 @@ const HomePage = () => {
                         )
                       }
                     >
-                      <div className="product-image-container">
+                      <div
+                        className="product-image-container"
+                        onTouchStart={hasMultipleImages ? handleImageTouchStart : undefined}
+                        onTouchEnd={
+                          hasMultipleImages
+                            ? (e) => handleImageTouchEnd(e, product.id, productImages)
+                            : undefined
+                        }
+                      >
                         {currentImageUrl ? (
                           <img
                             key={`${product.id}-${currentImageIndex}`}
@@ -2154,19 +2194,18 @@ const HomePage = () => {
 
                         {/* Delivery Information */}
                         <div className="product-delivery-info">
-                          <div className="delivery-availability">
-                            <FontAwesomeIcon
-                              icon={faShoppingBag}
-                              className="delivery-icon"
-                            />
-                            <span>بتخلص بسرعة</span>
-                          </div>
-                          <div className="delivery-express">
-                            <FontAwesomeIcon
-                              icon={faBolt}
-                              className="delivery-lightning-icon"
-                            />
-                            <span>يوصلك في {getDeliveryDate()}</span>
+                          {product.isFreeDelivery && (
+                            <div className="delivery-free" title="توصيل مجاني">
+                              <FontAwesomeIcon
+                                icon={faTruck}
+                                className="delivery-icon"
+                              />
+                              <span>توصيل مجاني</span>
+                            </div>
+                          )}
+                          <div className="delivery-express delivery-timeline" title={`التوصيل خلال ${(product.expectedDeliveryText || "3-4 days").replace(/\bday\b/gi, "يوم").replace(/\bdays\b/gi, "أيام")}`}>
+                            <FontAwesomeIcon icon={faTruck} className="delivery-lightning-icon" />
+                            <span>{(product.expectedDeliveryText || "3-4 days").replace(/\bday\b/gi, "يوم").replace(/\bdays\b/gi, "أيام")}</span>
                           </div>
                         </div>
                       </div>

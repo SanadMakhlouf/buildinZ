@@ -1147,6 +1147,14 @@
   box-shadow: var(--shadow-xl);
   animation: slideUp 0.2s ease;
   position: relative;
+  -webkit-overflow-scrolling: touch;
+  contain: layout;
+}
+
+/* Date input - prevents mobile freeze with touch optimization */
+.service-date-input {
+  touch-action: manipulation !important;
+  -webkit-tap-highlight-color: transparent;
 }
 
 @keyframes slideUp {

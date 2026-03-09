@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faShoppingCart, 
@@ -24,9 +24,9 @@ const FloatingCart = () => {
   
   const navigate = useNavigate();
   
-  const handleCheckout = () => {
+  const handleViewCart = () => {
     toggleCart(); // Close the cart
-    navigate('/checkout');
+    navigate('/cart');
   };
 
   return (
@@ -99,12 +99,9 @@ const FloatingCart = () => {
               <span>{cartTotal.price.toFixed(0)} درهم</span>
             </div>
             <div className="cart-actions">
-              <Link to="/cart" className="view-cart-btn" onClick={toggleCart}>
-                عرض السلة
-              </Link>
-              <button className="checkout-btn" onClick={handleCheckout}>
+              <button className="checkout-btn" onClick={handleViewCart}>
                 <FontAwesomeIcon icon={faShoppingBag} />
-                إتمام الشراء
+                عرض السلة
               </button>
             </div>
           </div>

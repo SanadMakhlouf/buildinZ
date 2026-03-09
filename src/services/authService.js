@@ -110,6 +110,37 @@ export const authService = {
     }
   },
 
+  /**
+   * Initiates Google sign-in via redirect flow.
+   * Fetches the Google OAuth URL from the backend and redirects the user.
+   * After Google sign-in, the backend redirects to /auth/google/callback?token=xxx
+   */
+  async initiateGoogleLogin() {
+    const response = await fetch(`${config.API_BASE_URL}/auth/google`, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' },
+    });
+    const data = await response.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      throw new Error(data.message || 'فشل في الحصول على رابط تسجيل الدخول بـ Google');
+    }
+  },
+
+  /**
+   * Completes Google login by storing the token from callback URL.
+   * Called by AuthCallbackPage when user returns from Google.
+   */
+  completeGoogleLogin(token, user = null) {
+    if (token) {
+      localStorage.setItem('token', token);
+      if (user) {
+        localStorage.setItem('user', JSON.stringify(user));
+      }
+    }
+  },
+
   logout() {
     // Clear local storage
     localStorage.removeItem('token');

@@ -527,7 +527,7 @@ const ServicesPage2 = () => {
                         <div className="product-rating-section">
                           <span className="review-count">(0)</span>
                           <span className="rating-value">
-                            {service.rating?.toFixed(1) || "4.8"}
+                            {(service.rating || 0).toFixed(1)}
                           </span>
                           <FontAwesomeIcon
                             icon={faStar}
@@ -640,7 +640,7 @@ const ServicesPage2 = () => {
                         <div className="product-rating-section">
                           <span className="review-count">(0)</span>
                           <span className="rating-value">
-                            {service.rating?.toFixed(1) || "4.8"}
+                            {(service.rating || 0).toFixed(1)}
                           </span>
                           <FontAwesomeIcon
                             icon={faStar}

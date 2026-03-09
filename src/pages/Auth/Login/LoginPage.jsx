@@ -301,6 +301,28 @@ const LoginPage = () => {
                       </>
                     ) : 'تسجيل الدخول'}
                   </button>
+
+                  <p className="auth-divider">أو</p>
+
+                  <button
+                    type="button"
+                    className="google-signin-btn"
+                    onClick={async () => {
+                      setApiError(null);
+                      setIsLoading(true);
+                      try {
+                        await authService.initiateGoogleLogin();
+                      } catch (err) {
+                        setApiError(err.message || 'فشل تسجيل الدخول بـ Google');
+                      } finally {
+                        setIsLoading(false);
+                      }
+                    }}
+                    disabled={isLoading}
+                  >
+                    <i className="fab fa-google"></i>
+                    تسجيل الدخول باستخدام Google
+                  </button>
                 </form>
 
                 <div className="auth-footer">

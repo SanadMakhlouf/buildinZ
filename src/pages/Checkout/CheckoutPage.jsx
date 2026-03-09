@@ -22,6 +22,7 @@ import {
 import { useCart } from '../../context/CartContext';
 import AddressManager from '../../components/Profile/AddressManager';
 import authService from '../../services/authService';
+import profileService from '../../services/profileService';
 import './CheckoutPage.css';
 
 const CheckoutPage = () => {
@@ -42,6 +43,7 @@ const CheckoutPage = () => {
   const [secondsToRedirect, setSecondsToRedirect] = useState(3);
   const [existingOrderId, setExistingOrderId] = useState(null);
   const [loadingExistingOrder, setLoadingExistingOrder] = useState(false);
+  const [userPhone, setUserPhone] = useState(null);
   
   // Check for order_id parameter (for retrying payment)
   useEffect(() => {
@@ -107,6 +109,24 @@ const CheckoutPage = () => {
     }
   }, [location]);
   
+  // Fetch user profile phone number
+  useEffect(() => {
+    const fetchUserPhone = async () => {
+      if (authService.isAuthenticated()) {
+        try {
+          const profile = await profileService.getProfile();
+          const phone = profile.data?.user?.phone || profile.data?.phone || profile.phone;
+          if (phone) {
+            setUserPhone(phone);
+          }
+        } catch (err) {
+          console.debug('Could not fetch user phone:', err);
+        }
+      }
+    };
+    fetchUserPhone();
+  }, []);
+
   // Redirect to cart if cart is empty
   useEffect(() => {
     if (cart.length === 0 && !orderSuccess && !paymentStatus) {
@@ -137,6 +157,36 @@ const CheckoutPage = () => {
     setPaymentMethod(method);
   };
   
+  // Validate address completeness
+  const isAddressValid = () => {
+    if (!selectedAddress) return false;
+    
+    const addressStreet = (selectedAddress.street || selectedAddress.address_line1)?.trim();
+    const addressCity = selectedAddress.city?.trim();
+    const addressName = selectedAddress.name?.trim();
+    const addressPhone = selectedAddress.phone?.trim();
+    const phone = addressPhone || userPhone;
+    
+    // Check all required fields
+    if (!addressStreet || !addressCity || !addressName) {
+      return false;
+    }
+    
+    // Phone is required
+    if (!phone) {
+      return false;
+    }
+    
+    // Validate phone format
+    const phoneRegex = /^(\+?[0-9]{1,4}[-\s]?)?[0-9]{9,10}$/;
+    const cleanPhone = phone.replace(/\s/g, '');
+    if (!phoneRegex.test(cleanPhone)) {
+      return false;
+    }
+    
+    return true;
+  };
+  
   const handleSubmitOrder = async (e) => {
     e.preventDefault();
     
@@ -148,6 +198,45 @@ const CheckoutPage = () => {
     
     if (!selectedAddress) {
       setError('يرجى اختيار عنوان للشحن');
+      return;
+    }
+    
+    // Validate important address details
+    const addressStreet = (selectedAddress.street || selectedAddress.address_line1)?.trim();
+    const addressCity = selectedAddress.city?.trim();
+    const addressName = selectedAddress.name?.trim();
+    const addressPhone = selectedAddress.phone?.trim();
+    
+    // Check for missing required address fields
+    const missingFields = [];
+    if (!addressStreet) {
+      missingFields.push('عنوان الشارع');
+    }
+    if (!addressCity) {
+      missingFields.push('المدينة');
+    }
+    if (!addressName) {
+      missingFields.push('اسم العنوان');
+    }
+    
+    if (missingFields.length > 0) {
+      setError(`يرجى إكمال بيانات العنوان التالية: ${missingFields.join('، ')}`);
+      return;
+    }
+    
+    // Validate phone number - must exist in address or user profile
+    const phone = addressPhone || userPhone;
+    
+    if (!phone) {
+      setError('يرجى إضافة رقم هاتف في العنوان أو في الملف الشخصي لإتمام الطلب');
+      return;
+    }
+    
+    // Validate phone format if provided
+    const phoneRegex = /^(\+?[0-9]{1,4}[-\s]?)?[0-9]{9,10}$/;
+    const cleanPhone = phone.replace(/\s/g, '');
+    if (!phoneRegex.test(cleanPhone)) {
+      setError('رقم الهاتف غير صحيح. يرجى إدخال رقم هاتف صالح');
       return;
     }
     
@@ -168,7 +257,7 @@ const CheckoutPage = () => {
         state: selectedAddress.state,
         zip: selectedAddress.zip_code || selectedAddress.zip,
         country: selectedAddress.country || 'AE',
-        phone: selectedAddress.phone || undefined,
+        phone: addressPhone || userPhone,
         name: selectedAddress.name
       };
       
@@ -375,7 +464,11 @@ const CheckoutPage = () => {
             )}
             
             <div className="auth-buttons">
-              <button className="btn-primary" onClick={() => navigate('/login?redirect=/checkout')}>
+              <button className="btn-primary" onClick={() => navigate('/cart')}>
+                <FontAwesomeIcon icon={faShoppingBag} />
+                عرض السلة
+              </button>
+              <button className="btn-secondary" onClick={() => navigate('/login?redirect=/checkout')}>
                 <FontAwesomeIcon icon={faLock} />
                 تسجيل الدخول
               </button>
@@ -541,7 +634,7 @@ const CheckoutPage = () => {
             <button 
               className="submit-order-btn"
               onClick={handleSubmitOrder}
-              disabled={loading || !selectedAddress}
+              disabled={loading || !selectedAddress || !isAddressValid()}
             >
               {loading ? (
                 <>
@@ -555,6 +648,29 @@ const CheckoutPage = () => {
             
             {!selectedAddress && (
               <p className="select-address-hint">يرجى اختيار عنوان الشحن أولاً</p>
+            )}
+            
+            {selectedAddress && !isAddressValid() && (
+              <div className="select-address-hint" style={{ color: '#EF4444', marginTop: '8px', fontSize: '0.9rem' }}>
+                {(() => {
+                  const missingFields = [];
+                  const addressStreet = (selectedAddress.street || selectedAddress.address_line1)?.trim();
+                  const addressCity = selectedAddress.city?.trim();
+                  const addressName = selectedAddress.name?.trim();
+                  const addressPhone = selectedAddress.phone?.trim();
+                  const phone = addressPhone || userPhone;
+                  
+                  if (!addressStreet) missingFields.push('عنوان الشارع');
+                  if (!addressCity) missingFields.push('المدينة');
+                  if (!addressName) missingFields.push('اسم العنوان');
+                  if (!phone) missingFields.push('رقم الهاتف');
+                  
+                  if (missingFields.length > 0) {
+                    return `يرجى إكمال: ${missingFields.join('، ')}`;
+                  }
+                  return 'يرجى التأكد من صحة بيانات العنوان';
+                })()}
+              </div>
             )}
             
             <div className="trust-badges">

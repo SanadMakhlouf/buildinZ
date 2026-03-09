@@ -182,6 +182,8 @@
 .password-toggle-btn {
   position: absolute;
   right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
   background: transparent;
   border: none;
   color: #6c757d;
@@ -262,7 +264,7 @@
 .auth-continue-btn {
   width: 100%;
   padding: 15px 24px;
-  background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+  background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
   color: white;
   border: none;
   border-radius: 10px;
@@ -278,7 +280,7 @@
   gap: 10px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+  box-shadow: 0 4px 15px rgba(13, 110, 253, 0.35);
 }
 
 .auth-continue-btn::before {
@@ -300,8 +302,8 @@
 }
 
 .auth-continue-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
-  box-shadow: 0 6px 25px rgba(108, 117, 125, 0.4);
+  background: linear-gradient(135deg, #0a58ca 0%, #084298 100%);
+  box-shadow: 0 6px 25px rgba(13, 110, 253, 0.45);
   transform: translateY(-2px);
 }
 
@@ -367,6 +369,72 @@
   margin: 20px 0 0 0;
   line-height: 1.6;
   font-family: 'Noto Kufi Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.auth-forgot-password-wrapper {
+  margin-top: 2px;
+}
+
+.auth-forgot-link {
+  background: none;
+  border: none;
+  color: #0d6efd;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+  font-family: 'Noto Kufi Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.5;
+}
+
+.auth-forgot-link:hover {
+  text-decoration: underline;
+  color: #0a58ca;
+}
+
+.auth-forgot-icon {
+  margin-left: 6px;
+  font-size: 12px;
+}
+
+.auth-divider {
+  text-align: center;
+  color: #6c757d;
+  font-size: 14px;
+  margin: 16px 0;
+}
+
+.auth-google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 20px;
+  background: white;
+  color: #5f6368;
+  border: 1.5px solid #dadce0;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Noto Kufi Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.auth-google-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  margin-bottom: 12px;
+}
+
+.auth-google-btn:hover {
+  background: #f8f9fa;
+  border-color: #dadce0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.auth-google-btn svg {
+  font-size: 18px;
 }
 
 /* Responsive */

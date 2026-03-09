@@ -31,6 +31,18 @@ import serviceBuilderService from "../../services/serviceBuilderService";
 import "./ProductsPage.css";
 import "../Home/HomePage.css"; // For category carousel styles
 
+/** Build expected delivery text from lead days when API doesn't return expected_delivery_text */
+function buildDeliveryText(min, max) {
+  if (min == null || min === undefined) return null;
+  const minNum = parseInt(min, 10);
+  if (Number.isNaN(minNum) || minNum < 0) return null;
+  const maxNum = max != null && max !== "" ? parseInt(max, 10) : null;
+  if (maxNum != null && !Number.isNaN(maxNum) && maxNum > minNum) {
+    return `${minNum}-${maxNum} days`;
+  }
+  return minNum === 1 ? "1 day" : `${minNum} days`;
+}
+
 const ProductsPage = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -93,23 +105,75 @@ const ProductsPage = () => {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`${config.BACKEND_URL}/api/products`);
+      // First, try to fetch all products with a high limit (more efficient)
+      let allProducts = [];
+      let currentPage = 1;
+      let hasMorePages = true;
+      const perPage = 100; // Fetch 100 products per request
 
-      if (!response.ok) {
-        throw new Error(
-          `Failed to fetch products: ${response.status} ${response.statusText}`
-        );
+      while (hasMorePages) {
+        const url = `${config.BACKEND_URL}/api/products?page=${currentPage}&limit=${perPage}`;
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch products: ${response.status} ${response.statusText}`
+          );
+        }
+
+        let responseData;
+        try {
+          responseData = await response.json();
+        } catch (parseError) {
+          throw new Error("Failed to parse response from server");
+        }
+
+        // Handle different response formats
+        let products = [];
+        if (responseData.success) {
+          // Check if data is an array directly
+          if (Array.isArray(responseData.data)) {
+            products = responseData.data;
+          }
+          // Check if data.products exists (most common format)
+          else if (responseData.data?.products && Array.isArray(responseData.data.products)) {
+            products = responseData.data.products;
+          }
+          // Check if data is an object with products array
+          else if (responseData.data?.data && Array.isArray(responseData.data.data)) {
+            products = responseData.data.data;
+          }
+        }
+
+        if (products.length > 0) {
+          allProducts = [...allProducts, ...products];
+          
+          // Check pagination metadata
+          const meta = responseData.meta || responseData.data?.meta;
+          if (meta && meta.last_page) {
+            // Use metadata if available
+            hasMorePages = currentPage < meta.last_page;
+            currentPage++;
+          } else {
+            // If no meta, check if we got less than requested (means no more pages)
+            // If we got exactly perPage items, there might be more
+            hasMorePages = products.length === perPage;
+            currentPage++;
+          }
+        } else {
+          // No products in this page, stop fetching
+          hasMorePages = false;
+        }
+
+        // Safety limit to prevent infinite loops
+        if (currentPage > 100) {
+          console.warn('Reached maximum page limit (100) while fetching products');
+          break;
+        }
       }
 
-      let responseData;
-      try {
-        responseData = await response.json();
-      } catch (parseError) {
-        throw new Error("Failed to parse response from server");
-      }
-
-      if (responseData.success && responseData.data?.products) {
-        const formattedProducts = responseData.data.products
+      if (allProducts.length > 0) {
+        const formattedProducts = allProducts
           .filter((product) => product && product.id) // Filter out invalid products
           .map((product) => {
             try {
@@ -119,7 +183,7 @@ const ProductsPage = () => {
                 vendor: product.vendor_profile?.business_name || "",
                 vendorId: product.vendor_profile?.id || "",
                 category: product.category?.name || "",
-                categoryId: product.category?.id || "",
+                categoryId: product.category?.id ? product.category.id.toString() : null,
                 price: parseFloat(product.price) || 0,
                 originalPrice: product.original_price
                   ? parseFloat(product.original_price)
@@ -150,6 +214,9 @@ const ProductsPage = () => {
                   : 0,
                 sku: product.sku || "",
                 label: product.label || null,
+                isFreeDelivery: !!product.is_free_delivery,
+                estimatedDeliveryDate: product.estimated_delivery_date || null,
+                expectedDeliveryText: product.expected_delivery_text || buildDeliveryText(product.delivery_lead_days, product.delivery_lead_days_max) || null,
               };
             } catch (mapError) {
               console.error("Error mapping product:", mapError, product);
@@ -159,7 +226,9 @@ const ProductsPage = () => {
           .filter((product) => product !== null); // Remove any null products from mapping errors
 
         setProducts(formattedProducts);
+        console.log(`Fetched ${formattedProducts.length} products total`);
       } else {
+        console.warn('No products found in response');
         setProducts([]);
       }
     } catch (err) {
@@ -230,6 +299,28 @@ const ProductsPage = () => {
     fetchCategories();
     fetchServices();
   }, [fetchProducts, fetchCategories, fetchServices]);
+
+  // Sync URL params with state when URL changes (e.g., when clicking category from HomePage)
+  useEffect(() => {
+    const categoryParam = searchParams.get("category") || "";
+    const searchParam = searchParams.get("search") || "";
+    const sortParam = searchParams.get("sort") || "popular";
+
+    // Update state if URL params differ from current state
+    // Use functional updates to avoid dependency issues
+    setSelectedCategory((prev) => {
+      if (categoryParam !== prev) return categoryParam;
+      return prev;
+    });
+    setSearchTerm((prev) => {
+      if (searchParam !== prev) return searchParam;
+      return prev;
+    });
+    setSortBy((prev) => {
+      if (sortParam !== prev) return sortParam;
+      return prev;
+    });
+  }, [searchParams]); // Only depend on searchParams to sync URL -> state
 
   // Save wishlist to localStorage whenever it changes
   useEffect(() => {
@@ -383,10 +474,19 @@ const ProductsPage = () => {
 
       // Category filter
       if (selectedCategory) {
-        filtered = filtered.filter((p) => {
-          if (!p) return false;
-          return p.categoryId?.toString() === selectedCategory.toString();
-        });
+        const categoryIdStr = selectedCategory.toString().trim();
+        if (categoryIdStr) {
+          filtered = filtered.filter((p) => {
+            if (!p) return false;
+            // Check categoryId - convert to string for comparison
+            const productCategoryId = p.categoryId 
+              ? p.categoryId.toString().trim() 
+              : null;
+            
+            // Only include products that match the selected category
+            return productCategoryId === categoryIdStr;
+          });
+        }
       }
 
       // Brand filter
@@ -526,20 +626,12 @@ const ProductsPage = () => {
   // Product Card Component
   const ProductCard = ({ product }) => {
     const [imageError, setImageError] = useState(false);
+    const [imageIndex, setImageIndex] = useState(0);
+    const [touchStartX, setTouchStartX] = useState(null);
 
     if (!product || !product.id) {
       return null;
     }
-
-    const discount =
-      product.originalPrice &&
-      product.price &&
-      product.originalPrice > product.price
-        ? Math.round(
-            ((product.originalPrice - product.price) / product.originalPrice) *
-              100
-          )
-        : 0;
 
     const getImageUrl = (imagePath) => {
       try {
@@ -555,6 +647,43 @@ const ProductsPage = () => {
       }
     };
 
+    const productImages =
+      product.images && product.images.length > 0
+        ? product.images
+            .map((img) => getImageUrl(typeof img === "string" ? img : img?.url))
+            .filter(Boolean)
+        : product.image
+        ? [getImageUrl(product.image)]
+        : [];
+    const hasMultipleImages = productImages.length > 1;
+    const currentImageUrl = productImages[imageIndex] || productImages[0];
+
+    const handleTouchStart = (e) => {
+      if (hasMultipleImages) setTouchStartX(e.touches[0].clientX);
+    };
+    const handleTouchEnd = (e) => {
+      if (!hasMultipleImages || touchStartX === null) return;
+      const diff = touchStartX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 50) {
+        setImageIndex((prev) =>
+          diff > 0
+            ? Math.min(prev + 1, productImages.length - 1)
+            : Math.max(prev - 1, 0)
+        );
+      }
+      setTouchStartX(null);
+    };
+
+    const discount =
+      product.originalPrice &&
+      product.price &&
+      product.originalPrice > product.price
+        ? Math.round(
+            ((product.originalPrice - product.price) / product.originalPrice) *
+              100
+          )
+        : 0;
+
     return (
       <div
         className={`product-card ${viewMode === "list" ? "list-view" : ""}`}
@@ -567,10 +696,14 @@ const ProductsPage = () => {
           )
         }
       >
-        <div className="product-image-container">
-          {product.image && !imageError ? (
+        <div
+          className="product-image-container"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
+          {currentImageUrl && !imageError ? (
             <img
-              src={getImageUrl(product.image)}
+              src={currentImageUrl}
               alt={product.name}
               className="product-image"
               onError={() => setImageError(true)}
@@ -668,15 +801,19 @@ const ProductsPage = () => {
 
           {/* Delivery Information */}
           <div className="product-delivery-info">
-            <div className="delivery-free">
-              <FontAwesomeIcon icon={faTruck} className="delivery-icon" />
-            </div>
-            <div className="delivery-express">
-              <FontAwesomeIcon
-                icon={faBolt}
-                className="delivery-lightning-icon"
-              />
-              <span>يوصلك في {getDeliveryDate()}</span>
+            {product.isFreeDelivery && (
+              <div className="delivery-free" title="توصيل مجاني">
+                <FontAwesomeIcon icon={faTruck} className="delivery-icon" />
+                <span>توصيل مجاني</span>
+              </div>
+            )}
+            <div className="delivery-express delivery-timeline" title={`التوصيل خلال ${(product.expectedDeliveryText || "3-4 days").replace(/\bday\b/gi, "يوم").replace(/\bdays\b/gi, "أيام")}`}>
+              <FontAwesomeIcon icon={faTruck} className="delivery-lightning-icon" />
+              <span>
+                {(product.expectedDeliveryText || "3-4 days")
+                  .replace(/\bday\b/gi, "يوم")
+                  .replace(/\bdays\b/gi, "أيام")}
+              </span>
             </div>
           </div>
         </div>
@@ -1144,7 +1281,7 @@ const ProductsPage = () => {
                       <div className="product-rating-section">
                         <span className="review-count">(0)</span>
                         <span className="rating-value">
-                          {service.rating?.toFixed(1) || "4.8"}
+                          {(service.rating || 0).toFixed(1)}
                         </span>
                         <FontAwesomeIcon
                           icon={faStar}
@@ -1317,18 +1454,18 @@ const ProductsPage = () => {
 
                       {/* Delivery Information */}
                       <div className="product-delivery-info">
-                        <div className="delivery-free">
-                          <FontAwesomeIcon
-                            icon={faTruck}
-                            className="delivery-icon"
-                          />
-                        </div>
-                        <div className="delivery-express">
-                          <FontAwesomeIcon
-                            icon={faBolt}
-                            className="delivery-lightning-icon"
-                          />
-                          <span>يوصلك في {getDeliveryDate()}</span>
+                        {product.isFreeDelivery && (
+                          <div className="delivery-free" title="توصيل مجاني">
+                            <FontAwesomeIcon
+                              icon={faTruck}
+                              className="delivery-icon"
+                            />
+                            <span>توصيل مجاني</span>
+                          </div>
+                        )}
+                        <div className="delivery-express delivery-timeline" title={`التوصيل خلال ${(product.expectedDeliveryText || "3-4 days").replace(/\bday\b/gi, "يوم").replace(/\bdays\b/gi, "أيام")}`}>
+                          <FontAwesomeIcon icon={faTruck} className="delivery-lightning-icon" />
+                          <span>{(product.expectedDeliveryText || "3-4 days").replace(/\bday\b/gi, "يوم").replace(/\bdays\b/gi, "أيام")}</span>
                         </div>
                       </div>
                     </div>

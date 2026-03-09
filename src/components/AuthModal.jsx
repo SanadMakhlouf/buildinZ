@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faEye, faEyeSlash, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faEye, faEyeSlash, faArrowRight, faKey } from '@fortawesome/free-solid-svg-icons';
+import { faGoogle as faGoogleBrand } from '@fortawesome/free-brands-svg-icons';
 import authService from '../services/authService';
 import './AuthModal.css';
 
 const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [mode, setMode] = useState(initialMode); // 'login' or 'signup'
   const [step, setStep] = useState(1); // 1: email, 2: password/form
   const [formData, setFormData] = useState({
@@ -85,10 +85,11 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
 
   const validateEmail = () => {
     const newErrors = {};
+    const email = formData.email.trim();
     
-    if (!formData.email) {
+    if (!email) {
       newErrors.email = 'البريد الإلكتروني مطلوب';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
       newErrors.email = 'البريد الإلكتروني غير صالح';
     }
     
@@ -164,7 +165,8 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
         setApiError(null);
         
         try {
-          await authService.login(formData.email, formData.password, false);
+          const email = formData.email.trim().toLowerCase();
+          await authService.login(email, formData.password, false);
           
           // Success - close modal and reload
           setTimeout(() => {
@@ -190,8 +192,8 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
         
         try {
           const signupData = {
-            fullName: formData.fullName,
-            email: formData.email,
+            fullName: formData.fullName.trim(),
+            email: formData.email.trim().toLowerCase(),
             password: formData.password,
             confirmPassword: formData.confirmPassword
           };
@@ -308,7 +310,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.4 }}
           >
-            هلا! لنبدأ
+            أهلاً بك! لنبدأ
           </motion.h2>
 
           {/* Mode Toggle Buttons */}
@@ -426,6 +428,54 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                     )}
                   </motion.button>
 
+                  <motion.p className="auth-divider" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
+                    أو
+                  </motion.p>
+
+                  <motion.button
+                    type="button"
+                    className="auth-google-btn"
+                    onClick={async () => {
+                      setApiError(null);
+                      setIsLoading(true);
+                      try {
+                        await authService.initiateGoogleLogin();
+                      } catch (err) {
+                        setApiError(err.message || 'فشل تسجيل الدخول بـ Google');
+                        setIsLoading(false);
+                      }
+                    }}
+                    disabled={isLoading}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.25, duration: 0.4 }}
+                  >
+                    <FontAwesomeIcon icon={faGoogleBrand} />
+                    {mode === 'login' ? 'تسجيل الدخول باستخدام Google' : 'إنشاء حساب باستخدام Google'}
+                  </motion.button>
+
+                  {mode === 'login' && (
+                    <motion.div
+                      className="auth-forgot-password-wrapper"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.25 }}
+                    >
+                      <button
+                        type="button"
+                        className="auth-forgot-link"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          onClose();
+                          navigate('/forgot-password');
+                        }}
+                      >
+                        <FontAwesomeIcon icon={faKey} className="auth-forgot-icon" />
+                        نسيت كلمة المرور؟
+                      </button>
+                    </motion.div>
+                  )}
+
                   {/* Privacy Policy Text */}
                   <motion.p 
                     className="auth-privacy-text"
@@ -507,6 +557,27 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                         {errors.password}
                       </motion.span>
                     )}
+                    {mode === 'login' && (
+                      <motion.div
+                        className="auth-forgot-password-wrapper"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.2 }}
+                      >
+                        <button
+                          type="button"
+                          className="auth-forgot-link"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            onClose();
+                            navigate('/forgot-password');
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faKey} className="auth-forgot-icon" />
+                          نسيت كلمة المرور؟
+                        </button>
+                      </motion.div>
+                    )}
                   </motion.div>
 
                   {mode === 'signup' && (
@@ -587,7 +658,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                     disabled={isLoading}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: mode === 'signup' ? 0.3 : 0.2, duration: 0.4 }}
+                    transition={{ delay: mode === 'signup' ? 0.3 : 0.25, duration: 0.4 }}
                     whileHover={{ scale: 1.02, boxShadow: "0 6px 20px rgba(108, 117, 125, 0.4)" }}
                     whileTap={{ scale: 0.98 }}
                   >

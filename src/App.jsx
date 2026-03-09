@@ -16,6 +16,7 @@ import LoginPage from './pages/Auth/Login/LoginPage';
 import SignupPage from './pages/Auth/Signup/SignupPage';
 import ForgotPassword from './pages/Auth/Login/ForgotPassword';
 import ResetPassword from './pages/Auth/Login/ResetPassword';
+import AuthCallbackPage from './pages/Auth/AuthCallbackPage';
 import AdminPage from './pages/Admin/AdminPage';
 import FAQPage from './pages/FAQ/FAQPage';
 import PrivacyPage from './pages/Privacy/PrivacyPage';
@@ -57,6 +58,7 @@ function App() {
               <Route path="/services2/categories/:id" element={<CategoryDetailPage />} />
               <Route path="/services2/:id" element={<ServiceDetailPage />} />
               <Route path="/products" element={<ProductsPage />} />
+              <Route path="/store" element={<ProductsPage />} />
               <Route path="/products/:productId" element={<ProductDetailPage />} />
               <Route path="/products/:productId/:slug" element={<ProductDetailPage />} />
               <Route path="/profile" element={<ProfilePage />} />
@@ -64,6 +66,7 @@ function App() {
               <Route path="/signup" element={<SignupPage />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/auth/google/callback" element={<AuthCallbackPage />} />
               <Route path="/admin" element={<AdminPage />} />
               <Route path="/faq" element={<FAQPage />} />
               <Route path="/privacy" element={<PrivacyPage />} />

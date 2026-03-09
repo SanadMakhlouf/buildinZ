@@ -38,6 +38,7 @@ const ProductDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedImage, setSelectedImage] = useState(0);
+  const [selectedVariant, setSelectedVariant] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [imageError, setImageError] = useState({});
@@ -65,11 +66,14 @@ const ProductDetailPage = () => {
         const response = await productService.getProductById(productId);
 
         if (response.data && response.data.success) {
-          setProduct(response.data.data.product);
-          if (
-            response.data.data.product.image_urls &&
-            response.data.data.product.image_urls.length > 0
-          ) {
+          const p = response.data.data.product;
+          setProduct(p);
+          const vars = p.variants || [];
+          const firstInStock = vars.find(
+            (v) => (v.stock_quantity ?? v.stockQuantity ?? 0) > 0
+          );
+          setSelectedVariant(firstInStock || null);
+          if (p.image_urls && p.image_urls.length > 0) {
             setSelectedImage(0);
           }
         } else {
@@ -104,7 +108,10 @@ const ProductDetailPage = () => {
   };
 
   const increaseQuantity = () => {
-    if (product && product.stock_quantity && quantity < product.stock_quantity) {
+    const max = selectedVariant
+      ? (selectedVariant.stock_quantity ?? selectedVariant.stockQuantity ?? 0)
+      : (product?.stock_quantity ?? 0);
+    if (product && max > 0 && quantity < max) {
       setQuantity(quantity + 1);
     }
   };
@@ -116,19 +123,30 @@ const ProductDetailPage = () => {
   };
 
   const handleAddToCart = () => {
-    if (product && product.stock_quantity > 0) {
+    const stock = selectedVariant
+      ? (selectedVariant.stock_quantity ?? selectedVariant.stockQuantity ?? 0)
+      : (product?.stock_quantity ?? 0);
+    if (product && stock > 0) {
+      const price = selectedVariant
+        ? parseFloat(selectedVariant.price)
+        : parseFloat(product.price);
+      const image =
+        product.primary_image_url ||
+        (product.image_urls && product.image_urls.length > 0
+          ? product.image_urls[0]
+          : null);
+      const variantImage = selectedVariant?.images?.[0];
       const cartProduct = {
-        id: product.id,
+        id: selectedVariant ? `p${product.id}v${selectedVariant.id}` : product.id,
+        productId: product.id,
+        variantId: selectedVariant?.id,
         name: product.name,
-        price: parseFloat(product.price),
-        image:
-          product.primary_image_url ||
-          (product.image_urls && product.image_urls.length > 0
-            ? product.image_urls[0]
-            : null),
+        price,
+        image: variantImage || image,
         vendor: product.vendor_profile?.business_name || "",
-        stockQuantity: product.stock_quantity || 0,
+        stockQuantity: stock,
         category: product.category?.name || "",
+        variantAttributes: selectedVariant?.attributes || selectedVariant?.variant_attributes,
       };
 
       addToCart(cartProduct, quantity);
@@ -197,15 +215,6 @@ const ProductDetailPage = () => {
     });
   };
 
-  const getRandomRating = (id) => {
-    const seed = id * 0.618;
-    return (4.2 + (seed % 0.8)).toFixed(1);
-  };
-
-  const getRandomReviewCount = (id) => {
-    const seed = id * 0.314;
-    return Math.floor(15 + (seed % 485));
-  };
 
   if (loading) {
     return (
@@ -236,12 +245,27 @@ const ProductDetailPage = () => {
     );
   }
 
-  const availableImages =
-    product.image_urls && product.image_urls.length > 0
-      ? product.image_urls
-      : product.primary_image_url
-      ? [product.primary_image_url]
-      : [];
+  const variants = product.variants || [];
+  const effectivePrice = selectedVariant
+    ? parseFloat(selectedVariant.price)
+    : parseFloat(product.price);
+  const effectiveStock = selectedVariant
+    ? (selectedVariant.stock_quantity ?? selectedVariant.stockQuantity ?? 0)
+    : (product.stock_quantity ?? 0);
+  const variantImages =
+    selectedVariant &&
+    selectedVariant.images &&
+    Array.isArray(selectedVariant.images) &&
+    selectedVariant.images.length > 0
+      ? selectedVariant.images
+      : null;
+  const availableImages = variantImages
+    ? variantImages
+    : product.image_urls && product.image_urls.length > 0
+    ? product.image_urls
+    : product.primary_image_url
+    ? [product.primary_image_url]
+    : [];
 
   const discount =
     product.original_price &&
@@ -253,8 +277,8 @@ const ProductDetailPage = () => {
         )
       : 0;
 
-  const displayRating = averageRating > 0 ? averageRating : getRandomRating(product.id);
-  const displayReviewCount = product.reviews?.length > 0 ? product.reviews.length : getRandomReviewCount(product.id);
+  const displayRating = averageRating || 0;
+  const displayReviewCount = product.reviews?.length || 0;
 
   // SEO Data
   const pageTitle = `${product.name} - ${product.category?.name || "منتج"} | BuildingZ`;
@@ -482,11 +506,41 @@ const ProductDetailPage = () => {
               <span className="pdp-rating-count">({displayReviewCount} تقييم)</span>
             </div>
 
+            {/* Variant Selector */}
+            {variants.length > 0 && (
+              <div className="pdp-variants">
+                {variants.map((v) => {
+                  const attrs = v.attributes || v.variant_attributes || {};
+                  const color = v.color ?? attrs.color;
+                  const size = v.size ?? attrs.size;
+                  const label = [color, size].filter(Boolean).join(" / ") || `خيار ${v.id}`;
+                  const isSelected = selectedVariant?.id === v.id;
+                  const outOfStock = (v.stock_quantity ?? v.stockQuantity ?? 0) <= 0;
+                  return (
+                    <button
+                      key={v.id}
+                      type="button"
+                      className={`pdp-variant-btn ${isSelected ? "active" : ""} ${outOfStock ? "out-of-stock" : ""}`}
+                      onClick={() => {
+                        if (!outOfStock) {
+                          setSelectedVariant(v);
+                          setSelectedImage(0);
+                        }
+                      }}
+                      disabled={outOfStock}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
             {/* Price */}
             <div className="pdp-price-section">
               <div className="pdp-price-main">
                 <span className="pdp-price-value">
-                  {parseFloat(product.price)}
+                  {effectivePrice.toLocaleString("ar-SA")}
                 </span>
                 <span className="pdp-price-currency">درهم</span>
               </div>
@@ -503,14 +557,17 @@ const ProductDetailPage = () => {
             </div>
 
             {/* Stock Status */}
-            <div className={`pdp-stock ${product.stock_quantity > 0 ? 'in-stock' : 'out-of-stock'}`}>
-              {product.stock_quantity > 0 ? (
+            <div className={`pdp-stock ${effectiveStock > 0 ? 'in-stock' : 'out-of-stock'}`}>
+              {effectiveStock > 0 ? (
                 <>
                   <FontAwesomeIcon icon={faCheckCircle} />
                   <span>متوفر في المخزون</span>
-                  {product.stock_quantity <= 10 && (
+                  <span className="pdp-stock-quantity">
+                    ({effectiveStock} قطعة متوفرة)
+                  </span>
+                  {effectiveStock <= 10 && (
                     <span className="pdp-low-stock">
-                      (باقي {product.stock_quantity} فقط)
+                      (كمية محدودة)
                     </span>
                   )}
                 </>
@@ -524,11 +581,40 @@ const ProductDetailPage = () => {
 
             {/* Delivery Info */}
             <div className="pdp-delivery-info">
-              
+              {product.expected_delivery_text && (
+                <div className="pdp-delivery-lead">
+                  <FontAwesomeIcon icon={faTruck} />
+                  <span>
+                    التوصيل خلال{" "}
+                    {product.expected_delivery_text
+                      .replace(/\bday\b/gi, "يوم")
+                      .replace(/\bdays\b/gi, "أيام")}
+                  </span>
+                </div>
+              )}
+              {product.estimated_delivery_date && (
+                <div className="pdp-delivery-date">
+                  <FontAwesomeIcon icon={faTruck} />
+                  <span>
+                    التوصيل المتوقع:{" "}
+                    {new Date(product.estimated_delivery_date).toLocaleDateString("ar-SA", {
+                      weekday: "long",
+                      day: "numeric",
+                      month: "long",
+                    })}
+                  </span>
+                </div>
+              )}
+              {product.is_free_delivery && (
+                <div className="pdp-free-delivery">
+                  <FontAwesomeIcon icon={faTruck} />
+                  <span>توصيل مجاني</span>
+                </div>
+              )}
             </div>
 
             {/* Quantity & Add to Cart */}
-            {product.stock_quantity > 0 && (
+            {effectiveStock > 0 && (
               <div className="pdp-actions">
                 <div className="pdp-quantity">
                   <span className="pdp-quantity-label">الكمية:</span>
@@ -537,7 +623,7 @@ const ProductDetailPage = () => {
                       <FontAwesomeIcon icon={faMinus} />
                     </button>
                     <span className="pdp-quantity-value">{quantity}</span>
-                    <button onClick={increaseQuantity} disabled={quantity >= product.stock_quantity}>
+                    <button onClick={increaseQuantity} disabled={quantity >= effectiveStock}>
                       <FontAwesomeIcon icon={faPlus} />
                     </button>
                   </div>
@@ -562,7 +648,7 @@ const ProductDetailPage = () => {
 
                 <button className="pdp-buy-now" onClick={() => {
                   handleAddToCart();
-                  navigate('/checkout');
+                  navigate('/cart');
                 }}>
                   <FontAwesomeIcon icon={faShoppingBag} />
                   اشتري الآن
@@ -647,27 +733,97 @@ const ProductDetailPage = () => {
                       {product.stock_quantity > 0 ? `${product.stock_quantity} قطعة متوفرة` : 'غير متوفر'}
                     </span>
                   </div>
+
+                  {/* Measurement Details - Size only */}
+                  {product.measurement_details && typeof product.measurement_details === 'object' && Object.keys(product.measurement_details).length > 0 && (
+                    Object.entries(product.measurement_details)
+                      .filter(([key]) => key.toLowerCase().includes('size'))
+                      .map(([key, value]) => (
+                        <div key={key} className="pdp-info-item">
+                          <span className="pdp-info-label">
+                            {key === 'top_size' ? 'حجم السطح' :
+                             key === 'size' ? 'الحجم' :
+                             'الحجم'}
+                          </span>
+                          <span className="pdp-info-value">{value}</span>
+                        </div>
+                      ))
+                  )}
+
+                  {/* Dimensions fallback */}
+                  {product.dimensions && !product.measurement_details && (
+                    <div className="pdp-info-item">
+                      <span className="pdp-info-label">الأبعاد</span>
+                      <span className="pdp-info-value">{product.dimensions}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
 
             {activeTab === 'specs' && (
               <div className="pdp-specs-content">
-                {product.specifications ? (
-                  typeof product.specifications === 'object' ? (
-                    <div className="pdp-specs-grid">
-                      {Object.entries(product.specifications).map(([key, value]) => (
-                        <div key={key} className="pdp-spec-item">
-                          <span className="pdp-spec-key">{key}</span>
-                          <span className="pdp-spec-value">{value}</span>
-                        </div>
-                      ))}
+                {/* Measurement Details - Size only */}
+                {product.measurement_details && typeof product.measurement_details === 'object' && Object.keys(product.measurement_details).length > 0 && (
+                  Object.entries(product.measurement_details)
+                    .filter(([key]) => key.toLowerCase().includes('size'))
+                    .length > 0 && (
+                    <div className="pdp-specs-section">
+                      <h4 className="pdp-specs-section-title">الحجم</h4>
+                      <div className="pdp-specs-grid">
+                        {Object.entries(product.measurement_details)
+                          .filter(([key]) => key.toLowerCase().includes('size'))
+                          .map(([key, value]) => (
+                            <div key={key} className="pdp-spec-item">
+                              <span className="pdp-spec-key">
+                                {key === 'top_size' ? 'حجم السطح' :
+                                 key === 'size' ? 'الحجم' :
+                                 'الحجم'}
+                              </span>
+                              <span className="pdp-spec-value">{value}</span>
+                            </div>
+                          ))}
+                      </div>
                     </div>
-                  ) : (
-                    <p>{product.specifications}</p>
                   )
+                )}
+
+                {/* Specifications */}
+                {product.specifications ? (
+                  <div className="pdp-specs-section">
+                    {product.measurement_details && Object.keys(product.measurement_details).length > 0 && (
+                      <h4 className="pdp-specs-section-title">المواصفات الفنية</h4>
+                    )}
+                    {typeof product.specifications === 'object' ? (
+                      <div className="pdp-specs-grid">
+                        {Object.entries(product.specifications).map(([key, value]) => (
+                          <div key={key} className="pdp-spec-item">
+                            <span className="pdp-spec-key">{key}</span>
+                            <span className="pdp-spec-value">{value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p>{product.specifications}</p>
+                    )}
+                  </div>
                 ) : (
-                  <p className="pdp-no-content">لا توجد مواصفات متاحة لهذا المنتج.</p>
+                  !product.measurement_details && (
+                    <p className="pdp-no-content">لا توجد مواصفات متاحة لهذا المنتج.</p>
+                  )
+                )}
+
+                {/* Dimensions fallback */}
+                {product.dimensions && !product.measurement_details && (
+                  <div className="pdp-specs-section">
+                    <h4 className="pdp-specs-section-title">الأبعاد</h4>
+                    <div className="pdp-specs-grid">
+                      <div className="pdp-spec-item">
+                        <span className="pdp-spec-key">الأبعاد</span>
+                        <span className="pdp-spec-value">{product.dimensions}</span>
+                      </div>
+                    </div>
+                  </div>
                 )}
               </div>
             )}

@@ -192,8 +192,8 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
         const position = marker.getPosition();
         map.setCenter(position);
         
-        // Reverse geocode the position
-        geocoder.geocode({ location: position.toJSON() }, (results, status) => {
+        // Reverse geocode the position (region: ae for UAE accuracy)
+        geocoder.geocode({ location: position.toJSON(), region: 'ae', language: 'ar' }, (results, status) => {
           if (status === 'OK' && results[0]) {
             setSelectedLocation(results[0]);
           }
@@ -204,16 +204,16 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
       map.addListener('click', (event) => {
         marker.setPosition(event.latLng);
         
-        // Reverse geocode the position
-        geocoder.geocode({ location: event.latLng.toJSON() }, (results, status) => {
+        // Reverse geocode the position (region: ae for UAE accuracy)
+        geocoder.geocode({ location: event.latLng.toJSON(), region: 'ae', language: 'ar' }, (results, status) => {
           if (status === 'OK' && results[0]) {
             setSelectedLocation(results[0]);
           }
         });
       });
       
-      // Initial reverse geocoding
-      geocoder.geocode({ location: mapCenter }, (results, status) => {
+      // Initial reverse geocoding (region: ae for UAE accuracy)
+      geocoder.geocode({ location: mapCenter, region: 'ae', language: 'ar' }, (results, status) => {
         if (status === 'OK' && results[0]) {
           setSelectedLocation(results[0]);
         }
@@ -270,9 +270,9 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
             mapInstanceRef.current.setCenter(newCenter);
             markerRef.current.setPosition(newCenter);
             
-            // Reverse geocode the position
+            // Reverse geocode the position (region: ae for UAE accuracy)
             if (geocoderRef.current) {
-              geocoderRef.current.geocode({ location: newCenter }, (results, status) => {
+              geocoderRef.current.geocode({ location: newCenter, region: 'ae', language: 'ar' }, (results, status) => {
                 if (status === 'OK' && results[0]) {
                   setSelectedLocation(results[0]);
                 } else {

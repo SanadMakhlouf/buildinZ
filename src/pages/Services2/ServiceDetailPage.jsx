@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -241,6 +241,18 @@ const ServiceDetailPage = () => {
     }
   };
 
+  // Memoize min date for service booking - computed when modal opens (fixes mobile freeze)
+  const bookingMinDate = useMemo(
+    () => new Date().toISOString().split("T")[0],
+    [showBookingModal]
+  );
+
+  // Stable handler for preferred date - reduces re-renders
+  const handlePreferredDateChange = useCallback((e) => {
+    const value = e.target.value;
+    setCustomerInfo((prev) => ({ ...prev, preferredDate: value }));
+  }, []);
+
   // Image gallery navigation
   const nextImage = () => {
     if (service?.images) {
@@ -370,13 +382,32 @@ const ServiceDetailPage = () => {
   const handleSubmitOrder = async () => {
     if (
       !customerInfo.name ||
-      !customerInfo.phone ||
       !customerInfo.emirate ||
       !customerInfo.preferredDate
     ) {
       setBookingError(
-        "يرجى ملء جميع الحقول المطلوبة (الاسم، الهاتف، الإمارة، التاريخ المفضل)"
+        "يرجى ملء جميع الحقول المطلوبة (الاسم، الإمارة، التاريخ المفضل)"
       );
+      return;
+    }
+    
+    // Validate phone number - must exist in customerInfo or selectedAddress
+    const customerPhone = customerInfo.phone?.trim();
+    const addressPhone = selectedAddress?.phone?.trim();
+    const phone = customerPhone || addressPhone;
+    
+    if (!phone) {
+      setBookingError(
+        "يرجى إضافة رقم هاتف في معلومات العميل أو في عنوان الشحن"
+      );
+      return;
+    }
+    
+    // Validate phone format
+    const phoneRegex = /^(\+?[0-9]{1,4}[-\s]?)?[0-9]{9,10}$/;
+    const cleanPhone = phone.replace(/\s/g, '');
+    if (!phoneRegex.test(cleanPhone)) {
+      setBookingError("رقم الهاتف غير صحيح. يرجى إدخال رقم هاتف صالح");
       return;
     }
 
@@ -499,7 +530,7 @@ const ServiceDetailPage = () => {
           );
           formData.append(
             "shipping_address[phone]",
-            selectedAddress.phone || customerInfo.phone
+            addressPhone || customerPhone
           );
         }
 
@@ -536,7 +567,7 @@ const ServiceDetailPage = () => {
               selectedAddress.state ||
               selectedAddress.city,
             country: selectedAddress.country || "UAE",
-            phone: selectedAddress.phone || customerInfo.phone,
+            phone: addressPhone || customerPhone,
           };
         }
 
@@ -1469,15 +1500,10 @@ const ServiceDetailPage = () => {
                     </label>
                     <input
                       type="date"
-                      className="form-input"
+                      className="form-input service-date-input"
                       value={customerInfo.preferredDate}
-                      onChange={(e) =>
-                        setCustomerInfo((prev) => ({
-                          ...prev,
-                          preferredDate: e.target.value,
-                        }))
-                      }
-                      min={new Date().toISOString().split("T")[0]}
+                      onChange={handlePreferredDateChange}
+                      min={bookingMinDate}
                       required
                       style={{
                         padding: "12px",
@@ -1486,6 +1512,7 @@ const ServiceDetailPage = () => {
                         borderRadius: "8px",
                         width: "100%",
                         fontFamily: "inherit",
+                        touchAction: "manipulation",
                       }}
                     />
                   </div>

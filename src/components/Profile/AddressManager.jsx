@@ -143,8 +143,10 @@ const AddressManager = ({ checkoutMode = false, onAddressSelect = null, selected
       errors.address_line1 = 'العنوان مطلوب';
     }
     
-    // Phone validation (optional field)
-    if (formData.phone && !/^(\+?[0-9]{1,4}[-\s]?)?[0-9]{9,10}$/.test(formData.phone.replace(/\s/g, ''))) {
+    // Phone validation - required in checkout mode, optional otherwise
+    if (checkoutMode && !formData.phone?.trim()) {
+      errors.phone = 'رقم الهاتف مطلوب لإتمام الطلب';
+    } else if (formData.phone && !/^(\+?[0-9]{1,4}[-\s]?)?[0-9]{9,10}$/.test(formData.phone.replace(/\s/g, ''))) {
       errors.phone = 'رقم الهاتف غير صحيح';
     }
     
@@ -485,10 +487,28 @@ const AddressManager = ({ checkoutMode = false, onAddressSelect = null, selected
     }
   };
 
+  // Check if address is complete for checkout
+  const isAddressCompleteForCheckout = (address) => {
+    if (!checkoutMode) return true;
+    
+    const hasStreet = !!(address.street || address.address_line1)?.trim();
+    const hasCity = !!address.city?.trim();
+    const hasName = !!address.name?.trim();
+    const hasPhone = !!address.phone?.trim();
+    
+    return hasStreet && hasCity && hasName && hasPhone;
+  };
+  
   // Handle address selection in checkout mode
   const handleAddressSelect = (address) => {
     if (checkoutMode && onAddressSelect) {
-      onAddressSelect(address);
+      // Warn if address is incomplete but still allow selection
+      if (!isAddressCompleteForCheckout(address)) {
+        // Still allow selection - validation will happen at checkout
+        onAddressSelect(address);
+      } else {
+        onAddressSelect(address);
+      }
     }
   };
 
@@ -546,12 +566,29 @@ const AddressManager = ({ checkoutMode = false, onAddressSelect = null, selected
             <div className="address-details">
               <div className="address-header">
                 <h3>{address.name}</h3>
-                {address.is_default && (
-                  <span className="default-badge">
-                    <FontAwesomeIcon icon={icons.default} />
-                    افتراضي
-                  </span>
-                )}
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  {address.is_default && (
+                    <span className="default-badge">
+                      <FontAwesomeIcon icon={icons.default} />
+                      افتراضي
+                    </span>
+                  )}
+                  {checkoutMode && !isAddressCompleteForCheckout(address) && (
+                    <span className="incomplete-badge" style={{ 
+                      background: '#FEF3C7', 
+                      color: '#92400E', 
+                      padding: '2px 8px', 
+                      borderRadius: '4px', 
+                      fontSize: '0.75rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}>
+                      <FontAwesomeIcon icon={icons.warning} style={{ fontSize: '0.7rem' }} />
+                      غير مكتمل
+                    </span>
+                  )}
+                </div>
               </div>
               
               <div className="address-content">
@@ -729,16 +766,17 @@ const AddressManager = ({ checkoutMode = false, onAddressSelect = null, selected
               </div>
 
               <div className="form-group">
-                <label htmlFor="phone">رقم الهاتف</label>
-                <input
-                  type="tel"
+                <label htmlFor="phone">رقم الهاتف{checkoutMode && ' *'}</label>
+                  <input
+                    type="tel"
                   id="phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  placeholder="رقم الهاتف للتواصل عند التوصيل"
-                  className={formErrors.phone ? 'error' : ''}
-                />
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    placeholder={checkoutMode ? "رقم الهاتف مطلوب للتواصل عند التوصيل*" : "رقم الهاتف للتواصل عند التوصيل"}
+                    className={formErrors.phone ? 'error' : ''}
+                    required={checkoutMode}
+                  />
                 {formErrors.phone && <span className="error-message">{formErrors.phone}</span>}
               </div>
               

@@ -113,7 +113,21 @@ const CategoryCarousel = ({
     <section className="noon-categories-section" aria-label="الفئات">
       <div className="noon-section-container">
         <div className="noon-categories-wrapper">
-          <div className="noon-categories-scroll" ref={categoryScrollRef}>
+          <button
+            className="noon-category-nav noon-category-nav-left"
+            onClick={() => scrollCategories("left")}
+            aria-label="تمرير لليسار"
+          >
+            <FontAwesomeIcon icon={faChevronLeft} />
+          </button>
+          <button
+            className="noon-category-nav noon-category-nav-right"
+            onClick={() => scrollCategories("right")}
+            aria-label="تمرير لليمين"
+          >
+            <FontAwesomeIcon icon={faChevronRight} />
+          </button>
+          <div className="noon-categories-scroll noon-categories-scroll-with-nav" ref={categoryScrollRef}>
             {loading ? (
               // Skeleton loaders - same as homepage
               Array(12)

@@ -71,7 +71,7 @@ const CartPage = () => {
         {/* Header */}
         <div className="cart-header">
           <h1>سلة التسوق</h1>
-=        </div>
+        </div>
         
         <div className="cart-main-content">
           {/* Cart Items */}

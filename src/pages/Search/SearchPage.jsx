@@ -7,6 +7,8 @@ import {
   faStar,
   faHeart,
   faShoppingCart,
+  faTools,
+  faTruck,
 } from "@fortawesome/free-solid-svg-icons";
 import "./SearchPage.css";
 import searchService from "../../services/searchService";
@@ -16,6 +18,18 @@ import serviceBuilderService from "../../services/serviceBuilderService";
 // Define a base64 encoded placeholder image to avoid external requests
 const PLACEHOLDER_IMAGE_SMALL =
   "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZWVlZWVlIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMThweCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgYWxpZ25tZW50LWJhc2VsaW5lPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmaWxsPSIjOTk5OTk5Ij5ObyBJbWFnZTwvdGV4dD48L3N2Zz4=";
+
+/** Build expected delivery text from lead days when API doesn't return expected_delivery_text */
+function buildDeliveryText(min, max) {
+  if (min == null || min === undefined) return null;
+  const minNum = parseInt(min, 10);
+  if (Number.isNaN(minNum) || minNum < 0) return null;
+  const maxNum = max != null && max !== "" ? parseInt(max, 10) : null;
+  if (maxNum != null && !Number.isNaN(maxNum) && maxNum > minNum) {
+    return `${minNum}-${maxNum} days`;
+  }
+  return minNum === 1 ? "1 day" : `${minNum} days`;
+}
 
 const SearchPage = () => {
   const [searchParams] = useSearchParams();
@@ -90,6 +104,8 @@ const SearchPage = () => {
                 product.stock_quantity !== undefined
                   ? product.stock_quantity
                   : null,
+              isFreeDelivery: !!product.is_free_delivery,
+              expectedDeliveryText: product.expected_delivery_text || buildDeliveryText(product.delivery_lead_days, product.delivery_lead_days_max) || null,
             };
           });
 
@@ -384,62 +400,76 @@ const SearchPage = () => {
                     <h2 className="section-title">
                       الخدمات ({services.length})
                     </h2>
-                    {services.map((service) => {
-                      const slug =
-                        service.slug ||
-                        (service.name
-                          ? service.name.toLowerCase().replace(/\s+/g, "-")
-                          : "service");
-                      const serviceProductsList =
-                        serviceProducts[service.id] || [];
-                      const isLoadingProducts =
-                        loadingServiceProducts[service.id];
+                    <div className="services-grid">
+                      {services.map((service) => {
+                        const serviceProductsList =
+                          serviceProducts[service.id] || [];
+                        const isLoadingProducts =
+                          loadingServiceProducts[service.id];
+                        const serviceImage = getServiceImage(service);
+                        const imageUrl = serviceImage
+                          ? serviceBuilderService.getImageUrl(serviceImage)
+                          : null;
+                        const serviceDiscount = service.discount || 0;
 
-                      return (
-                        <div key={service.id} className="service-with-products">
-                          <Link
-                            to={`/services2/${service.id}-${slug}`}
-                            className="service-card"
-                          >
-                            <div className="service-image">
-                              {getServiceImage(service) ? (
-                                <img
-                                  src={serviceBuilderService.getImageUrl(
-                                    getServiceImage(service)
-                                  )}
-                                  alt={service.name}
-                                  onError={(e) => {
-                                    e.target.onerror = null;
-                                    e.target.src = PLACEHOLDER_IMAGE_SMALL;
-                                  }}
-                                />
-                              ) : (
-                                <div className="service-image-placeholder">
-                                  <FontAwesomeIcon icon={faShoppingBag} />
-                                </div>
-                              )}
-                            </div>
-                            <div className="service-content">
-                              <h3 className="service-title">{service.name}</h3>
-                              {service.category && (
-                                <p className="service-category">
-                                  {service.category.name}
-                                </p>
-                              )}
-                              {service.description && (
-                                <p className="service-description">
-                                  {service.description.substring(0, 100)}...
-                                </p>
-                              )}
-                              {service.base_price > 0 && (
-                                <div className="service-price">
-                                  <span className="price-value">
-                                    {service.base_price} درهم
+                        return (
+                          <div key={service.id} className="service-with-products">
+                            <Link
+                              to={`/services2/${service.id}`}
+                              className="product-card"
+                            >
+                              <div className="product-image-container">
+                                {imageUrl ? (
+                                  <img
+                                    src={imageUrl}
+                                    alt={service.name}
+                                    className="product-image"
+                                    onError={(e) => {
+                                      e.target.onerror = null;
+                                      e.target.src = PLACEHOLDER_IMAGE_SMALL;
+                                    }}
+                                    loading="lazy"
+                                  />
+                                ) : (
+                                  <div className="product-image-placeholder">
+                                    <FontAwesomeIcon icon={faTools} />
+                                  </div>
+                                )}
+
+                                {/* Discount Badge */}
+                                {serviceDiscount > 0 && (
+                                  <span className="product-badge discount-badge">
+                                    {serviceDiscount}% OFF
                                   </span>
+                                )}
+
+                                {/* Deal Banner */}
+                                {serviceDiscount > 0 && (
+                                  <div className="product-deal-banner">Deal</div>
+                                )}
+                              </div>
+
+                              <div className="product-details">
+                                <h3 className="product-name">{service.name}</h3>
+                                {service.description && (
+                                  <p className="product-description">
+                                    {service.description.substring(0, 80)}...
+                                  </p>
+                                )}
+
+                                {/* Rating Section */}
+                                <div className="product-rating-section">
+                                  <span className="review-count">(0)</span>
+                                  <span className="rating-value">
+                                    {(service.rating || 0).toFixed(1)}
+                                  </span>
+                                  <FontAwesomeIcon
+                                    icon={faStar}
+                                    className="rating-star"
+                                  />
                                 </div>
-                              )}
-                            </div>
-                          </Link>
+                              </div>
+                            </Link>
 
                           {/* Service Products */}
                           {isLoadingProducts ? (
@@ -529,6 +559,7 @@ const SearchPage = () => {
                         </div>
                       );
                     })}
+                    </div>
                   </div>
                 )}
 
@@ -659,19 +690,18 @@ const SearchPage = () => {
                             </div>
                             {/* Delivery Information */}
                             <div className="product-delivery-info">
-                              <div className="delivery-availability">
-                                <FontAwesomeIcon
-                                  icon={faShoppingBag}
-                                  className="delivery-icon"
-                                />
-                                <span>بتخلص بسرعة</span>
-                              </div>
-                              <div className="delivery-express">
-                                <FontAwesomeIcon
-                                  icon={faBolt}
-                                  className="delivery-lightning-icon"
-                                />
-                                <span>يوصلك في {getDeliveryDate()}</span>
+                              {product.isFreeDelivery && (
+                                <div className="delivery-free" title="توصيل مجاني">
+                                  <FontAwesomeIcon
+                                    icon={faTruck}
+                                    className="delivery-icon"
+                                  />
+                                  <span>توصيل مجاني</span>
+                                </div>
+                              )}
+                              <div className="delivery-express delivery-timeline" title={`التوصيل خلال ${(product.expectedDeliveryText || "3-4 days").replace(/\bday\b/gi, "يوم").replace(/\bdays\b/gi, "أيام")}`}>
+                                <FontAwesomeIcon icon={faTruck} className="delivery-lightning-icon" />
+                                <span>{(product.expectedDeliveryText || "3-4 days").replace(/\bday\b/gi, "يوم").replace(/\bdays\b/gi, "أيام")}</span>
                               </div>
                             </div>
                             {product.tags && product.tags.length > 0 && (

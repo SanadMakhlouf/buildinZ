@@ -868,6 +868,44 @@
   gap: 1rem;
 }
 
+/* Category carousel navigation arrows */
+.noon-category-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: white;
+  border: 1px solid #e5e5e5;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  z-index: 10;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.noon-category-nav:hover {
+  background: #f8f9fa;
+  border-color: #dee2e6;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.noon-category-nav-left {
+  left: -8px;
+}
+
+.noon-category-nav-right {
+  right: -8px;
+}
+
+.noon-categories-scroll-with-nav {
+  padding: 0 36px;
+}
+
 .noon-scroll-btn {
   width: 44px;
   height: 44px;
@@ -890,6 +928,11 @@
   background: #f5f5f5;
   border-color: #d0d0d0;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: scale(1.05);
+}
+
+.noon-scroll-btn:active {
+  transform: scale(0.95);
 }
 
 .noon-scroll-btn svg {
@@ -898,10 +941,12 @@
 
 .noon-scroll-right {
   order: 1;
+  margin-left: 8px;
 }
 
 .noon-scroll-left {
   order: 3;
+  margin-right: 8px;
 }
 
 .noon-categories-scroll {
@@ -1675,6 +1720,8 @@
   margin-top: 0.5rem;
 }
 
+.delivery-free,
+.delivery-lead,
 .delivery-availability {
   display: flex;
   align-items: center;

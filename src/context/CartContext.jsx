@@ -26,7 +26,9 @@ export const CartProvider = ({ children }) => {
         const parsedCart = JSON.parse(savedCart);
         return {
           items: parsedCart.reduce((total, item) => total + item.quantity, 0),
-          price: parsedCart.reduce((total, item) => total + (item.price * item.quantity), 0)
+          price: Math.round(
+            parsedCart.reduce((total, item) => total + item.price * item.quantity, 0)
+          )
         };
       }
       return { items: 0, price: 0 };
@@ -40,9 +42,11 @@ export const CartProvider = ({ children }) => {
   useEffect(() => {
     localStorage.setItem('cart', JSON.stringify(cart));
     
-    // Calculate cart totals
+    // Calculate cart totals (rounded for consistency across display)
     const itemCount = cart.reduce((total, item) => total + item.quantity, 0);
-    const totalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+    const totalPrice = Math.round(
+      cart.reduce((total, item) => total + item.price * item.quantity, 0)
+    );
     
     setCartTotal({
       items: itemCount,

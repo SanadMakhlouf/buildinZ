@@ -115,7 +115,13 @@ export const addressService = {
             if (window.google && window.google.maps) {
               const geocoder = new window.google.maps.Geocoder();
               
-              geocoder.geocode({ location: { lat: latitude, lng: longitude } }, (results, status) => {
+              geocoder.geocode(
+                {
+                  location: { lat: latitude, lng: longitude },
+                  region: 'ae',
+                  language: 'ar'
+                },
+                (results, status) => {
                 if (status === 'OK' && results[0]) {
                   const addressResult = results[0];
                   
