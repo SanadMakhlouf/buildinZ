@@ -523,17 +523,6 @@ const ServicesPage2 = () => {
                           </p>
                         )}
 
-                        {/* Rating Section */}
-                        <div className="product-rating-section">
-                          <span className="review-count">(0)</span>
-                          <span className="rating-value">
-                            {(service.rating || 0).toFixed(1)}
-                          </span>
-                          <FontAwesomeIcon
-                            icon={faStar}
-                            className="rating-star"
-                          />
-                        </div>
                       </div>
                     </div>
                   );
@@ -636,17 +625,6 @@ const ServicesPage2 = () => {
                           </p>
                         )}
 
-                        {/* Rating Section */}
-                        <div className="product-rating-section">
-                          <span className="review-count">(0)</span>
-                          <span className="rating-value">
-                            {(service.rating || 0).toFixed(1)}
-                          </span>
-                          <FontAwesomeIcon
-                            icon={faStar}
-                            className="rating-star"
-                          />
-                        </div>
                       </div>
                     </div>
                   );

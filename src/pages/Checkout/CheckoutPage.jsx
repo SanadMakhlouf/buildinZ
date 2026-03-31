@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet';
 import config from '../../config/apiConfig';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -26,6 +27,7 @@ import profileService from '../../services/profileService';
 import './CheckoutPage.css';
 
 const CheckoutPage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { cart, cartTotal, clearCart } = useCart();
@@ -87,11 +89,11 @@ const CheckoutPage = () => {
           setNotes(data.data.order.notes);
         }
       } else {
-        setError('لم نتمكن من العثور على الطلب المطلوب');
+        setError(t('checkout.orderNotFound'));
       }
     } catch (err) {
       console.error('Error fetching order:', err);
-      setError('حدث خطأ أثناء جلب بيانات الطلب');
+      setError(t('checkout.fetchError'));
     } finally {
       setLoadingExistingOrder(false);
     }
@@ -327,7 +329,7 @@ const CheckoutPage = () => {
   // Payment Success Page
   if (paymentStatus === 'success') {
     return (
-      <div className="checkout-page" dir="rtl">
+      <div className="checkout-page" >
         <div className="checkout-container">
           <div className="checkout-result checkout-success">
             <div className="result-icon success">
@@ -353,7 +355,7 @@ const CheckoutPage = () => {
   // Payment Failure Page
   if (paymentStatus === 'failure') {
     return (
-      <div className="checkout-page" dir="rtl">
+      <div className="checkout-page" >
         <div className="checkout-container">
           <div className="checkout-result checkout-failure">
             <div className="result-icon failure">
@@ -379,7 +381,7 @@ const CheckoutPage = () => {
   // Payment Redirect
   if (redirectingToPayment && paymentLink) {
     return (
-      <div className="checkout-page" dir="rtl">
+      <div className="checkout-page" >
         <div className="checkout-container">
           <div className="checkout-redirect">
             <div className="result-icon processing">
@@ -404,7 +406,7 @@ const CheckoutPage = () => {
   // Order Success
   if (orderSuccess && orderData) {
     return (
-      <div className="checkout-page" dir="rtl">
+      <div className="checkout-page" >
         <div className="checkout-container">
           <div className="checkout-result checkout-success">
             <div className="result-icon success">
@@ -447,7 +449,7 @@ const CheckoutPage = () => {
   // Auth Required
   if (!authService.isAuthenticated()) {
     return (
-      <div className="checkout-page" dir="rtl">
+      <div className="checkout-page" >
         <div className="checkout-container">
           <div className="checkout-auth">
             <div className="auth-icon">
@@ -485,7 +487,7 @@ const CheckoutPage = () => {
   }
   
   return (
-    <div className="checkout-page" dir="rtl">
+    <div className="checkout-page" >
       <Helmet>
         <title>إتمام الشراء | BuildingZ</title>
         <meta name="description" content="أكمل عملية الشراء في BuildingZ - دفع آمن وتوصيل سريع" />

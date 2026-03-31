@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useSearchParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -14,6 +15,7 @@ import "./SearchPage.css";
 import searchService from "../../services/searchService";
 import config from "../../config/apiConfig";
 import serviceBuilderService from "../../services/serviceBuilderService";
+import { getDeliveryDate, formatDeliveryDate } from "../../utils/deliveryUtils";
 
 // Define a base64 encoded placeholder image to avoid external requests
 const PLACEHOLDER_IMAGE_SMALL =
@@ -32,6 +34,7 @@ function buildDeliveryText(min, max) {
 }
 
 const SearchPage = () => {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q") || "";
   const [isLoading, setIsLoading] = useState(true);
@@ -106,6 +109,9 @@ const SearchPage = () => {
                   : null,
               isFreeDelivery: !!product.is_free_delivery,
               expectedDeliveryText: product.expected_delivery_text || buildDeliveryText(product.delivery_lead_days, product.delivery_lead_days_max) || null,
+              estimatedDeliveryDate: product.estimated_delivery_date || null,
+              delivery_lead_days: product.delivery_lead_days,
+              delivery_lead_days_max: product.delivery_lead_days_max,
             };
           });
 
@@ -457,17 +463,6 @@ const SearchPage = () => {
                                   </p>
                                 )}
 
-                                {/* Rating Section */}
-                                <div className="product-rating-section">
-                                  <span className="review-count">(0)</span>
-                                  <span className="rating-value">
-                                    {(service.rating || 0).toFixed(1)}
-                                  </span>
-                                  <FontAwesomeIcon
-                                    icon={faStar}
-                                    className="rating-star"
-                                  />
-                                </div>
                               </div>
                             </Link>
 
@@ -645,23 +640,6 @@ const SearchPage = () => {
                               </p>
                             )}
 
-                            {/* Rating Section */}
-                            {(product.rating > 0 ||
-                              product.reviewCount > 0) && (
-                              <div className="product-rating-section">
-                                <span className="review-count">
-                                  ({product.reviewCount || 0})
-                                </span>
-                                <span className="rating-value">
-                                  {(product.rating || 0).toFixed(1)}
-                                </span>
-                                <FontAwesomeIcon
-                                  icon={faStar}
-                                  className="rating-star"
-                                />
-                              </div>
-                            )}
-
                             <div className="product-price-section">
                               <div className="product-price">
                                 {product.originalPrice &&
@@ -699,9 +677,13 @@ const SearchPage = () => {
                                   <span>توصيل مجاني</span>
                                 </div>
                               )}
-                              <div className="delivery-express delivery-timeline" title={`التوصيل خلال ${(product.expectedDeliveryText || "3-4 days").replace(/\bday\b/gi, "يوم").replace(/\bdays\b/gi, "أيام")}`}>
+                              <div className="delivery-express delivery-timeline" title={formatDeliveryDate(getDeliveryDate(product)) ? `${t('home.getItBy')} ${formatDeliveryDate(getDeliveryDate(product))}` : ''}>
                                 <FontAwesomeIcon icon={faTruck} className="delivery-lightning-icon" />
-                                <span>{(product.expectedDeliveryText || "3-4 days").replace(/\bday\b/gi, "يوم").replace(/\bdays\b/gi, "أيام")}</span>
+                                <span>
+                                  {formatDeliveryDate(getDeliveryDate(product))
+                                    ? `${t('home.getItBy')} ${formatDeliveryDate(getDeliveryDate(product))}`
+                                    : (product.expectedDeliveryText || "3-4 days").replace(/\bday\b/gi, "يوم").replace(/\bdays\b/gi, "أيام")}
+                                </span>
                               </div>
                             </div>
                             {product.tags && product.tags.length > 0 && (

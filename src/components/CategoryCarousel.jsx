@@ -1,4 +1,5 @@
 import React, { useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -22,6 +23,7 @@ const CategoryCarousel = ({
   onCategoryClick,
   selectedCategory = null,
 }) => {
+  const { t } = useTranslation();
   const categoryScrollRef = useRef(null);
 
   // Default category icons mapping
@@ -110,20 +112,20 @@ const CategoryCarousel = ({
   };
 
   return (
-    <section className="noon-categories-section" aria-label="الفئات">
+    <section className="noon-categories-section" aria-label={t('categories.ariaLabel')}>
       <div className="noon-section-container">
         <div className="noon-categories-wrapper">
           <button
             className="noon-category-nav noon-category-nav-left"
             onClick={() => scrollCategories("left")}
-            aria-label="تمرير لليسار"
+            aria-label={t('categories.scrollLeft')}
           >
             <FontAwesomeIcon icon={faChevronLeft} />
           </button>
           <button
             className="noon-category-nav noon-category-nav-right"
             onClick={() => scrollCategories("right")}
-            aria-label="تمرير لليمين"
+            aria-label={t('categories.scrollRight')}
           >
             <FontAwesomeIcon icon={faChevronRight} />
           </button>
@@ -213,7 +215,7 @@ const CategoryCarousel = ({
                   color: "#666",
                 }}
               >
-                <p>لا توجد فئات متاحة حالياً</p>
+                <p>{t('categories.noCategories')}</p>
               </div>
             )}
           </div>

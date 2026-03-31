@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import { motion, AnimatePresence } from 'framer-motion';
 import authService from '../../../services/authService';
 import './LoginPage.css';
 import './ForgotPassword.css';
 
 const ResetPassword = () => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -43,9 +46,9 @@ const ResetPassword = () => {
       }));
     } else {
       // If token or email is missing, show error
-      setApiError('رابط إعادة تعيين كلمة المرور غير صالح أو منتهي الصلاحية.');
+      setApiError(t('resetPassword.errors.invalidLink'));
     }
-  }, [location]);
+  }, [location, t]);
 
   // Password strength and requirements checker
   useEffect(() => {
@@ -94,21 +97,21 @@ const ResetPassword = () => {
     const newErrors = {};
     
     if (!formData.password) {
-      newErrors.password = 'كلمة المرور مطلوبة';
+      newErrors.password = t('resetPassword.validation.passwordRequired');
     } else if (formData.password.length < 8) {
-      newErrors.password = 'كلمة المرور يجب أن تكون 8 أحرف على الأقل';
+      newErrors.password = t('resetPassword.validation.passwordMin');
     } else if (!passwordRequirements.uppercase || !passwordRequirements.lowercase) {
-      newErrors.password = 'كلمة المرور يجب أن تحتوي على حروف كبيرة وصغيرة';
+      newErrors.password = t('resetPassword.validation.passwordUpperLower');
     } else if (!passwordRequirements.number) {
-      newErrors.password = 'كلمة المرور يجب أن تحتوي على رقم واحد على الأقل';
+      newErrors.password = t('resetPassword.validation.passwordNumber');
     } else if (!passwordRequirements.special) {
-      newErrors.password = 'كلمة المرور يجب أن تحتوي على رمز خاص واحد على الأقل';
+      newErrors.password = t('resetPassword.validation.passwordSpecial');
     }
     
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'تأكيد كلمة المرور مطلوب';
+      newErrors.confirmPassword = t('resetPassword.validation.confirmRequired');
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'كلمات المرور غير متطابقة';
+      newErrors.confirmPassword = t('resetPassword.validation.passwordsMismatch');
     }
     
     setErrors(newErrors);
@@ -134,7 +137,7 @@ const ResetPassword = () => {
           // Show success message
           setResetSuccess(true);
         } else {
-          setApiError(response.message || 'حدث خطأ أثناء إعادة تعيين كلمة المرور. يرجى المحاولة مرة أخرى.');
+          setApiError(response.message || t('resetPassword.errors.resetFailed'));
         }
       } catch (error) {
         // Handle validation errors
@@ -143,7 +146,7 @@ const ResetPassword = () => {
           const newErrors = {};
           
           if (validationErrors.token) {
-            setApiError('رابط إعادة تعيين كلمة المرور غير صالح أو منتهي الصلاحية.');
+            setApiError(t('resetPassword.errors.invalidLink'));
           } else if (validationErrors.email) {
             newErrors.email = validationErrors.email[0];
           } else if (validationErrors.password) {
@@ -152,9 +155,9 @@ const ResetPassword = () => {
           
           setErrors(newErrors);
         } else if (error.response?.data?.code === 'PASSWORD_RESET_FAILED') {
-          setApiError('رابط إعادة تعيين كلمة المرور غير صالح أو منتهي الصلاحية.');
+          setApiError(t('resetPassword.errors.invalidLink'));
         } else {
-          setApiError('حدث خطأ أثناء إعادة تعيين كلمة المرور. يرجى المحاولة مرة أخرى.');
+          setApiError(t('resetPassword.errors.resetFailed'));
         }
       } finally {
         setIsLoading(false);
@@ -166,13 +169,13 @@ const ResetPassword = () => {
     switch (passwordStrength) {
       case 0:
       case 1:
-        return 'ضعيفة';
+        return t('signupPage.passwordStrength.weak');
       case 2:
-        return 'متوسطة';
+        return t('signupPage.passwordStrength.medium');
       case 3:
-        return 'قوية';
+        return t('signupPage.passwordStrength.strong');
       case 4:
-        return 'قوية جداً';
+        return t('signupPage.passwordStrength.veryStrong');
       default:
         return '';
     }
@@ -196,6 +199,12 @@ const ResetPassword = () => {
 
   return (
     <div className="auth-page">
+      <Helmet>
+        <title>{t('resetPassword.title')} | BuildingZ</title>
+        <meta name="description" content={t('resetPassword.subtitle')} />
+        <meta name="robots" content="noindex, nofollow" />
+        <link rel="canonical" href="https://buildingzuae.com/reset-password" />
+      </Helmet>
       {/* Simple Background */}
       <div className="auth-bg"></div>
 
@@ -210,7 +219,7 @@ const ResetPassword = () => {
           <span className="logo-text">BuildingZ</span>
         </Link>
         <Link to="/login" className="back-link">
-          العودة لتسجيل الدخول
+          {t('resetPassword.backToLogin')}
         </Link>
       </motion.nav>
 
@@ -234,10 +243,10 @@ const ResetPassword = () => {
                 <div className="success-icon">
                   <i className="fas fa-check-circle"></i>
                 </div>
-                <h2>تم إعادة تعيين كلمة المرور</h2>
-                <p>تم إعادة تعيين كلمة المرور الخاصة بك بنجاح. يمكنك الآن تسجيل الدخول باستخدام كلمة المرور الجديدة.</p>
+                <h2>{t('resetPassword.successTitle')}</h2>
+                <p>{t('resetPassword.successMessage')}</p>
                 <Link to="/login" className="return-login-btn">
-                  تسجيل الدخول
+                  {t('resetPassword.login')}
                 </Link>
               </motion.div>
             ) : (
@@ -249,8 +258,8 @@ const ResetPassword = () => {
               >
                 {/* Header */}
                 <div className="auth-header">
-                  <h1>إعادة تعيين كلمة المرور</h1>
-                  <p>أدخل كلمة المرور الجديدة لحسابك</p>
+                  <h1>{t('resetPassword.title')}</h1>
+                  <p>{t('resetPassword.subtitle')}</p>
                 </div>
 
                 {/* API Error Message */}
@@ -275,7 +284,7 @@ const ResetPassword = () => {
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      placeholder="البريد الإلكتروني"
+                      placeholder={t('resetPassword.emailPlaceholder')}
                       readOnly
                       className="readonly-input"
                     />
@@ -300,7 +309,7 @@ const ResetPassword = () => {
                         name="password"
                         value={formData.password}
                         onChange={handleChange}
-                        placeholder="كلمة المرور الجديدة"
+                        placeholder={t('resetPassword.newPasswordPlaceholder')}
                         className={errors.password ? 'error' : ''}
                         autoComplete="new-password"
                       />
@@ -308,7 +317,7 @@ const ResetPassword = () => {
                         type="button"
                         className="password-toggle"
                         onClick={() => setShowPassword(!showPassword)}
-                        aria-label={showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
+                        aria-label={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}
                       >
                         <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
                       </button>
@@ -344,23 +353,23 @@ const ResetPassword = () => {
                         </div>
                         
                         <div className="password-requirements">
-                          <p>يجب أن تحتوي كلمة المرور على:</p>
+                          <p>{t('resetPassword.requirements')}</p>
                           <ul>
                             <li className={passwordRequirements.length ? 'met' : ''}>
                               <i className={`fas ${passwordRequirements.length ? 'fa-check' : 'fa-times'}`}></i>
-                              8 أحرف على الأقل
+                              {t('resetPassword.minChars')}
                             </li>
                             <li className={(passwordRequirements.uppercase && passwordRequirements.lowercase) ? 'met' : ''}>
                               <i className={`fas ${(passwordRequirements.uppercase && passwordRequirements.lowercase) ? 'fa-check' : 'fa-times'}`}></i>
-                              حروف كبيرة وصغيرة
+                              {t('resetPassword.upperLower')}
                             </li>
                             <li className={passwordRequirements.number ? 'met' : ''}>
                               <i className={`fas ${passwordRequirements.number ? 'fa-check' : 'fa-times'}`}></i>
-                              رقم واحد على الأقل
+                              {t('resetPassword.oneNumber')}
                             </li>
                             <li className={passwordRequirements.special ? 'met' : ''}>
                               <i className={`fas ${passwordRequirements.special ? 'fa-check' : 'fa-times'}`}></i>
-                              رمز خاص واحد على الأقل (!@#$%^&*)
+                              {t('resetPassword.oneSpecial')}
                             </li>
                           </ul>
                         </div>
@@ -375,7 +384,7 @@ const ResetPassword = () => {
                         name="confirmPassword"
                         value={formData.confirmPassword}
                         onChange={handleChange}
-                        placeholder="تأكيد كلمة المرور"
+                        placeholder={t('resetPassword.confirmPlaceholder')}
                         className={errors.confirmPassword ? 'error' : ''}
                         autoComplete="new-password"
                       />
@@ -383,7 +392,7 @@ const ResetPassword = () => {
                         type="button"
                         className="password-toggle"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        aria-label={showConfirmPassword ? "إخفاء تأكيد كلمة المرور" : "إظهار تأكيد كلمة المرور"}
+                        aria-label={showConfirmPassword ? t('signupPage.hideConfirmPassword') : t('signupPage.showConfirmPassword')}
                       >
                         <i className={`fas ${showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
                       </button>
@@ -412,10 +421,10 @@ const ResetPassword = () => {
                     {isLoading ? (
                       <>
                         <i className="fas fa-spinner fa-spin"></i>
-                        جاري إعادة التعيين...
+                        {t('resetPassword.resetting')}
                       </>
                     ) : (
-                      'إعادة تعيين كلمة المرور'
+                      t('resetPassword.submit')
                     )}
                   </motion.button>
                 </form>

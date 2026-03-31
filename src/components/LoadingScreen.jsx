@@ -1,7 +1,10 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import './LoadingScreen.css';
 
-const LoadingScreen = ({ message = "جاري التحميل..." }) => {
+const LoadingScreen = ({ message }) => {
+  const { t } = useTranslation();
+  const displayMessage = message ?? t('common.loading');
   return (
     <div className="loading-screen">
       {/* Animated Background */}
@@ -44,7 +47,7 @@ const LoadingScreen = ({ message = "جاري التحميل..." }) => {
 
         {/* Loading Message */}
         <div className="loading-message">
-          <h2>{message}</h2>
+          <h2>{displayMessage}</h2>
           <div className="loading-dots">
             <span></span>
             <span></span>

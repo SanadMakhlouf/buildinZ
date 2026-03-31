@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -6,6 +7,7 @@ import authService from '../../../services/authService';
 import './SignupPage.css';
 
 const SignupPage = () => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -61,31 +63,31 @@ const SignupPage = () => {
     const newErrors = {};
     
     if (!formData.fullName) {
-      newErrors.fullName = 'الاسم الكامل مطلوب';
+      newErrors.fullName = t('auth.validation.fullNameRequired');
     } else if (formData.fullName.length < 2) {
-      newErrors.fullName = 'الاسم يجب أن يكون حرفين على الأقل';
+      newErrors.fullName = t('auth.validation.fullNameMin');
     }
     
     if (!formData.email) {
-      newErrors.email = 'البريد الإلكتروني مطلوب';
+      newErrors.email = t('auth.validation.emailRequired');
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'البريد الإلكتروني غير صالح';
+      newErrors.email = t('auth.validation.emailInvalid');
     }
     
     if (!formData.password) {
-      newErrors.password = 'كلمة المرور مطلوبة';
+      newErrors.password = t('auth.validation.passwordRequired');
     } else if (formData.password.length < 6) {
-      newErrors.password = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+      newErrors.password = t('auth.validation.passwordMin');
     }
     
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'تأكيد كلمة المرور مطلوب';
+      newErrors.confirmPassword = t('auth.validation.confirmPasswordRequired');
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'كلمات المرور غير متطابقة';
+      newErrors.confirmPassword = t('auth.validation.passwordsMismatch');
     }
     
     if (!formData.agreeTerms) {
-      newErrors.agreeTerms = 'يجب الموافقة على الشروط والأحكام';
+      newErrors.agreeTerms = t('auth.validation.agreeTerms');
     }
     
     setErrors(newErrors);
@@ -115,7 +117,7 @@ const SignupPage = () => {
           setTimeout(() => {
             navigate(redirectPath, { 
               state: { 
-                message: 'تم إنشاء الحساب وتسجيل الدخول بنجاح!',
+                message: t('signupPage.successAndLoggedIn'),
                 type: 'success'
               } 
             });
@@ -128,7 +130,7 @@ const SignupPage = () => {
           setTimeout(() => {
             navigate(`/login?redirect=${encodeURIComponent(redirectPath)}`, { 
               state: { 
-                message: 'تم إنشاء الحساب بنجاح. يرجى تسجيل الدخول.',
+                message: t('signupPage.successPleaseLogin'),
                 type: 'info'
               } 
             });
@@ -174,13 +176,13 @@ const SignupPage = () => {
           if (errorData.message) {
             setApiError(errorData.message);
           } else {
-            setApiError('يرجى التحقق من البيانات المدخلة وإصلاح الأخطاء.');
+            setApiError(t('auth.validation.checkData'));
           }
         } else {
           // Handle other types of errors (network, server, etc.)
           const errorMessage = errorData?.message || 
                                errorData?.error ||
-                             'حدث خطأ أثناء إنشاء الحساب. يرجى المحاولة مرة أخرى.';
+                             t('auth.errors.signupFailed');
         setApiError(errorMessage);
         }
       } finally {
@@ -194,13 +196,13 @@ const SignupPage = () => {
     switch (passwordStrength) {
       case 0:
       case 1:
-        return 'ضعيفة';
+        return t('signupPage.passwordStrength.weak');
       case 2:
-        return 'متوسطة';
+        return t('signupPage.passwordStrength.medium');
       case 3:
-        return 'قوية';
+        return t('signupPage.passwordStrength.strong');
       case 4:
-        return 'قوية جداً';
+        return t('signupPage.passwordStrength.veryStrong');
       default:
         return '';
     }
@@ -225,8 +227,8 @@ const SignupPage = () => {
   return (
     <div className="auth-page">
       <Helmet>
-        <title>إنشاء حساب جديد | BuildingZ</title>
-        <meta name="description" content="أنشئ حساباً جديداً في BuildingZ للتسوق ومتابعة طلباتك" />
+        <title>{t('signupPage.title')} | BuildingZ</title>
+        <meta name="description" content={t('signupPage.description')} />
         <meta name="robots" content="noindex, nofollow" />
         <link rel="canonical" href="https://buildingzuae.com/signup" />
       </Helmet>
@@ -243,7 +245,7 @@ const SignupPage = () => {
       >
        
         <Link to="/" className="back-link">
-          العودة للرئيسية
+          {t('signupPage.backToHome')}
         </Link>
       </motion.nav>
 
@@ -267,8 +269,8 @@ const SignupPage = () => {
                 <div className="success-icon">
                   <i className="fas fa-check-circle"></i>
                 </div>
-                <h2>تم إنشاء الحساب بنجاح</h2>
-                <p>جاري تسجيل الدخول تلقائياً...</p>
+                <h2>{t('signupPage.successTitle')}</h2>
+                <p>{t('signupPage.redirecting')}</p>
               </motion.div>
             ) : (
               <motion.div
@@ -279,8 +281,8 @@ const SignupPage = () => {
               >
                 {/* Header */}
                 <div className="auth-header">
-                  <h1>إنشاء حساب جديد</h1>
-                  <p>أنشئ حسابك للوصول إلى جميع خدماتنا</p>
+                  <h1>{t('signupPage.title')}</h1>
+                  <p>{t('signupPage.subtitle')}</p>
                 </div>
 
                 {/* API Error Message */}
@@ -305,7 +307,7 @@ const SignupPage = () => {
                       name="fullName"
                       value={formData.fullName}
                       onChange={handleChange}
-                      placeholder="الاسم الكامل"
+                      placeholder={t('signupPage.fullNamePlaceholder')}
                       className={errors.fullName ? 'error' : ''}
                       autoComplete="name"
                     />
@@ -329,7 +331,7 @@ const SignupPage = () => {
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      placeholder="البريد الإلكتروني"
+                      placeholder={t('signupPage.emailPlaceholder')}
                       className={errors.email ? 'error' : ''}
                       autoComplete="email"
                     />
@@ -354,7 +356,7 @@ const SignupPage = () => {
                         name="password"
                         value={formData.password}
                         onChange={handleChange}
-                        placeholder="كلمة المرور"
+                        placeholder={t('signupPage.passwordPlaceholder')}
                         className={errors.password ? 'error' : ''}
                         autoComplete="new-password"
                       />
@@ -362,7 +364,7 @@ const SignupPage = () => {
                         type="button"
                         className="password-toggle"
                         onClick={() => setShowPassword(!showPassword)}
-                        aria-label={showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
+                        aria-label={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}
                       >
                         <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
                       </button>
@@ -405,7 +407,7 @@ const SignupPage = () => {
                         name="confirmPassword"
                         value={formData.confirmPassword}
                         onChange={handleChange}
-                        placeholder="تأكيد كلمة المرور"
+                        placeholder={t('signupPage.confirmPasswordPlaceholder')}
                         className={errors.confirmPassword ? 'error' : ''}
                         autoComplete="new-password"
                       />
@@ -413,7 +415,7 @@ const SignupPage = () => {
                         type="button"
                         className="password-toggle"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        aria-label={showConfirmPassword ? "إخفاء تأكيد كلمة المرور" : "إظهار تأكيد كلمة المرور"}
+                        aria-label={showConfirmPassword ? t('auth.hidePassword') : t('auth.showPassword')}
                       >
                         <i className={`fas ${showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
                       </button>
@@ -441,7 +443,7 @@ const SignupPage = () => {
                         onChange={handleChange}
                       />
                       <span>
-                        أوافق على <Link to="/terms" className="terms-link">الشروط والأحكام</Link> و <Link to="/privacy" className="terms-link">سياسة الخصوصية</Link>
+                        {t('signupPage.agreeTerms')} <Link to="/terms" className="terms-link">{t('signupPage.terms')}</Link> {t('signupPage.and')} <Link to="/privacy" className="terms-link">{t('signupPage.privacyPolicy')}</Link>
                       </span>
                     </label>
                     <AnimatePresence>
@@ -468,18 +470,18 @@ const SignupPage = () => {
                     {isLoading ? (
                       <>
                         <i className="fas fa-spinner fa-spin"></i>
-                        جاري إنشاء الحساب...
+                        {t('signupPage.creatingAccount')}
                       </>
                     ) : (
-                      'إنشاء حساب'
+                      t('signupPage.submit')
                     )}
                   </motion.button>
                 </form>
 
                 {/* Footer */}
                 <div className="auth-footer">
-                  <span>لديك حساب بالفعل؟</span>
-                  <Link to="/login" className="switch-link">تسجيل الدخول</Link>
+                  <span>{t('signupPage.hasAccount')}</span>
+                  <Link to="/login" className="switch-link">{t('signupPage.login')}</Link>
                 </div>
               </motion.div>
             )}

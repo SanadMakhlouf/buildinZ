@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import "../styles/Sidebar.css";
 import { motion, AnimatePresence } from "framer-motion";
 import dataService from "../services/dataService";
@@ -9,6 +10,7 @@ const Sidebar = ({
   selectedCategory,
   onCategorySelect,
 }) => {
+  const { t } = useTranslation();
   const [expandedCategory, setExpandedCategory] = useState(null);
   const [expandedSubcategory, setExpandedSubcategory] = useState(null);
   const [activeService, setActiveService] = useState(null);
@@ -117,11 +119,11 @@ const Sidebar = ({
   return (
     <div className="sidebar">
       <div className="sidebar-header">
-        <h2>حاسبة التكاليف</h2>
+        <h2>{t('sidebar.costCalculator')}</h2>
         <div className="search-container">
           <input
             type="text"
-            placeholder="بحث..."
+            placeholder={t('sidebar.searchPlaceholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
@@ -237,7 +239,7 @@ const Sidebar = ({
                                 className="no-services"
                                 variants={itemVariants}
                               >
-                                لا توجد خدمات متاحة
+                                {t('sidebar.noServices')}
                               </motion.div>
                             )}
                           </motion.div>
@@ -253,7 +255,7 @@ const Sidebar = ({
 
         {filteredCategories.length === 0 && (
           <div className="no-results">
-            <p>لا توجد نتائج مطابقة للبحث</p>
+            <p>{t('sidebar.noSearchResults')}</p>
           </div>
         )}
       </div>

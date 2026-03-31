@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
@@ -14,6 +15,7 @@ import notificationService from '../services/notificationService';
 import './NotificationDropdown.css';
 
 const NotificationDropdown = ({ isOpen, onClose, onToggle }) => {
+  const { t } = useTranslation();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -163,13 +165,13 @@ const NotificationDropdown = ({ isOpen, onClose, onToggle }) => {
   return (
     <div className="notification-dropdown" ref={dropdownRef}>
       <div className="notification-header">
-        <h3>الإشعارات</h3>
+        <h3>{t('notificationDropdown.title')}</h3>
         <div className="notification-actions">
           {unreadCount > 0 && (
             <button 
               className="mark-all-read-btn"
               onClick={handleMarkAllAsRead}
-              title="تحديد الكل كمقروء"
+              title={t('notificationDropdown.markAllRead')}
             >
               <FontAwesomeIcon icon={faCheckDouble} />
             </button>
@@ -177,7 +179,7 @@ const NotificationDropdown = ({ isOpen, onClose, onToggle }) => {
           <button 
             className="close-dropdown-btn"
             onClick={onClose}
-            title="إغلاق"
+            title={t('notificationDropdown.close')}
           >
             <FontAwesomeIcon icon={faTimes} />
           </button>
@@ -188,12 +190,12 @@ const NotificationDropdown = ({ isOpen, onClose, onToggle }) => {
         {loading && notifications.length === 0 ? (
           <div className="notification-loading">
             <div className="loading-spinner"></div>
-            <p>جاري تحميل الإشعارات...</p>
+            <p>{t('notificationDropdown.loading')}</p>
           </div>
         ) : notifications.length === 0 ? (
           <div className="no-notifications">
             <FontAwesomeIcon icon={faBell} className="no-notifications-icon" />
-            <p>لا توجد إشعارات</p>
+            <p>{t('notificationDropdown.empty')}</p>
           </div>
         ) : (
           <>
@@ -213,7 +215,7 @@ const NotificationDropdown = ({ isOpen, onClose, onToggle }) => {
                   
                   <div className="notification-content">
                     <div className="notification-title">
-                      {notification.data?.title || 'إشعار جديد'}
+                      {notification.data?.title || t('notificationDropdown.newNotification')}
                     </div>
                     <div className="notification-message">
                       {notification.data?.message}
@@ -228,7 +230,7 @@ const NotificationDropdown = ({ isOpen, onClose, onToggle }) => {
                       <button
                         className="mark-read-btn"
                         onClick={(e) => handleMarkAsRead(notification.id, e)}
-                        title="تحديد كمقروء"
+                        title={t('notificationDropdown.markRead')}
                       >
                         <FontAwesomeIcon icon={faCheck} />
                       </button>
@@ -237,7 +239,7 @@ const NotificationDropdown = ({ isOpen, onClose, onToggle }) => {
                     <button
                       className="delete-btn"
                       onClick={(e) => handleDeleteNotification(notification.id, e)}
-                      title="حذف"
+                      title={t('notificationDropdown.delete')}
                     >
                       <FontAwesomeIcon icon={faTrash} />
                     </button>
@@ -246,7 +248,7 @@ const NotificationDropdown = ({ isOpen, onClose, onToggle }) => {
                       <FontAwesomeIcon 
                         icon={faExternalLinkAlt} 
                         className="action-indicator"
-                        title="انقر للعرض"
+                        title={t('notificationDropdown.clickToView')}
                       />
                     )}
                   </div>
@@ -265,7 +267,7 @@ const NotificationDropdown = ({ isOpen, onClose, onToggle }) => {
                   onClick={loadMore}
                   disabled={loading}
                 >
-                  {loading ? 'جاري التحميل...' : 'تحميل المزيد'}
+                  {loading ? t('common.loading') : t('notificationDropdown.loadMore')}
                 </button>
               </div>
             )}
@@ -279,7 +281,7 @@ const NotificationDropdown = ({ isOpen, onClose, onToggle }) => {
           className="view-all-btn"
           onClick={onClose}
         >
-          عرض جميع الإشعارات
+          {t('notificationDropdown.viewAll')}
         </Link>
       </div>
     </div>

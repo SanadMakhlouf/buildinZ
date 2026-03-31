@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faEye, faEyeSlash, faArrowRight, faKey } from '@fortawesome/free-solid-svg-icons';
@@ -8,6 +9,7 @@ import authService from '../services/authService';
 import './AuthModal.css';
 
 const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [mode, setMode] = useState(initialMode); // 'login' or 'signup'
   const [step, setStep] = useState(1); // 1: email, 2: password/form
@@ -88,9 +90,9 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
     const email = formData.email.trim();
     
     if (!email) {
-      newErrors.email = 'البريد الإلكتروني مطلوب';
+      newErrors.email = t('auth.validation.emailRequired');
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'البريد الإلكتروني غير صالح';
+      newErrors.email = t('auth.validation.emailInvalid');
     }
     
     setErrors(newErrors);
@@ -101,9 +103,9 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
     const newErrors = {};
     
     if (!formData.password) {
-      newErrors.password = 'كلمة المرور مطلوبة';
+      newErrors.password = t('auth.validation.passwordRequired');
     } else if (formData.password.length < 6) {
-      newErrors.password = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+      newErrors.password = t('auth.validation.passwordMin');
     }
     
     setErrors(newErrors);
@@ -114,25 +116,25 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
     const newErrors = {};
     
     if (!formData.fullName) {
-      newErrors.fullName = 'الاسم الكامل مطلوب';
+      newErrors.fullName = t('auth.validation.fullNameRequired');
     } else if (formData.fullName.length < 2) {
-      newErrors.fullName = 'الاسم يجب أن يكون حرفين على الأقل';
+      newErrors.fullName = t('auth.validation.fullNameMin');
     }
     
     if (!formData.password) {
-      newErrors.password = 'كلمة المرور مطلوبة';
+      newErrors.password = t('auth.validation.passwordRequired');
     } else if (formData.password.length < 6) {
-      newErrors.password = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+      newErrors.password = t('auth.validation.passwordMin');
     }
     
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'تأكيد كلمة المرور مطلوب';
+      newErrors.confirmPassword = t('auth.validation.confirmPasswordRequired');
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'كلمات المرور غير متطابقة';
+      newErrors.confirmPassword = t('auth.validation.passwordsMismatch');
     }
     
     if (!formData.agreeTerms) {
-      newErrors.agreeTerms = 'يجب الموافقة على الشروط والأحكام';
+      newErrors.agreeTerms = t('auth.validation.agreeTerms');
     }
     
     setErrors(newErrors);
@@ -175,7 +177,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
           }, 500);
         } catch (error) {
           const errorMessage = error.response?.data?.message || 
-                             'حدث خطأ أثناء تسجيل الدخول. يرجى المحاولة مرة أخرى.';
+                             t('auth.errors.loginFailed');
           setApiError(errorMessage);
           setButtonClicked(false);
         } finally {
@@ -209,7 +211,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
             }, 500);
           } else {
             // Auto-login failed, show message
-            setSuccessMessage('تم إنشاء الحساب بنجاح. يرجى تسجيل الدخول.');
+            setSuccessMessage(t('auth.successMessage'));
             setButtonClicked(false);
             setTimeout(() => {
               setMode('login');
@@ -248,12 +250,12 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
             if (errorData.message) {
               setApiError(errorData.message);
             } else {
-              setApiError('يرجى التحقق من البيانات المدخلة وإصلاح الأخطاء.');
+              setApiError(t('auth.validation.checkData'));
             }
           } else {
             const errorMessage = errorData?.message || 
                                errorData?.error ||
-                               'حدث خطأ أثناء إنشاء الحساب. يرجى المحاولة مرة أخرى.';
+                               t('auth.errors.signupFailed');
             setApiError(errorMessage);
           }
           setButtonClicked(false);
@@ -289,13 +291,13 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
           exit={{ opacity: 0, scale: 0.9, y: 30 }}
           transition={{ type: "spring", damping: 25, stiffness: 300 }}
           onClick={(e) => e.stopPropagation()}
-          dir="rtl"
+          dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
         >
           {/* Close Button */}
           <motion.button 
             className="auth-modal-close" 
             onClick={onClose} 
-            aria-label="إغلاق"
+            aria-label={t('auth.close')}
             whileHover={{ scale: 1.1, rotate: 90 }}
             whileTap={{ scale: 0.9 }}
             transition={{ type: "spring", stiffness: 400, damping: 17 }}
@@ -310,7 +312,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.4 }}
           >
-            أهلاً بك! لنبدأ
+            {t('auth.welcome')}
           </motion.h2>
 
           {/* Mode Toggle Buttons */}
@@ -324,13 +326,13 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
               className={`toggle-btn ${mode === 'login' ? 'active' : ''}`}
               onClick={() => handleModeToggle('login')}
             >
-              تسجيل الدخول
+              {t('auth.login')}
             </button>
             <button
               className={`toggle-btn ${mode === 'signup' ? 'active' : ''}`}
               onClick={() => handleModeToggle('signup')}
             >
-              إنشاء حساب
+              {t('auth.signup')}
             </button>
           </motion.div>
 
@@ -388,10 +390,10 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      placeholder="يرجى إدخال البريد الإلكتروني"
+                      placeholder={t('auth.emailPlaceholder')}
                       className={errors.email ? 'error' : ''}
                       autoComplete="email"
-                      dir="rtl"
+                      dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
                     />
                     {errors.email && (
                       <motion.span 
@@ -418,18 +420,18 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                     {isLoading ? (
                       <>
                         <i className="fas fa-spinner fa-spin"></i>
-                        جاري المعالجة...
+                        {t('auth.processing')}
                       </>
                     ) : (
                       <>
-                        متابعة
+                        {t('auth.continue')}
                         <FontAwesomeIcon icon={faArrowRight} className="btn-arrow" />
                       </>
                     )}
                   </motion.button>
 
                   <motion.p className="auth-divider" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
-                    أو
+                    {t('auth.or')}
                   </motion.p>
 
                   <motion.button
@@ -441,7 +443,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                       try {
                         await authService.initiateGoogleLogin();
                       } catch (err) {
-                        setApiError(err.message || 'فشل تسجيل الدخول بـ Google');
+                        setApiError(err.message || t('auth.errors.googleFailed'));
                         setIsLoading(false);
                       }
                     }}
@@ -451,7 +453,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                     transition={{ delay: 0.25, duration: 0.4 }}
                   >
                     <FontAwesomeIcon icon={faGoogleBrand} />
-                    {mode === 'login' ? 'تسجيل الدخول باستخدام Google' : 'إنشاء حساب باستخدام Google'}
+                    {mode === 'login' ? t('auth.loginWithGoogle') : t('auth.signupWithGoogle')}
                   </motion.button>
 
                   {mode === 'login' && (
@@ -471,7 +473,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                         }}
                       >
                         <FontAwesomeIcon icon={faKey} className="auth-forgot-icon" />
-                        نسيت كلمة المرور؟
+                        {t('auth.forgotPassword')}
                       </button>
                     </motion.div>
                   )}
@@ -483,9 +485,9 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.4, duration: 0.4 }}
                   >
-                    بالمتابعة، أؤكد أنني قد قرأت{' '}
+                    {t('auth.privacyText')}{' '}
                     <a href="/privacy" className="auth-privacy-link" onClick={(e) => e.stopPropagation()}>
-                      سياسة الخصوصية
+                      {t('auth.privacyPolicy')}
                     </a>
                   </motion.p>
                 </>
@@ -503,10 +505,10 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                         name="fullName"
                         value={formData.fullName}
                         onChange={handleChange}
-                        placeholder="الاسم الكامل"
+                        placeholder={t('auth.fullNamePlaceholder')}
                         className={errors.fullName ? 'error' : ''}
                         autoComplete="name"
-                        dir="rtl"
+                        dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
                       />
                       {errors.fullName && (
                         <motion.span 
@@ -533,16 +535,16 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                         name="password"
                         value={formData.password}
                         onChange={handleChange}
-                        placeholder="كلمة المرور"
+                        placeholder={t('auth.passwordPlaceholder')}
                         className={errors.password ? 'error' : ''}
                         autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-                        dir="rtl"
+                        dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
                       />
                       <button
                         type="button"
                         className="password-toggle-btn"
                         onClick={() => setShowPassword(!showPassword)}
-                        aria-label={showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
+                        aria-label={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}
                       >
                         <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                       </button>
@@ -574,7 +576,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                           }}
                         >
                           <FontAwesomeIcon icon={faKey} className="auth-forgot-icon" />
-                          نسيت كلمة المرور؟
+                          {t('auth.forgotPassword')}
                         </button>
                       </motion.div>
                     )}
@@ -594,16 +596,16 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                             name="confirmPassword"
                             value={formData.confirmPassword}
                             onChange={handleChange}
-                            placeholder="تأكيد كلمة المرور"
+                            placeholder={t('auth.confirmPasswordPlaceholder')}
                             className={errors.confirmPassword ? 'error' : ''}
                             autoComplete="new-password"
-                            dir="rtl"
+                            dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
                           />
                           <button
                             type="button"
                             className="password-toggle-btn"
                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            aria-label={showConfirmPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
+                            aria-label={showConfirmPassword ? t('auth.hidePassword') : t('auth.showPassword')}
                           >
                             <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} />
                           </button>
@@ -635,7 +637,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                           />
                           <span className="auth-checkbox-custom"></span>
                           <span className="auth-checkbox-text">
-                            أوافق على <a href="/terms" className="auth-privacy-link">الشروط والأحكام</a> و <a href="/privacy" className="auth-privacy-link">سياسة الخصوصية</a>
+                            {t('auth.termsAndPrivacy')} <a href="/terms" className="auth-privacy-link">{t('auth.terms')}</a> {t('auth.and')} <a href="/privacy" className="auth-privacy-link">{t('auth.privacyPolicy')}</a>
                           </span>
                         </label>
                         {errors.agreeTerms && (
@@ -665,11 +667,11 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                     {isLoading ? (
                       <>
                         <i className="fas fa-spinner fa-spin"></i>
-                        {mode === 'login' ? 'جاري تسجيل الدخول...' : 'جاري إنشاء الحساب...'}
+                        {mode === 'login' ? t('auth.loggingIn') : t('auth.creatingAccount')}
                       </>
                     ) : (
                       <>
-                        متابعة
+                        {t('auth.continue')}
                         <FontAwesomeIcon icon={faArrowRight} className="btn-arrow" />
                       </>
                     )}
@@ -688,7 +690,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                     whileHover={{ scale: 1.02, backgroundColor: "#f0f0f0" }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    رجوع
+                    {t('auth.back')}
                   </motion.button>
                 </>
               )}

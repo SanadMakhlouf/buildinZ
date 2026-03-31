@@ -27,9 +27,12 @@ import {
 import { faHeart as faHeartOutline } from "@fortawesome/free-regular-svg-icons";
 import { useCart } from "../../context/CartContext";
 import productService from "../../services/productService";
+import { useTranslation } from "react-i18next";
+import { getDeliveryDate, formatDeliveryDate } from "../../utils/deliveryUtils";
 import "./ProductDetailPage.css";
 
 const ProductDetailPage = () => {
+  const { t } = useTranslation();
   const { productId } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
@@ -108,12 +111,13 @@ const ProductDetailPage = () => {
   };
 
   const increaseQuantity = () => {
-    const max = selectedVariant
+    if (!product) return;
+    const maxFromStock = selectedVariant
       ? (selectedVariant.stock_quantity ?? selectedVariant.stockQuantity ?? 0)
       : (product?.stock_quantity ?? 0);
-    if (product && max > 0 && quantity < max) {
-      setQuantity(quantity + 1);
-    }
+    const mode = selectedVariant?.availability_mode ?? product?.availability_mode ?? "quantity";
+    const max = mode === "quantity" ? maxFromStock : Number.POSITIVE_INFINITY;
+    if (quantity < max) setQuantity(quantity + 1);
   };
 
   const decreaseQuantity = () => {
@@ -126,7 +130,14 @@ const ProductDetailPage = () => {
     const stock = selectedVariant
       ? (selectedVariant.stock_quantity ?? selectedVariant.stockQuantity ?? 0)
       : (product?.stock_quantity ?? 0);
-    if (product && stock > 0) {
+    const mode = selectedVariant?.availability_mode ?? product?.availability_mode ?? "quantity";
+    const apiAvailable =
+      product?.is_available_for_purchase ??
+      product?.is_available ??
+      (product?.availability_status === "available" ? true : undefined);
+    const isAvailable =
+      mode === "availability" ? (apiAvailable ?? stock > 0) : stock > 0;
+    if (product && isAvailable) {
       const price = selectedVariant
         ? parseFloat(selectedVariant.price)
         : parseFloat(product.price);
@@ -144,7 +155,7 @@ const ProductDetailPage = () => {
         price,
         image: variantImage || image,
         vendor: product.vendor_profile?.business_name || "",
-        stockQuantity: stock,
+        stockQuantity: mode === "quantity" ? stock : undefined,
         category: product.category?.name || "",
         variantAttributes: selectedVariant?.attributes || selectedVariant?.variant_attributes,
       };
@@ -208,7 +219,7 @@ const ProductDetailPage = () => {
   const getDeliveryDate = () => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    return tomorrow.toLocaleDateString("ar-SA", {
+    return tomorrow.toLocaleDateString("en-US", {
       weekday: "long",
       day: "numeric",
       month: "long",
@@ -252,6 +263,18 @@ const ProductDetailPage = () => {
   const effectiveStock = selectedVariant
     ? (selectedVariant.stock_quantity ?? selectedVariant.stockQuantity ?? 0)
     : (product.stock_quantity ?? 0);
+  const availabilityMode =
+    selectedVariant?.availability_mode ??
+    product.availability_mode ??
+    "quantity";
+  const apiAvailable =
+    product.is_available_for_purchase ??
+    product.is_available ??
+    (product.availability_status === "available" ? true : undefined);
+  const effectiveAvailable =
+    availabilityMode === "availability"
+      ? (apiAvailable ?? effectiveStock > 0)
+      : effectiveStock > 0;
   const variantImages =
     selectedVariant &&
     selectedVariant.images &&
@@ -307,7 +330,7 @@ const ProductDetailPage = () => {
       "priceCurrency": "AED",
       "price": parseFloat(product.price),
       "priceValidUntil": new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      "availability": product.stock_quantity > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      "availability": effectiveAvailable ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
       "seller": {
         "@type": "Organization",
         "name": product.vendor?.name || "BuildingZ UAE"
@@ -354,7 +377,7 @@ const ProductDetailPage = () => {
   };
 
   return (
-    <div className="pdp-page" dir="rtl">
+    <div className="pdp-page">
       <Helmet>
         {/* Primary Meta Tags */}
         <title>{pageTitle}</title>
@@ -378,7 +401,7 @@ const ProductDetailPage = () => {
         {/* Product OG Tags */}
         <meta property="product:price:amount" content={product.price} />
         <meta property="product:price:currency" content="AED" />
-        <meta property="product:availability" content={product.stock_quantity > 0 ? "in stock" : "out of stock"} />
+        <meta property="product:availability" content={effectiveAvailable ? "in stock" : "out of stock"} />
         
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
@@ -491,21 +514,6 @@ const ProductDetailPage = () => {
             {/* Title */}
             <h1 className="pdp-title">{product.name}</h1>
 
-            {/* Rating */}
-            <div className="pdp-rating">
-              <div className="pdp-stars">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <FontAwesomeIcon
-                    key={star}
-                    icon={faStar}
-                    className={star <= Math.round(parseFloat(displayRating)) ? 'filled' : ''}
-                  />
-                ))}
-              </div>
-              <span className="pdp-rating-value">{displayRating}</span>
-              <span className="pdp-rating-count">({displayReviewCount} تقييم)</span>
-            </div>
-
             {/* Variant Selector */}
             {variants.length > 0 && (
               <div className="pdp-variants">
@@ -540,35 +548,39 @@ const ProductDetailPage = () => {
             <div className="pdp-price-section">
               <div className="pdp-price-main">
                 <span className="pdp-price-value">
-                  {effectivePrice.toLocaleString("ar-SA")}
+                  {effectivePrice.toLocaleString("en-US")}
                 </span>
                 <span className="pdp-price-currency">درهم</span>
               </div>
               {discount > 0 && (
                 <div className="pdp-price-old">
                   <span className="pdp-original-price">
-                    {parseFloat(product.original_price).toLocaleString('ar-SA')} درهم
+                    {parseFloat(product.original_price).toLocaleString('en-US')} درهم
                   </span>
                   <span className="pdp-savings">
-                    وفر {(parseFloat(product.original_price) - parseFloat(product.price)).toLocaleString('ar-SA')} درهم
+                    وفر {(parseFloat(product.original_price) - parseFloat(product.price)).toLocaleString('en-US')} درهم
                   </span>
                 </div>
               )}
             </div>
 
             {/* Stock Status */}
-            <div className={`pdp-stock ${effectiveStock > 0 ? 'in-stock' : 'out-of-stock'}`}>
-              {effectiveStock > 0 ? (
+            <div className={`pdp-stock ${effectiveAvailable ? 'in-stock' : 'out-of-stock'}`}>
+              {effectiveAvailable ? (
                 <>
                   <FontAwesomeIcon icon={faCheckCircle} />
                   <span>متوفر في المخزون</span>
-                  <span className="pdp-stock-quantity">
-                    ({effectiveStock} قطعة متوفرة)
-                  </span>
-                  {effectiveStock <= 10 && (
-                    <span className="pdp-low-stock">
-                      (كمية محدودة)
-                    </span>
+                  {availabilityMode === "quantity" && (
+                    <>
+                      <span className="pdp-stock-quantity">
+                        ({effectiveStock} قطعة متوفرة)
+                      </span>
+                      {effectiveStock <= 10 && (
+                        <span className="pdp-low-stock">
+                          (كمية محدودة)
+                        </span>
+                      )}
+                    </>
                   )}
                 </>
               ) : (
@@ -581,27 +593,12 @@ const ProductDetailPage = () => {
 
             {/* Delivery Info */}
             <div className="pdp-delivery-info">
-              {product.expected_delivery_text && (
-                <div className="pdp-delivery-lead">
-                  <FontAwesomeIcon icon={faTruck} />
-                  <span>
-                    التوصيل خلال{" "}
-                    {product.expected_delivery_text
-                      .replace(/\bday\b/gi, "يوم")
-                      .replace(/\bdays\b/gi, "أيام")}
-                  </span>
-                </div>
-              )}
-              {product.estimated_delivery_date && (
+              {formatDeliveryDate(getDeliveryDate(product)) && (
                 <div className="pdp-delivery-date">
                   <FontAwesomeIcon icon={faTruck} />
                   <span>
-                    التوصيل المتوقع:{" "}
-                    {new Date(product.estimated_delivery_date).toLocaleDateString("ar-SA", {
-                      weekday: "long",
-                      day: "numeric",
-                      month: "long",
-                    })}
+                    {t('home.getItBy')}{" "}
+                    {formatDeliveryDate(getDeliveryDate(product))}
                   </span>
                 </div>
               )}
@@ -614,7 +611,7 @@ const ProductDetailPage = () => {
             </div>
 
             {/* Quantity & Add to Cart */}
-            {effectiveStock > 0 && (
+            {effectiveAvailable && (
               <div className="pdp-actions">
                 <div className="pdp-quantity">
                   <span className="pdp-quantity-label">الكمية:</span>
@@ -623,7 +620,10 @@ const ProductDetailPage = () => {
                       <FontAwesomeIcon icon={faMinus} />
                     </button>
                     <span className="pdp-quantity-value">{quantity}</span>
-                    <button onClick={increaseQuantity} disabled={quantity >= effectiveStock}>
+                    <button
+                      onClick={increaseQuantity}
+                      disabled={availabilityMode === "quantity" ? quantity >= effectiveStock : false}
+                    >
                       <FontAwesomeIcon icon={faPlus} />
                     </button>
                   </div>
@@ -696,12 +696,6 @@ const ProductDetailPage = () => {
             >
               المواصفات
             </button>
-            <button 
-              className={`pdp-tab ${activeTab === 'reviews' ? 'active' : ''}`}
-              onClick={() => setActiveTab('reviews')}
-            >
-              التقييمات ({displayReviewCount})
-            </button>
           </div>
 
           <div className="pdp-tab-content">
@@ -729,8 +723,12 @@ const ProductDetailPage = () => {
                   
                   <div className="pdp-info-item">
                     <span className="pdp-info-label">التوفر</span>
-                    <span className={`pdp-info-value ${product.stock_quantity > 0 ? 'stock-available' : 'stock-unavailable'}`}>
-                      {product.stock_quantity > 0 ? `${product.stock_quantity} قطعة متوفرة` : 'غير متوفر'}
+                    <span className={`pdp-info-value ${effectiveAvailable ? 'stock-available' : 'stock-unavailable'}`}>
+                      {effectiveAvailable
+                        ? availabilityMode === "quantity"
+                          ? `${effectiveStock} قطعة متوفرة`
+                          : "متوفر"
+                        : "غير متوفر"}
                     </span>
                   </div>
 
@@ -828,38 +826,6 @@ const ProductDetailPage = () => {
               </div>
             )}
 
-            {activeTab === 'reviews' && (
-              <div className="pdp-reviews-content">
-                {product.reviews && product.reviews.length > 0 ? (
-                  <div className="pdp-reviews-list">
-                    {product.reviews.map((review, index) => (
-                      <div key={index} className="pdp-review-item">
-                        <div className="pdp-review-header">
-                          <div className="pdp-review-stars">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <FontAwesomeIcon
-                                key={star}
-                                icon={faStar}
-                                className={star <= review.rating ? 'filled' : ''}
-                              />
-                            ))}
-                          </div>
-                          <span className="pdp-review-author">{review.user_name || 'مستخدم'}</span>
-                        </div>
-                        {review.comment && (
-                          <p className="pdp-review-comment">{review.comment}</p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="pdp-no-reviews">
-                    <FontAwesomeIcon icon={faStar} />
-                    <p>لا توجد تقييمات بعد. كن أول من يقيّم هذا المنتج!</p>
-                  </div>
-                )}
-              </div>
-            )}
           </div>
         </div>
       </div>

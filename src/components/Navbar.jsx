@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import "../styles/Navbar.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -19,6 +20,8 @@ import { useCart } from "../context/CartContext";
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
+  const SHOW_LANGUAGE_SWITCH = false; // Set to true to re-enable
   const { cartTotal } = useCart();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -26,7 +29,6 @@ const Navbar = () => {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState("login");
   const [searchQuery, setSearchQuery] = useState("");
-  const [language, setLanguage] = useState("ar"); // "ar" for Arabic (UAE), "en" for English (USA)
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -79,9 +81,8 @@ const Navbar = () => {
   };
 
   const handleLanguageSelect = (lang) => {
-    setLanguage(lang);
+    i18n.changeLanguage(lang);
     setLanguageMenuOpen(false);
-    // TODO: Implement language switching logic
   };
 
   // Close language menu when clicking outside
@@ -104,7 +105,6 @@ const Navbar = () => {
     <>
       <header
         className={`navbar ${scrolled ? "navbar-scrolled" : ""}`}
-        dir="rtl"
         role="banner"
       >
         <div className="navbar-container">
@@ -114,7 +114,7 @@ const Navbar = () => {
               <Link
                 to="/"
                 className="logo-link"
-                aria-label="BuildingZ - الصفحة الرئيسية"
+                aria-label={t("nav.homeAria")}
               >
                 <img
                   src="/assets/logo.png"
@@ -128,10 +128,10 @@ const Navbar = () => {
           {/* Links between logo and search */}
           <div className="navbar-center-links">
             <Link to="/services2" className="navbar-center-link">
-              خدمات
+              {t("nav.services")}
             </Link>
             <Link to="/products" className="navbar-center-link">
-              متجر
+              {t("nav.store")}
             </Link>
           </div>
 
@@ -143,16 +143,16 @@ const Navbar = () => {
                 <input
                   type="text"
                   className="navbar-search-input"
-                  placeholder="ما الذي تبحث عنه؟"
+                  placeholder={t("nav.searchPlaceholder")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={handleSearchKeyPress}
-                  aria-label="البحث"
+                  aria-label={t("nav.search")}
                 />
                 <button
                   type="submit"
                   className="search-submit-button"
-                  aria-label="ابحث"
+                  aria-label={t("nav.searchSubmit")}
                   onClick={handleSearchSubmit}
                 >
                   <FontAwesomeIcon icon={faSearch} />
@@ -163,20 +163,21 @@ const Navbar = () => {
 
           {/* Left Section: Language Flag, User, Cart & Favorites */}
           <div className="navbar-left">
-            {/* Language Flag Selector */}
+            {/* Language Flag Selector - disabled for now */}
+            {SHOW_LANGUAGE_SWITCH && (
             <div className="navbar-language-dropdown">
               <button
                 className="navbar-language-flag-button"
                 onClick={() => setLanguageMenuOpen(!languageMenuOpen)}
-                aria-label="اختر اللغة"
+                aria-label={t("nav.selectLanguage")}
               >
                 <img
                   src={
-                    language === "ar"
+                    i18n.language === "ar"
                       ? "https://flagcdn.com/w40/ae.png"
                       : "https://flagcdn.com/w40/us.png"
                   }
-                  alt={language === "ar" ? "UAE Flag" : "USA Flag"}
+                  alt={i18n.language === "ar" ? "UAE Flag" : "USA Flag"}
                   className="language-flag"
                 />
                 <FontAwesomeIcon
@@ -190,7 +191,7 @@ const Navbar = () => {
                 <div className="language-dropdown-menu">
                   <button
                     className={`language-option ${
-                      language === "ar" ? "active" : ""
+                      i18n.language === "ar" ? "active" : ""
                     }`}
                     onClick={() => handleLanguageSelect("ar")}
                   >
@@ -199,11 +200,11 @@ const Navbar = () => {
                       alt="UAE Flag"
                       className="language-flag-small"
                     />
-                    <span>العربية</span>
+                    <span>{t("nav.arabic")}</span>
                   </button>
                   <button
                     className={`language-option ${
-                      language === "en" ? "active" : ""
+                      i18n.language === "en" ? "active" : ""
                     }`}
                     onClick={() => handleLanguageSelect("en")}
                   >
@@ -212,11 +213,12 @@ const Navbar = () => {
                       alt="USA Flag"
                       className="language-flag-small"
                     />
-                    <span>English</span>
+                    <span>{t("nav.english")}</span>
                   </button>
                 </div>
               )}
             </div>
+            )}
 
             <div className="navbar-divider"></div>
 
@@ -225,10 +227,10 @@ const Navbar = () => {
               <Link
                 to="/profile"
                 className="navbar-user-button"
-                aria-label="الملف الشخصي"
+                aria-label={t("nav.profile")}
               >
                 <FontAwesomeIcon icon={faUser} />
-                <span className="user-text">الملف الشخصي</span>
+                <span className="user-text">{t("nav.profile")}</span>
               </Link>
             ) : (
               <button
@@ -237,10 +239,10 @@ const Navbar = () => {
                   setAuthModalOpen(true);
                 }}
                 className="navbar-user-button"
-                aria-label="تسجيل الدخول"
+                aria-label={t("nav.login")}
               >
                 <FontAwesomeIcon icon={faUser} />
-                <span className="user-text">تسجيل الدخول</span>
+                <span className="user-text">{t("nav.login")}</span>
               </button>
             )}
 
@@ -250,14 +252,14 @@ const Navbar = () => {
             <Link
               to="/favorites"
               className="navbar-icon-button"
-              aria-label="المفضلة"
+              aria-label={t("nav.favorites")}
             >
               <FontAwesomeIcon icon={faHeart} />
             </Link>
             <Link
               to="/cart"
               className="navbar-icon-button cart-button"
-              aria-label="سلة التسوق"
+              aria-label={t("nav.cart")}
             >
               <FontAwesomeIcon icon={faShoppingBag} />
               {cartTotal.items > 0 && (
@@ -269,7 +271,7 @@ const Navbar = () => {
             <button
               className={`mobile-menu-toggle ${mobileMenuOpen ? "active" : ""}`}
               onClick={toggleMobileMenu}
-              aria-label="القائمة"
+              aria-label={t("nav.menu")}
             >
               <FontAwesomeIcon icon={mobileMenuOpen ? faTimes : faBars} />
             </button>
@@ -279,24 +281,24 @@ const Navbar = () => {
         <div
           className={`mobile-menu ${mobileMenuOpen ? "open" : ""}`}
           role="navigation"
-          aria-label="القائمة المحمولة"
+          aria-label={t("nav.mobileMenu")}
         >
           <div className="mobile-menu-container">
             <form className="mobile-search-form" onSubmit={handleSearchSubmit}>
               <div className="mobile-search">
                 <input
                   type="text"
-                  placeholder="ما الذي تبحث عنه؟"
+                  placeholder={t("nav.searchPlaceholder")}
                   className="mobile-search-input"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={handleSearchKeyPress}
-                  aria-label="البحث"
+                  aria-label={t("nav.search")}
                 />
                 <button
                   type="submit"
                   className="mobile-search-button"
-                  aria-label="ابحث"
+                  aria-label={t("nav.searchSubmit")}
                   onClick={handleSearchSubmit}
                 >
                   <FontAwesomeIcon icon={faSearch} />
@@ -304,13 +306,14 @@ const Navbar = () => {
               </div>
             </form>
 
-            {/* Language Selector in Mobile Menu */}
+            {/* Language Selector in Mobile Menu - disabled for now */}
+            {SHOW_LANGUAGE_SWITCH && (
             <div className="mobile-language-selector">
-              <div className="mobile-language-label">اختر اللغة</div>
+              <div className="mobile-language-label">{t("nav.selectLanguage")}</div>
               <div className="mobile-language-options">
                 <button
                   className={`mobile-language-option ${
-                    language === "ar" ? "active" : ""
+                    i18n.language === "ar" ? "active" : ""
                   }`}
                   onClick={() => {
                     handleLanguageSelect("ar");
@@ -322,11 +325,11 @@ const Navbar = () => {
                     alt="UAE Flag"
                     className="mobile-language-flag"
                   />
-                  <span>العربية</span>
+                  <span>{t("nav.arabic")}</span>
                 </button>
                 <button
                   className={`mobile-language-option ${
-                    language === "en" ? "active" : ""
+                    i18n.language === "en" ? "active" : ""
                   }`}
                   onClick={() => {
                     handleLanguageSelect("en");
@@ -338,33 +341,34 @@ const Navbar = () => {
                     alt="USA Flag"
                     className="mobile-language-flag"
                   />
-                  <span>English</span>
+                  <span>{t("nav.english")}</span>
                 </button>
               </div>
             </div>
+            )}
 
             <nav
               className="mobile-nav"
               role="navigation"
-              aria-label="القائمة المحمولة"
+              aria-label={t("nav.mobileMenu")}
             >
               <Link to="/" className="mobile-nav-link">
-                الرئيسية
+                {t("nav.home")}
               </Link>
               <Link to="/services" className="mobile-nav-link">
-                الخدمات
+                {t("nav.services")}
               </Link>
               <Link to="/products" className="mobile-nav-link">
-                المتجر
+                {t("nav.store")}
               </Link>
               <Link to="/track-order" className="mobile-nav-link">
-                تتبع الطلب
+                {t("nav.trackOrder")}
               </Link>
               <Link to="/about" className="mobile-nav-link">
-                من نحن
+                {t("nav.about")}
               </Link>
               <Link to="/favorites" className="mobile-nav-link">
-                المفضلة
+                {t("nav.favorites")}
               </Link>
             </nav>
           </div>

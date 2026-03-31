@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -28,6 +29,7 @@ import { useCart } from "../../context/CartContext";
 import config from "../../config/apiConfig";
 import CategoryCarousel from "../../components/CategoryCarousel";
 import serviceBuilderService from "../../services/serviceBuilderService";
+import { getDeliveryDate, formatDeliveryDate } from "../../utils/deliveryUtils";
 import "./ProductsPage.css";
 import "../Home/HomePage.css"; // For category carousel styles
 
@@ -44,6 +46,7 @@ function buildDeliveryText(min, max) {
 }
 
 const ProductsPage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { addToCart } = useCart();
@@ -95,9 +98,7 @@ const ProductsPage = () => {
     return cleaned || fallback;
   };
 
-  // Pagination
-  const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 24;
+  // Pagination removed (show all filtered products)
 
   // Fetch products
   const fetchProducts = useCallback(async () => {
@@ -217,6 +218,8 @@ const ProductsPage = () => {
                 isFreeDelivery: !!product.is_free_delivery,
                 estimatedDeliveryDate: product.estimated_delivery_date || null,
                 expectedDeliveryText: product.expected_delivery_text || buildDeliveryText(product.delivery_lead_days, product.delivery_lead_days_max) || null,
+                delivery_lead_days: product.delivery_lead_days,
+                delivery_lead_days_max: product.delivery_lead_days_max,
               };
             } catch (mapError) {
               console.error("Error mapping product:", mapError, product);
@@ -556,18 +559,7 @@ const ProductsPage = () => {
     sortBy,
   ]);
 
-  // Pagination
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
-  const paginatedProducts = useMemo(() => {
-    const startIndex = (currentPage - 1) * productsPerPage;
-    const endIndex = startIndex + productsPerPage;
-    return filteredProducts.slice(startIndex, endIndex);
-  }, [filteredProducts, currentPage, productsPerPage]);
-
-  // Reset pagination when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, selectedCategory, selectedBrands, priceRange, sortBy]);
+  // Pagination removed (show all filtered products)
 
   // Update URL params
   useEffect(() => {
@@ -762,16 +754,6 @@ const ProductsPage = () => {
             <p className="product-description">{product.description}</p>
           )}
 
-          {/* Rating Section */}
-          <div className="product-rating-section">
-            <span className="review-count">
-              ({formatReviewCount(product.reviewCount || 0)})
-            </span>
-            <span className="rating-value">
-              {(product.rating || 0).toFixed(1)}
-            </span>
-            <FontAwesomeIcon icon={faStar} className="rating-star" />
-          </div>
 
           {/* Price Section */}
           <div className="product-price-section">
@@ -807,12 +789,12 @@ const ProductsPage = () => {
                 <span>توصيل مجاني</span>
               </div>
             )}
-            <div className="delivery-express delivery-timeline" title={`التوصيل خلال ${(product.expectedDeliveryText || "3-4 days").replace(/\bday\b/gi, "يوم").replace(/\bdays\b/gi, "أيام")}`}>
+            <div className="delivery-express delivery-timeline" title={formatDeliveryDate(getDeliveryDate(product)) ? `${t('home.getItBy')} ${formatDeliveryDate(getDeliveryDate(product))}` : ''}>
               <FontAwesomeIcon icon={faTruck} className="delivery-lightning-icon" />
               <span>
-                {(product.expectedDeliveryText || "3-4 days")
-                  .replace(/\bday\b/gi, "يوم")
-                  .replace(/\bdays\b/gi, "أيام")}
+                {formatDeliveryDate(getDeliveryDate(product))
+                  ? `${t('home.getItBy')} ${formatDeliveryDate(getDeliveryDate(product))}`
+                  : (product.expectedDeliveryText || "3-4 days").replace(/\bday\b/gi, "يوم").replace(/\bdays\b/gi, "أيام")}
               </span>
             </div>
           </div>
@@ -1131,73 +1113,17 @@ const ProductsPage = () => {
           </div>
 
           {/* Products Grid/List */}
-          {paginatedProducts.length > 0 ? (
+          {filteredProducts.length > 0 ? (
             <>
               <div
                 className={`products-grid ${
                   viewMode === "list" ? "list-view" : ""
                 }`}
               >
-                {paginatedProducts.map((product) => (
+                {filteredProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
               </div>
-
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="products-pagination">
-                  <button
-                    className="pagination-btn"
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage((prev) => prev - 1)}
-                  >
-                    <FontAwesomeIcon icon={faChevronRight} />
-                    السابق
-                  </button>
-
-                  <div className="pagination-numbers">
-                    {[...Array(totalPages)].map((_, idx) => {
-                      const page = idx + 1;
-                      if (
-                        page === 1 ||
-                        page === totalPages ||
-                        (page >= currentPage - 1 && page <= currentPage + 1)
-                      ) {
-                        return (
-                          <button
-                            key={page}
-                            className={`pagination-number ${
-                              currentPage === page ? "active" : ""
-                            }`}
-                            onClick={() => setCurrentPage(page)}
-                          >
-                            {page}
-                          </button>
-                        );
-                      } else if (
-                        page === currentPage - 2 ||
-                        page === currentPage + 2
-                      ) {
-                        return (
-                          <span key={page} className="pagination-ellipsis">
-                            ...
-                          </span>
-                        );
-                      }
-                      return null;
-                    })}
-                  </div>
-
-                  <button
-                    className="pagination-btn"
-                    disabled={currentPage === totalPages}
-                    onClick={() => setCurrentPage((prev) => prev + 1)}
-                  >
-                    التالي
-                    <FontAwesomeIcon icon={faChevronLeft} />
-                  </button>
-                </div>
-              )}
             </>
           ) : (
             <div className="products-empty">
@@ -1277,17 +1203,6 @@ const ProductsPage = () => {
                         </p>
                       )}
 
-                      {/* Rating Section */}
-                      <div className="product-rating-section">
-                        <span className="review-count">(0)</span>
-                        <span className="rating-value">
-                          {(service.rating || 0).toFixed(1)}
-                        </span>
-                        <FontAwesomeIcon
-                          icon={faStar}
-                          className="rating-star"
-                        />
-                      </div>
                     </div>
                   </div>
                 );
@@ -1410,19 +1325,6 @@ const ProductsPage = () => {
                         </p>
                       )}
 
-                      {/* Rating Section */}
-                      <div className="product-rating-section">
-                        <span className="review-count">
-                          ({formatReviewCount(product.reviewCount || 0)})
-                        </span>
-                        <span className="rating-value">
-                          {(product.rating || 0).toFixed(1)}
-                        </span>
-                        <FontAwesomeIcon
-                          icon={faStar}
-                          className="rating-star"
-                        />
-                      </div>
 
                       {/* Price Section */}
                       <div className="product-price-section">
@@ -1463,9 +1365,13 @@ const ProductsPage = () => {
                             <span>توصيل مجاني</span>
                           </div>
                         )}
-                        <div className="delivery-express delivery-timeline" title={`التوصيل خلال ${(product.expectedDeliveryText || "3-4 days").replace(/\bday\b/gi, "يوم").replace(/\bdays\b/gi, "أيام")}`}>
+                        <div className="delivery-express delivery-timeline" title={formatDeliveryDate(getDeliveryDate(product)) ? `${t('home.getItBy')} ${formatDeliveryDate(getDeliveryDate(product))}` : ''}>
                           <FontAwesomeIcon icon={faTruck} className="delivery-lightning-icon" />
-                          <span>{(product.expectedDeliveryText || "3-4 days").replace(/\bday\b/gi, "يوم").replace(/\bdays\b/gi, "أيام")}</span>
+                          <span>
+                            {formatDeliveryDate(getDeliveryDate(product))
+                              ? `${t('home.getItBy')} ${formatDeliveryDate(getDeliveryDate(product))}`
+                              : (product.expectedDeliveryText || "3-4 days").replace(/\bday\b/gi, "يوم").replace(/\bdays\b/gi, "أيام")}
+                          </span>
                         </div>
                       </div>
                     </div>

@@ -1,6 +1,7 @@
 import axios from 'axios';
 import authService from './authService';
 import config from '../config/apiConfig';
+import i18n from '../i18n';
 
 console.log('Using API base URL:', config.API_BASE_URL);
 
@@ -37,7 +38,7 @@ api.interceptors.response.use(
     if (!error.response) {
       console.error('Network Error:', error.message);
       return Promise.reject({
-        message: 'لا يمكن الاتصال بالخادم. يرجى التحقق من اتصالك بالإنترنت.',
+        message: i18n.t('common.networkError'),
         originalError: error
       });
     }
@@ -72,11 +73,12 @@ api.interceptors.response.use(
 );
 
 // Helper function to handle API errors
-const handleApiError = (error, fallbackMessage = 'حدث خطأ. يرجى المحاولة مرة أخرى.') => {
-  if (error.message) {
+const handleApiError = (error, fallbackMessage) => {
+  const defaultMessage = fallbackMessage ?? i18n.t('common.error');
+  if (error?.message) {
     return error.message;
   }
-  return fallbackMessage;
+  return defaultMessage;
 };
 
 // Check if user is authenticated - use authService's implementation

@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { getDeliveryDate, formatDeliveryDate } from "../../utils/deliveryUtils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import SEO from "../../components/SEO/SEO";
 import {
@@ -58,6 +60,7 @@ function buildDeliveryText(min, max) {
 }
 
 const HomePage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const [productImageIndices, setProductImageIndices] = useState({});
@@ -113,14 +116,14 @@ const HomePage = () => {
 
   // Service all section rotating texts
   const serviceAllTexts = [
-    "ضمان الجودة",
-    "خدمات مضمونة 100%",
-    "خدمة سريعة",
-    "سرعة قصوى للوصول",
-    "دعم 24/7",
-    "خدمة عملاء متواصلة",
-    "فنيون محترفون",
-    "خبرة عالية وموثوقة",
+    t('home.serviceTexts.quality'),
+    t('home.serviceTexts.guaranteed'),
+    t('home.serviceTexts.fast'),
+    t('home.serviceTexts.speed'),
+    t('home.serviceTexts.support'),
+    t('home.serviceTexts.customerService'),
+    t('home.serviceTexts.professionals'),
+    t('home.serviceTexts.experience'),
   ];
   const [currentServiceTextIndex, setCurrentServiceTextIndex] = useState(0);
 
@@ -482,6 +485,9 @@ const HomePage = () => {
                   label: product.label || null,
                   isFreeDelivery: !!product.is_free_delivery,
                   expectedDeliveryText: product.expected_delivery_text || buildDeliveryText(product.delivery_lead_days, product.delivery_lead_days_max) || null,
+                  estimatedDeliveryDate: product.estimated_delivery_date || null,
+                  delivery_lead_days: product.delivery_lead_days,
+                  delivery_lead_days_max: product.delivery_lead_days_max,
                 })
               );
               setProducts(formattedProducts);
@@ -573,19 +579,30 @@ const HomePage = () => {
   useEffect(() => {
     const handleCategoryScroll = () => {
       if (categoryScrollRef.current) {
-        const scrollLeft = categoryScrollRef.current.scrollLeft;
-        const scrollWidth = categoryScrollRef.current.scrollWidth;
-        const clientWidth = categoryScrollRef.current.clientWidth;
+        const el = categoryScrollRef.current;
+        const scrollLeft = el.scrollLeft;
+        const scrollWidth = el.scrollWidth;
+        const clientWidth = el.clientWidth;
         const itemWidth = 140 + 16; // category width + gap
-        const containerWidth = categoryScrollRef.current.offsetWidth;
+        const containerWidth = el.offsetWidth;
         const visibleItems = Math.floor(containerWidth / itemWidth);
         const pageWidth = visibleItems * itemWidth;
-        const currentPage = Math.round(scrollLeft / pageWidth);
-        setCategoryPage(currentPage);
-        
-        // Check if we can scroll left or right
-        setCanScrollLeft(scrollLeft > 0);
-        setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10); // 10px threshold
+        const maxScroll = scrollWidth - clientWidth;
+        const isRtl = getComputedStyle(el).direction === "rtl";
+
+        setCategoryPage(Math.round(Math.abs(scrollLeft) / pageWidth));
+
+        if (isRtl) {
+          // RTL: scrollLeft starts at 0 (rightmost) and goes negative (leftmost)
+          // Left arrow = can scroll more to the left (further into content) = not at the end yet
+          // Right arrow = can scroll back to the right (toward start) = not at position 0
+          const absScroll = Math.abs(scrollLeft);
+          setCanScrollLeft(absScroll < maxScroll - 10);
+          setCanScrollRight(absScroll > 10);
+        } else {
+          setCanScrollLeft(scrollLeft > 10);
+          setCanScrollRight(scrollLeft < maxScroll - 10);
+        }
       }
     };
 
@@ -745,16 +762,6 @@ const HomePage = () => {
     };
   }, [autoScrollIntervals]);
 
-  // Calculate delivery date
-  const getDeliveryDate = () => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    return tomorrow.toLocaleDateString("en-US", {
-      day: "numeric",
-      month: "long",
-    });
-  };
-
   // Get image URL helper
   const getImageUrl = (imagePath, cacheBust = null) => {
     // Return null/undefined if no image path - let component handle fallback
@@ -837,7 +844,7 @@ const HomePage = () => {
   const handleNewsletterSubmit = (e) => {
     e.preventDefault();
     if (email) {
-      alert("تم الاشتراك بنجاح في النشرة الإخبارية!");
+      alert(t('home.newsletterSuccess'));
       setEmail("");
     }
   };
@@ -918,16 +925,16 @@ const HomePage = () => {
   return (
     <div className="noon-homepage" role="document">
       <SEO
-        title="الصفحة الرئيسية"
-        description="BuildingZ أكبر متجر إلكتروني لمواد البناء والديكور في الإمارات. تسوق الأثاث، الأدوات، مواد البناء والمزيد مع توصيل سريع لجميع أنحاء الإمارات."
-        keywords="مواد بناء, ديكور, أثاث, أدوات منزلية, تسوق أونلاين, الإمارات"
+        title={t('home.title')}
+        description={t('seo.defaultDescription')}
+        keywords={t('seo.defaultKeywords')}
         url="/"
       />
       {/* Service Categories Names (no images) */}
       {serviceCategoriesNames.length > 0 && (
-        <section className="noon-service-names-strip" aria-label="فئات الخدمات">
+        <section className="noon-service-names-strip" aria-label={t('home.serviceCategories')}>
           <div className="noon-section-container">
-            <div className="noon-service-names-wrapper" dir="rtl">
+            <div className="noon-service-names-wrapper">
               {/* Categories List */}
               <div className="noon-service-names-list">
                 {serviceCategoriesNames.map((cat) => (
@@ -950,7 +957,7 @@ const HomePage = () => {
               </div>
 
               {/* Scroll Arrow */}
-              <button className="service-scroll-arrow" aria-label="عرض المزيد">
+              <button className="service-scroll-arrow" aria-label={t('common.showMore')}>
                 <FontAwesomeIcon icon={faChevronLeft} />
               </button>
 
@@ -965,7 +972,7 @@ const HomePage = () => {
                   {/* Right Arrow Button */}
                   <button
                     className="service-nav-arrow service-nav-arrow-left"
-                    aria-label="التالي"
+                    aria-label={t('common.next')}
                     onClick={handleServiceTextNext}
                   >
                     <FontAwesomeIcon icon={faChevronRight} />
@@ -974,7 +981,7 @@ const HomePage = () => {
                   {/* Left Arrow Button */}
                   <button
                     className="service-nav-arrow service-nav-arrow-right"
-                    aria-label="السابق"
+                    aria-label={t('common.prev')}
                     onClick={handleServiceTextPrev}
                   >
                     <FontAwesomeIcon icon={faChevronLeft} />
@@ -993,7 +1000,7 @@ const HomePage = () => {
               onMouseLeave={handleMegaMenuLeave}
             >
               {loadingCategoryDetails ? (
-                <div className="mega-menu-loading">جاري التحميل...</div>
+                <div className="mega-menu-loading">{t('common.loading')}</div>
               ) : categoryDetails?.category ? (
                 <div className="mega-menu-content">
                   {/* Right Section: Subcategories List */}
@@ -1066,7 +1073,7 @@ const HomePage = () => {
                           alt={hoveredCategory.name}
                         />
                         <div className="mega-menu-cta">
-                          ابدأ مشوارك مع {hoveredCategory.name}
+                          {t('home.startWith')} {hoveredCategory.name}
                         </div>
                       </div>
                     </div>
@@ -1240,17 +1247,6 @@ const HomePage = () => {
       <section className="noon-categories-section" aria-label="الفئات">
         <div className="noon-section-container">
           <div className="noon-categories-wrapper">
-            {/* Left Arrow Button */}
-            {canScrollLeft && (
-              <button
-                className="noon-scroll-btn noon-scroll-left"
-                onClick={() => scrollCategories("left")}
-                aria-label="السابق"
-              >
-                <FontAwesomeIcon icon={faChevronRight} />
-              </button>
-            )}
-            
             <div className="noon-categories-scroll" ref={categoryScrollRef}>
               {loading ? (
                 // Skeleton loaders
@@ -1344,15 +1340,21 @@ const HomePage = () => {
                 </div>
               )}
             </div>
-            
-            {/* Right Arrow Button */}
+
+            {canScrollLeft && (
+              <button
+                className="noon-cat-arrow noon-cat-arrow-left"
+                onClick={() => scrollCategories("left")}
+              >
+                &#8592;
+              </button>
+            )}
             {canScrollRight && (
               <button
-                className="noon-scroll-btn noon-scroll-right"
+                className="noon-cat-arrow noon-cat-arrow-right"
                 onClick={() => scrollCategories("right")}
-                aria-label="التالي"
               >
-                <FontAwesomeIcon icon={faChevronLeft} />
+                &#8594;
               </button>
             )}
           </div>
@@ -1485,19 +1487,6 @@ const HomePage = () => {
                           </p>
                         )}
 
-                        {/* Rating Section */}
-                        <div className="product-rating-section">
-                          <span className="rating-value">
-                            {(service.rating || 0).toFixed(1)}
-                          </span>
-                          <FontAwesomeIcon
-                            icon={faStar}
-                            className="rating-star"
-                          />
-                          <span className="review-count">
-                            ({formatReviewCount(service.reviews?.length || 0)})
-                          </span>
-                        </div>
                       </div>
                     </div>
                   );
@@ -1635,7 +1624,7 @@ const HomePage = () => {
                                       e
                                     )
                                   }
-                                  title="الصورة السابقة"
+                                  title={t('home.prevImage')}
                                 >
                                   <FontAwesomeIcon icon={faChevronRight} />
                                 </button>
@@ -1648,7 +1637,7 @@ const HomePage = () => {
                                       e
                                     )
                                   }
-                                  title="الصورة التالية"
+                                  title={t('home.nextImage')}
                                 >
                                   <FontAwesomeIcon icon={faChevronLeft} />
                                 </button>
@@ -1730,20 +1719,6 @@ const HomePage = () => {
                             {product.name || "منتج بدون اسم"}
                           </h3>
 
-                          {/* Rating Section */}
-                          <div className="product-rating-section">
-                            <span className="rating-value">
-                              {(product.rating || 0).toFixed(1)}
-                            </span>
-                            <FontAwesomeIcon
-                              icon={faStar}
-                              className="rating-star"
-                            />
-                            <span className="review-count">
-                              ({formatReviewCount(product.reviewCount || 0)})
-                            </span>
-                          </div>
-
                           {/* Price Section */}
                           <div className="product-price-section">
                             <div className="product-price">
@@ -1760,7 +1735,7 @@ const HomePage = () => {
                                     )}
                                   </span>
                                 )}
-                              <span className="price-currency">درهم</span>
+                              <span className="price-currency">{t('cart.currency')}</span>
                               <span className="price-value">
                                 {(product.price || 0).toLocaleString("en-US", {
                                   minimumFractionDigits: 0,
@@ -1778,17 +1753,21 @@ const HomePage = () => {
                           {/* Delivery Information */}
                           <div className="product-delivery-info">
                             {product.isFreeDelivery && (
-                              <div className="delivery-free" title="توصيل مجاني">
+                              <div className="delivery-free" title={t('home.freeDelivery')}>
                                 <FontAwesomeIcon
                                   icon={faTruck}
                                   className="delivery-icon"
                                 />
-                                <span>توصيل مجاني</span>
+                                <span>{t('home.freeDelivery')}</span>
                               </div>
                             )}
-                            <div className="delivery-express delivery-timeline" title={`التوصيل خلال ${(product.expectedDeliveryText || "3-4 days").replace(/\bday\b/gi, "يوم").replace(/\bdays\b/gi, "أيام")}`}>
+                            <div className="delivery-express delivery-timeline" title={formatDeliveryDate(getDeliveryDate(product)) ? `${t('home.getItBy')} ${formatDeliveryDate(getDeliveryDate(product))}` : ''}>
                               <FontAwesomeIcon icon={faTruck} className="delivery-lightning-icon" />
-                              <span>{(product.expectedDeliveryText || "3-4 days").replace(/\bday\b/gi, "يوم").replace(/\bdays\b/gi, "أيام")}</span>
+                              <span>
+                                {formatDeliveryDate(getDeliveryDate(product))
+                                  ? `${t('home.getItBy')} ${formatDeliveryDate(getDeliveryDate(product))}`
+                                  : (product.expectedDeliveryText || "3-4 days").replace(/\bday\b/gi, "يوم").replace(/\bdays\b/gi, "أيام")}
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -1800,7 +1779,7 @@ const HomePage = () => {
       </section>
 
       {/* Promotional Banner */}
-      <section className="noon-promo-section" aria-label="عرض ترويجي">
+      <section className="noon-promo-section" aria-label={t('home.promoBanner')}>
         <div className="noon-section-container">
           <div
             className="noon-promo-banner"
@@ -1815,16 +1794,10 @@ const HomePage = () => {
           >
             <div className="noon-promo-banner-overlay"></div>
             <div className="noon-promo-content">
-              <h2>
-                {" "}
-                يشيل عنك هم التشطيب ......... كل اللي تحتاجه في مكان واحد
-              </h2>
-              <p>
-                مجموعة واسعة من خدمات البناء والصيانة والتصميم الداخلي الصورة
-                اعتقد مقاسها صغير ، لو نخلي ا
-              </p>
+              <h2>{t('home.promoTitle')}</h2>
+              <p>{t('home.promoDesc')}</p>
               <Link to="/services" className="noon-promo-btn">
-                استكشف الخدمات
+                {t('home.exploreServices')}
               </Link>
             </div>
           </div>
@@ -1835,13 +1808,13 @@ const HomePage = () => {
       {services.length > 8 && (
         <section
           className="noon-services-section"
-          aria-label="المزيد من الخدمات"
+          aria-label={t('home.moreServices')}
         >
           <div className="noon-section-container">
             <header className="noon-section-header">
-              <h2>المزيد من الخدمات</h2>
+              <h2>{t('home.moreServices')}</h2>
               <Link to="/services" className="noon-view-all">
-                عرض الكل <FontAwesomeIcon icon={faArrowLeft} />
+                {t('home.viewAll')} <FontAwesomeIcon icon={faArrowLeft} />
               </Link>
             </header>
 
@@ -1909,19 +1882,6 @@ const HomePage = () => {
                         </p>
                       )}
 
-                      {/* Rating Section */}
-                      <div className="product-rating-section">
-                        <span className="rating-value">
-                          {(service.rating || 0).toFixed(1)}
-                        </span>
-                        <FontAwesomeIcon
-                          icon={faStar}
-                          className="rating-star"
-                        />
-                        <span className="review-count">
-                          ({formatReviewCount(service.reviews?.length || 0)})
-                        </span>
-                      </div>
                     </div>
                   </div>
                 );
@@ -1935,13 +1895,13 @@ const HomePage = () => {
       {products.length > 8 && (
         <section
           className="noon-services-section"
-          aria-label="المزيد من المنتجات"
+          aria-label={t('home.moreProducts')}
         >
           <div className="noon-section-container">
             <header className="noon-section-header">
-              <h2>المزيد من المنتجات</h2>
+              <h2>{t('home.moreProducts')}</h2>
               <Link to="/products" className="noon-view-all">
-                عرض الكل <FontAwesomeIcon icon={faArrowLeft} />
+                {t('home.viewAll')} <FontAwesomeIcon icon={faArrowLeft} />
               </Link>
             </header>
 
@@ -2051,7 +2011,7 @@ const HomePage = () => {
                                 onClick={(e) =>
                                   handlePrevImage(product.id, productImages, e)
                                 }
-                                title="الصورة السابقة"
+                                title={t('home.prevImage')}
                               >
                                 <FontAwesomeIcon icon={faChevronRight} />
                               </button>
@@ -2060,7 +2020,7 @@ const HomePage = () => {
                                 onClick={(e) =>
                                   handleNextImage(product.id, productImages, e)
                                 }
-                                title="الصورة التالية"
+                                title={t('home.nextImage')}
                               >
                                 <FontAwesomeIcon icon={faChevronLeft} />
                               </button>
@@ -2085,7 +2045,7 @@ const HomePage = () => {
                         {(product.stockQuantity === 0 ||
                           product.stockQuantity === null) && (
                           <span className="product-badge out-of-stock-badge">
-                            نفذت الكمية
+                            {t('home.outOfStock')}
                           </span>
                         )}
 
@@ -2100,8 +2060,8 @@ const HomePage = () => {
                           }}
                           title={
                             isInWishlist(product.id)
-                              ? "إزالة من المفضلة"
-                              : "إضافة للمفضلة"
+                              ? t('home.removeFromWishlist')
+                              : t('home.addToWishlist')
                           }
                         >
                           <FontAwesomeIcon icon={faHeart} />
@@ -2147,20 +2107,6 @@ const HomePage = () => {
                           </p>
                         )}
 
-                        {/* Rating Section */}
-                        <div className="product-rating-section">
-                          <span className="rating-value">
-                            {(product.rating || 0).toFixed(1)}
-                          </span>
-                          <FontAwesomeIcon
-                            icon={faStar}
-                            className="rating-star"
-                          />
-                          <span className="review-count">
-                            ({formatReviewCount(product.reviewCount || 0)})
-                          </span>
-                        </div>
-
                         {/* Price Section */}
                         <div className="product-price-section">
                           <div className="product-price">
@@ -2177,7 +2123,7 @@ const HomePage = () => {
                                   )}
                                 </span>
                               )}
-                            <span className="price-currency">درهم</span>
+                            <span className="price-currency">{t('cart.currency')}</span>
                             <span className="price-value">
                               {(product.price || 0).toLocaleString("en-US", {
                                 minimumFractionDigits: 0,
@@ -2195,17 +2141,21 @@ const HomePage = () => {
                         {/* Delivery Information */}
                         <div className="product-delivery-info">
                           {product.isFreeDelivery && (
-                            <div className="delivery-free" title="توصيل مجاني">
+                            <div className="delivery-free" title={t('home.freeDelivery')}>
                               <FontAwesomeIcon
                                 icon={faTruck}
                                 className="delivery-icon"
                               />
-                              <span>توصيل مجاني</span>
+                              <span>{t('home.freeDelivery')}</span>
                             </div>
                           )}
-                          <div className="delivery-express delivery-timeline" title={`التوصيل خلال ${(product.expectedDeliveryText || "3-4 days").replace(/\bday\b/gi, "يوم").replace(/\bdays\b/gi, "أيام")}`}>
+                          <div className="delivery-express delivery-timeline" title={formatDeliveryDate(getDeliveryDate(product)) ? `${t('home.getItBy')} ${formatDeliveryDate(getDeliveryDate(product))}` : ''}>
                             <FontAwesomeIcon icon={faTruck} className="delivery-lightning-icon" />
-                            <span>{(product.expectedDeliveryText || "3-4 days").replace(/\bday\b/gi, "يوم").replace(/\bdays\b/gi, "أيام")}</span>
+                            <span>
+                              {formatDeliveryDate(getDeliveryDate(product))
+                                ? `${t('home.getItBy')} ${formatDeliveryDate(getDeliveryDate(product))}`
+                                : (product.expectedDeliveryText || "3-4 days").replace(/\bday\b/gi, "يوم").replace(/\bdays\b/gi, "أيام")}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -2218,24 +2168,24 @@ const HomePage = () => {
       )}
 
       {/* App Download Section */}
-      <section className="noon-app-section" aria-label="تحميل التطبيق">
+      <section className="noon-app-section" aria-label={t('home.downloadApp')}>
         <div className="noon-section-container">
           <div className="noon-app-content">
             <div className="noon-app-text">
-              <h2>حمّل التطبيق</h2>
-              <p>احصل على تجربة أفضل مع تطبيق Buildinz للهاتف المحمول</p>
+              <h2>{t('home.downloadApp')}</h2>
+              <p>{t('home.downloadAppDesc')}</p>
               <div className="noon-app-buttons">
                 <a href="#" className="noon-app-btn">
                   <FontAwesomeIcon icon={faApple} />
                   <div>
-                    <span>حمّل من</span>
+                    <span>{t('home.downloadFrom')}</span>
                     <strong>App Store</strong>
                   </div>
                 </a>
                 <a href="#" className="noon-app-btn">
                   <FontAwesomeIcon icon={faGooglePlay} />
                   <div>
-                    <span>حمّل من</span>
+                    <span>{t('home.downloadFrom')}</span>
                     <strong>Google Play</strong>
                   </div>
                 </a>
@@ -2249,7 +2199,7 @@ const HomePage = () => {
       <footer
         className="noon-footer"
         role="contentinfo"
-        aria-label="تذييل الموقع"
+        aria-label={t('home.footerLabel')}
       >
         <div className="noon-footer-container">
           <div className="noon-footer-content">
@@ -2258,10 +2208,7 @@ const HomePage = () => {
               <div className="noon-footer-logo">
                 <img src="/assets/logo.png" alt="Buildinz" />
               </div>
-              <p>
-                منصة شاملة تربط بين العملاء ومقدمي الخدمات المنزلية والمهنية في
-                دولة الإمارات العربية المتحدة.
-              </p>
+              <p>{t('home.footerAbout')}</p>
               <div className="noon-footer-social">
                 <a
                   href="https://www.facebook.com/buildingzuae"

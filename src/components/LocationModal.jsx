@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faLocationDot, 
@@ -29,6 +30,7 @@ import {
 import authService from '../services/authService';
 
 const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
+  const { t } = useTranslation();
   const [view, setView] = useState('map'); // 'map' or 'saved'
   const [searchQuery, setSearchQuery] = useState('');
   const [mapCenter, setMapCenter] = useState({ lat: 25.276987, lng: 55.296249 }); // Dubai default
@@ -111,7 +113,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
           if (error.code === "UNAUTHENTICATED") {
             setAuthError(true);
           } else {
-            setError('لم نتمكن من تحميل العناوين. يرجى المحاولة مرة أخرى.');
+            setError(t('location.errors.loadAddresses'));
           }
         } finally {
           setIsLoading(false);
@@ -235,7 +237,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
     } catch (error) {
       console.error("Error initializing Google Maps:", error);
       setLoadingMap(false);
-      setError('لم نتمكن من تحميل الخريطة. يرجى المحاولة مرة أخرى.');
+      setError(t('location.errors.loadMap'));
     }
   }, [isOpen, mapCenter, mapsLoaded]);
 
@@ -276,7 +278,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
                 if (status === 'OK' && results[0]) {
                   setSelectedLocation(results[0]);
                 } else {
-                  setError('لم نتمكن من تحديد العنوان بناءً على الموقع. يرجى المحاولة مرة أخرى.');
+                  setError(t('location.errors.geocode'));
                 }
                 setIsLoading(false);
               });
@@ -291,7 +293,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
         },
         (error) => {
           console.error("Error getting location:", error);
-          setError("لم نتمكن من تحديد موقعك. يرجى السماح بالوصول إلى الموقع أو إدخال العنوان يدويًا.");
+          setError(t('location.errors.location'));
           setIsLoading(false);
         },
         {
@@ -301,7 +303,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
         }
       );
     } else {
-      setError("متصفحك لا يدعم تحديد الموقع.");
+      setError(t('location.errors.noGeolocation'));
     }
   };
 
@@ -321,7 +323,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
       // Create address object
       const addressData = {
         ...selectedLocation,
-        name: addressName || 'العنوان الرئيسي',
+        name: addressName || t('location.mainAddress'),
         type: addressType,
         displayAddress: formatAddress(selectedLocation.address_components),
         isDefault: editingAddress ? editingAddress.is_default : false
@@ -358,7 +360,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
       if (error.code === "UNAUTHENTICATED") {
         setAuthError(true);
       } else {
-        setError('حدث خطأ أثناء حفظ العنوان. يرجى المحاولة مرة أخرى.');
+        setError(t('location.errors.saveAddress'));
       }
     } finally {
       setIsSaving(false);
@@ -382,7 +384,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
       if (error.code === "UNAUTHENTICATED") {
         setAuthError(true);
       } else {
-        setError('حدث خطأ أثناء حذف العنوان. يرجى المحاولة مرة أخرى.');
+        setError(t('location.errors.deleteAddress'));
       }
     } finally {
       setIsLoading(false);
@@ -406,7 +408,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
       if (error.code === "UNAUTHENTICATED") {
         setAuthError(true);
       } else {
-        setError('حدث خطأ أثناء تعيين العنوان الافتراضي. يرجى المحاولة مرة أخرى.');
+        setError(t('location.errors.setDefault'));
       }
     } finally {
       setIsLoading(false);
@@ -507,7 +509,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
       onClose();
     } catch (error) {
       console.error('Error confirming location:', error);
-      setError('حدث خطأ أثناء تأكيد الموقع. يرجى المحاولة مرة أخرى.');
+      setError(t('location.errors.confirmLocation'));
     } finally {
       setIsLoading(false);
     }
@@ -527,7 +529,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
             id="location-search-input"
             type="text"
             className="location-search-input"
-            placeholder="ابحث عن منطقة، شارع، معلم..."
+            placeholder={t('location.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             disabled={isLoading || isSaving}
@@ -543,7 +545,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
           ) : (
             <>
               <FontAwesomeIcon icon={faLocationDot} />
-              <span>حدد موقعي</span>
+              <span>{t('location.detectMyLocation')}</span>
             </>
           )}
         </button>
@@ -557,28 +559,28 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
       
       {authError && (
         <div className="modal-auth-error">
-          <FontAwesomeIcon icon={faLock} /> قم بتسجيل الدخول لإدارة العناوين
+          <FontAwesomeIcon icon={faLock} /> {t('location.loginToManage')}
           <button className="modal-login-btn" onClick={handleLogin}>
-            تسجيل الدخول
+            {t('auth.login')}
           </button>
         </div>
       )}
       
       <div className="location-map-container">
         <div className="map-instruction">
-          حرك الخريطة لتحديد الموقع بدقة
+          {t('location.mapInstruction')}
         </div>
         {!mapsLoaded && (
           <div className="map-loading">
             <FontAwesomeIcon icon={faSpinner} spin className="loading-icon" />
-            <p>جاري تحميل الخريطة...</p>
+            <p>{t('location.loadingMap')}</p>
           </div>
         )}
         <div ref={mapRef} className="google-map"></div>
         {(loadingMap || isLoading) && mapsLoaded && (
           <div className="map-loading">
             <FontAwesomeIcon icon={faSpinner} spin className="loading-icon" />
-            <p>جاري تحميل الخريطة...</p>
+            <p>{t('location.loadingMap')}</p>
           </div>
         )}
       </div>
@@ -595,10 +597,10 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
           
           <div className="save-address-form">
             <div className="form-group">
-              <label>اسم العنوان</label>
+              <label>{t('location.addressName')}</label>
               <input
                 type="text"
-                placeholder="مثال: المنزل، العمل..."
+                placeholder={t('location.addressNamePlaceholder')}
                 value={addressName}
                 onChange={(e) => setAddressName(e.target.value)}
                 disabled={isLoading || isSaving || authError}
@@ -606,7 +608,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
             </div>
             
             <div className="form-group">
-              <label>نوع العنوان</label>
+              <label>{t('location.addressType')}</label>
               <div className="address-type-options">
                 <button 
                   className={`type-option ${addressType === 'home' ? 'active' : ''}`}
@@ -614,7 +616,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
                   disabled={isLoading || isSaving || authError}
                 >
                   <FontAwesomeIcon icon={faHome} />
-                  <span>منزل</span>
+                  <span>{t('location.home')}</span>
                 </button>
                 <button 
                   className={`type-option ${addressType === 'work' ? 'active' : ''}`}
@@ -622,7 +624,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
                   disabled={isLoading || isSaving || authError}
                 >
                   <FontAwesomeIcon icon={faBuilding} />
-                  <span>عمل</span>
+                  <span>{t('location.work')}</span>
                 </button>
                 <button 
                   className={`type-option ${addressType === 'other' ? 'active' : ''}`}
@@ -630,7 +632,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
                   disabled={isLoading || isSaving || authError}
                 >
                   <FontAwesomeIcon icon={faLocationDot} />
-                  <span>آخر</span>
+                  <span>{t('location.other')}</span>
                 </button>
               </div>
             </div>
@@ -644,7 +646,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
           onClick={() => setView('saved')}
           disabled={isLoading || isSaving}
         >
-          العناوين المحفوظة
+          {t('location.savedAddresses')}
         </button>
         
         <div className="primary-actions">
@@ -656,7 +658,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
             {isSaving ? (
               <FontAwesomeIcon icon={faSpinner} spin />
             ) : (
-              editingAddress ? 'تحديث العنوان' : 'حفظ العنوان'
+              editingAddress ? t('location.updateAddress') : t('location.saveAddress')
             )}
           </button>
           <button 
@@ -667,7 +669,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
             {isLoading ? (
               <FontAwesomeIcon icon={faSpinner} spin />
             ) : (
-              'تأكيد الموقع'
+              t('location.confirmLocation')
             )}
           </button>
         </div>
@@ -681,35 +683,35 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
         {authError ? (
           <div className="modal-auth-error center">
             <FontAwesomeIcon icon={faLock} size="2x" />
-            <p>قم بتسجيل الدخول لعرض العناوين المحفوظة</p>
+            <p>{t('location.loginToView')}</p>
             <button className="modal-login-btn" onClick={handleLogin}>
-              تسجيل الدخول
+              {t('auth.login')}
             </button>
           </div>
         ) : isLoading ? (
           <div className="loading-container">
             <FontAwesomeIcon icon={faSpinner} spin className="loading-icon" />
-            <p>جاري تحميل العناوين...</p>
+            <p>{t('location.loadingAddresses')}</p>
           </div>
         ) : error ? (
           <div className="modal-error center">
             <FontAwesomeIcon icon={faExclamationTriangle} />
             <p>{error}</p>
             <button className="retry-btn" onClick={() => window.location.reload()}>
-              إعادة المحاولة
+              {t('location.retry')}
             </button>
           </div>
         ) : savedAddresses.length === 0 ? (
           <div className="no-addresses">
             <FontAwesomeIcon icon={faLocationDot} className="no-address-icon" />
-            <p>لا توجد عناوين محفوظة</p>
+            <p>{t('location.noSavedAddresses')}</p>
             <button 
               className="add-address-button"
               onClick={() => setView('map')}
               disabled={isLoading}
             >
               <FontAwesomeIcon icon={faPlus} />
-              <span>إضافة عنوان جديد</span>
+              <span>{t('location.addNewAddress')}</span>
             </button>
           </div>
         ) : (
@@ -738,7 +740,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
                       <div className="address-name">
                         {address.name}
                         {address.is_default && (
-                          <span className="default-badge">الافتراضي</span>
+                          <span className="default-badge">{t('location.default')}</span>
                         )}
                       </div>
                       <div className="address-text">
@@ -752,7 +754,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
                       <button 
                         className="action-btn set-default-btn"
                         onClick={() => handleSetDefaultAddress(address.id)}
-                        title="تعيين كافتراضي"
+                        title={t('location.setAsDefault')}
                         disabled={isLoading}
                       >
                         <FontAwesomeIcon icon={faCheck} />
@@ -761,7 +763,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
                     <button 
                       className="action-btn edit-btn"
                       onClick={() => handleEditAddress(address)}
-                      title="تعديل"
+                      title={t('location.edit')}
                       disabled={isLoading}
                     >
                       <FontAwesomeIcon icon={faEdit} />
@@ -769,7 +771,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
                     <button 
                       className="action-btn delete-btn"
                       onClick={() => handleDeleteAddress(address.id)}
-                      title="حذف"
+                      title={t('location.delete')}
                       disabled={isLoading}
                     >
                       <FontAwesomeIcon icon={faTrash} />
@@ -789,7 +791,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
               disabled={isLoading}
             >
               <FontAwesomeIcon icon={faPlus} />
-              <span>إضافة عنوان جديد</span>
+              <span>{t('location.addNewAddress')}</span>
             </button>
           </>
         )}
@@ -801,7 +803,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
           onClick={() => setView('map')}
           disabled={isLoading}
         >
-          العودة إلى الخريطة
+          {t('location.backToMap')}
         </button>
       </div>
     </>
@@ -814,7 +816,7 @@ const LocationModal = ({ isOpen, onClose, onSelectLocation }) => {
       <div className="location-modal" ref={modalRef}>
         <div className="location-modal-header">
           <h2>
-            {view === 'map' ? 'تحديد العنوان' : 'العناوين المحفوظة'}
+            {view === 'map' ? t('location.selectAddress') : t('location.savedAddresses')}
           </h2>
           <button className="close-button" onClick={onClose} disabled={isLoading || isSaving}>
             <FontAwesomeIcon icon={faTimes} />

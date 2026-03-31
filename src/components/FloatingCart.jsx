@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faShoppingCart, 
@@ -13,6 +14,7 @@ import { useCart } from '../context/CartContext';
 import './FloatingCart.css';
 
 const FloatingCart = () => {
+  const { t } = useTranslation();
   const { 
     cart, 
     cartTotal, 
@@ -38,7 +40,7 @@ const FloatingCart = () => {
       
       <div className="cart-content">
         <div className="cart-header">
-          <h3>سلة التسوق</h3>
+          <h3>{t('cart.title')}</h3>
           <button className="close-cart" onClick={toggleCart}>
             <FontAwesomeIcon icon={faTimes} />
           </button>
@@ -47,7 +49,7 @@ const FloatingCart = () => {
         <div className="cart-items">
           {cart.length === 0 ? (
             <div className="empty-cart">
-              <p>سلة التسوق فارغة</p>
+              <p>{t('cart.empty')}</p>
             </div>
           ) : (
             cart.map(item => (
@@ -62,10 +64,10 @@ const FloatingCart = () => {
                 <div className="item-details">
                   <h4>{item.name}</h4>
                   <div className="item-price">
-                    <span>{item.price.toFixed(0)} درهم</span>
+                    <span>{item.price.toFixed(0)} {t('cart.currency')}</span>
                     {item.quantity > 1 && (
                       <span className="item-total">
-                        المجموع: {(item.price * item.quantity).toFixed(0)} درهم
+                        {t('cart.subtotal')}: {(item.price * item.quantity).toFixed(0)} {t('cart.currency')}
                       </span>
                     )}
                   </div>
@@ -95,13 +97,13 @@ const FloatingCart = () => {
         {cart.length > 0 && (
           <div className="cart-footer">
             <div className="cart-total">
-              <span>المجموع:</span>
-              <span>{cartTotal.price.toFixed(0)} درهم</span>
+              <span>{t('cart.totalLabel')}</span>
+              <span>{cartTotal.price.toFixed(0)} {t('cart.currency')}</span>
             </div>
             <div className="cart-actions">
               <button className="checkout-btn" onClick={handleViewCart}>
                 <FontAwesomeIcon icon={faShoppingBag} />
-                عرض السلة
+                {t('cart.viewCart')}
               </button>
             </div>
           </div>

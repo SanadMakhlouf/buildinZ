@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faSearch, 
@@ -17,18 +18,13 @@ import searchService from '../services/searchService';
 const PLACEHOLDER_ICON = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2VlZWVlZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjEwcHgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGFsaWdubWVudC1iYXNlbGluZT0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZmlsbD0iIzk5OTk5OSI+SWNvbjwvdGV4dD48L3N2Zz4=';
 
 const SearchModal = ({ isOpen, onClose }) => {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [recentSearches, setRecentSearches] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('all'); // 'all', 'products', 'services'
-  const [trendingSearches] = useState([
-    'تنظيف المنزل',
-    'صيانة مكيفات',
-    'سباكة',
-    'كهرباء',
-    'دهان'
-  ]);
+  const trendingSearches = t('search.trendingTerms', { returnObjects: true });
   
   const modalRef = useRef(null);
   const searchInputRef = useRef(null);
@@ -100,8 +96,8 @@ const SearchModal = ({ isOpen, onClose }) => {
             name: product.name,
             image: product.primary_image_url || 
                    (product.images && product.images.length > 0 ? product.images[0] : PLACEHOLDER_ICON),
-            price: product.price ? `SAR ${product.price}` : 'السعر غير متوفر',
-            category: product.category?.name || product.category || 'عام',
+            price: product.price ? `SAR ${product.price}` : t('search.priceUnavailable'),
+            category: product.category?.name || product.category || t('search.general'),
             rating: product.rating || 0,
             discountPercentage: product.discountPercentage || 0
           }));
@@ -116,10 +112,10 @@ const SearchModal = ({ isOpen, onClose }) => {
             type: 'service',
             name: service.name,
             image: service.image || service.preview_image || PLACEHOLDER_ICON,
-            category: service.categoryName || service.category || 'عام',
+            category: service.categoryName || service.category || t('search.general'),
             subcategory: service.subcategoryName || service.subcategory,
             rating: service.rating || 4.0,
-            price: service.price ? `${service.price} درهم` : 'السعر حسب الطلب',
+            price: service.price ? `${service.price} ${t('cart.currency')}` : t('search.priceOnRequest'),
             description: service.description
           }));
           
@@ -211,8 +207,8 @@ const SearchModal = ({ isOpen, onClose }) => {
             name: product.name,
             image: product.primary_image_url || 
                    (product.images && product.images.length > 0 ? product.images[0] : PLACEHOLDER_ICON),
-            price: product.price ? `SAR ${product.price}` : 'السعر غير متوفر',
-            category: product.category?.name || product.category || 'عام',
+            price: product.price ? `SAR ${product.price}` : t('search.priceUnavailable'),
+            category: product.category?.name || product.category || t('search.general'),
             rating: product.rating || 0,
             discountPercentage: product.discountPercentage || 0
           }));
@@ -227,10 +223,10 @@ const SearchModal = ({ isOpen, onClose }) => {
             type: 'service',
             name: service.name,
             image: service.image || service.preview_image || PLACEHOLDER_ICON,
-            category: service.categoryName || service.category || 'عام',
+            category: service.categoryName || service.category || t('search.general'),
             subcategory: service.subcategoryName || service.subcategory,
             rating: service.rating || 4.0,
-            price: service.price ? `${service.price} درهم` : 'السعر حسب الطلب',
+            price: service.price ? `${service.price} ${t('cart.currency')}` : t('search.priceOnRequest'),
             description: service.description
           }));
           
@@ -270,8 +266,8 @@ const SearchModal = ({ isOpen, onClose }) => {
             name: product.name,
             image: product.primary_image_url || 
                    (product.images && product.images.length > 0 ? product.images[0] : PLACEHOLDER_ICON),
-            price: product.price ? `SAR ${product.price}` : 'السعر غير متوفر',
-            category: product.category?.name || product.category || 'عام',
+            price: product.price ? `SAR ${product.price}` : t('search.priceUnavailable'),
+            category: product.category?.name || product.category || t('search.general'),
             rating: product.rating || 0,
             discountPercentage: product.discountPercentage || 0
           }));
@@ -286,10 +282,10 @@ const SearchModal = ({ isOpen, onClose }) => {
             type: 'service',
             name: service.name,
             image: service.image || service.preview_image || PLACEHOLDER_ICON,
-            category: service.categoryName || service.category || 'عام',
+            category: service.categoryName || service.category || t('search.general'),
             subcategory: service.subcategoryName || service.subcategory,
             rating: service.rating || 4.0,
-            price: service.price ? `${service.price} درهم` : 'السعر حسب الطلب',
+            price: service.price ? `${service.price} ${t('cart.currency')}` : t('search.priceOnRequest'),
             description: service.description
           }));
           
@@ -330,7 +326,7 @@ const SearchModal = ({ isOpen, onClose }) => {
               name: product.name,
               image: product.primary_image_url || 
                      (product.images && product.images.length > 0 ? product.images[0] : PLACEHOLDER_ICON),
-              price: product.price ? `SAR ${product.price}` : 'السعر غير متوفر',
+              price: product.price ? `SAR ${product.price}` : t('search.priceUnavailable'),
               category: product.category?.name || product.category || 'عام',
               rating: product.rating || 0,
               discountPercentage: product.discountPercentage || 0
@@ -346,10 +342,10 @@ const SearchModal = ({ isOpen, onClose }) => {
               type: 'service',
               name: service.name,
               image: service.image || service.preview_image || PLACEHOLDER_ICON,
-              category: service.categoryName || service.category || 'عام',
+              category: service.categoryName || service.category || t('search.general'),
               subcategory: service.subcategoryName || service.subcategory,
               rating: service.rating || 4.0,
-              price: service.price ? `${service.price} درهم` : 'السعر حسب الطلب',
+              price: service.price ? `${service.price} ${t('cart.currency')}` : t('search.priceOnRequest'),
               description: service.description
             }));
             
@@ -392,7 +388,7 @@ const SearchModal = ({ isOpen, onClose }) => {
             <input
               type="text"
               className="search-modal-input"
-              placeholder="ابحث عن منتج أو خدمة..."
+              placeholder={t('search.placeholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               ref={searchInputRef}
@@ -415,21 +411,21 @@ const SearchModal = ({ isOpen, onClose }) => {
             className={`search-tab ${activeTab === 'all' ? 'active' : ''}`}
             onClick={() => handleTabChange('all')}
           >
-            الكل
+            {t('search.all')}
           </button>
           <button
             className={`search-tab ${activeTab === 'products' ? 'active' : ''}`}
             onClick={() => handleTabChange('products')}
           >
             <FontAwesomeIcon icon={faStore} />
-            <span>المنتجات</span>
+            <span>{t('search.products')}</span>
           </button>
           <button
             className={`search-tab ${activeTab === 'services' ? 'active' : ''}`}
             onClick={() => handleTabChange('services')}
           >
             <FontAwesomeIcon icon={faTools} />
-            <span>الخدمات</span>
+            <span>{t('search.services')}</span>
           </button>
         </div>
 
@@ -439,14 +435,14 @@ const SearchModal = ({ isOpen, onClose }) => {
           {isLoading && (
             <div className="search-loading">
               <div className="search-loading-spinner"></div>
-              <p>جاري البحث...</p>
+              <p>{t('search.searching')}</p>
             </div>
           )}
 
           {/* Search Results */}
           {!isLoading && searchResults.length > 0 && (
             <div className="search-results">
-              <h3 className="results-title">نتائج البحث</h3>
+              <h3 className="results-title">{t('search.resultsTitle')}</h3>
               
               {searchResults.map((result) => {
                 // Determine the correct URL based on result type
@@ -475,7 +471,7 @@ const SearchModal = ({ isOpen, onClose }) => {
                       }}
                     />
                     {result.discountPercentage > 0 && (
-                      <div className="discount-badge">{result.discountPercentage}% خصم</div>
+                      <div className="discount-badge">{result.discountPercentage}% {t('search.discount')}</div>
                     )}
                   </div>
                   <div className="search-result-info">
@@ -513,7 +509,7 @@ const SearchModal = ({ isOpen, onClose }) => {
               })}
               
               <Link to={`/search?q=${encodeURIComponent(searchQuery)}`} className="view-all-results">
-                عرض جميع النتائج
+                {t('search.viewAllResults')}
                 <FontAwesomeIcon icon={faChevronRight} />
               </Link>
             </div>
@@ -522,8 +518,8 @@ const SearchModal = ({ isOpen, onClose }) => {
           {/* No Results */}
           {!isLoading && searchQuery && searchResults.length === 0 && (
             <div className="no-results">
-              <p>لم يتم العثور على نتائج لـ <span>"{searchQuery}"</span></p>
-              <p>حاول استخدام كلمات مختلفة أو تحقق من الإملاء</p>
+              <p>{t('search.noResults')} <span>"{searchQuery}"</span></p>
+              <p>{t('search.tryDifferent')}</p>
             </div>
           )}
 
@@ -536,10 +532,10 @@ const SearchModal = ({ isOpen, onClose }) => {
                   <div className="recent-searches-header">
                     <h3>
                       <FontAwesomeIcon icon={faHistory} />
-                      عمليات البحث الأخيرة
+                      {t('search.recentSearches')}
                     </h3>
                     <button className="clear-all-searches" onClick={clearAllRecentSearches}>
-                      مسح الكل
+                      {t('search.clearAll')}
                     </button>
                   </div>
                   
@@ -571,7 +567,7 @@ const SearchModal = ({ isOpen, onClose }) => {
                 <div className="trending-searches-header">
                   <h3>
                     <FontAwesomeIcon icon={faFire} />
-                    الأكثر بحثاً
+                    {t('search.trending')}
                   </h3>
                 </div>
                 

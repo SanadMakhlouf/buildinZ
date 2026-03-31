@@ -39,11 +39,13 @@ import LocationSelector from './components/LocationSelector';
 import SearchModal from './components/SearchModal';
 import CartProvider from './context/CartContext';
 import FloatingCart from './components/FloatingCart';
+import LanguageDirection from './components/LanguageDirection';
 
 function App() {
   return (
     <Router>
       <CartProvider>
+        <LanguageDirection />
         <div className="app" id="app-root">
           <Navbar />
           <LocationSelector />

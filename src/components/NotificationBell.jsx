@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell } from '@fortawesome/free-solid-svg-icons';
 import NotificationDropdown from './NotificationDropdown';
@@ -6,6 +7,7 @@ import notificationService from '../services/notificationService';
 import './NotificationBell.css';
 
 const NotificationBell = () => {
+  const { t } = useTranslation();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -63,8 +65,8 @@ const NotificationBell = () => {
       <button 
         className={`notification-bell ${isDropdownOpen ? 'active' : ''}`}
         onClick={handleDropdownToggle}
-        aria-label="الإشعارات"
-        title="الإشعارات"
+        aria-label={t('notifications.ariaLabel')}
+        title={t('notifications.title')}
       >
         <FontAwesomeIcon icon={faBell} />
         {unreadCount > 0 && (

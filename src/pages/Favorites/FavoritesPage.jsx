@@ -241,17 +241,6 @@ const FavoritesPage = () => {
                       </p>
                     )}
 
-                    {/* Rating Section */}
-                    <div className="product-rating-section">
-                      <span className="review-count">
-                        ({formatReviewCount(productsData[product.id]?.reviewCount || 0)})
-                      </span>
-                      <span className="rating-value">
-                        {(productsData[product.id]?.rating || 0).toFixed(1)}
-                      </span>
-                      <FontAwesomeIcon icon={faStar} className="rating-star" />
-                    </div>
-
                     {/* Price Section */}
                     <div className="product-price-section">
                       {discount > 0 && (

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -6,6 +7,7 @@ import authService from '../../../services/authService';
 import './LoginPage.css';
 
 const LoginPage = () => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -73,15 +75,15 @@ const LoginPage = () => {
     const newErrors = {};
     
     if (!formData.email) {
-      newErrors.email = 'البريد الإلكتروني مطلوب';
+      newErrors.email = t('auth.validation.emailRequired');
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'البريد الإلكتروني غير صالح';
+      newErrors.email = t('auth.validation.emailInvalid');
     }
     
     if (!formData.password) {
-      newErrors.password = 'كلمة المرور مطلوبة';
+      newErrors.password = t('auth.validation.passwordRequired');
     } else if (formData.password.length < 6) {
-      newErrors.password = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+      newErrors.password = t('auth.validation.passwordMin');
     }
     
     setErrors(newErrors);
@@ -116,7 +118,7 @@ const LoginPage = () => {
       } catch (error) {
         // Handle login errors
         const errorMessage = error.response?.data?.message || 
-                             'حدث خطأ أثناء تسجيل الدخول. يرجى المحاولة مرة أخرى.';
+                             t('auth.errors.loginFailed');
         setApiError(errorMessage);
       } finally {
         setIsLoading(false);
@@ -127,8 +129,8 @@ const LoginPage = () => {
   return (
     <div className="auth-page">
       <Helmet>
-        <title>تسجيل الدخول | BuildingZ</title>
-        <meta name="description" content="سجل دخولك إلى حسابك في BuildingZ للتسوق والوصول إلى طلباتك" />
+        <title>{t('loginPage.title')} | BuildingZ</title>
+        <meta name="description" content={t('loginPage.description')} />
         <meta name="robots" content="noindex, nofollow" />
         <link rel="canonical" href="https://buildingzuae.com/login" />
       </Helmet>
@@ -145,7 +147,7 @@ const LoginPage = () => {
       >
         
         <Link to="/" className="back-link">
-          العودة للرئيسية
+          {t('loginPage.backToHome')}
         </Link>
       </motion.nav>
 
@@ -169,8 +171,8 @@ const LoginPage = () => {
                 <div className="success-icon">
                   <i className="fas fa-check-circle"></i>
                 </div>
-                <h2>تم تسجيل الدخول بنجاح</h2>
-                <p>جاري تحويلك...</p>
+                <h2>{t('loginPage.successTitle')}</h2>
+                <p>{t('loginPage.redirecting')}</p>
               </motion.div>
             ) : (
               <motion.div
@@ -181,8 +183,8 @@ const LoginPage = () => {
               >
                 {/* Header */}
                 <div className="auth-header">
-                  <h1>تسجيل الدخول</h1>
-                  <p>أدخل بياناتك للوصول إلى حسابك</p>
+                  <h1>{t('loginPage.title')}</h1>
+                  <p>{t('loginPage.subtitle')}</p>
                 </div>
 
                 {/* API Error Message */}
@@ -221,7 +223,7 @@ const LoginPage = () => {
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      placeholder="البريد الإلكتروني"
+                      placeholder={t('loginPage.emailPlaceholder')}
                       className={errors.email ? 'error' : ''}
                       autoComplete="email"
                     />
@@ -246,7 +248,7 @@ const LoginPage = () => {
                         name="password"
                         value={formData.password}
                         onChange={handleChange}
-                        placeholder="كلمة المرور"
+                        placeholder={t('loginPage.passwordPlaceholder')}
                         className={errors.password ? 'error' : ''}
                         autoComplete="current-password"
                       />
@@ -254,7 +256,7 @@ const LoginPage = () => {
                         type="button"
                         className="password-toggle"
                         onClick={() => setShowPassword(!showPassword)}
-                        aria-label={showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
+                        aria-label={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}
                       >
                         <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
                       </button>
@@ -282,10 +284,10 @@ const LoginPage = () => {
                         onChange={handleChange}
                       />
                       <span className="checkmark"></span>
-                      تذكرني
+                      {t('loginPage.rememberMe')}
                     </label>
                     <Link to="/forgot-password" className="forgot-link">
-                      نسيت كلمة المرور؟
+                      {t('loginPage.forgotPassword')}
                     </Link>
                   </div>
 
@@ -297,12 +299,12 @@ const LoginPage = () => {
                     {isLoading ? (
                       <>
                         <i className="fas fa-spinner fa-spin"></i>
-                        جاري تسجيل الدخول...
+                        {t('loginPage.loggingIn')}
                       </>
-                    ) : 'تسجيل الدخول'}
+                    ) : t('loginPage.submit')}
                   </button>
 
-                  <p className="auth-divider">أو</p>
+                  <p className="auth-divider">{t('loginPage.or')}</p>
 
                   <button
                     type="button"
@@ -313,7 +315,7 @@ const LoginPage = () => {
                       try {
                         await authService.initiateGoogleLogin();
                       } catch (err) {
-                        setApiError(err.message || 'فشل تسجيل الدخول بـ Google');
+                        setApiError(err.message || t('auth.errors.googleFailed'));
                       } finally {
                         setIsLoading(false);
                       }
@@ -321,12 +323,12 @@ const LoginPage = () => {
                     disabled={isLoading}
                   >
                     <i className="fab fa-google"></i>
-                    تسجيل الدخول باستخدام Google
+                    {t('loginPage.loginWithGoogle')}
                   </button>
                 </form>
 
                 <div className="auth-footer">
-                  <p>ليس لديك حساب؟ <Link to="/signup">إنشاء حساب</Link></p>
+                  <p>{t('loginPage.noAccount')} <Link to="/signup">{t('loginPage.createAccount')}</Link></p>
                 </div>
               </motion.div>
             )}

@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import { motion, AnimatePresence } from 'framer-motion';
 import authService from '../../../services/authService';
 import './LoginPage.css';
 import './ForgotPassword.css';
 
 const ForgotPassword = () => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
@@ -29,9 +32,9 @@ const ForgotPassword = () => {
     const newErrors = {};
     
     if (!email) {
-      newErrors.email = 'البريد الإلكتروني مطلوب';
+      newErrors.email = t('auth.validation.emailRequired');
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'البريد الإلكتروني غير صالح';
+      newErrors.email = t('auth.validation.emailInvalid');
     }
     
     setErrors(newErrors);
@@ -53,7 +56,7 @@ const ForgotPassword = () => {
           setResetSent(true);
         } else {
           // This should not happen based on API docs, but handle just in case
-          setApiError(response.message || 'حدث خطأ أثناء إرسال طلب إعادة تعيين كلمة المرور. يرجى المحاولة مرة أخرى.');
+          setApiError(response.message || t('forgotPassword.errors.sendFailed'));
         }
       } catch (error) {
         // Handle validation errors
@@ -64,7 +67,7 @@ const ForgotPassword = () => {
               email: validationErrors.email[0]
             });
           } else {
-            setApiError(error.response.data.message || 'بيانات غير صالحة. يرجى التحقق من البريد الإلكتروني المدخل.');
+            setApiError(error.response.data.message || t('forgotPassword.errors.invalidData'));
           }
         } else {
           // For security reasons, don't expose if user doesn't exist
@@ -79,6 +82,12 @@ const ForgotPassword = () => {
 
   return (
     <div className="auth-page">
+      <Helmet>
+        <title>{t('forgotPassword.title')} | BuildingZ</title>
+        <meta name="description" content={t('forgotPassword.subtitle')} />
+        <meta name="robots" content="noindex, nofollow" />
+        <link rel="canonical" href="https://buildingzuae.com/forgot-password" />
+      </Helmet>
       {/* Simple Background */}
       <div className="auth-bg"></div>
 
@@ -93,7 +102,7 @@ const ForgotPassword = () => {
           <span className="logo-text">BuildingZ</span>
         </Link>
         <Link to="/login" className="back-link">
-          العودة لتسجيل الدخول
+          {t('forgotPassword.backToLogin')}
         </Link>
       </motion.nav>
 
@@ -117,11 +126,11 @@ const ForgotPassword = () => {
                 <div className="success-icon">
                   <i className="fas fa-check-circle"></i>
                 </div>
-                <h2>تم إرسال رابط إعادة التعيين</h2>
-                <p>لقد أرسلنا رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني. يرجى التحقق من صندوق الوارد الخاص بك واتباع التعليمات.</p>
-                <p className="reset-note">ملاحظة: الرابط صالح لمدة 60 دقيقة فقط.</p>
+                <h2>{t('forgotPassword.successTitle')}</h2>
+                <p>{t('forgotPassword.successMessage')}</p>
+                <p className="reset-note">{t('forgotPassword.note')}</p>
                 <Link to="/login" className="return-login-btn">
-                  العودة لتسجيل الدخول
+                  {t('forgotPassword.backToLogin')}
                 </Link>
               </motion.div>
             ) : (
@@ -133,8 +142,8 @@ const ForgotPassword = () => {
               >
                 {/* Header */}
                 <div className="auth-header">
-                  <h1>استعادة كلمة المرور</h1>
-                  <p>أدخل بريدك الإلكتروني وسنرسل لك رابط لإعادة تعيين كلمة المرور</p>
+                  <h1>{t('forgotPassword.title')}</h1>
+                  <p>{t('forgotPassword.subtitle')}</p>
                 </div>
 
                 {/* API Error Message */}
@@ -159,7 +168,7 @@ const ForgotPassword = () => {
                       name="email"
                       value={email}
                       onChange={handleChange}
-                      placeholder="البريد الإلكتروني"
+                      placeholder={t('forgotPassword.emailPlaceholder')}
                       className={errors.email ? 'error' : ''}
                       autoComplete="email"
                     />
@@ -187,18 +196,18 @@ const ForgotPassword = () => {
                     {isLoading ? (
                       <>
                         <i className="fas fa-spinner fa-spin"></i>
-                        جاري إرسال الطلب...
+                        {t('forgotPassword.sending')}
                       </>
                     ) : (
-                      'إرسال رابط إعادة التعيين'
+                      t('forgotPassword.submit')
                     )}
                   </motion.button>
                 </form>
 
                 {/* Footer */}
                 <div className="auth-footer">
-                  <span>تذكرت كلمة المرور؟</span>
-                  <Link to="/login" className="switch-link">تسجيل الدخول</Link>
+                  <span>{t('forgotPassword.remembered')}</span>
+                  <Link to="/login" className="switch-link">{t('forgotPassword.login')}</Link>
                 </div>
               </motion.div>
             )}
